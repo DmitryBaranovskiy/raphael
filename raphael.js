@@ -1,6 +1,6 @@
 function Raphael() {
     return (function (r, args) {
-        r.version = "0.5.2";
+        r.version = "0.5.3";
         var C = {};
         function Matrix(m11, m12, m21, m22, dx, dy) {
             this.m = [
@@ -237,6 +237,10 @@ function Raphael() {
                 return p;
             };
             var setFillAndStroke = function (o, params) {
+                o[0].attrs = o[0].attrs || {};
+                for (var par in params) {
+                    o[0].attrs[par] = params[par];
+                }
                 params["font-family"] && (o[0].style.fontFamily = params["font-family"]);
                 params["font-size"] && (o[0].style.fontSize = params["font-size"]);
                 params["font"] && (o[0].style.font = params["font"]);
@@ -250,6 +254,9 @@ function Raphael() {
                     params.fill && (fill.on = true);
                     if (fill.on) {
                         fill.color = params.fill;
+                    }
+                    if (params.fill == "none") {
+                        fill.on = false;
                     }
                     o.appendChild(fill);
                     var stroke = (o.getElementsByTagName("stroke") && o.getElementsByTagName("stroke")[0]) || document.createElement("rvml:stroke");
@@ -278,6 +285,8 @@ function Raphael() {
                 }
             };
             var addGrdientFill = function (o, gradient) {
+                o[0].attrs = o[0].attrs || {};
+                o[0].attrs.gradient = gradient;
                 o = o.shape || o[0];
                 var fill = o.getElementsByTagName("fill");
                 if (fill.length) {
@@ -321,55 +330,72 @@ function Raphael() {
                     }
                 }
             };
+            var setTheBox = function (vml, o, x, y, w, h) {
+                o.origin = o.origin || {x: x, y: y, w: w, h: h};
+                var left = vml.width / 2 - o.origin.w / 2,
+                    top = vml.height / 2 - o.origin.h / 2,
+                    gs = o.Group.style,
+                    os = o[0].style;
+                gs.position = "absolute";
+                gs.left = o.origin.x - left + "px";
+                gs.top = o.origin.y - top + "px";
+                o.X = o.origin.x - left;
+                o.Y = o.origin.y - top;
+                o.W = w;
+                o.H = h;
+                gs.width = vml.width + "px";
+                gs.height = vml.height + "px";
+                os.position = "absolute";
+                os.top = top + "px";
+                os.left = left + "px";
+                os.width = w + "px";
+                os.height = h + "px";
+            };
             var Element = function (node, group, vml) {
-                var X = 0,
-                    Y = 0,
-                    Rotation = 0,
+                var Rotation = 0,
                     RotX = 0,
                     RotY = 0,
                     Scale = 1;
                 this[0] = node;
+                this.X = 0;
+                this.Y = 0;
                 arguments.callee.name = "Element";
+                this[0].attrs = {};
                 this.Group = group;
-                this.rotate = function (deg, x, y) {
+                this.rotate = function (deg) {
                     Rotation += deg;
-                    var alpha = Rotation * Math.PI / 180,
-                        c = Math.cos(alpha),
-                        s = Math.sin(alpha);
-                    this.Group.style.left = 0;
-                    this.Group.style.top = 0;
-                    this.Group.style.rotation = 0;
-                    var cx = vml.width / 2,
-                        cy = vml.height / 2,
-                        bbox = this.getBBox(),
-                        dx = cx - (bbox.x + bbox.width / 2),
-                        dy = cy - (bbox.y + bbox.height / 2),
-                        phi = Math.atan(dy / dx),
-                        g = Math.sqrt(dx * dx + dy * dy);
-                        RotX = -Math.round(dx - g * Math.cos(alpha + phi));
-                        RotY = -Math.round(dy - g * Math.sin(alpha + phi));
-                    this.Group.style.left = X + RotX;
-                    this.Group.style.top = Y + RotY;
                     this.Group.style.rotation = Rotation;
                     return this;
                 };
                 this.translate = function (x, y) {
-                    X += x;
-                    Y += y;
-                    this.Group.style.left = X + RotX;
-                    this.Group.style.top = Y + RotY;
+                    this.X += x;
+                    this.Y += y;
+                    this.Group.style.left = this.X + "px";
+                    this.Group.style.top = this.Y + "px";
                     return this;
                 };
+                // depricated
                 this.matrix = function (xx, xy, yx, yy, dx, dy) {
                     tMatrix = new Matrix(xx, xy, yx, yy, dx, dy);
-                    this[0].style.filter = tMatrix;
+                    this.Group.style.filter = tMatrix;
                     return this;
                 };
-                this.scale = function (times) {
-                    Scale *= times;
-                    if (Scale != 1) {
-                        this[0].style.width = parseInt(this[0].style.width, 10) * Scale;
-                        this[0].style.height = parseInt(this[0].style.height, 10) * Scale;
+                this.scale = function (x, y) {
+                    y = y || x;
+                    if (x != 0 && !(x == 1 && y == 1)) {
+                        var dirx = Math.round(x / Math.abs(x)),
+                            diry = Math.round(y / Math.abs(y));
+                        if (dirx != 1 || diry != 1) {
+                            this[0].style.filter = new Matrix(dirx, 0, 0, diry, 0, 0);
+                        }
+                        var width = parseInt(this[0].style.width, 10) * x * dirx;
+                        var height = parseInt(this[0].style.height, 10) * y * diry;
+                        var left = parseInt(this[0].style.left, 10);
+                        var top = parseInt(this[0].style.top, 10);
+                        this[0].style.left = this.X = left + this.W / 2 - width / 2;
+                        this[0].style.top = this.Y = top + this.H / 2 - height / 2;
+                        this[0].style.width = this.W = width;
+                        this[0].style.height = this.H = height;
                     }
                     return this;
                 };
@@ -387,8 +413,26 @@ function Raphael() {
                     this.shape && this.shape.parentNode.removeChild(this.shape);
                 };
                 this.attr = function () {
+                    if (arguments.length == 1 && typeof arguments[0] == "string") {
+                        return this[0].attrs[arguments[0]];
+                    }
+                    if (this[0].attrs && arguments.length == 1 && arguments[0] instanceof Array) {
+                        var values = {};
+                        for (var i = 0, ii = arguments[0].length; i < ii; i++) {
+                            values[arguments[0][i]] = this[0].attrs[arguments[0][i]];
+                        };
+                        return values;
+                    }
                     if (this[0].tagName.toLowerCase() == "group") {
                         var children = this[0].childNodes;
+                        this[0].attrs = this[0].attrs || {};
+                        if (arguments.length == 2) {
+                            this[0].attrs[arguments[0]] = arguments[1];
+                        } else if (arguments.length = 1 || typeof arguments[0] == "object") {
+                            for (var j in arguments[0]) {
+                                this[0].attrs[j] = arguments[0][j];
+                            }
+                        }
                         for (var i = 0, ii = children.length; i < ii; i++) {
                             this.attr.apply(new item(children[i], this[0], vml), arguments);
                         };
@@ -474,40 +518,29 @@ function Raphael() {
                 this.toFront = function () {
                     this.Group.parentNode.appendChild(this.Group);
                 };
+                this.toBack = function () {
+                    if (this.Group.parentNode.firstChild != this.Group) {
+                        this.Group.parentNode.insertBefore(this.Group, this.Group.parentNode.firstChild);
+                    }
+                };
             };
             var theCircle = function (vml, x, y, r) {
-                var g = document.createElement("rvml:group"), gl = g.style;
-                gl.position = "absolute";
-                gl.left = 0;
-                gl.top = 0;
-                gl.width = vml.width;
-                gl.height = vml.height;
-                var o = document.createElement("rvml:oval"), ol = o.style;
-                ol.width = ol.height = r * 2 + "px";
-                ol.top = vml._getY(y) - r + "px";
-                ol.left = vml._getX(x) - r + "px";
+                var g = document.createElement("rvml:group");
+                var o = document.createElement("rvml:oval");
                 g.appendChild(o);
                 vml.canvas.appendChild(g);
                 var res = new Element(o, g, vml);
                 setFillAndStroke(res, {stroke: "#000"});
-                res.cx = x;
-                res.cy = y;
-                res.r = r;
+                setTheBox(vml, res, x - r, y - r, r * 2, r * 2);
+                o.attrs.cx = x;
+                o.attrs.cy = y;
+                o.attrs.r = r;
                 res.type = "circle";
                 return res;
             };
             var theRect = function (vml, x, y, w, h, r) {
-                var g = document.createElement("rvml:group"), gl = g.style;
-                gl.position = "absolute";
-                gl.left = 0;
-                gl.top = 0;
-                gl.width = vml.width;
-                gl.height = vml.height;
-                var o = document.createElement(r ? "rvml:roundrect" : "rvml:rect"), ol = o.style;
-                ol.height = vml._getH(h) + "px";
-                ol.width = vml._getW(w) + "px";
-                ol.top = vml._getY(y) + "px";
-                ol.left = vml._getX(x) + "px";
+                var g = document.createElement("rvml:group");
+                var o = document.createElement(r ? "rvml:roundrect" : "rvml:rect");
                 if (r) {
                     o.arcsize = r / (Math.min(w, h));
                 }
@@ -515,60 +548,43 @@ function Raphael() {
                 vml.canvas.appendChild(g);
                 var res = new Element(o, g, vml);
                 setFillAndStroke(res, {stroke: "#000"});
-                res.cx = x;
-                res.cy = y;
-                res.r = r;
+                setTheBox(vml, res, x, y, w, h);
+                o.attrs.x = x;
+                o.attrs.y = y;
+                o.attrs.w = w;
+                o.attrs.h = h;
+                o.attrs.r = r;
                 res.type = "rect";
                 return res;
             };
             var theEllipse = function (vml, x, y, rx, ry) {
-                var g = document.createElement("rvml:group"), gl = g.style;
-                gl.position = "absolute";
-                gl.left = 0;
-                gl.top = 0;
-                gl.width = vml.width;
-                gl.height = vml.height;
-                var o = document.createElement("rvml:oval"), ol = o.style;
-                ol.width = rx * 2 + "px";
-                ol.height = ry * 2 + "px";
-                ol.top = y - ry + "px";
-                ol.left = x - rx + "px";
+                var g = document.createElement("rvml:group");
+                var o = document.createElement("rvml:oval");
                 g.appendChild(o);
                 vml.canvas.appendChild(g);
                 var res = new Element(o, g, vml);
                 setFillAndStroke(res, {stroke: "#000"});
-                res.cx = x;
-                res.cy = y;
-                res.rx = rx;
-                res.ry = ry;
+                setTheBox(vml, res, x - rx, y - ry, rx * 2, ry * 2);
+                o.attrs.cx = x;
+                o.attrs.cy = y;
+                o.attrs.rx = rx;
+                o.attrs.ry = ry;
                 res.type = "ellipse";
                 return res;
             };
             var theImage = function (vml, src, x, y, w, h) {
                 var g = document.createElement("rvml:group");
-                g.style.position = "absolute";
-                g.style.left = 0;
-                g.style.top = 0;
-                g.style.width = vml.width;
-                g.style.height = vml.height;
-                g.coordsize = vml.coordsize;
-                g.coordorigin = vml.coordorigin;
                 var o = document.createElement("rvml:image");
                 o.src = src;
-                o.style.position = "absolute";
-                o.style.width = w + "px";
-                o.style.height = h + "px";
-                o.style.top = y + "px";
-                o.style.left = x + "px";
-                o.coordsize = vml.coordsize;
-                o.coordorigin = vml.coordorigin;
                 g.appendChild(o);
                 vml.canvas.appendChild(g);
                 var res = new Element(o, g, vml);
+                setTheBox(vml, res, x, y, w, h);
                 res.type = "image";
                 return res;
             };
             var theText = function (vml, x, y, text) {
+                // @TODO: setTheBox
                 var g = document.createElement("rvml:group"), gs = g.style;
                 var el = document.createElement("rvml:shape"), ol = el.style;
                 var path = document.createElement("rvml:path"), ps = path.style;
@@ -597,28 +613,6 @@ function Raphael() {
                 vml.canvas.appendChild(g);
                 var res = new Element(o, g, vml);
                 res.shape = el;
-                res.type = "text";
-                return res;
-            };
-            var theText2 = function (vml, x, y, text) {
-                var g = document.createElement("rvml:group");
-                g.style.position = "absolute";
-                g.style.left = 0;
-                g.style.top = 0;
-                g.style.width = vml.width;
-                g.style.height = vml.height;
-                g.coordsize = vml.coordsize;
-                g.coordorigin = vml.coordorigin;
-                var o = document.createElement("rvml:textbox");
-                o.style.position = "absolute";
-                o.style.top = y  + "px";
-                o.style.left = x + "px";
-                o.innerHTML = "<div>" + text + "</div>";
-                o.coordsize = vml.coordsize;
-                o.coordorigin = vml.coordorigin;
-                g.appendChild(o);
-                vml.canvas.appendChild(g);
-                var res = new Element(o, g, vml);
                 res.type = "text";
                 return res;
             };
@@ -922,8 +916,6 @@ function Raphael() {
                 if (typeof pathString == "string") {
                     pathString = pathString.replace(/([mzlhvcsqta])/ig, ",$1,").replace(/([^,])\-/ig, "$1,-");
                     path = pathString.split(",");
-                    console.log(params.fill);
-                    console.log(path);
                     var i = 1, ii = path.length;
                     while (i < ii) {
                         switch (path[i]) {
@@ -1000,46 +992,33 @@ function Raphael() {
                     Scale = 1,
                     tMatrix = null;
                 this[0] = node;
+                this[0].attrs = this[0].attrs || {};
+                this.transformations = [];
                 this.rotate = function (deg) {
-                    var tr =    ((X || Y) ? "translate(" + X + "," + Y + ")" : "") +
-                                ((Scale - 1) ? " scale(" + Scale + ")" : "") +
-                                (tMatrix ? " " + tMatrix : "");
                     var bbox = this.getBBox();
-                    Rotation.x = (bbox.x + bbox.width / 2);
-                    Rotation.y = (bbox.y + bbox.height / 2);
-                    Rotation.deg += deg;
-                    this[0].setAttribute("transform", tr + " rotate(" + Rotation.deg + " " + Rotation.x + " " + Rotation.y + ")");
+                    this.transformations.push("rotate(" + deg + " " + (bbox.x + bbox.width / 2) + " " + (bbox.y + bbox.height / 2) + ")");
+                    this[0].setAttribute("transform", this.transformations.join(" "));
                     return this;
                 };
                 this.translate = function (x, y) {
-                    X += x;
-                    Y += y;
-                    var tr =    ((Scale - 1) ? " scale(" + Scale + ")" : "") +
-                                (tMatrix ? " " + tMatrix : "") +
-                                (Rotation.deg ? " rotate(" + Rotation.deg + " " + (X + Rotation.x) + " " + (Y + Rotation.y) + ")" : "");
-                    this[0].setAttribute("transform", tr + " translate(" + X + "," + Y + ")");
-                    Rotation.x += X;
-                    Rotation.y += Y;
+                    this.transformations.push("translate(" + x + "," + y + ")");
+                    this[0].setAttribute("transform", this.transformations.join(" "));
                     return this;
                 };
-                this.scale = function (times) {
-                    var tr =    ((X || Y) ? "translate(" + X + "," + Y + ")" : "") +
-                                (tMatrix ? " " + tMatrix : "");
-                    Scale *= times;
-                    this[0].setAttribute("transform", tr + " scale(" + Scale + ")");
-                    Rotation.x = (this.getBBox().x + this.getBBox().width / 2);
-                    Rotation.y = (this.getBBox().y + this.getBBox().height / 2);
-                    var tr =    ((X || Y) ? "translate(" + X + "," + Y + ")" : "") + " scale(" + Scale + ")" +
-                                (tMatrix ? " " + tMatrix : "") +
-                                (Rotation.deg ? " rotate(" + Rotation.deg + " " + Rotation.x + " " + Rotation.y + ")" : "");
+                this.scale = function (x, y) {
+                    y = y || x;
+                    if (x != 0 && !(x == 1 && y == 1)) {
+                        var bbox = this.getBBox(),
+                            dx = bbox.x * (1 - x) + (bbox.width / 2 - bbox.width * x / 2),
+                            dy = bbox.y * (1 - y) + (bbox.height / 2 - bbox.height * y / 2);
+                        this.transformations.push(new Matrix(x, 0, 0, y, dx, dy));
+                        this[0].setAttribute("transform", this.transformations.join(" "));
+                    }
                     return this;
                 };
                 this.matrix = function (xx, xy, yx, yy, dx, dy) {
-                    var tr =    ((X || Y) ? "translate(" + X + "," + Y + ")" : "") +
-                                ((Scale - 1) ? " scale(" + Scale + ")" : "") +
-                                (Rotation.deg ? " rotate(" + Rotation.deg + " " + Rotation.x + " " + Rotation.y + ")" : "");
-                    tMatrix = new Matrix(xx, xy, yx, yy, dx, dy);
-                    this[0].setAttribute("transform", tr + " " + tMatrix);
+                    this.transformations.push(new Matrix(xx, xy, yx, yy, dx, dy));
+                    this[0].setAttribute("transform", this.transformations.join(" "));
                     return this;
                 };
                 this.remove = function () {
@@ -1049,10 +1028,21 @@ function Raphael() {
                     return this[0].getBBox();
                 };
                 this.attr = function () {
+                    if (arguments.length == 1 && typeof arguments[0] == "string") {
+                        return this[0].attrs[arguments[0]];
+                    }
+                    if (arguments.length == 1 && arguments[0] instanceof Array) {
+                        var values = {};
+                        for (var j in arguments[0]) {
+                            values[arguments[0][j]] = this[0].attrs[arguments[0][j]];
+                        }
+                        return values;
+                    }
                     if (arguments.length == 2) {
                         var att = arguments[0],
                             value = arguments[1];
                         this[att] = value;
+                        this[0].attrs[att] = value;
                         switch (att) {
                             case "rx":
                             case "cx":
@@ -1065,11 +1055,9 @@ function Raphael() {
                                 this[0].setAttribute(att, svg._getY(value));
                                 break;
                             case "width":
-                            case "rx":
                                 this[0].setAttribute(att, svg._getW(value));
                                 break;
                             case "height":
-                            case "ry":
                                 this[0].setAttribute(att, svg._getH(value));
                                 break;
                             case "gradient":
@@ -1090,6 +1078,7 @@ function Raphael() {
                         var params = arguments[0];
                         if (params) {
                             for (var attr in params) {
+                                this[0].attrs[attr] = params[attr];
                                 if (attr == "stroke-dasharray") {
                                     this[0].setAttribute(attr, params[attr].replace(" ", ","));
                                 } else {
@@ -1103,6 +1092,7 @@ function Raphael() {
                             }
                         }
                         if (params.gradient) {
+                            this[0].attrs.gradient = params.gradient;
                             addGrdientFill(this[0], params.gradient, svg);
                         }
                     }
@@ -1119,6 +1109,11 @@ function Raphael() {
                 el.setAttribute("r", r);
                 el.setAttribute("fill", "none");
                 el.setAttribute("stroke", "#000");
+                el.attrs = el.attrs || {};
+                el.attrs.cx = x;
+                el.attrs.cy = y;
+                el.attrs.r = r;
+                el.attrs.stroke = "#000";
                 if (svg.canvas) {
                     svg.canvas.appendChild(el);
                 }
@@ -1132,12 +1127,19 @@ function Raphael() {
                 el.setAttribute("y", svg._getY(y));
                 el.setAttribute("width", svg._getW(w));
                 el.setAttribute("height", svg._getH(h));
+                el.attrs = el.attrs || {};
+                el.attrs.x = x;
+                el.attrs.y = y;
+                el.attrs.width = w;
+                el.attrs.height = h;
                 if (r) {
                     el.setAttribute("rx", r);
                     el.setAttribute("ry", r);
+                    el.attrs.rx = el.attrs.ry = r;
                 }
                 el.setAttribute("fill", "none");
                 el.setAttribute("stroke", "#000");
+                el.attrs.stroke = "#000";
                 if (svg.canvas) {
                     svg.canvas.appendChild(el);
                 }
@@ -1153,6 +1155,12 @@ function Raphael() {
                 el.setAttribute("ry", svg._getH(ry));
                 el.setAttribute("fill", "none");
                 el.setAttribute("stroke", "#000");
+                el.attrs = el.attrs || {};
+                el.attrs.cx = x;
+                el.attrs.cy = y;
+                el.attrs.rx = rx;
+                el.attrs.ry = ry;
+                el.attrs.stroke = "#000";
                 if (svg.canvas) {
                     svg.canvas.appendChild(el);
                 }
@@ -1179,7 +1187,14 @@ function Raphael() {
                 el.setAttribute("x", x);
                 el.setAttribute("y", y);
                 el.setAttribute("text-anchor", "middle");
-                el.appendChild(document.createTextNode(text));
+                el.setAttribute("fill", "#000");
+                el.attrs = el.attrs || {};
+                el.attrs.x = x;
+                el.attrs.y = y;
+                el.attrs.fill = "#000";
+                if (text) {
+                    el.appendChild(document.createTextNode(text));
+                }
                 if (svg.canvas) {
                     svg.canvas.appendChild(el);
                 }
