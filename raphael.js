@@ -1,6 +1,6 @@
 function Raphael() {
     return (function (r, args) {
-        r.version = "0.5.3";
+        r.version = "0.5.4b";
         var C = {};
         function Matrix(m11, m12, m21, m22, dx, dy) {
             this.m = [
@@ -362,6 +362,12 @@ function Raphael() {
                 arguments.callee.name = "Element";
                 this[0].attrs = {};
                 this.Group = group;
+                this.hide = function () {
+                    this[0].style.display = "none";
+                };
+                this.show = function () {
+                    this[0].style.display = "block";
+                };
                 this.rotate = function (deg) {
                     Rotation += deg;
                     this.Group.style.rotation = Rotation;
@@ -435,7 +441,7 @@ function Raphael() {
                         }
                         for (var i = 0, ii = children.length; i < ii; i++) {
                             this.attr.apply(new item(children[i], this[0], vml), arguments);
-                        };
+                        }
                     } else {
                         if (arguments.length == 2) {
                             var att = arguments[0],
@@ -498,6 +504,11 @@ function Raphael() {
                                 case "id":
                                     this[0].id = value;
                                     break;
+                                case "text":
+                                    if (this.type == "text") {
+                                        this[0].string = value;
+                                    }
+                                    break;
                                 case "gradient":
                                     addGrdientFill(this, value);
                             }
@@ -507,6 +518,9 @@ function Raphael() {
                             setFillAndStroke(this, params);
                             if (params.gradient) {
                                 addGrdientFill(this, params.gradient);
+                            }
+                            if (params.text && this.type == "text") {
+                                this[0].string = params.text;
                             }
                             if (params.id) {
                                 this[0].id = params.id;
@@ -588,20 +602,15 @@ function Raphael() {
                 var g = document.createElement("rvml:group"), gs = g.style;
                 var el = document.createElement("rvml:shape"), ol = el.style;
                 var path = document.createElement("rvml:path"), ps = path.style;
-                path.v = ["m", x, ", ", y, "l", x + 1, ", ", y].join("");
+                path.v = ["m", Math.round(x), ", ", Math.round(y), "l", Math.round(x) + 1, ", ", Math.round(y)].join("");
                 path.textpathok = true;
-                ps.position = "absolute";
-                ps.top = 0;
-                ps.left = 0;
-                ol.width = vml.width + "px";
-                ol.height = vml.height + "px";
+                ol.width = vml.width;
+                ol.height = vml.height;
                 gs.position = "absolute";
                 gs.left = 0;
                 gs.top = 0;
                 gs.width = vml.width;
                 gs.height = vml.height;
-                g.coordsize = vml.coordsize;
-                g.coordorigin = vml.coordorigin;
                 var o = document.createElement("rvml:textpath");
                 o.string = text;
                 o.on = true;
@@ -609,9 +618,9 @@ function Raphael() {
                 o.coordorigin = vml.coordorigin;
                 el.appendChild(o);
                 el.appendChild(path);
-                g.appendChild(el);
-                vml.canvas.appendChild(g);
-                var res = new Element(o, g, vml);
+                // g.appendChild(el);
+                vml.canvas.appendChild(el);
+                var res = new Element(o, el, vml);
                 res.shape = el;
                 res.type = "text";
                 return res;
@@ -749,6 +758,9 @@ function Raphael() {
                     SVG.canvas.appendChild(el);
                 }
                 var p = new Element(el, SVG);
+                for (var attr in params) {
+                    p.attrs[attr] = params[attr];
+                }
                 p.isAbsolute = true;
                 p.path = [];
                 p.last = {x: 0, y: 0, bx: 0, by: 0};
@@ -992,8 +1004,14 @@ function Raphael() {
                     Scale = 1,
                     tMatrix = null;
                 this[0] = node;
-                this[0].attrs = this[0].attrs || {};
+                this.attrs = this.attrs || {};
                 this.transformations = [];
+                this.hide = function () {
+                    this[0].style.display = "none";
+                };
+                this.show = function () {
+                    this[0].style.display = "block";
+                };
                 this.rotate = function (deg) {
                     var bbox = this.getBBox();
                     this.transformations.push("rotate(" + deg + " " + (bbox.x + bbox.width / 2) + " " + (bbox.y + bbox.height / 2) + ")");
@@ -1029,12 +1047,12 @@ function Raphael() {
                 };
                 this.attr = function () {
                     if (arguments.length == 1 && typeof arguments[0] == "string") {
-                        return this[0].attrs[arguments[0]];
+                        return this.attrs[arguments[0]];
                     }
                     if (arguments.length == 1 && arguments[0] instanceof Array) {
                         var values = {};
                         for (var j in arguments[0]) {
-                            values[arguments[0][j]] = this[0].attrs[arguments[0][j]];
+                            values[arguments[0][j]] = this.attrs[arguments[0][j]];
                         }
                         return values;
                     }
@@ -1042,7 +1060,7 @@ function Raphael() {
                         var att = arguments[0],
                             value = arguments[1];
                         this[att] = value;
-                        this[0].attrs[att] = value;
+                        this.attrs[att] = value;
                         switch (att) {
                             case "rx":
                             case "cx":
@@ -1066,6 +1084,12 @@ function Raphael() {
                             case "stroke-dasharray":
                                 this[0].setAttribute(att, value.replace(" ", ","));
                                 break;
+                            case "text":
+                                if (this.type == "text") {
+                                    this[0].removeChild(this[0].firstChild);
+                                    this[0].appendChild(document.createTextNode(value));
+                                }
+                                break;
                             default :
                                 var cssrule = att.replace(/(\-.)/g, function (w) {
                                     return w.substring(1).toUpperCase();
@@ -1076,19 +1100,20 @@ function Raphael() {
                         }
                     } else if (arguments.length = 1 && typeof arguments[0] == "object") {
                         var params = arguments[0];
-                        if (params) {
-                            for (var attr in params) {
-                                this[0].attrs[attr] = params[attr];
-                                if (attr == "stroke-dasharray") {
-                                    this[0].setAttribute(attr, params[attr].replace(" ", ","));
-                                } else {
-                                    var cssrule = attr.replace(/(\-.)/g, function (w) {
-                                        return w.substring(1).toUpperCase();
-                                    });
-                                    this[0].style[cssrule] = params[attr];
-                                    // Need following line for Firefox
-                                    this[0].setAttribute(attr, params[attr]);
-                                }
+                        for (var attr in params) {
+                            this.attrs[attr] = params[attr];
+                            if (attr == "stroke-dasharray") {
+                                this[0].setAttribute(attr, params[attr].replace(" ", ","));
+                            } else if (attr == "text" && this.type == "text") {
+                                this[0].removeChild(this[0].firstChild);
+                                this[0].appendChild(document.createTextNode(params[attr]));
+                            } else {
+                                var cssrule = attr.replace(/(\-.)/g, function (w) {
+                                    return w.substring(1).toUpperCase();
+                                });
+                                this[0].style[cssrule] = params[attr];
+                                // Need following line for Firefox
+                                this[0].setAttribute(attr, params[attr]);
                             }
                         }
                         if (params.gradient) {
@@ -1100,6 +1125,11 @@ function Raphael() {
                 };
                 this.toFront = function () {
                     this[0].parentNode.appendChild(this[0]);
+                };
+                this.toBack = function () {
+                    if (this[0].parentNode.firstChild != this[0]) {
+                        this[0].parentNode.insertBefore(this[0], this[0].parentNode.firstChild);
+                    }
                 };
             };
             var theCircle = function (svg, x, y, r) {
