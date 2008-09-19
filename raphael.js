@@ -1,6 +1,6 @@
 function Raphael() {
     return (function (r, args) {
-        r.version = "0.5.4b";
+        r.version = "0.5.4";
         var C = {};
         function Matrix(m11, m12, m21, m22, dx, dy) {
             this.m = [
@@ -363,10 +363,12 @@ function Raphael() {
                 this[0].attrs = {};
                 this.Group = group;
                 this.hide = function () {
-                    this[0].style.display = "none";
+                    this.Group.style.display = "none";
+                    return this;
                 };
                 this.show = function () {
-                    this[0].style.display = "block";
+                    this.Group.style.display = "block";
+                    return this;
                 };
                 this.rotate = function (deg) {
                     Rotation += deg;
@@ -618,9 +620,9 @@ function Raphael() {
                 o.coordorigin = vml.coordorigin;
                 el.appendChild(o);
                 el.appendChild(path);
-                // g.appendChild(el);
-                vml.canvas.appendChild(el);
-                var res = new Element(o, el, vml);
+                g.appendChild(el);
+                vml.canvas.appendChild(g);
+                var res = new Element(o, g, vml);
                 res.shape = el;
                 res.type = "text";
                 return res;
@@ -1008,9 +1010,11 @@ function Raphael() {
                 this.transformations = [];
                 this.hide = function () {
                     this[0].style.display = "none";
+                    return this;
                 };
                 this.show = function () {
                     this[0].style.display = "block";
+                    return this;
                 };
                 this.rotate = function (deg) {
                     var bbox = this.getBBox();
@@ -1376,7 +1380,7 @@ function Raphael() {
                 this._getX = this._getY = this._getW = this._getH = function (x) { return x; };
             };
             C.safari = function () {
-                if (this.type == "SVG") {
+                if (r.type == "SVG") {
                     var rect = C.rect(0, 0, C.width, C.height).attr("stroke-width", 0);
                     setTimeout(function () {rect.remove();}, 0);
                 }
