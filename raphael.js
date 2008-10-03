@@ -275,7 +275,6 @@ var Raphael = (function (type) {
                     if (params.stroke == "none" || typeof stroke.on == "undefined") {
                         stroke.on = false;
                     }
-                    // alert(stroke.on);
                     if (stroke.on && params.stroke) {
                         stroke.color = params.stroke;
                     }
@@ -283,11 +282,11 @@ var Raphael = (function (type) {
                     stroke.joinstyle = params["stroke-linejoin"] || "miter";
                     stroke.miterlimit = params["stroke-miterlimit"] || 8;
                     stroke.endcap = {butt: "flat", square: "square", round: "round"}[params["stroke-linecap"] || "miter"];
-                    stroke.weight = (parseFloat(params["stroke-width"], 10) || 1) + "px";
+                    stroke.weight = (parseFloat(params["stroke-width"], 10) || 1);
                     if (params["stroke-dasharray"]) {
                         var dashes = params["stroke-dasharray"].replace(" ", ",").split(","),
                             dashesn = [],
-                            str = parseFloat(stroke.weight, 10);
+                            str = stroke.weight;
                         for (var i = 0, ii = dashes.length; i < ii; i++) {
                             var res = dashes[i] / str;
                             if (!isNaN(res)) {
@@ -385,7 +384,6 @@ var Raphael = (function (type) {
                         case "text":
                             this.textpath.v = ["m", Math.round(attr.x), ", ", Math.round(attr.y - 2), "l", Math.round(attr.x) + 1, ", ", Math.round(attr.y - 2)].join("");
                             return;
-                            break;
                         default:
                             return;
                     }
@@ -579,12 +577,12 @@ var Raphael = (function (type) {
                 g.appendChild(o);
                 vml.canvas.appendChild(g);
                 var res = new Element(o, g, vml);
+                res.type = "image";
                 res.setBox({x: x, y: y, w: w, h: h});
                 o.attrs.x = x;
                 o.attrs.y = y;
                 o.attrs.w = w;
                 o.attrs.h = h;
-                res.type = "image";
                 return res;
             };
             var theText = function (vml, x, y, text) {
