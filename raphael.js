@@ -478,7 +478,7 @@ var Raphael = (function (type) {
                         this[0].attrs = this[0].attrs || {};
                         if (arguments.length == 2) {
                             this[0].attrs[arguments[0]] = arguments[1];
-                        } else if (arguments.length = 1 || typeof arguments[0] == "object") {
+                        } else if (arguments.length == 1 || typeof arguments[0] == "object") {
                             for (var j in arguments[0]) {
                                 this[0].attrs[j] = arguments[0][j];
                             }
@@ -646,22 +646,23 @@ var Raphael = (function (type) {
             r._create = function () {
                 // container, width, height
                 // x, y, width, height
+                var container, width, height;
                 if (typeof arguments[0] == "string") {
-                    var container = document.getElementById(arguments[0]);
-                    var width = arguments[1];
-                    var height = arguments[2];
+                    container = document.getElementById(arguments[0]);
+                    width = arguments[1];
+                    height = arguments[2];
                 }
                 if (typeof arguments[0] == "object") {
-                    var container = arguments[0];
-                    var width = arguments[1];
-                    var height = arguments[2];
+                    container = arguments[0];
+                    width = arguments[1];
+                    height = arguments[2];
                 }
                 if (typeof arguments[0] == "number") {
-                    var container = 1,
-                        x = arguments[0],
-                        y = arguments[1],
-                        width = arguments[2],
-                        height = arguments[3];
+                    container = 1;
+                    x = arguments[0];
+                    y = arguments[1];
+                    width = arguments[2];
+                    height = arguments[3];
                 }
                 if (!container) {
                     throw new Error("VML container not found.");
@@ -996,11 +997,12 @@ var Raphael = (function (type) {
                 var X = 0,
                     Y = 0,
                     Rotation = {deg: 0, x: 0, y: 0},
-                    Scale = 1,
+                    ScaleX = 1,
+                    ScaleY = 1,
                     tMatrix = null;
                 this[0] = node;
                 this.attrs = this.attrs || {};
-                this.transformations = [];
+                this.transformations = []; // rotate, translate, scale, matrix
                 this.hide = function () {
                     this[0].style.display = "none";
                     return this;
@@ -1011,28 +1013,46 @@ var Raphael = (function (type) {
                 };
                 this.rotate = function (deg) {
                     var bbox = this.getBBox();
-                    this.transformations.push("rotate(" + deg + " " + (bbox.x + bbox.width / 2) + " " + (bbox.y + bbox.height / 2) + ")");
+                    Rotation.deg += deg;
+                    if (Rotation.deg) {
+                        this.transformations[0] = ("rotate(" + Rotation.deg + " " + (bbox.x + bbox.width / 2) + " " + (bbox.y + bbox.height / 2) + ")");
+                    } else {
+                        this.transformations[0] = "";
+                    }
                     this[0].setAttribute("transform", this.transformations.join(" "));
                     return this;
                 };
                 this.translate = function (x, y) {
-                    this.transformations.push("translate(" + x + "," + y + ")");
+                    X += x;
+                    Y += y;
+                    if (X && Y) {
+                        this.transformations[1] = "translate(" + X + "," + Y + ")";
+                    } else {
+                        this.transformations[1] = "";
+                    }
                     this[0].setAttribute("transform", this.transformations.join(" "));
                     return this;
                 };
                 this.scale = function (x, y) {
                     y = y || x;
                     if (x != 0 && !(x == 1 && y == 1)) {
-                        var bbox = this.getBBox(),
-                            dx = bbox.x * (1 - x) + (bbox.width / 2 - bbox.width * x / 2),
-                            dy = bbox.y * (1 - y) + (bbox.height / 2 - bbox.height * y / 2);
-                        this.transformations.push(new Matrix(x, 0, 0, y, dx, dy));
+                        ScaleX *= x;
+                        ScaleY *= y;
+                        if (!(ScaleX == 1 && ScaleY == 1)) {
+                            var bbox = this.getBBox(),
+                                dx = bbox.x * (1 - ScaleX) + (bbox.width / 2 - bbox.width * ScaleX / 2),
+                                dy = bbox.y * (1 - ScaleY) + (bbox.height / 2 - bbox.height * ScaleY / 2);
+                            this.transformations[2] = new Matrix(ScaleX, 0, 0, ScaleY, dx, dy);
+                        } else {
+                            this.transformations[2] = "";
+                        }
                         this[0].setAttribute("transform", this.transformations.join(" "));
                     }
                     return this;
                 };
+                // depricated
                 this.matrix = function (xx, xy, yx, yy, dx, dy) {
-                    this.transformations.push(new Matrix(xx, xy, yx, yy, dx, dy));
+                    this.transformations[3] = new Matrix(xx, xy, yx, yy, dx, dy);
                     this[0].setAttribute("transform", this.transformations.join(" "));
                     return this;
                 };
@@ -1094,8 +1114,9 @@ var Raphael = (function (type) {
                                 this[0].style[cssrule] = value;
                                 // Need following line for Firefox
                                 this[0].setAttribute(att, value);
+                                break;
                         }
-                    } else if (arguments.length = 1 && typeof arguments[0] == "object") {
+                    } else if (arguments.length == 1 && typeof arguments[0] == "object") {
                         var params = arguments[0];
                         for (var attr in params) {
                             this.attrs[attr] = params[attr];
@@ -1341,17 +1362,15 @@ var Raphael = (function (type) {
             };
             C.drawGrid = function (x, y, w, h, wv, hv, color) {
                 color = color || "#000";
-                var res = this.group();
-                var params = {stroke: color, "stroke-width": "1px", "stroke-opacity": .3};
-                res.rect(x, y, w, h).attr(params);
+                var p = this.path({stroke: color, "stroke-width": 1})
+                        .moveTo(x, y).lineTo(x + w, y).lineTo(x + w, y + h).lineTo(x, y + h).lineTo(x, y);
                 for (var i = 1; i < hv; i++) {
-                    var p = res.path(params);
                     p.moveTo(x, y + i * Math.round(h / hv)).lineTo(x + w, y + i * Math.round(h / hv));
                 }
                 for (var i = 1; i < wv; i++) {
-                    res.path(params).moveTo(x + i * Math.round(w / wv), y).lineTo(x + i * Math.round(w / wv), y + h);
+                    p.moveTo(x + i * Math.round(w / wv), y).lineTo(x + i * Math.round(w / wv), y + h);
                 }
-                return res;
+                return p;
             };
             C.setGrid = function (xmin, ymin, xmax, ymax, w, h) {
                 var xc = (xmax - xmin) / w;
@@ -1374,7 +1393,7 @@ var Raphael = (function (type) {
             };
             C.safari = function () {
                 if (r.type == "SVG") {
-                    var rect = C.rect(-C.width, -C.width, C.width * 3, C.height * 3).attr({stroke: "none"});
+                    var rect = C.rect(-C.width, -C.height, C.width * 3, C.height * 3).attr({stroke: "none"});
                     setTimeout(function () {rect.remove();}, 0);
                 }
             };
@@ -1383,17 +1402,16 @@ var Raphael = (function (type) {
         } else {
             return function () {};
         }
-    })((!(window.SVGPreserveAspectRatio && window.SVGPreserveAspectRatio.SVG_PRESERVEASPECTRATIO_XMINYMIN == 2) && !(window.CanvasRenderingContext2D)) ? "VML" : "SVG");
+    })((!(window.SVGPreserveAspectRatio && window.SVGPreserveAspectRatio.SVG_PRESERVEASPECTRATIO_XMINYMIN == 2)) ? "VML" : "SVG");
 
 
-Raphael.type = (!(window.SVGPreserveAspectRatio && window.SVGPreserveAspectRatio.SVG_PRESERVEASPECTRATIO_XMINYMIN == 2) && !(window.CanvasRenderingContext2D)) ? "VML" : "SVG";
 Raphael.vml = !(Raphael.svg = (Raphael.type == "SVG"));
-if (!(window.SVGPreserveAspectRatio && window.SVGPreserveAspectRatio.SVG_PRESERVEASPECTRATIO_XMINYMIN == 2) && window.CanvasRenderingContext2D) {
+if (Raphael.vml && window.CanvasRenderingContext2D) {
     Raphael.type = "Canvas only";
     Raphael.vml = Raphael.svg = false;
 }
 Raphael.toString = function () {
-    return "You browser supports " + this.type;
+    return "Your browser supports " + this.type;
 };
 Raphael.hsb2rgb = function (hue, saturation, brightness) {
     if (typeof hue == "object" && "h" in hue && "s" in hue && "b" in hue) {
@@ -1404,8 +1422,8 @@ Raphael.hsb2rgb = function (hue, saturation, brightness) {
     var red,
         green,
         blue;
-    if (brightness == 0.0) {
-        return {r: 0, g: 0, b: 0};
+    if (brightness == 0) {
+        return {r: 0, g: 0, b: 0, hex: "#000"};
     } else {
         var i = Math.floor(hue * 6),
             f = (hue * 6) - i,
@@ -1423,15 +1441,18 @@ Raphael.hsb2rgb = function (hue, saturation, brightness) {
         ][i]();
     }
     var rgb = {r: red, g: green, b: blue};
-    var r = Math.round(rgb.r).toString(16);
+    red *= 255;
+    green *= 255;
+    blue *= 255;
+    var r = Math.round(red).toString(16);
     if (r.length == 1) {
         r = "0" + r;
     }
-    var g = Math.round(rgb.g).toString(16);
+    var g = Math.round(green).toString(16);
     if (g.length == 1) {
         g = "0" + g;
     }
-    var b = Math.round(rgb.b).toString(16);
+    var b = Math.round(blue).toString(16);
     if (b.length == 1) {
         b = "0" + b;
     }
@@ -1454,6 +1475,11 @@ Raphael.rgb2hsb = function (red, green, blue) {
             green = parseInt(red.substring(3, 5), 16);
             red = parseInt(red.substring(1, 3), 16);
         }
+    }
+    if (red > 1 || green > 1 || blue > 1) {
+        red /= 255;
+        green /= 255;
+        blue /= 255;
     }
     var max = Math.max(red, green, blue),
         min = Math.min(red, green, blue),
@@ -1483,7 +1509,7 @@ Raphael.rgb2hsb = function (red, green, blue) {
     return {h: hue, s: saturation, b: brightness};
 };
 Raphael.getColor = function (value) {
-    var start = arguments.callee.start = arguments.callee.start || {h: 0, s: 1, b: value || 200};
+    var start = arguments.callee.start = arguments.callee.start || {h: 0, s: 1, b: value || .75};
     var rgb = this.hsb2rgb(start.h, start.s, start.b);
     start.h += .1;
     if (start.h > 1) {
