@@ -1,5 +1,5 @@
 /*
- * Raphael 0.5.4b - JavaScript Vector Library
+ * Raphael 0.5.5b - JavaScript Vector Library
  *
  * Copyright (c) 2008 Dmitry Baranovskiy (raphaeljs.com)
  * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
@@ -8,7 +8,7 @@ var Raphael = (function (type) {
         var r = function () {
             return r._create.apply(r, arguments);
         };
-        r.version = "0.5.4b";
+        r.version = "0.5.5b";
         r.type = type;
         var C = {};
         function Matrix(m11, m12, m21, m22, dx, dy) {
@@ -73,7 +73,8 @@ var Raphael = (function (type) {
                         } else {
                             this.andClose();
                         }
-                    };
+                    }
+                    return this;
                 };
                 p.moveTo = function (x, y) {
                     var d = this.isAbsolute?"m":"t";
@@ -81,8 +82,8 @@ var Raphael = (function (type) {
                     var _getY = this.isAbsolute ? VML._getY : VML._getH;
                     d += Math.round(_getX(parseFloat(x, 10))) + " " + Math.round(_getY(parseFloat(y, 10)));
                     this[0].path = this.Path += d;
-                    this.last.x = Math.round(_getX(parseFloat(x, 10)));
-                    this.last.y = Math.round(_getY(parseFloat(y, 10)));
+                    this.last.x = (this.isAbsolute ? 0 : this.last.x) + Math.round(_getX(parseFloat(x, 10)));
+                    this.last.y = (this.isAbsolute ? 0 : this.last.y) + Math.round(_getY(parseFloat(y, 10)));
                     this.last.isAbsolute = this.isAbsolute;
                     this.path.push({type: "move", arg: [].slice.call(arguments, 0), pos: this.isAbsolute});
                     return this;
@@ -93,10 +94,34 @@ var Raphael = (function (type) {
                     var _getY = this.isAbsolute ? VML._getY : VML._getH;
                     d += Math.round(_getX(parseFloat(x, 10))) + " " + Math.round(_getY(parseFloat(y, 10)));
                     this[0].path = this.Path += d;
-                    this.last.x = Math.round(_getX(parseFloat(x, 10)));
-                    this.last.y = Math.round(_getY(parseFloat(y, 10)));
+                    this.last.x = (this.isAbsolute ? 0 : this.last.x) + Math.round(_getX(parseFloat(x, 10)));
+                    this.last.y = (this.isAbsolute ? 0 : this.last.y) + Math.round(_getY(parseFloat(y, 10)));
                     this.last.isAbsolute = this.isAbsolute;
                     this.path.push({type: "line", arg: [].slice.call(arguments, 0), pos: this.isAbsolute});
+                    return this;
+                };
+                p.arcTo = function (rx, ry, large_arc_flag, sweep_flag, x2, y2) {
+                    // for more information of where this math came from visit:
+                    // http://www.w3.org/TR/SVG11/implnote.html#ArcImplementationNotes
+                    var x1 = this.last.x,
+                        y1 = this.last.y,
+                        x = (x1 - x2) / 2,
+                        y = (y1 - y2) / 2,
+                        k = (large_arc_flag == sweep_flag ? -1 : 1) *
+                            Math.sqrt((rx * rx * ry * ry - rx * rx * y * y - ry * ry * x * x) / (rx * rx * y * y + ry * ry * x * x)),
+                        cx = k * rx * y / ry + (x1 + x2) / 2,
+                        cy = k * -ry * x / rx + (y1 + y2) / 2,
+                        d = sweep_flag ? (this.isAbsolute?"wa":"wr") : (this.isAbsolute?"at":"ar"),
+                        _getX = this.isAbsolute ? VML._getX : VML._getW,
+                        _getY = this.isAbsolute ? VML._getY : VML._getH,
+                        left = Math.round(cx - rx),
+                        top = Math.round(cy - ry);
+                    d += [left, top, left + rx * 2, top + ry * 2, x1, y1, Math.round(_getX(parseFloat(x2, 10))), Math.round(_getX(parseFloat(y2, 10)))].join(", ");
+                    this[0].path = this.Path += d;
+                    this.last.x = (this.isAbsolute ? 0 : this.last.x) + Math.round(_getX(parseFloat(x2, 10)));
+                    this.last.y = (this.isAbsolute ? 0 : this.last.y) + Math.round(_getY(parseFloat(y2, 10)));
+                    this.last.isAbsolute = this.isAbsolute;
+                    this.path.push({type: "arc", arg: [].slice.call(arguments, 0), pos: this.isAbsolute});
                     return this;
                 };
                 p.cplineTo = function (x1, y1, w1) {
@@ -112,8 +137,8 @@ var Raphael = (function (type) {
                         var d = this.isAbsolute?"c":"v";
                         var attr = [this.last.x + w, this.last.y, x - w, y, x, y];
                         d += attr.join(" ") + " ";
-                        this.last.x = attr[4];
-                        this.last.y = attr[5];
+                        this.last.x = (this.isAbsolute ? 0 : this.last.x) + attr[4];
+                        this.last.y = (this.isAbsolute ? 0 : this.last.y) + attr[5];
                         this.last.bx = attr[2];
                         this.last.by = attr[3];
                         this[0].path = this.Path += d;
@@ -126,8 +151,8 @@ var Raphael = (function (type) {
                     var _getX = this.isAbsolute ? VML._getX : VML._getW;
                     var _getY = this.isAbsolute ? VML._getY : VML._getH;
                     if (arguments.length == 6) {
-                        this.last.x = Math.round(_getX(parseFloat(arguments[4], 10)));
-                        this.last.y = Math.round(_getY(parseFloat(arguments[5], 10)));
+                        this.last.x = (this.isAbsolute ? 0 : this.last.x) + Math.round(_getX(parseFloat(arguments[4], 10)));
+                        this.last.y = (this.isAbsolute ? 0 : this.last.y) + Math.round(_getY(parseFloat(arguments[5], 10)));
                         this.last.bx = Math.round(_getX(parseFloat(arguments[2], 10)));
                         this.last.by = Math.round(_getY(parseFloat(arguments[3], 10)));
                         d += Math.round(_getX(parseFloat(arguments[0], 10))) + " " + Math.round(_getY(parseFloat(arguments[1], 10))) + " " +
@@ -260,7 +285,7 @@ var Raphael = (function (type) {
                     if ("fill-opacity" in params || "opacity" in params) {
                         fill.opacity = ((params["fill-opacity"] + 1 || 2) - 1) * ((params.opacity + 1 || 2) - 1);
                     }
-                    params.fill && (fill.on = true);
+                    fill.on = (params.fill && params.fill != "none");
                     if (fill.on && params.fill) {
                         fill.color = params.fill;
                     }
@@ -282,7 +307,9 @@ var Raphael = (function (type) {
                     stroke.joinstyle = params["stroke-linejoin"] || "miter";
                     stroke.miterlimit = params["stroke-miterlimit"] || 8;
                     stroke.endcap = {butt: "flat", square: "square", round: "round"}[params["stroke-linecap"] || "miter"];
-                    stroke.weight = (parseFloat(params["stroke-width"], 10) || 1);
+                    if (params["stroke-width"]) {
+                        stroke.weight = (parseFloat(params["stroke-width"], 10) || 1) * 12/16;
+                    }
                     if (params["stroke-dasharray"]) {
                         var dashes = params["stroke-dasharray"].replace(" ", ",").split(","),
                             dashesn = [],
@@ -778,7 +805,8 @@ var Raphael = (function (type) {
                         } else {
                             this.andClose();
                         }
-                    };
+                    }
+                    return this;
                 };
                 p.moveTo = function (x, y) {
                     var d = this.isAbsolute?"M":"m";
@@ -802,6 +830,18 @@ var Raphael = (function (type) {
                     this.last.x = SVG._getX(parseFloat(x, 10));
                     this.last.y = SVG._getY(parseFloat(y, 10));
                     this.path.push({type: "line", arg: arguments, pos: this.isAbsolute});
+                    return this;
+                };
+                p.arcTo = function (rx, ry, large_arc_flag, sweep_flag, x, y) {
+                    var d = this.isAbsolute ? "A" : "a";
+                    var _getX = this.isAbsolute ? SVG._getX : SVG._getW;
+                    var _getY = this.isAbsolute ? SVG._getY : SVG._getH;
+                    d += [SVG._getW(parseFloat(rx, 10)), SVG._getH(parseFloat(ry, 10)), 0, large_arc_flag, sweep_flag, _getX(parseFloat(x, 10)), _getY(parseFloat(y, 10))].join(" ");
+                    var oldD = this[0].getAttribute("d") || "";
+                    this[0].setAttribute("d", oldD + d);
+                    this.last.x = SVG._getX(parseFloat(x, 10));
+                    this.last.y = SVG._getY(parseFloat(y, 10));
+                    this.path.push({type: "arc", arg: arguments, pos: this.isAbsolute});
                     return this;
                 };
                 p.cplineTo = function (x1, y1, w1) {
@@ -1143,12 +1183,29 @@ var Raphael = (function (type) {
                 };
                 this.toFront = function () {
                     this[0].parentNode.appendChild(this[0]);
+                    return this;
                 };
                 this.toBack = function () {
                     if (this[0].parentNode.firstChild != this[0]) {
                         this[0].parentNode.insertBefore(this[0], this[0].parentNode.firstChild);
                     }
+                    return this;
                 };
+                // this.animateTo = function (x, y, ms, callback) {
+                //     if ("cx" in node.attrs || "x" in node.attrs) {
+                //         var X = node.attrs.cx || node.attrs.x;
+                //         var Y = node.attrs.cy || node.attrs.y;
+                //         var dy = y - Y;
+                //         var dx = x - X;
+                //         var coeff = dy / dx;
+                //         var plus = Y - coeff * X;
+                //         var alpha = Math.atan(this.coeff);
+                //         this.xs = this.step * Math.cos(alpha);
+                //         if (x < X) {
+                //             this.xs = -this.xs;
+                //         }
+                //  }
+                // };
             };
             var theCircle = function (svg, x, y, r) {
                 var el = document.createElementNS(svg.svgns, "circle");
@@ -1413,6 +1470,7 @@ if (Raphael.vml && window.CanvasRenderingContext2D) {
 Raphael.toString = function () {
     return "Your browser supports " + this.type;
 };
+// generic utilities
 Raphael.hsb2rgb = function (hue, saturation, brightness) {
     if (typeof hue == "object" && "h" in hue && "s" in hue && "b" in hue) {
         brightness = hue.b;
