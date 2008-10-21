@@ -1,5 +1,5 @@
 /*
- * Raphael 0.5.5b - JavaScript Vector Library
+ * Raphael 0.5.6b - JavaScript Vector Library
  *
  * Copyright (c) 2008 Dmitry Baranovskiy (raphaeljs.com)
  * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
@@ -8,7 +8,7 @@ var Raphael = (function (type) {
         var r = function () {
             return r._create.apply(r, arguments);
         };
-        r.version = "0.5.5b";
+        r.version = "0.5.6b";
         r.type = type;
         var C = {};
         function Matrix(m11, m12, m21, m22, dx, dy) {
@@ -103,6 +103,8 @@ var Raphael = (function (type) {
                 p.arcTo = function (rx, ry, large_arc_flag, sweep_flag, x2, y2) {
                     // for more information of where this math came from visit:
                     // http://www.w3.org/TR/SVG11/implnote.html#ArcImplementationNotes
+                    x2 = (this.isAbsolute ? 0 : this.last.x) + x2;
+                    y2 = (this.isAbsolute ? 0 : this.last.y) + y2;
                     var x1 = this.last.x,
                         y1 = this.last.y,
                         x = (x1 - x2) / 2,
@@ -260,6 +262,12 @@ var Raphael = (function (type) {
                             case "v":
                                 p.relatively().lineTo(0, path[++i]);
                                 break;
+                            case "A":
+                                p.absolutely().arcTo(path[++i], path[++i], path[++i], path[++i], path[++i], path[++i]);
+                                break;
+                            case "a":
+                                p.relatively().arcTo(path[++i], path[++i], path[++i], path[++i], path[++i], path[++i]);
+                                break;
                             case "Z":
                             case "z":
                                 p.andClose();
@@ -271,14 +279,15 @@ var Raphael = (function (type) {
                 return p;
             };
             var setFillAndStroke = function (o, params) {
-                o[0].attrs = o[0].attrs || {};
+                var s = o[0].style;
+                o.attrs = o.attrs || {};
                 for (var par in params) {
-                    o[0].attrs[par] = params[par];
+                    o.attrs[par] = params[par];
                 }
-                params["font-family"] && (o[0].style.fontFamily = params["font-family"]);
-                params["font-size"] && (o[0].style.fontSize = params["font-size"]);
-                params["font"] && (o[0].style.font = params["font"]);
-                params["font-weight"] && (o[0].style.fontWeight = params["font-weight"]);
+                params["font-family"] && (s.fontFamily = params["font-family"]);
+                params["font-size"] && (s.fontSize = params["font-size"]);
+                params["font"] && (s.font = params["font"]);
+                params["font-weight"] && (s.fontWeight = params["font-weight"]);
                 if (typeof params.opacity != "undefined" || typeof params["stroke-width"] != "undefined" || typeof params.fill != "undefined" || typeof params.stroke != "undefined") {
                     o = o.shape || o[0];
                     var fill = (o.getElementsByTagName("fill") && o.getElementsByTagName("fill")[0]) || document.createElement("rvml:fill");
@@ -288,9 +297,6 @@ var Raphael = (function (type) {
                     fill.on = (params.fill && params.fill != "none");
                     if (fill.on && params.fill) {
                         fill.color = params.fill;
-                    }
-                    if (params.fill == "none") {
-                        fill.on = false;
                     }
                     o.appendChild(fill);
                     var stroke = (o.getElementsByTagName("stroke") && o.getElementsByTagName("stroke")[0]) || document.createElement("rvml:stroke");
@@ -326,8 +332,8 @@ var Raphael = (function (type) {
                 }
             };
             var addGrdientFill = function (o, gradient) {
-                o[0].attrs = o[0].attrs || {};
-                o[0].attrs.gradient = gradient;
+                o.attrs = o.attrs || {};
+                o.attrs.gradient = gradient;
                 o = o.shape || o[0];
                 var fill = o.getElementsByTagName("fill");
                 if (fill.length) {
@@ -379,175 +385,176 @@ var Raphael = (function (type) {
                 this[0] = node;
                 this.X = 0;
                 this.Y = 0;
-                arguments.callee.name = "Element";
-                this[0].attrs = {};
+                this.attrs = {};
                 this.Group = group;
-                this.setBox = function (params) {
-                    var gs = this.Group.style,
-                        os = this[0].style;
-                    for (var i in params) {
-                        this[0].attrs[i] = params[i];
+                this.vml = vml;
+            };
+            Element.prototype.setBox = function (params) {
+                var gs = this.Group.style,
+                    os = this[0].style;
+                for (var i in params) {
+                    this.attrs[i] = params[i];
+                }
+                var attr = this.attrs, x, y, w, h;
+                switch (this.type) {
+                    case "circle": 
+                        x = attr.cx - attr.r;
+                        y = attr.cy - attr.r;
+                        w = h = attr.r * 2;
+                        break;
+                    case "ellipse":
+                        x = attr.cx - attr.rx;
+                        y = attr.cy - attr.ry;
+                        w = attr.rx * 2;
+                        h = attr.ry * 2;
+                        break;
+                    case "rect":
+                    case "image":
+                        x = attr.x;
+                        y = attr.y;
+                        w = attr.w;
+                        h = attr.h;
+                        break;
+                    case "text":
+                        this.textpath.v = ["m", Math.round(attr.x), ", ", Math.round(attr.y - 2), "l", Math.round(attr.x) + 1, ", ", Math.round(attr.y - 2)].join("");
+                        return;
+                    default:
+                        return;
+                }
+                var left = this.vml.width / 2 - w / 2,
+                    top = this.vml.height / 2 - h / 2;
+                gs.position = "absolute";
+                gs.left = x - left + "px";
+                gs.top = y - top + "px";
+                this.X = x - left;
+                this.Y = y - top;
+                this.W = w;
+                this.H = h;
+                gs.width = this.vml.width + "px";
+                gs.height = this.vml.height + "px";
+                os.position = "absolute";
+                os.top = top + "px";
+                os.left = left + "px";
+                os.width = w + "px";
+                os.height = h + "px";
+            };
+            Element.prototype.hide = function () {
+                this.Group.style.display = "none";
+                return this;
+            };
+            Element.prototype.show = function () {
+                this.Group.style.display = "block";
+                return this;
+            };
+            Element.prototype.rotate = function (deg) {
+                Rotation += deg;
+                this.Group.style.rotation = Rotation;
+                return this;
+            };
+            Element.prototype.translate = function (x, y) {
+                this.X += x;
+                this.Y += y;
+                this.Group.style.left = this.X + "px";
+                this.Group.style.top = this.Y + "px";
+                return this;
+            };
+            // depricated
+            Element.prototype.matrix = function (xx, xy, yx, yy, dx, dy) {
+                tMatrix = new Matrix(xx, xy, yx, yy, dx, dy);
+                this.Group.style.filter = tMatrix;
+                return this;
+            };
+            Element.prototype.scale = function (x, y) {
+                y = y || x;
+                if (x != 0 && !(x == 1 && y == 1)) {
+                    var dirx = Math.round(x / Math.abs(x)),
+                        diry = Math.round(y / Math.abs(y)),
+                        s = this[0].style;
+                    if (dirx != 1 || diry != 1) {
+                        s.filter = new Matrix(dirx, 0, 0, diry, 0, 0);
                     }
-                    var attr = this[0].attrs, x, y, w, h;
-                    switch (this.type) {
-                        case "circle": 
-                            x = attr.cx - attr.r;
-                            y = attr.cy - attr.r;
-                            w = h = attr.r * 2;
-                            break;
-                        case "ellipse":
-                            x = attr.cx - attr.rx;
-                            y = attr.cy - attr.ry;
-                            w = attr.rx * 2;
-                            h = attr.ry * 2;
-                            break;
-                        case "rect":
-                        case "image":
-                            x = attr.x;
-                            y = attr.y;
-                            w = attr.w;
-                            h = attr.h;
-                            break;
-                        case "text":
-                            this.textpath.v = ["m", Math.round(attr.x), ", ", Math.round(attr.y - 2), "l", Math.round(attr.x) + 1, ", ", Math.round(attr.y - 2)].join("");
-                            return;
-                        default:
-                            return;
-                    }
-                    var left = vml.width / 2 - w / 2,
-                        top = vml.height / 2 - h / 2;
-                    gs.position = "absolute";
-                    gs.left = x - left + "px";
-                    gs.top = y - top + "px";
-                    this.X = x - left;
-                    this.Y = y - top;
-                    this.W = w;
-                    this.H = h;
-                    gs.width = vml.width + "px";
-                    gs.height = vml.height + "px";
-                    os.position = "absolute";
-                    os.top = top + "px";
-                    os.left = left + "px";
-                    os.width = w + "px";
-                    os.height = h + "px";
+                    var width = parseInt(s.width, 10) * x * dirx;
+                    var height = parseInt(s.height, 10) * y * diry;
+                    var left = parseInt(s.left, 10);
+                    var top = parseInt(s.top, 10);
+                    s.left = this.X = left + this.W / 2 - width / 2;
+                    s.top = this.Y = top + this.H / 2 - height / 2;
+                    s.width = this.W = width;
+                    s.height = this.H = height;
+                }
+                return this;
+            };
+            Element.prototype.getBBox = function () {
+                return {
+                    x: this.Group.offsetLeft,
+                    y: this.Group.offsetTop,
+                    width: this.Group.offsetWidth,
+                    height: this.Group.offsetHeight
                 };
-                this.hide = function () {
-                    this.Group.style.display = "none";
-                    return this;
-                };
-                this.show = function () {
-                    this.Group.style.display = "block";
-                    return this;
-                };
-                this.rotate = function (deg) {
-                    Rotation += deg;
-                    this.Group.style.rotation = Rotation;
-                    return this;
-                };
-                this.translate = function (x, y) {
-                    this.X += x;
-                    this.Y += y;
-                    this.Group.style.left = this.X + "px";
-                    this.Group.style.top = this.Y + "px";
-                    return this;
-                };
-                // depricated
-                this.matrix = function (xx, xy, yx, yy, dx, dy) {
-                    tMatrix = new Matrix(xx, xy, yx, yy, dx, dy);
-                    this.Group.style.filter = tMatrix;
-                    return this;
-                };
-                this.scale = function (x, y) {
-                    y = y || x;
-                    if (x != 0 && !(x == 1 && y == 1)) {
-                        var dirx = Math.round(x / Math.abs(x)),
-                            diry = Math.round(y / Math.abs(y));
-                        if (dirx != 1 || diry != 1) {
-                            this[0].style.filter = new Matrix(dirx, 0, 0, diry, 0, 0);
-                        }
-                        var width = parseInt(this[0].style.width, 10) * x * dirx;
-                        var height = parseInt(this[0].style.height, 10) * y * diry;
-                        var left = parseInt(this[0].style.left, 10);
-                        var top = parseInt(this[0].style.top, 10);
-                        this[0].style.left = this.X = left + this.W / 2 - width / 2;
-                        this[0].style.top = this.Y = top + this.H / 2 - height / 2;
-                        this[0].style.width = this.W = width;
-                        this[0].style.height = this.H = height;
-                    }
-                    return this;
-                };
-                this.getBBox = function () {
-                    return {
-                        x: this.Group.offsetLeft,
-                        y: this.Group.offsetTop,
-                        width: this.Group.offsetWidth,
-                        height: this.Group.offsetHeight
+            };
+            Element.prototype.remove = function () {
+                this[0].parentNode.removeChild(this[0]);
+                this.Group.parentNode.removeChild(this.Group);
+                this.shape && this.shape.parentNode.removeChild(this.shape);
+            };
+            Element.prototype.attr = function () {
+                if (arguments.length == 1 && typeof arguments[0] == "string") {
+                    return this.attrs[arguments[0]];
+                }
+                if (this.attrs && arguments.length == 1 && arguments[0] instanceof Array) {
+                    var values = {};
+                    for (var i = 0, ii = arguments[0].length; i < ii; i++) {
+                        values[arguments[0][i]] = this.attrs[arguments[0][i]];
                     };
-                };
-                this.remove = function () {
-                    this[0].parentNode.removeChild(this[0]);
-                    this.Group.parentNode.removeChild(this.Group);
-                    this.shape && this.shape.parentNode.removeChild(this.shape);
-                };
-                this.attr = function () {
-                    if (arguments.length == 1 && typeof arguments[0] == "string") {
-                        return this[0].attrs[arguments[0]];
-                    }
-                    if (this[0].attrs && arguments.length == 1 && arguments[0] instanceof Array) {
-                        var values = {};
-                        for (var i = 0, ii = arguments[0].length; i < ii; i++) {
-                            values[arguments[0][i]] = this[0].attrs[arguments[0][i]];
-                        };
-                        return values;
-                    }
-                    if (this[0].tagName.toLowerCase() == "group") {
-                        var children = this[0].childNodes;
-                        this[0].attrs = this[0].attrs || {};
-                        if (arguments.length == 2) {
-                            this[0].attrs[arguments[0]] = arguments[1];
-                        } else if (arguments.length == 1 || typeof arguments[0] == "object") {
-                            for (var j in arguments[0]) {
-                                this[0].attrs[j] = arguments[0][j];
-                            }
-                        }
-                        for (var i = 0, ii = children.length; i < ii; i++) {
-                            this.attr.apply(new item(children[i], this[0], vml), arguments);
-                        }
-                    } else {
-                        var params;
-                        if (arguments.length == 2) {
-                            params = {};
-                            params[arguments[0]] = arguments[1];
-                        }
-                        if (arguments.length == 1 && typeof arguments[0] == "object") {
-                            params = arguments[0];
-                        }
-                        if (params) {
-                            setFillAndStroke(this, params);
-                            this.setBox(params);
-                            if (params.gradient) {
-                                addGrdientFill(this, params.gradient);
-                            }
-                            if (params.text && this.type == "text") {
-                                this[0].string = params.text;
-                            }
-                            if (params.id) {
-                                this[0].id = params.id;
-                            }
+                    return values;
+                }
+                if (this[0].tagName.toLowerCase() == "group") {
+                    var children = this[0].childNodes;
+                    this.attrs = this.attrs || {};
+                    if (arguments.length == 2) {
+                        this.attrs[arguments[0]] = arguments[1];
+                    } else if (arguments.length == 1 || typeof arguments[0] == "object") {
+                        for (var j in arguments[0]) {
+                            this.attrs[j] = arguments[0][j];
                         }
                     }
-                    return this;
-                };
-                this.toFront = function () {
-                    this.Group.parentNode.appendChild(this.Group);
-                    return this;
-                };
-                this.toBack = function () {
-                    if (this.Group.parentNode.firstChild != this.Group) {
-                        this.Group.parentNode.insertBefore(this.Group, this.Group.parentNode.firstChild);
+                    for (var i = 0, ii = children.length; i < ii; i++) {
+                        this.attr.apply(new item(children[i], this[0], this.vml), arguments);
                     }
-                    return this;
-                };
+                } else {
+                    var params;
+                    if (arguments.length == 2) {
+                        params = {};
+                        params[arguments[0]] = arguments[1];
+                    }
+                    if (arguments.length == 1 && typeof arguments[0] == "object") {
+                        params = arguments[0];
+                    }
+                    if (params) {
+                        setFillAndStroke(this, params);
+                        this.setBox(params);
+                        if (params.gradient) {
+                            addGrdientFill(this, params.gradient);
+                        }
+                        if (params.text && this.type == "text") {
+                            this[0].string = params.text;
+                        }
+                        if (params.id) {
+                            this[0].id = params.id;
+                        }
+                    }
+                }
+                return this;
+            };
+            Element.prototype.toFront = function () {
+                this.Group.parentNode.appendChild(this.Group);
+                return this;
+            };
+            Element.prototype.toBack = function () {
+                if (this.Group.parentNode.firstChild != this.Group) {
+                    this.Group.parentNode.insertBefore(this.Group, this.Group.parentNode.firstChild);
+                }
+                return this;
             };
             var theCircle = function (vml, x, y, r) {
                 var g = document.createElement("rvml:group");
@@ -557,9 +564,9 @@ var Raphael = (function (type) {
                 var res = new Element(o, g, vml);
                 setFillAndStroke(res, {stroke: "#000", fill: "none"});
                 res.setBox({x: x - r, y: y - r, w: r * 2, h: r * 2});
-                o.attrs.cx = x;
-                o.attrs.cy = y;
-                o.attrs.r = r;
+                res.attrs.cx = x;
+                res.attrs.cy = y;
+                res.attrs.r = r;
                 res.type = "circle";
                 return res;
             };
@@ -574,11 +581,11 @@ var Raphael = (function (type) {
                 var res = new Element(o, g, vml);
                 setFillAndStroke(res, {stroke: "#000"});
                 res.setBox({x: x, y: y, w: w, h: h});
-                o.attrs.x = x;
-                o.attrs.y = y;
-                o.attrs.w = w;
-                o.attrs.h = h;
-                o.attrs.r = r;
+                res.attrs.x = x;
+                res.attrs.y = y;
+                res.attrs.w = w;
+                res.attrs.h = h;
+                res.attrs.r = r;
                 res.type = "rect";
                 return res;
             };
@@ -590,10 +597,10 @@ var Raphael = (function (type) {
                 var res = new Element(o, g, vml);
                 setFillAndStroke(res, {stroke: "#000"});
                 res.setBox({x: x - rx, y: y - ry, w: rx * 2, h: ry * 2});
-                o.attrs.cx = x;
-                o.attrs.cy = y;
-                o.attrs.rx = rx;
-                o.attrs.ry = ry;
+                res.attrs.cx = x;
+                res.attrs.cy = y;
+                res.attrs.rx = rx;
+                res.attrs.ry = ry;
                 res.type = "ellipse";
                 return res;
             };
@@ -606,10 +613,10 @@ var Raphael = (function (type) {
                 var res = new Element(o, g, vml);
                 res.type = "image";
                 res.setBox({x: x, y: y, w: w, h: h});
-                o.attrs.x = x;
-                o.attrs.y = y;
-                o.attrs.w = w;
-                o.attrs.h = h;
+                res.attrs.x = x;
+                res.attrs.y = y;
+                res.attrs.w = w;
+                res.attrs.h = h;
                 return res;
             };
             var theText = function (vml, x, y, text) {
@@ -639,10 +646,10 @@ var Raphael = (function (type) {
                 res.shape = el;
                 res.textpath = path;
                 res.type = "text";
-                o.attrs.x = x;
-                o.attrs.y = y;
-                o.attrs.w = 1;
-                o.attrs.h = 1;
+                res.attrs.x = x;
+                res.attrs.y = y;
+                res.attrs.w = 1;
+                res.attrs.h = 1;
                 return res;
             };
             var theGroup = function (vml) {
@@ -1003,6 +1010,12 @@ var Raphael = (function (type) {
                             case "v":
                                 p.relatively().lineTo(0, path[++i]);
                                 break;
+                            case "A":
+                                p.absolutely().arcTo(path[++i], path[++i], path[++i], path[++i], path[++i], path[++i]);
+                                break;
+                            case "a":
+                                p.relatively().arcTo(path[++i], path[++i], path[++i], path[++i], path[++i], path[++i]);
+                                break;
                             case "z":
                                 p.andClose();
                                 break;
@@ -1043,169 +1056,154 @@ var Raphael = (function (type) {
                 this[0] = node;
                 this.attrs = this.attrs || {};
                 this.transformations = []; // rotate, translate, scale, matrix
-                this.hide = function () {
-                    this[0].style.display = "none";
-                    return this;
-                };
-                this.show = function () {
-                    this[0].style.display = "block";
-                    return this;
-                };
-                this.rotate = function (deg) {
-                    var bbox = this.getBBox();
-                    Rotation.deg += deg;
-                    if (Rotation.deg) {
-                        this.transformations[0] = ("rotate(" + Rotation.deg + " " + (bbox.x + bbox.width / 2) + " " + (bbox.y + bbox.height / 2) + ")");
+            };
+            Element.prototype.hide = function () {
+                this[0].style.display = "none";
+                return this;
+            };
+            Element.prototype.show = function () {
+                this[0].style.display = "block";
+                return this;
+            };
+            Element.prototype.rotate = function (deg) {
+                var bbox = this.getBBox();
+                Rotation.deg += deg;
+                if (Rotation.deg) {
+                    this.transformations[0] = ("rotate(" + Rotation.deg + " " + (bbox.x + bbox.width / 2) + " " + (bbox.y + bbox.height / 2) + ")");
+                } else {
+                    this.transformations[0] = "";
+                }
+                this[0].setAttribute("transform", this.transformations.join(" "));
+                return this;
+            };
+            Element.prototype.translate = function (x, y) {
+                X += x;
+                Y += y;
+                if (X && Y) {
+                    this.transformations[1] = "translate(" + X + "," + Y + ")";
+                } else {
+                    this.transformations[1] = "";
+                }
+                this[0].setAttribute("transform", this.transformations.join(" "));
+                return this;
+            };
+            Element.prototype.scale = function (x, y) {
+                y = y || x;
+                if (x != 0 && !(x == 1 && y == 1)) {
+                    ScaleX *= x;
+                    ScaleY *= y;
+                    if (!(ScaleX == 1 && ScaleY == 1)) {
+                        var bbox = this.getBBox(),
+                            dx = bbox.x * (1 - ScaleX) + (bbox.width / 2 - bbox.width * ScaleX / 2),
+                            dy = bbox.y * (1 - ScaleY) + (bbox.height / 2 - bbox.height * ScaleY / 2);
+                        this.transformations[2] = new Matrix(ScaleX, 0, 0, ScaleY, dx, dy);
                     } else {
-                        this.transformations[0] = "";
+                        this.transformations[2] = "";
                     }
                     this[0].setAttribute("transform", this.transformations.join(" "));
-                    return this;
-                };
-                this.translate = function (x, y) {
-                    X += x;
-                    Y += y;
-                    if (X && Y) {
-                        this.transformations[1] = "translate(" + X + "," + Y + ")";
-                    } else {
-                        this.transformations[1] = "";
+                }
+                return this;
+            };
+            // depricated
+            Element.prototype.matrix = function (xx, xy, yx, yy, dx, dy) {
+                this.transformations[3] = new Matrix(xx, xy, yx, yy, dx, dy);
+                this[0].setAttribute("transform", this.transformations.join(" "));
+                return this;
+            };
+            Element.prototype.remove = function () {
+                this[0].parentNode.removeChild(this[0]);
+            };
+            Element.prototype.getBBox = function () {
+                return this[0].getBBox();
+            };
+            Element.prototype.attr = function () {
+                if (arguments.length == 1 && typeof arguments[0] == "string") {
+                    return this[0].getAttribute(arguments[0]);
+                }
+                if (arguments.length == 1 && arguments[0] instanceof Array) {
+                    var values = {};
+                    for (var j in arguments[0]) {
+                        values[arguments[0][j]] = this.attrs[arguments[0][j]];
                     }
-                    this[0].setAttribute("transform", this.transformations.join(" "));
-                    return this;
-                };
-                this.scale = function (x, y) {
-                    y = y || x;
-                    if (x != 0 && !(x == 1 && y == 1)) {
-                        ScaleX *= x;
-                        ScaleY *= y;
-                        if (!(ScaleX == 1 && ScaleY == 1)) {
-                            var bbox = this.getBBox(),
-                                dx = bbox.x * (1 - ScaleX) + (bbox.width / 2 - bbox.width * ScaleX / 2),
-                                dy = bbox.y * (1 - ScaleY) + (bbox.height / 2 - bbox.height * ScaleY / 2);
-                            this.transformations[2] = new Matrix(ScaleX, 0, 0, ScaleY, dx, dy);
-                        } else {
-                            this.transformations[2] = "";
-                        }
-                        this[0].setAttribute("transform", this.transformations.join(" "));
-                    }
-                    return this;
-                };
-                // depricated
-                this.matrix = function (xx, xy, yx, yy, dx, dy) {
-                    this.transformations[3] = new Matrix(xx, xy, yx, yy, dx, dy);
-                    this[0].setAttribute("transform", this.transformations.join(" "));
-                    return this;
-                };
-                this.remove = function () {
-                    this[0].parentNode.removeChild(this[0]);
-                };
-                this.getBBox = function () {
-                    return this[0].getBBox();
-                };
-                this.attr = function () {
-                    if (arguments.length == 1 && typeof arguments[0] == "string") {
-                        return this[0].getAttribute(arguments[0]);
-                    }
-                    if (arguments.length == 1 && arguments[0] instanceof Array) {
-                        var values = {};
-                        for (var j in arguments[0]) {
-                            values[arguments[0][j]] = this.attrs[arguments[0][j]];
-                        }
-                        return values;
-                    }
-                    if (arguments.length == 2) {
-                        var att = arguments[0],
-                            value = arguments[1];
-                        this[att] = value;
-                        this.attrs[att] = value;
-                        switch (att) {
-                            case "rx":
-                            case "cx":
-                            case "x":
-                                this[0].setAttribute(att, svg._getX(value));
-                                break;
-                            case "ry":
-                            case "cy":
-                            case "y":
-                                this[0].setAttribute(att, svg._getY(value));
-                                break;
-                            case "width":
-                                this[0].setAttribute(att, svg._getW(value));
-                                break;
-                            case "height":
-                                this[0].setAttribute(att, svg._getH(value));
-                                break;
-                            case "gradient":
-                                addGrdientFill(this[0], params.gradient, svg);
-                                break;
-                            case "stroke-dasharray":
-                                this[0].setAttribute(att, value.replace(" ", ","));
-                                break;
-                            case "text":
-                                if (this.type == "text") {
-                                    this[0].removeChild(this[0].firstChild);
-                                    this[0].appendChild(document.createTextNode(value));
-                                }
-                                break;
-                            default :
-                                var cssrule = att.replace(/(\-.)/g, function (w) {
-                                    return w.substring(1).toUpperCase();
-                                });
-                                this[0].style[cssrule] = value;
-                                // Need following line for Firefox
-                                this[0].setAttribute(att, value);
-                                break;
-                        }
-                    } else if (arguments.length == 1 && typeof arguments[0] == "object") {
-                        var params = arguments[0];
-                        for (var attr in params) {
-                            this.attrs[attr] = params[attr];
-                            if (attr == "stroke-dasharray") {
-                                this[0].setAttribute(attr, params[attr].replace(" ", ","));
-                            } else if (attr == "text" && this.type == "text") {
-                                this[0].removeChild(this[0].firstChild);
-                                this[0].appendChild(document.createTextNode(params[attr]));
-                            } else {
-                                var cssrule = attr.replace(/(\-.)/g, function (w) {
-                                    return w.substring(1).toUpperCase();
-                                });
-                                this[0].style[cssrule] = params[attr];
-                                // Need following line for Firefox
-                                this[0].setAttribute(attr, params[attr]);
-                            }
-                        }
-                        if (params.gradient) {
-                            this[0].attrs.gradient = params.gradient;
+                    return values;
+                }
+                if (arguments.length == 2) {
+                    var att = arguments[0],
+                        value = arguments[1];
+                    this[att] = value;
+                    this.attrs[att] = value;
+                    switch (att) {
+                        case "rx":
+                        case "cx":
+                        case "x":
+                            this[0].setAttribute(att, svg._getX(value));
+                            break;
+                        case "ry":
+                        case "cy":
+                        case "y":
+                            this[0].setAttribute(att, svg._getY(value));
+                            break;
+                        case "width":
+                            this[0].setAttribute(att, svg._getW(value));
+                            break;
+                        case "height":
+                            this[0].setAttribute(att, svg._getH(value));
+                            break;
+                        case "gradient":
                             addGrdientFill(this[0], params.gradient, svg);
+                            break;
+                        case "stroke-dasharray":
+                            this[0].setAttribute(att, value.replace(" ", ","));
+                            break;
+                        case "text":
+                            if (this.type == "text") {
+                                this[0].removeChild(this[0].firstChild);
+                                this[0].appendChild(document.createTextNode(value));
+                            }
+                            break;
+                        default :
+                            var cssrule = att.replace(/(\-.)/g, function (w) {
+                                return w.substring(1).toUpperCase();
+                            });
+                            this[0].style[cssrule] = value;
+                            // Need following line for Firefox
+                            this[0].setAttribute(att, value);
+                            break;
+                    }
+                } else if (arguments.length == 1 && typeof arguments[0] == "object") {
+                    var params = arguments[0];
+                    for (var attr in params) {
+                        this.attrs[attr] = params[attr];
+                        if (attr == "stroke-dasharray") {
+                            this[0].setAttribute(attr, params[attr].replace(" ", ","));
+                        } else if (attr == "text" && this.type == "text") {
+                            this[0].removeChild(this[0].firstChild);
+                            this[0].appendChild(document.createTextNode(params[attr]));
+                        } else {
+                            var cssrule = attr.replace(/(\-.)/g, function (w) {
+                                return w.substring(1).toUpperCase();
+                            });
+                            this[0].style[cssrule] = params[attr];
+                            // Need following line for Firefox
+                            this[0].setAttribute(attr, params[attr]);
                         }
                     }
-                    return this;
-                };
-                this.toFront = function () {
-                    this[0].parentNode.appendChild(this[0]);
-                    return this;
-                };
-                this.toBack = function () {
-                    if (this[0].parentNode.firstChild != this[0]) {
-                        this[0].parentNode.insertBefore(this[0], this[0].parentNode.firstChild);
+                    if (params.gradient) {
+                        this.attrs.gradient = params.gradient;
+                        addGrdientFill(this[0], params.gradient, svg);
                     }
-                    return this;
-                };
-                // this.animateTo = function (x, y, ms, callback) {
-                //     if ("cx" in node.attrs || "x" in node.attrs) {
-                //         var X = node.attrs.cx || node.attrs.x;
-                //         var Y = node.attrs.cy || node.attrs.y;
-                //         var dy = y - Y;
-                //         var dx = x - X;
-                //         var coeff = dy / dx;
-                //         var plus = Y - coeff * X;
-                //         var alpha = Math.atan(this.coeff);
-                //         this.xs = this.step * Math.cos(alpha);
-                //         if (x < X) {
-                //             this.xs = -this.xs;
-                //         }
-                //  }
-                // };
+                }
+                return this;
+            };
+            Element.prototype.toFront = function () {
+                this[0].parentNode.appendChild(this[0]);
+                return this;
+            };
+            Element.prototype.toBack = function () {
+                if (this[0].parentNode.firstChild != this[0]) {
+                    this[0].parentNode.insertBefore(this[0], this[0].parentNode.firstChild);
+                }
+                return this;
             };
             var theCircle = function (svg, x, y, r) {
                 var el = document.createElementNS(svg.svgns, "circle");
@@ -1214,15 +1212,15 @@ var Raphael = (function (type) {
                 el.setAttribute("r", r);
                 el.setAttribute("fill", "none");
                 el.setAttribute("stroke", "#000");
-                el.attrs = el.attrs || {};
-                el.attrs.cx = x;
-                el.attrs.cy = y;
-                el.attrs.r = r;
-                el.attrs.stroke = "#000";
                 if (svg.canvas) {
                     svg.canvas.appendChild(el);
                 }
                 var res = new Element(el, svg);
+                res.attrs = res.attrs || {};
+                res.attrs.cx = x;
+                res.attrs.cy = y;
+                res.attrs.r = r;
+                res.attrs.stroke = "#000";
                 res.type = "circle";
                 return res;
             };
@@ -1232,23 +1230,25 @@ var Raphael = (function (type) {
                 el.setAttribute("y", svg._getY(y));
                 el.setAttribute("width", svg._getW(w));
                 el.setAttribute("height", svg._getH(h));
-                el.attrs = el.attrs || {};
-                el.attrs.x = x;
-                el.attrs.y = y;
-                el.attrs.width = w;
-                el.attrs.height = h;
                 if (r) {
                     el.setAttribute("rx", r);
                     el.setAttribute("ry", r);
-                    el.attrs.rx = el.attrs.ry = r;
                 }
                 el.setAttribute("fill", "none");
                 el.setAttribute("stroke", "#000");
-                el.attrs.stroke = "#000";
                 if (svg.canvas) {
                     svg.canvas.appendChild(el);
                 }
                 var res = new Element(el, svg);
+                res.attrs = res.attrs || {};
+                res.attrs.x = x;
+                res.attrs.y = y;
+                res.attrs.width = w;
+                res.attrs.height = h;
+                res.attrs.stroke = "#000";
+                if (r) {
+                    res.attrs.rx = res.attrs.ry = r;
+                }
                 res.type = "rect";
                 return res;
             };
@@ -1260,16 +1260,16 @@ var Raphael = (function (type) {
                 el.setAttribute("ry", svg._getH(ry));
                 el.setAttribute("fill", "none");
                 el.setAttribute("stroke", "#000");
-                el.attrs = el.attrs || {};
-                el.attrs.cx = x;
-                el.attrs.cy = y;
-                el.attrs.rx = rx;
-                el.attrs.ry = ry;
-                el.attrs.stroke = "#000";
                 if (svg.canvas) {
                     svg.canvas.appendChild(el);
                 }
                 var res = new Element(el, svg);
+                res.attrs = res.attrs || {};
+                res.attrs.cx = x;
+                res.attrs.cy = y;
+                res.attrs.rx = rx;
+                res.attrs.ry = ry;
+                res.attrs.stroke = "#000";
                 res.type = "ellipse";
                 return res;
             };
@@ -1284,6 +1284,11 @@ var Raphael = (function (type) {
                     svg.canvas.appendChild(el);
                 }
                 var res = new Element(el, svg);
+                res.attrs = res.attrs || {};
+                res.attrs.x = x;
+                res.attrs.y = y;
+                res.attrs.width = w;
+                res.attrs.height = h;
                 res.type = "image";
                 return res;
             };
@@ -1293,10 +1298,6 @@ var Raphael = (function (type) {
                 el.setAttribute("y", y);
                 el.setAttribute("text-anchor", "middle");
                 el.setAttribute("fill", "#000");
-                el.attrs = el.attrs || {};
-                el.attrs.x = x;
-                el.attrs.y = y;
-                el.attrs.fill = "#000";
                 if (text) {
                     el.appendChild(document.createTextNode(text));
                 }
@@ -1304,6 +1305,10 @@ var Raphael = (function (type) {
                     svg.canvas.appendChild(el);
                 }
                 var res = new Element(el, svg);
+                res.attrs = res.attrs || {};
+                res.attrs.x = x;
+                res.attrs.y = y;
+                res.attrs.fill = "#000";
                 res.type = "text";
                 return res;
             };
@@ -1454,6 +1459,43 @@ var Raphael = (function (type) {
                     setTimeout(function () {rect.remove();}, 0);
                 }
             };
+            Element.prototype.animateTo = function (x, y, ms, callback) {
+                clearTimeout(this.animation_in_progress);
+                if ("cx" in this.attrs || "x" in this.attrs) {
+                    var is_round = ("cx" in this.attrs),
+                        X = this.attrs.cx || this.attrs.x,
+                        Y = this.attrs.cy || this.attrs.y;
+                    if (x == X && y == Y) {
+                        return this;
+                    }
+                    var dy = y - Y,
+                        dx = x - X,
+                        coeff = dy / dx,
+                        plus = Y - coeff * X,
+                        alpha = Math.atan(this.coeff);
+                    this.xs = this.step * Math.cos(alpha);
+                    if (x < X) {
+                        this.xs = -this.xs;
+                    }
+                    var start = new Date(),
+                        that = this;
+                    (function () {
+                        var time = (new Date()).getTime() - start.getTime();
+                        if (time < ms) {
+                            var x1 = X + time * dx / ms;
+                            var y1 = x1 * coeff + plus;
+                            that.attr(is_round ? {cx: x1, cy: y1} : {x: x1, y: y1});
+                            that.animation_in_progress = setTimeout(arguments.callee, 1);
+                            C.safari();
+                        } else {
+                            that.attr(is_round ? {cx: x, cy: y} : {x: x, y: y});
+                            C.safari();
+                            callback && callback.call(that);
+                        }
+                    })();
+                }
+                return this;
+            };
             
             return r;
         } else {
@@ -1518,7 +1560,7 @@ Raphael.hsb2rgb = function (hue, saturation, brightness) {
     return rgb;
 };
 Raphael.rgb2hsb = function (red, green, blue) {
-    if (typeof red == "object" && "r" in red && "h" in red && "b" in red) {
+    if (typeof red == "object" && "r" in red && "g" in red && "b" in red) {
         blue = red.b;
         green = red.g;
         red = red.r;
@@ -1569,7 +1611,7 @@ Raphael.rgb2hsb = function (red, green, blue) {
 Raphael.getColor = function (value) {
     var start = arguments.callee.start = arguments.callee.start || {h: 0, s: 1, b: value || .75};
     var rgb = this.hsb2rgb(start.h, start.s, start.b);
-    start.h += .1;
+    start.h += .075;
     if (start.h > 1) {
         start.h = 0;
         start.s -= .2;
