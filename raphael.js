@@ -294,7 +294,12 @@ var Raphael = (function (type) {
                     if ("fill-opacity" in params || "opacity" in params) {
                         fill.opacity = ((params["fill-opacity"] + 1 || 2) - 1) * ((params.opacity + 1 || 2) - 1);
                     }
-                    fill.on = (params.fill && params.fill != "none");
+                    if (params.fill) {
+                        fill.on = true;
+                    }
+                    if (params.fill == "none") {
+                        fill.on = false;
+                    }
                     if (fill.on && params.fill) {
                         fill.color = params.fill;
                     }
@@ -388,6 +393,14 @@ var Raphael = (function (type) {
                 this.attrs = {};
                 this.Group = group;
                 this.vml = vml;
+                this.rotate = function (deg) {
+                    if (deg == undefined) {
+                        return Rotation;
+                    }
+                    Rotation += deg;
+                    this.Group.style.rotation = Rotation;
+                    return this;
+                };
             };
             Element.prototype.setBox = function (params) {
                 var gs = this.Group.style,
@@ -446,12 +459,10 @@ var Raphael = (function (type) {
                 this.Group.style.display = "block";
                 return this;
             };
-            Element.prototype.rotate = function (deg) {
-                Rotation += deg;
-                this.Group.style.rotation = Rotation;
-                return this;
-            };
             Element.prototype.translate = function (x, y) {
+                if (x == undefined && y == undefined) {
+                    return {x: this.X, y: this.Y};
+                }
                 this.X += x;
                 this.Y += y;
                 this.Group.style.left = this.X + "px";
@@ -465,6 +476,10 @@ var Raphael = (function (type) {
                 return this;
             };
             Element.prototype.scale = function (x, y) {
+                if (x == undefined && y == undefined) {
+                    return ;
+                    // TODO
+                }
                 y = y || x;
                 if (x != 0 && !(x == 1 && y == 1)) {
                     var dirx = Math.round(x / Math.abs(x)),
@@ -1056,6 +1071,54 @@ var Raphael = (function (type) {
                 this[0] = node;
                 this.attrs = this.attrs || {};
                 this.transformations = []; // rotate, translate, scale, matrix
+                this.rotate = function (deg) {
+                    if (deg == undefined) {
+                        return Rotation.deg;
+                    }
+                    var bbox = this.getBBox();
+                    Rotation.deg += deg;
+                    if (Rotation.deg) {
+                        this.transformations[0] = ("rotate(" + Rotation.deg + " " + (bbox.x + bbox.width / 2) + " " + (bbox.y + bbox.height / 2) + ")");
+                    } else {
+                        this.transformations[0] = "";
+                    }
+                    this[0].setAttribute("transform", this.transformations.join(" "));
+                    return this;
+                };
+                this.translate = function (x, y) {
+                    if (x == undefined && y == undefined) {
+                        return {x: X, y: Y};
+                    }
+                    X += x;
+                    Y += y;
+                    if (X && Y) {
+                        this.transformations[1] = "translate(" + X + "," + Y + ")";
+                    } else {
+                        this.transformations[1] = "";
+                    }
+                    this[0].setAttribute("transform", this.transformations.join(" "));
+                    return this;
+                };
+                this.scale = function (x, y) {
+                    if (x == undefined && y == undefined) {
+                        return {x: ScaleX, y: ScaleY};
+                    }
+                    y = y || x;
+                    if (x != 0 && !(x == 1 && y == 1)) {
+                        ScaleX *= x;
+                        ScaleY *= y;
+                        if (!(ScaleX == 1 && ScaleY == 1)) {
+                            var bbox = this.getBBox(),
+                                dx = bbox.x * (1 - ScaleX) + (bbox.width / 2 - bbox.width * ScaleX / 2),
+                                dy = bbox.y * (1 - ScaleY) + (bbox.height / 2 - bbox.height * ScaleY / 2);
+                            this.transformations[2] = new Matrix(ScaleX, 0, 0, ScaleY, dx, dy);
+                        } else {
+                            this.transformations[2] = "";
+                        }
+                        this[0].setAttribute("transform", this.transformations.join(" "));
+                    }
+                    return this;
+                };
             };
             Element.prototype.hide = function () {
                 this[0].style.display = "none";
@@ -1063,45 +1126,6 @@ var Raphael = (function (type) {
             };
             Element.prototype.show = function () {
                 this[0].style.display = "block";
-                return this;
-            };
-            Element.prototype.rotate = function (deg) {
-                var bbox = this.getBBox();
-                Rotation.deg += deg;
-                if (Rotation.deg) {
-                    this.transformations[0] = ("rotate(" + Rotation.deg + " " + (bbox.x + bbox.width / 2) + " " + (bbox.y + bbox.height / 2) + ")");
-                } else {
-                    this.transformations[0] = "";
-                }
-                this[0].setAttribute("transform", this.transformations.join(" "));
-                return this;
-            };
-            Element.prototype.translate = function (x, y) {
-                X += x;
-                Y += y;
-                if (X && Y) {
-                    this.transformations[1] = "translate(" + X + "," + Y + ")";
-                } else {
-                    this.transformations[1] = "";
-                }
-                this[0].setAttribute("transform", this.transformations.join(" "));
-                return this;
-            };
-            Element.prototype.scale = function (x, y) {
-                y = y || x;
-                if (x != 0 && !(x == 1 && y == 1)) {
-                    ScaleX *= x;
-                    ScaleY *= y;
-                    if (!(ScaleX == 1 && ScaleY == 1)) {
-                        var bbox = this.getBBox(),
-                            dx = bbox.x * (1 - ScaleX) + (bbox.width / 2 - bbox.width * ScaleX / 2),
-                            dy = bbox.y * (1 - ScaleY) + (bbox.height / 2 - bbox.height * ScaleY / 2);
-                        this.transformations[2] = new Matrix(ScaleX, 0, 0, ScaleY, dx, dy);
-                    } else {
-                        this.transformations[2] = "";
-                    }
-                    this[0].setAttribute("transform", this.transformations.join(" "));
-                }
                 return this;
             };
             // depricated
