@@ -297,7 +297,7 @@ var Raphael = (function (type) {
                     if (params.fill) {
                         fill.on = true;
                     }
-                    if (params.fill == "none") {
+                    if (fill.on == undefined || params.fill == "none") {
                         fill.on = false;
                     }
                     if (fill.on && params.fill) {
