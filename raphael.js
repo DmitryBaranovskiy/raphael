@@ -1069,6 +1069,7 @@ var Raphael = (function (type) {
                     ScaleY = 1,
                     tMatrix = null;
                 this[0] = node;
+                this.svg = svg;
                 this.attrs = this.attrs || {};
                 this.transformations = []; // rotate, translate, scale, matrix
                 this.rotate = function (deg) {
@@ -1214,7 +1215,7 @@ var Raphael = (function (type) {
                     }
                     if (params.gradient) {
                         this.attrs.gradient = params.gradient;
-                        addGrdientFill(this[0], params.gradient, svg);
+                        addGrdientFill(this[0], params.gradient, this.svg);
                     }
                 }
                 return this;
