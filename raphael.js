@@ -1,5 +1,5 @@
 /*
- * Raphael 0.5.6b - JavaScript Vector Library
+ * Raphael 0.5.7b - JavaScript Vector Library
  *
  * Copyright (c) 2008 Dmitry Baranovskiy (raphaeljs.com)
  * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
@@ -8,7 +8,7 @@ var Raphael = (function (type) {
         var r = function () {
             return r._create.apply(r, arguments);
         };
-        r.version = "0.5.6b";
+        r.version = "0.5.7b";
         r.type = type;
         var C = {};
         function Matrix(m11, m12, m21, m22, dx, dy) {
@@ -315,12 +315,10 @@ var Raphael = (function (type) {
                         stroke.color = params.stroke;
                     }
                     stroke.opacity = ((params["stroke-opacity"] + 1 || 2) - 1) * ((params.opacity + 1 || 2) - 1);
-                    stroke.joinstyle = params["stroke-linejoin"] || "miter";
+                    stroke.joinstyle && (stroke.joinstyle = params["stroke-linejoin"] || "miter");
                     stroke.miterlimit = params["stroke-miterlimit"] || 8;
-                    stroke.endcap = {butt: "flat", square: "square", round: "round"}[params["stroke-linecap"] || "miter"];
-                    if (params["stroke-width"]) {
-                        stroke.weight = (parseFloat(params["stroke-width"], 10) || 1) * 12/16;
-                    }
+                    params["stroke-linecap"] && (stroke.endcap = {butt: "flat", square: "square", round: "round"}[params["stroke-linecap"]] || "miter");
+                    params["stroke-width"] && (stroke.weight = (parseFloat(params["stroke-width"], 10) || 1) * 12 / 16);
                     if (params["stroke-dasharray"]) {
                         var dashes = params["stroke-dasharray"].replace(" ", ",").split(","),
                             dashesn = [],
@@ -780,6 +778,9 @@ var Raphael = (function (type) {
                 };
                 return container;
             };
+            C.remove = function () {
+                C.canvas.parentNode.parentNode.removeChild(C.canvas.parentNode);
+            };
         }
         if (type == "SVG") {
             Matrix.prototype.toString = function () {
@@ -1161,21 +1162,21 @@ var Raphael = (function (type) {
                         case "rx":
                         case "cx":
                         case "x":
-                            this[0].setAttribute(att, svg._getX(value));
+                            this[0].setAttribute(att, this.svg._getX(value));
                             break;
                         case "ry":
                         case "cy":
                         case "y":
-                            this[0].setAttribute(att, svg._getY(value));
+                            this[0].setAttribute(att, this.svg._getY(value));
                             break;
                         case "width":
-                            this[0].setAttribute(att, svg._getW(value));
+                            this[0].setAttribute(att, this.svg._getW(value));
                             break;
                         case "height":
-                            this[0].setAttribute(att, svg._getH(value));
+                            this[0].setAttribute(att, this.svg._getH(value));
                             break;
                         case "gradient":
-                            addGrdientFill(this[0], params.gradient, svg);
+                            addGrdientFill(this[0], value, this.svg);
                             break;
                         case "stroke-dasharray":
                             this[0].setAttribute(att, value.replace(" ", ","));
@@ -1415,6 +1416,9 @@ var Raphael = (function (type) {
                 }
                 container.clear();
                 return container;
+            };
+            C.remove = function () {
+                C.canvas.parentNode.removeChild(C.canvas);
             };
             C.svgns = "http://www.w3.org/2000/svg";
             C.xlink = "http://www.w3.org/1999/xlink";
