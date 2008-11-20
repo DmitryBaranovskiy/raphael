@@ -1,5 +1,5 @@
 /*
- * Raphael 0.5.8b - JavaScript Vector Library
+ * Raphael 0.5.9b - JavaScript Vector Library
  *
  * Copyright (c) 2008 Dmitry Baranovskiy (raphaeljs.com)
  * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
@@ -8,7 +8,7 @@ var Raphael = (function (type) {
         var r = function () {
             return r._create.apply(r, arguments);
         };
-        r.version = "0.5.8b";
+        r.version = "0.5.9b";
         r.type = type;
         var C = {};
         function Matrix(m11, m12, m21, m22, dx, dy) {
@@ -118,7 +118,7 @@ var Raphael = (function (type) {
                         _getY = this.isAbsolute ? VML._getY : VML._getH,
                         left = Math.round(cx - rx),
                         top = Math.round(cy - ry);
-                    d += [left, top, left + rx * 2, top + ry * 2, x1, y1, Math.round(_getX(parseFloat(x2, 10))), Math.round(_getX(parseFloat(y2, 10)))].join(", ");
+                    d += [left, top, Math.round(left + rx * 2), Math.round(top + ry * 2), Math.round(x1), Math.round(y1), Math.round(_getX(parseFloat(x2, 10))), Math.round(_getX(parseFloat(y2, 10)))].join(", ");
                     this[0].path = this.Path += d;
                     this.last.x = (this.isAbsolute ? 0 : this.last.x) + _getX(parseFloat(x2, 10));
                     this.last.y = (this.isAbsolute ? 0 : this.last.y) + _getY(parseFloat(y2, 10));
@@ -1122,8 +1122,8 @@ var Raphael = (function (type) {
                         if (attr == "stroke-dasharray") {
                             this[0].setAttribute(attr, params[attr].replace(" ", ","));
                         } else if (attr == "text" && this.type == "text") {
-                            this[0].removeChild(this[0].firstChild);
-                            this[0].appendChild(document.createTextNode(params[attr]));
+                            this[0].childNodes.length && this[0].removeChild(this[0].firstChild);
+                            this[0].appendChild(document.createTextNode(params.text));
                         } else {
                             var cssrule = attr.replace(/(\-.)/g, function (w) {
                                 return w.substring(1).toUpperCase();
@@ -1574,7 +1574,7 @@ Raphael.rgb2hsb = function (red, green, blue) {
         green = red.g;
         red = red.r;
     }
-    if (red.charAt(0) == "#") {
+    if (typeof red == "string" && red.charAt(0) == "#") {
         if (red.length == 4) {
             blue = parseInt(red.substring(3), 16);
             green = parseInt(red.substring(2, 3), 16);
@@ -1625,7 +1625,7 @@ Raphael.getColor = function (value) {
         start.h = 0;
         start.s -= .2;
         if (start.s <= 0) {
-            start = {h: 0, s: 1, b: start.b};
+            arguments.callee.start = {h: 0, s: 1, b: start.b};
         }
     }
     return rgb.hex;
