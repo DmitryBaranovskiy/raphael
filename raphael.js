@@ -15,7 +15,7 @@ var Raphael = (function (type) {
             this.m = [
                 [m11 || 1, m12 || 0, 0],
                 [m21 || 0, m22 || 1, 0],
-                [dx || 0, dy || 0, 1],
+                [dx || 0, dy || 0, 1]
             ];
         }
 
@@ -1547,7 +1547,7 @@ Raphael.hsb2rgb = function (hue, saturation, brightness) {
             function () {red = p; green = q; blue = brightness;},
             function () {red = t; green = p; blue = brightness;},
             function () {red = brightness; green = p; blue = q;},
-            function () {red = brightness; green = t; blue = p;},
+            function () {red = brightness; green = t; blue = p;}
         ][i]();
     }
     var rgb = {r: red, g: green, b: blue};
