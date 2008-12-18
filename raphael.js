@@ -1,5 +1,5 @@
 /*
- * Raphael 0.5.9b - JavaScript Vector Library
+ * Raphael 0.5.10 - JavaScript Vector Library
  *
  * Copyright (c) 2008 Dmitry Baranovskiy (raphaeljs.com)
  * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
@@ -8,7 +8,7 @@ var Raphael = (function (type) {
         var r = function () {
             return r._create.apply(r, arguments);
         };
-        r.version = "0.5.9b";
+        r.version = "0.5.10";
         r.type = type;
         var C = {};
         function Matrix(m11, m12, m21, m22, dx, dy) {
@@ -153,14 +153,30 @@ var Raphael = (function (type) {
                     var _getX = this.isAbsolute ? VML._getX : VML._getW;
                     var _getY = this.isAbsolute ? VML._getY : VML._getH;
                     if (arguments.length == 6) {
+                        this.last.bx = (this.isAbsolute ? 0 : this.last.x) + _getX(parseFloat(arguments[2], 10));
+                        this.last.by = (this.isAbsolute ? 0 : this.last.y) + _getY(parseFloat(arguments[3], 10));
                         this.last.x = (this.isAbsolute ? 0 : this.last.x) + _getX(parseFloat(arguments[4], 10));
                         this.last.y = (this.isAbsolute ? 0 : this.last.y) + _getY(parseFloat(arguments[5], 10));
-                        this.last.bx = Math.round(_getX(parseFloat(arguments[2], 10)));
-                        this.last.by = Math.round(_getY(parseFloat(arguments[3], 10)));
-                        d += Math.round(_getX(parseFloat(arguments[0], 10))) + " " + Math.round(_getY(parseFloat(arguments[1], 10))) + " " +
-                             Math.round(_getX(parseFloat(arguments[2], 10))) + " " + Math.round(_getY(parseFloat(arguments[3], 10))) + " " +
-                             Math.round(_getX(parseFloat(arguments[4], 10))) + " " + Math.round(_getY(parseFloat(arguments[5], 10))) + " ";
+                        d += Math.round(_getX(parseFloat(arguments[0], 10))) + " " +
+                             Math.round(_getY(parseFloat(arguments[1], 10))) + " " +
+                             Math.round(_getX(parseFloat(arguments[2], 10))) + " " +
+                             Math.round(_getY(parseFloat(arguments[3], 10))) + " " +
+                             Math.round(_getX(parseFloat(arguments[4], 10))) + " " +
+                             Math.round(_getY(parseFloat(arguments[5], 10))) + " ";
                         this.last.isAbsolute = this.isAbsolute;
+                    }
+                    if (arguments.length == 4) {
+                        var bx = this.last.x * 2 - this.last.bx;
+                        var by = this.last.y * 2 - this.last.by;
+                        this.last.bx = (this.isAbsolute ? 0 : this.last.x) + _getX(parseFloat(arguments[0], 10));
+                        this.last.by = (this.isAbsolute ? 0 : this.last.y) + _getY(parseFloat(arguments[1], 10));
+                        this.last.x = (this.isAbsolute ? 0 : this.last.x) + _getX(parseFloat(arguments[2], 10));
+                        this.last.y = (this.isAbsolute ? 0 : this.last.y) + _getY(parseFloat(arguments[3], 10));
+                        d += [Math.round(bx), Math.round(by),
+                             Math.round(_getX(parseFloat(arguments[0], 10))),
+                             Math.round(_getY(parseFloat(arguments[1], 10))),
+                             Math.round(_getX(parseFloat(arguments[2], 10))),
+                             Math.round(_getY(parseFloat(arguments[3], 10)))].join(" ");
                     }
                     this[0].path = this.Path += d;
                     this.path.push({type: "curve", arg: [].slice.call(arguments, 0), pos: this.isAbsolute});
@@ -227,16 +243,8 @@ var Raphael = (function (type) {
                     return this;
                 };
                 if (typeof pathString == "string") {
-                    pathString = pathString.replace(/([mzlhvcsqta])/ig, ",$1,").replace(/([^,])\-/ig, "$1,-");
-                    path = pathString.split(",");
-                    var i = 1, ii = path.length;
                     p.absolutely();
-                    while (i < ii) {
-                        if (C.pathfinder[path[i]]) {
-                            i = C.pathfinder[path[i]](p, path, i);
-                        }
-                        i++;
-                    }
+                    C.pathfinder(p, pathString);
                 }
                 return p;
             };
@@ -348,6 +356,7 @@ var Raphael = (function (type) {
                     RotY = 0,
                     Scale = 1;
                 this[0] = node;
+                this.node = node;
                 this.X = 0;
                 this.Y = 0;
                 this.attrs = {};
@@ -947,16 +956,8 @@ var Raphael = (function (type) {
                     return this;
                 };
                 if (typeof pathString == "string") {
-                    pathString = pathString.replace(/([mzlhvcsqta])/ig, ",$1,").replace(/([^,])\-/ig, "$1,-");
-                    path = pathString.split(",");
-                    var i = 1, ii = path.length;
                     p.absolutely();
-                    while (i < ii) {
-                        if (C.pathfinder[path[i]]) {
-                            i = C.pathfinder[path[i]](p, path, i);
-                        }
-                        i++;
-                    }
+                    C.pathfinder(p, pathString);
                 }
                 return p;
             };
@@ -989,6 +990,7 @@ var Raphael = (function (type) {
                     ScaleY = 1,
                     tMatrix = null;
                 this[0] = node;
+                this.node = node;
                 this.svg = svg;
                 this.attrs = this.attrs || {};
                 this.transformations = []; // rotate, translate, scale, matrix
@@ -1444,67 +1446,66 @@ var Raphael = (function (type) {
                 }
                 return this;
             };
-            C.pathfinder = {
-                M: function (p, path, i) {
-                    p.moveTo(path[++i] * 1, path[++i] * 1);
-                    return i;
-                },
-                m: function (p, path, i) {
-                    p.moveTo(p.last.x + path[++i] * 1, p.last.y + path[++i] * 1);
-                    return i;
-                },
-                C: function (p, path, i) {
-                    p.curveTo(path[++i] * 1, path[++i] * 1, path[++i] * 1, path[++i] * 1, path[++i] * 1, path[++i] * 1);
-                    return i;
-                },
-                c: function (p, path, i) {
-                    p.curveTo(p.last.x + path[++i] * 1, p.last.y + path[++i] * 1, p.last.x + path[++i] * 1, p.last.y + path[++i] * 1, p.last.x + path[++i] * 1, p.last.y + path[++i] * 1);
-                    return i;
-                },
-                S: function (p, path, i) {
-                    p.curveTo(path[++i] * 1, path[++i] * 1, path[++i] * 1, path[++i] * 1);
-                    return i;
-                },
-                s: function (p, path, i) {
-                    p.curveTo(p.last.x + path[++i] * 1, p.last.y + path[++i] * 1, p.last.x + path[++i] * 1, p.last.y + path[++i] * 1);
-                    return i;
-                },
-                L: function (p, path, i) {
-                    p.lineTo(path[++i] * 1, path[++i] * 1);
-                    return i;
-                },
-                l: function (p, path, i) {
-                    p.lineTo(p.last.x + path[++i] * 1, p.last.y + path[++i] * 1);
-                    return i;
-                },
-                H: function (p, path, i) {
-                    p.lineTo(path[++i] * 1, p.last.y);
-                    return i;
-                },
-                h: function (p, path, i) {
-                    p.lineTo(p.last.x + path[++i] * 1, p.last.y);
-                    return i;
-                },
-                V: function (p, path, i) {
-                    p.lineTo(p.last.x, path[++i] * 1);
-                    return i;
-                },
-                v: function (p, path, i) {
-                    p.lineTo(p.last.x, p.last.y + path[++i] * 1);
-                    return i;
-                },
-                A: function (p, path, i) {
-                    p.arcTo(path[++i] * 1, path[++i] * 1, path[i += 2], path[++i] * 1, path[++i] * 1, path[++i] * 1, path[++i] * 1);
-                    return i;
-                },
-                a: function (p, path, i) {
-                    p.arcTo(p.last.x + path[++i] * 1, p.last.y + path[++i] * 1, path[i += 2] * 1, path[++i] * 1, path[++i] * 1, p.last.x + path[++i] * 1, p.last.y + path[++i] * 1);
-                    return i;
-                },
-                z: function (p, path, i) {
-                    p.andClose();
-                    return i;
-                }
+            C.pathfinder = function (p, path) {
+                var commands = {
+                    M: function (x, y) {
+                        this.moveTo(x, y);
+                    },
+                    m: function (x, y) {
+                        this.moveTo(this.last.x + x, this.last.y + y);
+                    },
+                    C: function (x1, y1, x2, y2, x3, y3) {
+                        this.curveTo(x1, y1, x2, y2, x3, y3);
+                    },
+                    c: function (x1, y1, x2, y2, x3, y3) {
+                        this.curveTo(this.last.x + x1, this.last.y + y1, this.last.x + x2, this.last.y + y2, this.last.x + x3, this.last.y + y3);
+                    },
+                    S: function (x1, y1, x2, y2) {
+                        p.curveTo(x1, y1, x2, y2);
+                    },
+                    s: function (x1, y1, x2, y2) {
+                        this.curveTo(this.last.x + x1, this.last.y + y1, this.last.x + x2, this.last.y + y2);
+                    },
+                    L: function (x, y) {
+                        p.lineTo(x, y);
+                    },
+                    l: function (x, y) {
+                        this.lineTo(this.last.x + x, this.last.y + y);
+                    },
+                    H: function (x) {
+                        this.lineTo(x, this.last.y);
+                    },
+                    h: function (x) {
+                        this.lineTo(this.last.x + x, this.last.y);
+                    },
+                    V: function (y) {
+                        this.lineTo(this.last.x, y);
+                    },
+                    v: function (y) {
+                        this.lineTo(this.last.x, this.last.y + y);
+                    },
+                    A: function (rx, ry, xaxisrotation, largearcflag, sweepflag, x, y) {
+                        this.arcTo(rx, ry, largearcflag, sweepflag, x, y);
+                    },
+                    a: function (rx, ry, xaxisrotation, largearcflag, sweepflag, x, y) {
+                        this.arcTo(this.last.x + rx, this.last.y + ry, largearcflag, sweethisflag, this.last.x + x, this.last.y + y);
+                    },
+                    z: function () {
+                        this.andClose();
+                    }
+                };
+                path.replace(/([mzlhvcsqta])\s*((-?\d*\.?\d*\s*,?\s*)+)/ig, function (a, b, c) {
+                    var params = [];
+                    c.replace(/(-?\d*\.?\d*)\s*,?\s*/ig, function (a, b) {
+                        b && params.push(+b);
+                    });
+                    while (params.length >= commands[b].length) {
+                        commands[b].apply(p, params.splice(0, commands[b].length));
+                        if (!commands[b].length) {
+                            break;
+                        };
+                    }
+                });
             };
             return r;
         } else {
@@ -1519,7 +1520,7 @@ if (Raphael.vml && window.CanvasRenderingContext2D) {
     Raphael.vml = Raphael.svg = false;
 }
 Raphael.toString = function () {
-    return "Your browser supports " + this.type;
+    return "Your browser supports " + this.type + ".\nYou are running " + unescape("Rapha%EBl%20") + this.version;
 };
 // generic utilities
 Raphael.hsb2rgb = function (hue, saturation, brightness) {
