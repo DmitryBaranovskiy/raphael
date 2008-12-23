@@ -271,7 +271,15 @@ var Raphael = (function (type) {
                         fill.on = false;
                     }
                     if (fill.on && params.fill) {
-                        fill.color = params.fill;
+                        var isURL = params.fill.match(/^url\(([^\)]+)\)$/i);
+                        if (isURL) {
+                            fill.src = isURL[1];
+                            fill.type = "tile";
+                        } else {
+                            fill.color = params.fill;
+                            fill.src = "";
+                            fill.type = "solid";
+                        }
                     }
                     o.appendChild(fill);
                     var stroke = (o.getElementsByTagName("stroke") && o.getElementsByTagName("stroke")[0]) || document.createElement("rvml:stroke");
@@ -290,16 +298,19 @@ var Raphael = (function (type) {
                     params["stroke-linecap"] && (stroke.endcap = {butt: "flat", square: "square", round: "round"}[params["stroke-linecap"]] || "miter");
                     params["stroke-width"] && (stroke.weight = (parseFloat(params["stroke-width"], 10) || 1) * 12 / 16);
                     if (params["stroke-dasharray"]) {
-                        var dashes = params["stroke-dasharray"].replace(" ", ",").split(","),
-                            dashesn = [],
-                            str = stroke.weight;
-                        for (var i = 0, ii = dashes.length; i < ii; i++) {
-                            var res = dashes[i] / str;
-                            if (!isNaN(res)) {
-                                dashesn.push(res);
-                            }
+                        var dasharray = {
+                            "-": "shortdash",
+                            ".": "shortdot",
+                            "-.": "shortdashdot",
+                            "-..": "shortdashdotdot",
+                            ". ": "dot",
+                            "- ": "dash",
+                            "--": "longdash",
+                            "- .": "dashdot",
+                            "--.": "longdashdot",
+                            "--..": "longdashdotdot"
                         };
-                        stroke.dashstyle = dashesn.join(" ");
+                        stroke.dashstyle = dasharray[params["stroke-dasharray"]] || "";
                     }
                     o.appendChild(stroke);
                 }
@@ -316,37 +327,37 @@ var Raphael = (function (type) {
                 }
                 if (gradient.dots.length) {
                     fill.on = true;
-                    fill.type = (gradient.type.toLowerCase() == "linear") ? "gradient" : "gradientradial";
+                    fill.method = "none";
+                    fill.type = (gradient.type.toLowerCase() == "linear") ? "gradient" : "gradientTitle";
                     if (typeof gradient.dots[0].color != "undefined") {
                         fill.color = gradient.dots[0].color || "#000";
-                    }
-                    if (typeof gradient.dots[0].opacity != "undefined") {
-                        fill.opacity = gradient.dots[0].opacity;
-                    }
-                    if (typeof gradient.dots[gradient.dots.length - 1].opacity != "undefined") {
-                        fill.opacity2 = gradient.dots[gradient.dots.length - 1].opacity;
                     }
                     if (typeof gradient.dots[gradient.dots.length - 1].color != "undefined") {
                         fill.color2 = gradient.dots[gradient.dots.length - 1].color || "#000";
                     }
-                    var colors = "";
-                    for (var i = 1, ii = gradient.dots.length - 1; i < ii; i++) {
-                        colors += gradient.dots[i].offset + " " + gradient.dots[i].color;
-                        if (i != ii - 1) {
-                            colors += ",";
+                    var colors = [];
+                    for (var i = 0, ii = gradient.dots.length; i < ii; i++) {
+                        if (gradient.dots[i].offset) {
+                            colors.push(gradient.dots[i].offset + " " + gradient.dots[i].color);
                         }
                     };
+                    var fillOpacity = gradient.dots[0].opacity || 1;
+                    var fillOpacity2 = gradient.dots[gradient.dots.length - 1].opacity || 1;
                     if (colors) {
-                        fill.colors = colors;
+                        fill.colors.value = colors.join(",");
+                        fillOpacity2 += fillOpacity;
+                        fillOpacity = fillOpacity2 - fillOpacity;
+                        fillOpacity2 -= fillOpacity;
                     }
+                    fill.setAttribute("opacity", fillOpacity);
+                    fill.setAttribute("opacity2", fillOpacity2);
                     if (gradient.vector) {
-                        var angle = Math.round(Math.atan((parseInt(gradient.vector[3], 10) - parseInt(gradient.vector[1], 10)) / (parseInt(gradient.vector[2], 10) - parseInt(gradient.vector[0], 10))) * 57.29) + 180;
-                        fill.angle = angle + 90;
+                        var angle = Math.round(Math.atan((parseFloat(gradient.vector[3], 10) - parseFloat(gradient.vector[1], 10)) / (parseFloat(gradient.vector[2], 10) - parseFloat(gradient.vector[0], 10))) * 57.29) || 0;
+                        fill.angle = 270 - angle;
                     }
                     if (gradient.type.toLowerCase() == "radial") {
-                        fill.focusposition = "0.5, 0.5";
-                        fill.focussize = "0, 0";
-                        fill.method = "none";
+                        fill.focus = "100%";
+                        fill.focusposition = "0.5 0.5";
                     }
                 }
             };
@@ -762,22 +773,23 @@ var Raphael = (function (type) {
             var thePath = function (params, pathString, SVG) {
                 var el = document.createElementNS(SVG.svgns, "path");
                 el.setAttribute("fill", "none");
-                if (params) {
-                    for (var attr in params) {
-                        if (params.gradient) {
-                            addGrdientFill(el, params.gradient, SVG);
-                        } else {
-                            el.setAttribute(attr, params[attr]);
-                        }
-                    }
-                }
                 if (SVG.canvas) {
                     SVG.canvas.appendChild(el);
                 }
                 var p = new Element(el, SVG);
-                for (var attr in params) {
-                    p.attrs[attr] = params[attr];
+                if (params) {
+                    setFillAndStroke(p, params);
+                    // for (var attr in params) {
+                    //     if (params.gradient) {
+                    //         addGrdientFill(el, params.gradient, SVG);
+                    //     } else {
+                    //         el.setAttribute(attr, params[attr]);
+                    //     }
+                    // }
                 }
+                // for (var attr in params) {
+                //     p.attrs[attr] = params[attr];
+                // }
                 p.isAbsolute = true;
                 p.path = [];
                 p.last = {x: 0, y: 0, bx: 0, by: 0};
@@ -982,6 +994,104 @@ var Raphael = (function (type) {
                 };
                 o.setAttribute("fill", "url(#" + el.id + ")");
             };
+            var setFillAndStroke = function (o, params) {
+                var dasharray = {
+                    "-": [3, 1],
+                    ".": [1, 1],
+                    "-.": [3, 1, 1, 1],
+                    "-..": [3, 1, 1, 1, 1, 1],
+                    ". ": [1, 3],
+                    "- ": [4, 3],
+                    "--": [8, 3],
+                    "- .": [4, 3, 1, 3],
+                    "--.": [8, 3, 1, 3],
+                    "--..": [8, 3, 1, 3, 1, 3]
+                };
+                for (var att in params) {
+                    var value = params[att];
+                    o.attrs[att] = value;
+                    switch (att) {
+                        case "rx":
+                        case "cx":
+                        case "x":
+                            o[0].setAttribute(att, o.svg._getX(value));
+                            break;
+                        case "ry":
+                        case "cy":
+                        case "y":
+                            o[0].setAttribute(att, o.svg._getY(value));
+                            break;
+                        case "width":
+                            o[0].setAttribute(att, o.svg._getW(value));
+                            break;
+                        case "height":
+                            o[0].setAttribute(att, o.svg._getH(value));
+                            break;
+                        case "gradient":
+                            addGrdientFill(o[0], value, o.svg);
+                            break;
+                        case "stroke-dasharray":
+                            value = dasharray[value.toLowerCase()];
+                            if (value) {
+                                var width = params["stroke-width"] || o.attr("stroke-width") || "1",
+                                    butt = {round: width, square: width, butt: 0}[o.attr("stroke-linecap")] || 0,
+                                    dashes = [];
+                                for (var i = 0, ii = value.length; i < ii; i++) {
+                                    dashes.push(value[i] * width + ((i % 2) ? 1 : -1) * butt);
+                                }
+                                value = dashes.join(",");
+                                o[0].setAttribute(att, value);
+                            }
+                            break;
+                        case "text":
+                            if (o.type == "text") {
+                                o[0].childNodes.length && o[0].removeChild(o[0].firstChild);
+                                o[0].appendChild(document.createTextNode(value));
+                            }
+                            break;
+                        case "fill":
+                            var isURL = value.match(/^url\(([^\)]+)\)$/i);
+                            if (isURL) {
+                                var el = document.createElementNS(o.svg.svgns, "pattern");
+                                var ig = document.createElementNS(o.svg.svgns, "image");
+                                console.log(isURL);
+                                el.id = "raphael-pattern-" + o.svg.gradients++;
+                                el.setAttribute("x", 0);
+                                el.setAttribute("y", 0);
+                                el.setAttribute("patternUnits", "userSpaceOnUse");
+                                ig.setAttribute("x", 0);
+                                ig.setAttribute("y", 0);
+                                ig.setAttributeNS(o.svg.xlink, "href", isURL[1]);
+                                el.appendChild(ig);
+                                var img = document.createElement("img");
+                                img.src = isURL[1];
+                                img.style.position = "absolute";
+                                img.style.top = "-9999em";
+                                img.style.left = "-9999em";
+                                img.onload = function () {
+                                    el.setAttribute("width", this.offsetWidth);
+                                    el.setAttribute("height", this.offsetHeight);
+                                    ig.setAttribute("width", this.offsetWidth);
+                                    ig.setAttribute("height", this.offsetHeight);
+                                    document.body.removeChild(this);
+                                };
+                                document.body.appendChild(img);
+                                o.svg.defs.appendChild(el);
+                                o[0].style.fill = "url(#" + el.id + ")";
+                                o[0].setAttribute("fill", "url(#" + el.id + ")");
+                                break;
+                            }
+                        default :
+                            var cssrule = att.replace(/(\-.)/g, function (w) {
+                                return w.substring(1).toUpperCase();
+                            });
+                            o[0].style[cssrule] = value;
+                            // Need following line for Firefox
+                            o[0].setAttribute(att, value);
+                            break;
+                    }
+                }
+            };
             var Element = function (node, svg) {
                 var X = 0,
                     Y = 0,
@@ -1014,7 +1124,7 @@ var Raphael = (function (type) {
                     }
                     X += x;
                     Y += y;
-                    if (X && Y) {
+                    if (X || Y) {
                         this.transformations[1] = "translate(" + X + "," + Y + ")";
                     } else {
                         this.transformations[1] = "";
@@ -1075,70 +1185,11 @@ var Raphael = (function (type) {
                     return values;
                 }
                 if (arguments.length == 2) {
-                    var att = arguments[0],
-                        value = arguments[1];
-                    this[att] = value;
-                    this.attrs[att] = value;
-                    switch (att) {
-                        case "rx":
-                        case "cx":
-                        case "x":
-                            this[0].setAttribute(att, this.svg._getX(value));
-                            break;
-                        case "ry":
-                        case "cy":
-                        case "y":
-                            this[0].setAttribute(att, this.svg._getY(value));
-                            break;
-                        case "width":
-                            this[0].setAttribute(att, this.svg._getW(value));
-                            break;
-                        case "height":
-                            this[0].setAttribute(att, this.svg._getH(value));
-                            break;
-                        case "gradient":
-                            addGrdientFill(this[0], value, this.svg);
-                            break;
-                        case "stroke-dasharray":
-                            this[0].setAttribute(att, value.replace(" ", ","));
-                            break;
-                        case "text":
-                            if (this.type == "text") {
-                                this[0].removeChild(this[0].firstChild);
-                                this[0].appendChild(document.createTextNode(value));
-                            }
-                            break;
-                        default :
-                            var cssrule = att.replace(/(\-.)/g, function (w) {
-                                return w.substring(1).toUpperCase();
-                            });
-                            this[0].style[cssrule] = value;
-                            // Need following line for Firefox
-                            this[0].setAttribute(att, value);
-                            break;
-                    }
+                    var params = {};
+                    params[arguments[0]] = arguments[1];
+                    setFillAndStroke(this, params);
                 } else if (arguments.length == 1 && typeof arguments[0] == "object") {
-                    var params = arguments[0];
-                    for (var attr in params) {
-                        this.attrs[attr] = params[attr];
-                        if (attr == "stroke-dasharray") {
-                            this[0].setAttribute(attr, params[attr].replace(" ", ","));
-                        } else if (attr == "text" && this.type == "text") {
-                            this[0].childNodes.length && this[0].removeChild(this[0].firstChild);
-                            this[0].appendChild(document.createTextNode(params.text));
-                        } else {
-                            var cssrule = attr.replace(/(\-.)/g, function (w) {
-                                return w.substring(1).toUpperCase();
-                            });
-                            this[0].style[cssrule] = params[attr];
-                            // Need following line for Firefox
-                            this[0].setAttribute(attr, params[attr]);
-                        }
-                    }
-                    if (params.gradient) {
-                        this.attrs.gradient = params.gradient;
-                        addGrdientFill(this[0], params.gradient, this.svg);
-                    }
+                    setFillAndStroke(this, arguments[0]);
                 }
                 return this;
             };
