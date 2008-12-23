@@ -1416,12 +1416,14 @@ var Raphael = (function (type) {
             C.drawGrid = function (x, y, w, h, wv, hv, color) {
                 color = color || "#000";
                 var p = this.path({stroke: color, "stroke-width": 1})
-                        .moveTo(x, y).lineTo(x + w, y).lineTo(x + w, y + h).lineTo(x, y + h).lineTo(x, y);
+                        .moveTo(x, y).lineTo(x + w, y).lineTo(x + w, y + h).lineTo(x, y + h).lineTo(x, y),
+                    rowHeight = h / hv,
+                    columnWidth = w / wv;
                 for (var i = 1; i < hv; i++) {
-                    p.moveTo(x, y + i * Math.round(h / hv)).lineTo(x + w, y + i * Math.round(h / hv));
+                    p.moveTo(x, y + i * rowHeight).lineTo(x + w, y + i * rowHeight);
                 }
                 for (var i = 1; i < wv; i++) {
-                    p.moveTo(x + i * Math.round(w / wv), y).lineTo(x + i * Math.round(w / wv), y + h);
+                    p.moveTo(x + i * columnWidth, y).lineTo(x + i * columnWidth, y + h);
                 }
                 return p;
             };
