@@ -779,17 +779,7 @@ var Raphael = (function (type) {
                 var p = new Element(el, SVG);
                 if (params) {
                     setFillAndStroke(p, params);
-                    // for (var attr in params) {
-                    //     if (params.gradient) {
-                    //         addGrdientFill(el, params.gradient, SVG);
-                    //     } else {
-                    //         el.setAttribute(attr, params[attr]);
-                    //     }
-                    // }
                 }
-                // for (var attr in params) {
-                //     p.attrs[attr] = params[attr];
-                // }
                 p.isAbsolute = true;
                 p.path = [];
                 p.last = {x: 0, y: 0, bx: 0, by: 0};
