@@ -1,5 +1,5 @@
 /*
- * Raphael 0.5.10 - JavaScript Vector Library
+ * Raphael 0.5.11 - JavaScript Vector Library
  *
  * Copyright (c) 2008 Dmitry Baranovskiy (raphaeljs.com)
  * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
@@ -8,7 +8,7 @@ var Raphael = (function (type) {
         var r = function () {
             return r._create.apply(r, arguments);
         };
-        r.version = "0.5.10";
+        r.version = "0.5.11";
         r.type = type;
         var C = {};
         function Matrix(m11, m12, m21, m22, dx, dy) {
