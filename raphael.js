@@ -1071,6 +1071,7 @@ var Raphael = (function (type) {
                                     ig.setAttribute("width", this.offsetWidth);
                                     ig.setAttribute("height", this.offsetHeight);
                                     document.body.removeChild(this);
+                                    C.safari();
                                 };
                                 document.body.appendChild(img);
                                 img.src = isURL[1];
@@ -1079,7 +1080,6 @@ var Raphael = (function (type) {
                                 o[0].setAttribute("fill", "url(#" + el.id + ")");
                                 o.pattern = el;
                                 updatePosition(o);
-                                C.safari();
                                 break;
                             }
                         default :
