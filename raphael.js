@@ -1,14 +1,14 @@
 /*
- * Raphael 0.5.11 - JavaScript Vector Library
+ * Raphael 0.5.12 - JavaScript Vector Library
  *
- * Copyright (c) 2008 Dmitry Baranovskiy (raphaeljs.com)
+ * Copyright (c) 2008 Dmitry Baranovskiy (http://raphaeljs.com)
  * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
  */
 var Raphael = (function (type) {
         var r = function () {
             return r._create.apply(r, arguments);
         };
-        r.version = "0.5.11";
+        r.version = "0.5.12";
         r.type = type;
         var C = {};
         function Matrix(m11, m12, m21, m22, dx, dy) {
@@ -984,6 +984,12 @@ var Raphael = (function (type) {
                 };
                 o.setAttribute("fill", "url(#" + el.id + ")");
             };
+            var updatePosition = function (o) {
+                if (o.pattern) {
+                    var bbox = o.node.getBBox();
+                    o.pattern.setAttribute("patternTransform", "translate(" + [bbox.x, bbox.y].join(",") + ")");
+                }
+            };
             var setFillAndStroke = function (o, params) {
                 var dasharray = {
                     "-": [3, 1],
@@ -1005,11 +1011,13 @@ var Raphael = (function (type) {
                         case "cx":
                         case "x":
                             o[0].setAttribute(att, o.svg._getX(value));
+                            updatePosition(o);
                             break;
                         case "ry":
                         case "cy":
                         case "y":
                             o[0].setAttribute(att, o.svg._getY(value));
+                            updatePosition(o);
                             break;
                         case "width":
                             o[0].setAttribute(att, o.svg._getW(value));
@@ -1044,7 +1052,6 @@ var Raphael = (function (type) {
                             if (isURL) {
                                 var el = document.createElementNS(o.svg.svgns, "pattern");
                                 var ig = document.createElementNS(o.svg.svgns, "image");
-                                console.log(isURL);
                                 el.id = "raphael-pattern-" + o.svg.gradients++;
                                 el.setAttribute("x", 0);
                                 el.setAttribute("y", 0);
@@ -1053,8 +1060,8 @@ var Raphael = (function (type) {
                                 ig.setAttribute("y", 0);
                                 ig.setAttributeNS(o.svg.xlink, "href", isURL[1]);
                                 el.appendChild(ig);
+
                                 var img = document.createElement("img");
-                                img.src = isURL[1];
                                 img.style.position = "absolute";
                                 img.style.top = "-9999em";
                                 img.style.left = "-9999em";
@@ -1066,9 +1073,13 @@ var Raphael = (function (type) {
                                     document.body.removeChild(this);
                                 };
                                 document.body.appendChild(img);
+                                img.src = isURL[1];
                                 o.svg.defs.appendChild(el);
                                 o[0].style.fill = "url(#" + el.id + ")";
                                 o[0].setAttribute("fill", "url(#" + el.id + ")");
+                                o.pattern = el;
+                                updatePosition(o);
+                                C.safari();
                                 break;
                             }
                         default :
