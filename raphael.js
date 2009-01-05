@@ -1,5 +1,5 @@
 /*
- * Raphael 0.5.12 - JavaScript Vector Library
+ * Raphael 0.6 - JavaScript Vector Library
  *
  * Copyright (c) 2008 Dmitry Baranovskiy (http://raphaeljs.com)
  * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
@@ -8,25 +8,13 @@ var Raphael = (function (type) {
         var r = function () {
             return r._create.apply(r, arguments);
         };
-        r.version = "0.5.12";
+        r.version = "0.6";
         r.type = type;
-        var C = {};
-        function Matrix(m11, m12, m21, m22, dx, dy) {
-            this.m = [
-                [m11 || 1, m12 || 0, 0],
-                [m21 || 0, m22 || 1, 0],
-                [dx || 0, dy || 0, 1]
-            ];
-        }
-
-        C._getX = C._getY = C._getW = C._getH = function (x) { return x; };
+        var availableAttrs = {cx: 0, cy: 0, fill: "#fff", "fill-opacity": 1, font: '16px "Arial"', "font-family": '"Arial"', "font-size": "16", gradient: 0, height: 0, opacity: 1, path: "M0,0", r: 0, rotation: 0, rx: 0, ry: 0, scale: "1 1", stroke: "#000", "stroke-dasharray": "", "stroke-linecap": "butt", "stroke-linejoin": "butt", "stroke-miterlimit": 0, "stroke-opacity": 1, "stroke-width": 1, translation: "0 0", width: 0, x: 0, y: 0},
+            availableAnimAttrs = {cx: "number", cy: "number", fill: "colour", "fill-opacity": "number", "font-size": "number", height: "number", opacity: "number", path: "path", r: "number", rotation: "number", rx: "number", ry: "number", scale: "csv", stroke: "colour", "stroke-opacity": "number", "stroke-width": "number", translation: "csv", width: "number", x: "number", y: "number"},
+            C = {};
 
         if (type == "VML") {
-            Matrix.prototype.toString = function () {
-                return "progid:DXImageTransform.Microsoft.Matrix(M11=" + this.m[0][0] +
-                    ", M12=" + this.m[1][0] + ", M21=" + this.m[0][1] + ", M22=" + this.m[1][1] +
-                    ", Dx=" + this.m[2][0] + ", Dy=" + this.m[2][1] + ", sizingmethod='auto expand', filtertype='bilinear')";
-            };
             var thePath = function (params, pathString, VML) {
                 var g = document.createElement("rvml:group"), gl = g.style;
                 gl.position = "absolute";
@@ -46,10 +34,6 @@ var Raphael = (function (type) {
                 g.appendChild(el);
                 VML.canvas.appendChild(g);
                 var p = new Element(el, g, VML);
-                setFillAndStroke(p, params);
-                if (params.gradient) {
-                    addGrdientFill(p, params.gradient);
-                }
                 p.isAbsolute = true;
                 p.type = "path";
                 p.path = [];
@@ -63,41 +47,24 @@ var Raphael = (function (type) {
                     this.isAbsolute = false;
                     return this;
                 };
-                p.redraw = function () {
-                    this.Path = "";
-                    var oldPath = this.path;
-                    this.path = [];
-                    for (var i = 0, ii = oldPath.length; i < ii; i++) {
-                        if (oldPath[i].type != "end") {
-                            this[oldPath[i].type + "To"].apply(this, oldPath[i].arg);
-                        } else {
-                            this.andClose();
-                        }
-                    }
-                    return this;
-                };
                 p.moveTo = function (x, y) {
                     var d = this.isAbsolute?"m":"t";
-                    var _getX = this.isAbsolute ? VML._getX : VML._getW;
-                    var _getY = this.isAbsolute ? VML._getY : VML._getH;
-                    d += Math.round(_getX(parseFloat(x, 10))) + " " + Math.round(_getY(parseFloat(y, 10)));
-                    this[0].path = this.Path += d;
-                    this.last.x = (this.isAbsolute ? 0 : this.last.x) + _getX(parseFloat(x, 10));
-                    this.last.y = (this.isAbsolute ? 0 : this.last.y) + _getY(parseFloat(y, 10));
+                    d += Math.round(parseFloat(x, 10)) + " " + Math.round(parseFloat(y, 10));
+                    this.node.path = this.Path += d;
+                    this.last.x = (this.isAbsolute ? 0 : this.last.x) + parseFloat(x, 10);
+                    this.last.y = (this.isAbsolute ? 0 : this.last.y) + parseFloat(y, 10);
                     this.last.isAbsolute = this.isAbsolute;
-                    this.path.push({type: "move", arg: [].slice.call(arguments, 0), pos: this.isAbsolute});
+                    this.attrs.path += (this.isAbsolute ? "M" : "m") + [x, y];
                     return this;
                 };
                 p.lineTo = function (x, y) {
                     var d = this.isAbsolute?"l":"r";
-                    var _getX = this.isAbsolute ? VML._getX : VML._getW;
-                    var _getY = this.isAbsolute ? VML._getY : VML._getH;
-                    d += Math.round(_getX(parseFloat(x, 10))) + " " + Math.round(_getY(parseFloat(y, 10)));
+                    d += Math.round(parseFloat(x, 10)) + " " + Math.round(parseFloat(y, 10));
                     this[0].path = this.Path += d;
-                    this.last.x = (this.isAbsolute ? 0 : this.last.x) + _getX(parseFloat(x, 10));
-                    this.last.y = (this.isAbsolute ? 0 : this.last.y) + _getY(parseFloat(y, 10));
+                    this.last.x = (this.isAbsolute ? 0 : this.last.x) + parseFloat(x, 10);
+                    this.last.y = (this.isAbsolute ? 0 : this.last.y) + parseFloat(y, 10);
                     this.last.isAbsolute = this.isAbsolute;
-                    this.path.push({type: "line", arg: [].slice.call(arguments, 0), pos: this.isAbsolute});
+                    this.attrs.path += (this.isAbsolute ? "L" : "l") + [x, y];
                     return this;
                 };
                 p.arcTo = function (rx, ry, large_arc_flag, sweep_flag, x2, y2) {
@@ -110,76 +77,100 @@ var Raphael = (function (type) {
                         x = (x1 - x2) / 2,
                         y = (y1 - y2) / 2,
                         k = (large_arc_flag == sweep_flag ? -1 : 1) *
-                            Math.sqrt((rx * rx * ry * ry - rx * rx * y * y - ry * ry * x * x) / (rx * rx * y * y + ry * ry * x * x)),
+                            Math.sqrt(Math.abs(rx * rx * ry * ry - rx * rx * y * y - ry * ry * x * x) / (rx * rx * y * y + ry * ry * x * x)),
                         cx = k * rx * y / ry + (x1 + x2) / 2,
                         cy = k * -ry * x / rx + (y1 + y2) / 2,
-                        d = sweep_flag ? (this.isAbsolute?"wa":"wr") : (this.isAbsolute?"at":"ar"),
-                        _getX = this.isAbsolute ? VML._getX : VML._getW,
-                        _getY = this.isAbsolute ? VML._getY : VML._getH,
+                        d = sweep_flag ? (this.isAbsolute ? "wa" : "wr") : (this.isAbsolute ? "at" : "ar"),
                         left = Math.round(cx - rx),
                         top = Math.round(cy - ry);
-                    d += [left, top, Math.round(left + rx * 2), Math.round(top + ry * 2), Math.round(x1), Math.round(y1), Math.round(_getX(parseFloat(x2, 10))), Math.round(_getX(parseFloat(y2, 10)))].join(", ");
-                    this[0].path = this.Path += d;
-                    this.last.x = (this.isAbsolute ? 0 : this.last.x) + _getX(parseFloat(x2, 10));
-                    this.last.y = (this.isAbsolute ? 0 : this.last.y) + _getY(parseFloat(y2, 10));
+                    d += [left, top, Math.round(left + rx * 2), Math.round(top + ry * 2), Math.round(x1), Math.round(y1), Math.round(parseFloat(x2, 10)), Math.round(parseFloat(y2, 10))].join(", ");
+                    this.node.path = this.Path += d;
+                    this.last.x = (this.isAbsolute ? 0 : this.last.x) + parseFloat(x2, 10);
+                    this.last.y = (this.isAbsolute ? 0 : this.last.y) + parseFloat(y2, 10);
                     this.last.isAbsolute = this.isAbsolute;
-                    this.path.push({type: "arc", arg: [].slice.call(arguments, 0), pos: this.isAbsolute});
+                    this.attrs.path += (this.isAbsolute ? "A" : "a") + [rx, ry, 0, large_arc_flag, sweep_flag, x2, y2];
                     return this;
                 };
                 p.cplineTo = function (x1, y1, w1) {
                     if (!w1) {
                         return this.lineTo(x1, y1);
                     } else {
-                        var p = {};
-                        p._getX = this.isAbsolute ? VML._getX : VML._getW;
-                        p._getY = this.isAbsolute ? VML._getY : VML._getH;
-                        var x = Math.round(p._getX(Math.round(parseFloat(x1, 10) * 100) / 100));
-                        var y = Math.round(p._getY(Math.round(parseFloat(y1, 10) * 100) / 100));
-                        var w = Math.round(VML._getW(Math.round(parseFloat(w1, 10) * 100) / 100));
-                        var d = this.isAbsolute?"c":"v";
-                        var attr = [Math.round(this.last.x) + w, Math.round(this.last.y), x - w, y, x, y];
+                        var x = Math.round(Math.round(parseFloat(x1, 10) * 100) / 100),
+                            y = Math.round(Math.round(parseFloat(y1, 10) * 100) / 100),
+                            w = Math.round(Math.round(parseFloat(w1, 10) * 100) / 100),
+                            d = this.isAbsolute ? "c" : "v",
+                            attr = [Math.round(this.last.x) + w, Math.round(this.last.y), x - w, y, x, y],
+                            svgattr = [this.last.x + w1, this.last.y, x1 - w1, y1, x1, y1];
                         d += attr.join(" ") + " ";
                         this.last.x = (this.isAbsolute ? 0 : this.last.x) + attr[4];
                         this.last.y = (this.isAbsolute ? 0 : this.last.y) + attr[5];
                         this.last.bx = attr[2];
                         this.last.by = attr[3];
-                        this[0].path = this.Path += d;
-                        this.path.push({type: "cpline", arg: [].slice.call(arguments, 0), pos: this.isAbsolute});
+                        this.node.path = this.Path += d;
+                        this.attrs.path += (this.isAbsolute ? "C" : "c") + svgattr;
                         return this;
                     }
                 };
                 p.curveTo = function () {
-                    var d = this.isAbsolute?"c":"v";
-                    var _getX = this.isAbsolute ? VML._getX : VML._getW;
-                    var _getY = this.isAbsolute ? VML._getY : VML._getH;
+                    var d = this.isAbsolute ? "c" : "v";
                     if (arguments.length == 6) {
-                        this.last.bx = (this.isAbsolute ? 0 : this.last.x) + _getX(parseFloat(arguments[2], 10));
-                        this.last.by = (this.isAbsolute ? 0 : this.last.y) + _getY(parseFloat(arguments[3], 10));
-                        this.last.x = (this.isAbsolute ? 0 : this.last.x) + _getX(parseFloat(arguments[4], 10));
-                        this.last.y = (this.isAbsolute ? 0 : this.last.y) + _getY(parseFloat(arguments[5], 10));
-                        d += Math.round(_getX(parseFloat(arguments[0], 10))) + " " +
-                             Math.round(_getY(parseFloat(arguments[1], 10))) + " " +
-                             Math.round(_getX(parseFloat(arguments[2], 10))) + " " +
-                             Math.round(_getY(parseFloat(arguments[3], 10))) + " " +
-                             Math.round(_getX(parseFloat(arguments[4], 10))) + " " +
-                             Math.round(_getY(parseFloat(arguments[5], 10))) + " ";
+                        this.last.bx = (this.isAbsolute ? 0 : this.last.x) + parseFloat(arguments[2], 10);
+                        this.last.by = (this.isAbsolute ? 0 : this.last.y) + parseFloat(arguments[3], 10);
+                        this.last.x = (this.isAbsolute ? 0 : this.last.x) + parseFloat(arguments[4], 10);
+                        this.last.y = (this.isAbsolute ? 0 : this.last.y) + parseFloat(arguments[5], 10);
+                        d += [Math.round(parseFloat(arguments[0], 10)),
+                             Math.round(parseFloat(arguments[1], 10)),
+                             Math.round(parseFloat(arguments[2], 10)),
+                             Math.round(parseFloat(arguments[3], 10)),
+                             Math.round(parseFloat(arguments[4], 10)),
+                             Math.round(parseFloat(arguments[5], 10))].join(" ") + " ";
                         this.last.isAbsolute = this.isAbsolute;
+                        this.attrs.path += (this.isAbsolute ? "C" : "c") + Array.prototype.splice.call(arguments, 0, arguments.length);
                     }
                     if (arguments.length == 4) {
                         var bx = this.last.x * 2 - this.last.bx;
                         var by = this.last.y * 2 - this.last.by;
-                        this.last.bx = (this.isAbsolute ? 0 : this.last.x) + _getX(parseFloat(arguments[0], 10));
-                        this.last.by = (this.isAbsolute ? 0 : this.last.y) + _getY(parseFloat(arguments[1], 10));
-                        this.last.x = (this.isAbsolute ? 0 : this.last.x) + _getX(parseFloat(arguments[2], 10));
-                        this.last.y = (this.isAbsolute ? 0 : this.last.y) + _getY(parseFloat(arguments[3], 10));
+                        this.last.bx = (this.isAbsolute ? 0 : this.last.x) + parseFloat(arguments[0], 10);
+                        this.last.by = (this.isAbsolute ? 0 : this.last.y) + parseFloat(arguments[1], 10);
+                        this.last.x = (this.isAbsolute ? 0 : this.last.x) + parseFloat(arguments[2], 10);
+                        this.last.y = (this.isAbsolute ? 0 : this.last.y) + parseFloat(arguments[3], 10);
                         d += [Math.round(bx), Math.round(by),
-                             Math.round(_getX(parseFloat(arguments[0], 10))),
-                             Math.round(_getY(parseFloat(arguments[1], 10))),
-                             Math.round(_getX(parseFloat(arguments[2], 10))),
-                             Math.round(_getY(parseFloat(arguments[3], 10)))].join(" ");
+                             Math.round(parseFloat(arguments[0], 10)),
+                             Math.round(parseFloat(arguments[1], 10)),
+                             Math.round(parseFloat(arguments[2], 10)),
+                             Math.round(parseFloat(arguments[3], 10))].join(" ") + " ";
+                         this.attrs.path += (this.isAbsolute ? "S" : "s") + Array.prototype.splice.call(arguments, 0, arguments.length);
                     }
-                    this[0].path = this.Path += d;
-                    this.path.push({type: "curve", arg: [].slice.call(arguments, 0), pos: this.isAbsolute});
+                    this.node.path = this.Path += d;
+                    return this;
+                };
+                p.qcurveTo = function () {
+                    var d = "qb";
+                    if (arguments.length == 4) {
+                        this.last.qx = (this.isAbsolute ? 0 : this.last.x) + parseFloat(arguments[0], 10);
+                        this.last.qy = (this.isAbsolute ? 0 : this.last.y) + parseFloat(arguments[1], 10);
+                        this.last.x = (this.isAbsolute ? 0 : this.last.x) + parseFloat(arguments[2], 10);
+                        this.last.y = (this.isAbsolute ? 0 : this.last.y) + parseFloat(arguments[3], 10);
+                        d += [Math.round(this.last.qx),
+                             Math.round(this.last.qy),
+                             Math.round(this.last.x),
+                             Math.round(this.last.y)].join(" ") + " ";
+                        this.last.isAbsolute = this.isAbsolute;
+                        this.attrs.path += (this.isAbsolute ? "Q" : "q") + Array.prototype.splice.call(arguments, 0, arguments.length);
+                    }
+                    if (arguments.length == 2) {
+                        this.last.qx = this.last.x * 2 - this.last.qx;
+                        this.last.qy = this.last.y * 2 - this.last.qy;
+                        this.last.x = (this.isAbsolute ? 0 : this.last.x) + parseFloat(arguments[2], 10);
+                        this.last.y = (this.isAbsolute ? 0 : this.last.y) + parseFloat(arguments[3], 10);
+                        d += [Math.round(this.last.qx),
+                             Math.round(this.last.qy),
+                             Math.round(this.last.x),
+                             Math.round(this.last.y)].join(" ") + " ";
+                         this.attrs.path += (this.isAbsolute ? "T" : "t") + Array.prototype.splice.call(arguments, 0, arguments.length);
+                    }
+                    this.node.path = this.Path += d;
+                    this.path.push({type: "qcurve", arg: [].slice.call(arguments, 0), pos: this.isAbsolute});
                     return this;
                 };
                 p.addRoundedCorner = function (r, dir) {
@@ -239,12 +230,19 @@ var Raphael = (function (type) {
                     return o;
                 };
                 p.andClose = function () {
-                    this[0].path = (this.Path += "x e");
+                    this.node.path = (this.Path += "x e");
+                    this.attrs.path += "z";
                     return this;
                 };
                 if (typeof pathString == "string") {
                     p.absolutely();
+                    p.attrs.path = "";
                     C.pathfinder(p, pathString);
+                }
+                p.setBox();
+                setFillAndStroke(p, params);
+                if (params.gradient) {
+                    addGrdientFill(p, params.gradient);
                 }
                 return p;
             };
@@ -253,6 +251,22 @@ var Raphael = (function (type) {
                 o.attrs = o.attrs || {};
                 for (var par in params) {
                     o.attrs[par] = params[par];
+                }
+                if (params.path && o.type == "path") {
+                    o.Path = "";
+                    o.path = [];
+                    C.pathfinder(o, params.path);
+                }
+                if (params.rotation != null) {
+                    o.Group.style.rotation = params.rotation;
+                }
+                if (params.translation) {
+                    var xy = params.translation.split(/[, ]+/);
+                    o.translate(xy[0], xy[1]);
+                }
+                if (params.scale) {
+                    var xy = params.scale.split(/[, ]+/);
+                    o.scale(xy[0], xy[1]);
                 }
                 params["font-family"] && (s.fontFamily = params["font-family"]);
                 params["font-size"] && (s.fontSize = params["font-size"]);
@@ -373,14 +387,25 @@ var Raphael = (function (type) {
                 this.attrs = {};
                 this.Group = group;
                 this.vml = vml;
-                this.rotate = function (deg) {
-                    if (deg == undefined) {
-                        return Rotation;
-                    }
-                    Rotation += deg;
-                    this.Group.style.rotation = Rotation;
-                    return this;
+                this._ = {
+                    tx: 0,
+                    ty: 0,
+                    rt: 0,
+                    sx: 1,
+                    sy: 1
                 };
+            };
+            Element.prototype.rotate = function (deg, isAbsolute) {
+                if (deg == undefined) {
+                    return this._.rt;
+                }
+                if (isAbsolute) {
+                    this._.rt = deg;
+                } else {
+                    this._.rt += deg;
+                }
+                this.Group.style.rotation = this._.rt;
+                return this;
             };
             Element.prototype.setBox = function (params) {
                 var gs = this.Group.style,
@@ -405,31 +430,55 @@ var Raphael = (function (type) {
                     case "image":
                         x = attr.x;
                         y = attr.y;
-                        w = attr.w;
-                        h = attr.h;
+                        w = attr.width || 0;
+                        h = attr.height || 0;
                         break;
                     case "text":
                         this.textpath.v = ["m", Math.round(attr.x), ", ", Math.round(attr.y - 2), "l", Math.round(attr.x) + 1, ", ", Math.round(attr.y - 2)].join("");
                         return;
+                    case "path":
+                        var dim = Raphael.pathDimensions(this.attrs.path),
+                        x = dim.x;
+                        y = dim.y;
+                        w = dim.width;
+                        h = dim.height;
+                        break;
                     default:
-                        return;
+                        x = 0;
+                        y = 0;
+                        w = this.vml.width;
+                        h = this.vml.height;
+                        break;
                 }
-                var left = this.vml.width / 2 - w / 2,
-                    top = this.vml.height / 2 - h / 2;
-                gs.position = "absolute";
-                gs.left = x - left + "px";
-                gs.top = y - top + "px";
-                this.X = x - left;
-                this.Y = y - top;
-                this.W = w;
-                this.H = h;
-                gs.width = this.vml.width + "px";
-                gs.height = this.vml.height + "px";
-                os.position = "absolute";
-                os.top = top + "px";
-                os.left = left + "px";
-                os.width = w + "px";
-                os.height = h + "px";
+                if (this.type == "path") {
+                    var left = Math.round(this.vml.width / 2 - w / 2 - x),
+                        top = Math.round(this.vml.height / 2 - h / 2 - y);
+                    gs.left = - left + "px";
+                    gs.top = - top + "px";
+                    this.X = left;
+                    this.Y = top;
+                    this.W = w;
+                    this.H = h;
+                    os.top = top + "px";
+                    os.left = left + "px";
+                } else {
+                    var left = this.vml.width / 2 - w / 2,
+                        top = this.vml.height / 2 - h / 2;
+                    gs.position = "absolute";
+                    gs.left = x - left + "px";
+                    gs.top = y - top + "px";
+                    this.X = x - left;
+                    this.Y = y - top;
+                    this.W = w;
+                    this.H = h;
+                    gs.width = this.vml.width + "px";
+                    gs.height = this.vml.height + "px";
+                    os.position = "absolute";
+                    os.top = top + "px";
+                    os.left = left + "px";
+                    os.width = w + "px";
+                    os.height = h + "px";
+                }
             };
             Element.prototype.hide = function () {
                 this.Group.style.display = "none";
@@ -441,50 +490,26 @@ var Raphael = (function (type) {
             };
             Element.prototype.translate = function (x, y) {
                 if (x == undefined && y == undefined) {
-                    return {x: this.X, y: this.Y};
+                    return {x: this._.tx, y: this._.ty};
                 }
-                this.X += x;
-                this.Y += y;
-                this.Group.style.left = this.X + "px";
-                this.Group.style.top = this.Y + "px";
-                return this;
-            };
-            // depricated
-            Element.prototype.matrix = function (xx, xy, yx, yy, dx, dy) {
-                tMatrix = new Matrix(xx, xy, yx, yy, dx, dy);
-                this.Group.style.filter = tMatrix;
-                return this;
-            };
-            Element.prototype.scale = function (x, y) {
-                if (x == undefined && y == undefined) {
-                    return ;
-                    // TODO
+                this._.tx += +x;
+                this._.ty += +y;
+                if (this.type == "path") {
+                    var path = this.attrs.path;
+                    path = Raphael.pathToRelative(path);
+                    path[0][1] += +x;
+                    path[0][2] += +y;
+                    this.attr({path: path.join(" ")});
                 }
-                y = y || x;
-                if (x != 0 && !(x == 1 && y == 1)) {
-                    var dirx = Math.round(x / Math.abs(x)),
-                        diry = Math.round(y / Math.abs(y)),
-                        s = this[0].style;
-                    if (dirx != 1 || diry != 1) {
-                        s.filter = new Matrix(dirx, 0, 0, diry, 0, 0);
-                    }
-                    var width = parseInt(s.width, 10) * x * dirx;
-                    var height = parseInt(s.height, 10) * y * diry;
-                    var left = parseInt(s.left, 10);
-                    var top = parseInt(s.top, 10);
-                    s.left = this.X = left + this.W / 2 - width / 2;
-                    s.top = this.Y = top + this.H / 2 - height / 2;
-                    s.width = this.W = width;
-                    s.height = this.H = height;
-                }
+                this.setBox({x: this._.tx, y: this._.ty});
                 return this;
             };
             Element.prototype.getBBox = function () {
                 return {
-                    x: this.Group.offsetLeft,
-                    y: this.Group.offsetTop,
-                    width: this.Group.offsetWidth,
-                    height: this.Group.offsetHeight
+                    x: this.X,
+                    y: this.Y,
+                    width: this.W,
+                    height: this.H
                 };
             };
             Element.prototype.remove = function () {
@@ -558,7 +583,7 @@ var Raphael = (function (type) {
                 vml.canvas.appendChild(g);
                 var res = new Element(o, g, vml);
                 setFillAndStroke(res, {stroke: "#000", fill: "none"});
-                res.setBox({x: x - r, y: y - r, w: r * 2, h: r * 2});
+                res.setBox({x: x - r, y: y - r, width: r * 2, height: r * 2});
                 res.attrs.cx = x;
                 res.attrs.cy = y;
                 res.attrs.r = r;
@@ -575,7 +600,7 @@ var Raphael = (function (type) {
                 vml.canvas.appendChild(g);
                 var res = new Element(o, g, vml);
                 setFillAndStroke(res, {stroke: "#000"});
-                res.setBox({x: x, y: y, w: w, h: h});
+                res.setBox({x: x, y: y, width: w, height: h});
                 res.attrs.x = x;
                 res.attrs.y = y;
                 res.attrs.w = w;
@@ -591,7 +616,7 @@ var Raphael = (function (type) {
                 vml.canvas.appendChild(g);
                 var res = new Element(o, g, vml);
                 setFillAndStroke(res, {stroke: "#000"});
-                res.setBox({x: x - rx, y: y - ry, w: rx * 2, h: ry * 2});
+                res.setBox({x: x - rx, y: y - ry, width: rx * 2, height: ry * 2});
                 res.attrs.cx = x;
                 res.attrs.cy = y;
                 res.attrs.rx = rx;
@@ -607,7 +632,7 @@ var Raphael = (function (type) {
                 vml.canvas.appendChild(g);
                 var res = new Element(o, g, vml);
                 res.type = "image";
-                res.setBox({x: x, y: y, w: w, h: h});
+                res.setBox({x: x, y: y, width: w, height: h});
                 res.attrs.x = x;
                 res.attrs.y = y;
                 res.attrs.w = w;
@@ -645,6 +670,7 @@ var Raphael = (function (type) {
                 res.attrs.y = y;
                 res.attrs.w = 1;
                 res.attrs.h = 1;
+                setFillAndStroke(res, {stroke: "none", fill: "#000"});
                 return res;
             };
             var theGroup = function (vml) {
@@ -765,11 +791,6 @@ var Raphael = (function (type) {
             };
         }
         if (type == "SVG") {
-            Matrix.prototype.toString = function () {
-                return "matrix(" + this.m[0][0] +
-                    ", " + this.m[1][0] + ", " + this.m[0][1] + ", " + this.m[1][1] +
-                    ", " + this.m[2][0] + ", " + this.m[2][1] + ")";
-            };
             var thePath = function (params, pathString, SVG) {
                 var el = document.createElementNS(SVG.svgns, "path");
                 el.setAttribute("fill", "none");
@@ -777,11 +798,8 @@ var Raphael = (function (type) {
                     SVG.canvas.appendChild(el);
                 }
                 var p = new Element(el, SVG);
-                if (params) {
-                    setFillAndStroke(p, params);
-                }
                 p.isAbsolute = true;
-                p.path = [];
+                p.type = "path";
                 p.last = {x: 0, y: 0, bx: 0, by: 0};
                 p.absolutely = function () {
                     this.isAbsolute = true;
@@ -791,53 +809,35 @@ var Raphael = (function (type) {
                     this.isAbsolute = false;
                     return this;
                 };
-                p.redraw = function () {
-                    this[0].setAttribute("d", "M0 0");
-                    var oldPath = this.path;
-                    this.path = [];
-                    for (var i = 0, ii = oldPath.length; i < ii; i++) {
-                        if (oldPath[i].type != "end") {
-                            this[oldPath[i].type + "To"].apply(this, oldPath[i].arg);
-                        } else {
-                            this.andClose();
-                        }
-                    }
-                    return this;
-                };
                 p.moveTo = function (x, y) {
                     var d = this.isAbsolute?"M":"m";
-                    var _getX = this.isAbsolute ? SVG._getX : SVG._getW;
-                    var _getY = this.isAbsolute ? SVG._getY : SVG._getH;
-                    d += _getX(parseFloat(x, 10)) + " " + _getY(parseFloat(y, 10)) + " ";
+                    d += parseFloat(x, 10).toFixed(3) + " " + parseFloat(y, 10).toFixed(3) + " ";
                     var oldD = this[0].getAttribute("d") || "";
+                    (oldD == "M0,0") && (oldD = "");
                     this[0].setAttribute("d", oldD + d);
-                    this.last.x = (this.isAbsolute ? 0 : this.last.x) + SVG._getX(parseFloat(x, 10));
-                    this.last.y = (this.isAbsolute ? 0 : this.last.y) + SVG._getY(parseFloat(y, 10));
-                    this.path.push({type: "move", arg: arguments, pos: this.isAbsolute});
+                    this.last.x = (this.isAbsolute ? 0 : this.last.x) + parseFloat(x, 10);
+                    this.last.y = (this.isAbsolute ? 0 : this.last.y) + parseFloat(y, 10);
+                    this.attrs.path = oldD + d;
                     return this;
                 };
                 p.lineTo = function (x, y) {
-                    this.last.x = (this.isAbsolute ? 0 : this.last.x) + SVG._getX(parseFloat(x, 10));
-                    this.last.y = (this.isAbsolute ? 0 : this.last.y) + SVG._getY(parseFloat(y, 10));
+                    this.last.x = (this.isAbsolute ? 0 : this.last.x) + parseFloat(x, 10);
+                    this.last.y = (this.isAbsolute ? 0 : this.last.y) + parseFloat(y, 10);
                     var d = this.isAbsolute?"L":"l";
-                    var _getX = this.isAbsolute ? SVG._getX : SVG._getW;
-                    var _getY = this.isAbsolute ? SVG._getY : SVG._getH;
-                    d += _getX(parseFloat(x, 10)) + " " + _getY(parseFloat(y, 10)) + " ";
+                    d += parseFloat(x, 10).toFixed(3) + " " + parseFloat(y, 10).toFixed(3) + " ";
                     var oldD = this[0].getAttribute("d") || "";
                     this[0].setAttribute("d", oldD + d);
-                    this.path.push({type: "line", arg: arguments, pos: this.isAbsolute});
+                    this.attrs.path = oldD + d;
                     return this;
                 };
                 p.arcTo = function (rx, ry, large_arc_flag, sweep_flag, x, y) {
                     var d = this.isAbsolute ? "A" : "a";
-                    var _getX = this.isAbsolute ? SVG._getX : SVG._getW;
-                    var _getY = this.isAbsolute ? SVG._getY : SVG._getH;
-                    d += [SVG._getW(parseFloat(rx, 10)), SVG._getH(parseFloat(ry, 10)), 0, large_arc_flag, sweep_flag, _getX(parseFloat(x, 10)), _getY(parseFloat(y, 10))].join(" ");
+                    d += [parseFloat(rx, 10).toFixed(3), parseFloat(ry, 10).toFixed(3), 0, large_arc_flag, sweep_flag, parseFloat(x, 10).toFixed(3), parseFloat(y, 10).toFixed(3)].join(" ");
                     var oldD = this[0].getAttribute("d") || "";
                     this[0].setAttribute("d", oldD + d);
-                    this.last.x = SVG._getX(parseFloat(x, 10));
-                    this.last.y = SVG._getY(parseFloat(y, 10));
-                    this.path.push({type: "arc", arg: arguments, pos: this.isAbsolute});
+                    this.last.x = parseFloat(x, 10);
+                    this.last.y = parseFloat(y, 10);
+                    this.attrs.path = oldD + d;
                     return this;
                 };
                 p.cplineTo = function (x1, y1, w1) {
@@ -845,15 +845,13 @@ var Raphael = (function (type) {
                         return this.lineTo(x1, y1);
                     } else {
                         var p = {};
-                        p._getX = this.isAbsolute ? SVG._getX : SVG._getW;
-                        p._getY = this.isAbsolute ? SVG._getY : SVG._getH;
-                        var x = p._getX(Math.round(parseFloat(x1, 10) * 100) / 100);
-                        var y = p._getY(Math.round(parseFloat(y1, 10) * 100) / 100);
-                        var w = SVG._getW(Math.round(parseFloat(w1, 10) * 100) / 100);
+                        var x = parseFloat(x1, 10);
+                        var y = parseFloat(y1, 10);
+                        var w = parseFloat(w1, 10);
                         var d = this.isAbsolute?"C":"c";
-                        var attr = [this.last.x + w, this.last.y, x - w, y, x, y];
+                        var attr = [+this.last.x + w, +this.last.y, x - w, y, x, y];
                         for (var i = 0, ii = attr.length; i < ii; i++) {
-                            d += attr[i] + " ";
+                            d += attr[i].toFixed(3) + " ";
                         }
                         this.last.x = (this.isAbsolute ? 0 : this.last.x) + attr[4];
                         this.last.y = (this.isAbsolute ? 0 : this.last.y) + attr[5];
@@ -861,38 +859,50 @@ var Raphael = (function (type) {
                         this.last.by = attr[3];
                         var oldD = this[0].getAttribute("d") || "";
                         this[0].setAttribute("d", oldD + d);
-                        this.path.push({type: "cpline", arg: arguments, pos: this.isAbsolute});
+                        this.attrs.path = oldD + d;
                         return this;
                     }
                 };
                 p.curveTo = function () {
-                    var p = {};
-                    p._getX = this.isAbsolute ? SVG._getX : SVG._getW;
-                    p._getY = this.isAbsolute ? SVG._getY : SVG._getH;
-                    if (arguments.length == 6) {
-                        var d = this.isAbsolute?"C":"c";
-                        for (var i = 0, ii = arguments.length; i < ii; i++) {
-                            d += p[(i % 2 == 0) ? "_getX" : "_getY"](Math.round(parseFloat(arguments[i], 10) * 100) / 100) + " ";
-                        }
-                        this.last.x = (this.isAbsolute ? 0 : this.last.x) + p._getX((parseFloat(arguments[4], 10) * 100) / 100);
-                        this.last.y = (this.isAbsolute ? 0 : this.last.y) + p._getY((parseFloat(arguments[5], 10) * 100) / 100);
-                        this.last.bx = p._getX((parseFloat(arguments[2], 10) * 100) / 100);
-                        this.last.by = p._getY((parseFloat(arguments[3], 10) * 100) / 100);
-                    } else {
-                        if (arguments.length == 4) {
-                            var d = this.isAbsolute?"S":"s";
-                            for (var i = 0, ii = arguments.length; i < ii; i++) {
-                                d += p[i % 2 == 0 ? "_getX" : "_getY"]((parseFloat(arguments[i], 10) * 100) / 100) + " ";
-                            }
-                        }
-                        this.last.x = (this.isAbsolute ? 0 : this.last.x) + p._getX((parseFloat(arguments[2], 10) * 100) / 100);
-                        this.last.y = (this.isAbsolute ? 0 : this.last.y) + p._getY((parseFloat(arguments[3], 10) * 100) / 100);
-                        this.last.bx = p._getX((parseFloat(arguments[0], 10) * 100) / 100);
-                        this.last.by = p._getY((parseFloat(arguments[1], 10) * 100) / 100);
+                    var p = {},
+                        command = [0, 1, 2, 3, "s", 5, "c"];
+                    
+                    var d = command[arguments.length];
+                    if (this.isAbsolute) {
+                        d = d.toUpperCase();
                     }
-                    var oldD = this[0].getAttribute("d") || "";
-                    this[0].setAttribute("d", oldD + d);
-                    this.path.push({type: "curve", arg: arguments, pos: this.isAbsolute});
+                    for (var i = 0, ii = arguments.length; i < ii; i++) {
+                        d += parseFloat(arguments[i], 10).toFixed(3) + " ";
+                    }
+                    this.last.x = (this.isAbsolute ? 0 : this.last.x) + parseFloat(arguments[arguments.length - 2], 10);
+                    this.last.y = (this.isAbsolute ? 0 : this.last.y) + parseFloat(arguments[arguments.length - 1], 10);
+                    this.last.bx = parseFloat(arguments[arguments.length - 4], 10);
+                    this.last.by = parseFloat(arguments[arguments.length - 3], 10);
+                    var oldD = this.node.getAttribute("d") || "";
+                    this.node.setAttribute("d", oldD + d);
+                    this.attrs.path = oldD + d;
+                    return this;
+                };
+                p.qcurveTo = function () {
+                    var p = {},
+                        command = [0, 1, "t", 3, "q"];
+                    
+                    var d = command[arguments.length];
+                    if (this.isAbsolute) {
+                        d = d.toUpperCase();
+                    }
+                    for (var i = 0, ii = arguments.length; i < ii; i++) {
+                        d += parseFloat(arguments[i], 10).toFixed(3) + " ";
+                    }
+                    this.last.x = (this.isAbsolute ? 0 : this.last.x) + parseFloat(arguments[arguments.length - 2], 10);
+                    this.last.y = (this.isAbsolute ? 0 : this.last.y) + parseFloat(arguments[arguments.length - 1], 10);
+                    if (arguments.length != 2) {
+                        this.last.qx = parseFloat(arguments[arguments.length - 4], 10);
+                        this.last.qy = parseFloat(arguments[arguments.length - 3], 10);
+                    }
+                    var oldD = this.node.getAttribute("d") || "";
+                    this.node.setAttribute("d", oldD + d);
+                    this.attrs.path = oldD + d;
                     return this;
                 };
                 p.addRoundedCorner = function (r, dir) {
@@ -954,12 +964,16 @@ var Raphael = (function (type) {
                 p.andClose = function () {
                     var oldD = this[0].getAttribute("d") || "";
                     this[0].setAttribute("d", oldD + "Z ");
-                    this.path.push({type: "end"});
+                    this.attrs.path = oldD + "Z ";
                     return this;
                 };
                 if (typeof pathString == "string") {
+                    p.attrs.path = pathString;
                     p.absolutely();
                     C.pathfinder(p, pathString);
+                }
+                if (params) {
+                    setFillAndStroke(p, params);
                 }
                 return p;
             };
@@ -1002,50 +1016,77 @@ var Raphael = (function (type) {
                     "- .": [4, 3, 1, 3],
                     "--.": [8, 3, 1, 3],
                     "--..": [8, 3, 1, 3, 1, 3]
+                },
+                addDashes = function (o, value) {
+                    value = dasharray[value.toString().toLowerCase()];
+                    if (value) {
+                        var width = o.attrs["stroke-width"] || "1",
+                            butt = {round: width, square: width, butt: 0}[o.attrs["stroke-linecap"]] || 0,
+                            dashes = [];
+                        for (var i = 0, ii = value.length; i < ii; i++) {
+                            dashes.push(value[i] * width + ((i % 2) ? 1 : -1) * butt);
+                        }
+                        value = dashes.join(",");
+                        o[0].setAttribute("stroke-dasharray", value);
+                    }
                 };
                 for (var att in params) {
                     var value = params[att];
                     o.attrs[att] = value;
                     switch (att) {
+                        case "path":
+                            if (o.type == "path") {
+                                o[0].setAttribute("d", "M0,0");
+                                C.pathfinder(o, value);
+                            }
                         case "rx":
                         case "cx":
                         case "x":
-                            o[0].setAttribute(att, o.svg._getX(value));
+                            o[0].setAttribute(att, value);
                             updatePosition(o);
                             break;
                         case "ry":
                         case "cy":
                         case "y":
-                            o[0].setAttribute(att, o.svg._getY(value));
+                            o[0].setAttribute(att, value);
                             updatePosition(o);
                             break;
                         case "width":
-                            o[0].setAttribute(att, o.svg._getW(value));
+                            o[0].setAttribute(att, value);
                             break;
                         case "height":
-                            o[0].setAttribute(att, o.svg._getH(value));
+                            o[0].setAttribute(att, value);
                             break;
                         case "gradient":
                             addGrdientFill(o[0], value, o.svg);
                             break;
-                        case "stroke-dasharray":
-                            value = dasharray[value.toLowerCase()];
-                            if (value) {
-                                var width = params["stroke-width"] || o.attr("stroke-width") || "1",
-                                    butt = {round: width, square: width, butt: 0}[o.attr("stroke-linecap")] || 0,
-                                    dashes = [];
-                                for (var i = 0, ii = value.length; i < ii; i++) {
-                                    dashes.push(value[i] * width + ((i % 2) ? 1 : -1) * butt);
-                                }
-                                value = dashes.join(",");
-                                o[0].setAttribute(att, value);
+                        case "stroke-width":
+                            o[0].style.strokeWidth = value;
+                            // Need following line for Firefox
+                            o[0].setAttribute(att, value);
+                            if (o.attrs["stroke-dasharray"]) {
+                                addDashes(o, o.attrs["stroke-dasharray"]);
                             }
+                            break;
+                        case "stroke-dasharray":
+                            addDashes(o, value);
                             break;
                         case "text":
                             if (o.type == "text") {
                                 o[0].childNodes.length && o[0].removeChild(o[0].firstChild);
                                 o[0].appendChild(document.createTextNode(value));
                             }
+                            break;
+                        case "rotation":
+                            o.rotate(value, true);
+                            break;
+                        case "translation":
+                            var xy = value.split(/[, ]+/);
+                            o.translate(xy[0], xy[1]);
+                            break;
+                        case "scale":
+                            var xy = value.split(/[, ]+/);
+                            o.scale(xy[0], xy[1]);
                             break;
                         case "fill":
                             var isURL = value.match(/^url\(([^\)]+)\)$/i);
@@ -1095,64 +1136,63 @@ var Raphael = (function (type) {
             };
             var Element = function (node, svg) {
                 var X = 0,
-                    Y = 0,
-                    Rotation = {deg: 0, x: 0, y: 0},
-                    ScaleX = 1,
-                    ScaleY = 1,
-                    tMatrix = null;
+                    Y = 0;
                 this[0] = node;
                 this.node = node;
                 this.svg = svg;
                 this.attrs = this.attrs || {};
                 this.transformations = []; // rotate, translate, scale, matrix
-                this.rotate = function (deg) {
-                    if (deg == undefined) {
-                        return Rotation.deg;
-                    }
-                    var bbox = this.getBBox();
-                    Rotation.deg += deg;
-                    if (Rotation.deg) {
-                        this.transformations[0] = ("rotate(" + Rotation.deg + " " + (bbox.x + bbox.width / 2) + " " + (bbox.y + bbox.height / 2) + ")");
-                    } else {
-                        this.transformations[0] = "";
-                    }
-                    this[0].setAttribute("transform", this.transformations.join(" "));
-                    return this;
+                this._ = {
+                    tx: 0,
+                    ty: 0,
+                    rt: {deg: 0, x: 0, y: 0},
+                    sx: 1,
+                    sy: 1
                 };
-                this.translate = function (x, y) {
-                    if (x == undefined && y == undefined) {
-                        return {x: X, y: Y};
-                    }
-                    X += x;
-                    Y += y;
-                    if (X || Y) {
-                        this.transformations[1] = "translate(" + X + "," + Y + ")";
-                    } else {
-                        this.transformations[1] = "";
-                    }
-                    this[0].setAttribute("transform", this.transformations.join(" "));
-                    return this;
-                };
-                this.scale = function (x, y) {
-                    if (x == undefined && y == undefined) {
-                        return {x: ScaleX, y: ScaleY};
-                    }
-                    y = y || x;
-                    if (x != 0 && !(x == 1 && y == 1)) {
-                        ScaleX *= x;
-                        ScaleY *= y;
-                        if (!(ScaleX == 1 && ScaleY == 1)) {
-                            var bbox = this.getBBox(),
-                                dx = bbox.x * (1 - ScaleX) + (bbox.width / 2 - bbox.width * ScaleX / 2),
-                                dy = bbox.y * (1 - ScaleY) + (bbox.height / 2 - bbox.height * ScaleY / 2);
-                            this.transformations[2] = new Matrix(ScaleX, 0, 0, ScaleY, dx, dy);
-                        } else {
-                            this.transformations[2] = "";
-                        }
-                        this[0].setAttribute("transform", this.transformations.join(" "));
-                    }
-                    return this;
-                };
+            };
+            Element.prototype.translate = function (x, y) {
+                if (x == undefined && y == undefined) {
+                    return {x: this._.tx, y: this._.ty};
+                }
+                this._.tx += +x;
+                this._.ty += +y;
+                switch (this.type) {
+                    case "circle":
+                    case "ellipse":
+                        this.attr({cx: this.attrs.cx + x, cy: this.attrs.cy + y});
+                        break;
+                    case "rect":
+                    case "image":
+                    case "text":
+                        this.attr({x: this.attrs.x + x, y: this.attrs.y + y});
+                        break;
+                    case "path":
+                        var path = Raphael.pathToRelative(this.attrs.path);
+                        path[0][1] += +x;
+                        path[0][2] += +y;
+                        this.attr({path: path.join(" ")});
+                    break;
+                }
+                return this;
+            };
+            Element.prototype.rotate = function (deg, isAbsolute) {
+                if (deg == undefined) {
+                    return this._.rt.deg;
+                }
+                var bbox = this.getBBox();
+                if (isAbsolute) {
+                    this._.rt.deg = deg;
+                } else {
+                    this._.rt.deg += deg;
+                }
+                
+                if (this._.rt.deg) {
+                    this.transformations[0] = ("rotate(" + this._.rt.deg + " " + (bbox.x + bbox.width / 2) + " " + (bbox.y + bbox.height / 2) + ")");
+                } else {
+                    this.transformations[0] = "";
+                }
+                this[0].setAttribute("transform", this.transformations.join(" "));
+                return this;
             };
             Element.prototype.hide = function () {
                 this[0].style.display = "none";
@@ -1160,12 +1200,6 @@ var Raphael = (function (type) {
             };
             Element.prototype.show = function () {
                 this[0].style.display = "block";
-                return this;
-            };
-            // depricated
-            Element.prototype.matrix = function (xx, xy, yx, yy, dx, dy) {
-                this.transformations[3] = new Matrix(xx, xy, yx, yy, dx, dy);
-                this[0].setAttribute("transform", this.transformations.join(" "));
                 return this;
             };
             Element.prototype.remove = function () {
@@ -1176,7 +1210,10 @@ var Raphael = (function (type) {
             };
             Element.prototype.attr = function () {
                 if (arguments.length == 1 && typeof arguments[0] == "string") {
-                    return this[0].getAttribute(arguments[0]);
+                    if (arguments[0] == "translation") {
+                        return this.translate();
+                    }
+                    return this.attrs[arguments[0]];
                 }
                 if (arguments.length == 1 && arguments[0] instanceof Array) {
                     var values = {};
@@ -1206,8 +1243,8 @@ var Raphael = (function (type) {
             };
             var theCircle = function (svg, x, y, r) {
                 var el = document.createElementNS(svg.svgns, "circle");
-                el.setAttribute("cx", svg._getX(x));
-                el.setAttribute("cy", svg._getY(y));
+                el.setAttribute("cx", x);
+                el.setAttribute("cy", y);
                 el.setAttribute("r", r);
                 el.setAttribute("fill", "none");
                 el.setAttribute("stroke", "#000");
@@ -1225,10 +1262,10 @@ var Raphael = (function (type) {
             };
             var theRect = function (svg, x, y, w, h, r) {
                 var el = document.createElementNS(svg.svgns, "rect");
-                el.setAttribute("x", svg._getX(x));
-                el.setAttribute("y", svg._getY(y));
-                el.setAttribute("width", svg._getW(w));
-                el.setAttribute("height", svg._getH(h));
+                el.setAttribute("x", x);
+                el.setAttribute("y", y);
+                el.setAttribute("width", w);
+                el.setAttribute("height", h);
                 if (r) {
                     el.setAttribute("rx", r);
                     el.setAttribute("ry", r);
@@ -1253,10 +1290,10 @@ var Raphael = (function (type) {
             };
             var theEllipse = function (svg, x, y, rx, ry) {
                 var el = document.createElementNS(svg.svgns, "ellipse");
-                el.setAttribute("cx", svg._getX(x));
-                el.setAttribute("cy", svg._getY(y));
-                el.setAttribute("rx", svg._getW(rx));
-                el.setAttribute("ry", svg._getH(ry));
+                el.setAttribute("cx", x);
+                el.setAttribute("cy", y);
+                el.setAttribute("rx", rx);
+                el.setAttribute("ry", ry);
                 el.setAttribute("fill", "none");
                 el.setAttribute("stroke", "#000");
                 if (svg.canvas) {
@@ -1274,10 +1311,11 @@ var Raphael = (function (type) {
             };
             var theImage = function (svg, src, x, y, w, h) {
                 var el = document.createElementNS(svg.svgns, "image");
-                el.setAttribute("x", svg._getX(x));
-                el.setAttribute("y", svg._getY(y));
-                el.setAttribute("width", svg._getW(w));
-                el.setAttribute("height", svg._getH(h));
+                el.setAttribute("x", x);
+                el.setAttribute("y", y);
+                el.setAttribute("width", w);
+                el.setAttribute("height", h);
+                el.setAttribute("preserveAspectRatio", "none");
                 el.setAttributeNS(svg.xlink, "href", src);
                 if (svg.canvas) {
                     svg.canvas.appendChild(el);
@@ -1438,31 +1476,220 @@ var Raphael = (function (type) {
                 }
                 return p;
             };
-            C.setGrid = function (xmin, ymin, xmax, ymax, w, h) {
-                var xc = (xmax - xmin) / w;
-                var yc = (ymax - ymin) / h;
-                this._getX = function (x) {
-                    return xmin + x * xc;
-                };
-                this._getY = function (y) {
-                    return ymin + y * yc;
-                };
-                this._getW = function (w) {
-                    return w * xc;
-                };
-                this._getH = function (h) {
-                    return h * yc;
-                };
-            };
-            C.clearGrid = function () {
-                this._getX = this._getY = this._getW = this._getH = function (x) { return x; };
-            };
             C.safari = function () {
                 if (r.type == "SVG") {
                     var rect = C.rect(-C.width, -C.height, C.width * 3, C.height * 3).attr({stroke: "none"});
                     setTimeout(function () {rect.remove();}, 0);
                 }
             };
+            Element.prototype.stop = function () {
+                clearTimeout(this.animation_in_progress);
+            };
+            Element.prototype.scale = function (x, y) {
+                if (x == undefined && y == undefined) {
+                    return {x: this._.sx, y: this._.sy};
+                }
+                y = y || x;
+                var dx, dy, cx, cy;
+                if (x != 0 && !(x == 1 && y == 1)) {
+                    var dirx = Math.round(x / Math.abs(x)),
+                        diry = Math.round(y / Math.abs(y)),
+                        s = this.node.style;
+                    dx = this.attr("x");
+                    dy = this.attr("y");
+                    cx = this.attr("cx");
+                    cy = this.attr("cy");
+                    if (dirx != 1 || diry != 1) {
+                        if (this.transformations) {
+                            this.transformations[2] = "scale(" + [dirx, diry] + ")";
+                            this.node.setAttribute("transform", this.transformations.join(" "));
+                            dx = (dirx < 0) ? -this.attr("x") - this.attrs.width * x * dirx / this._.sx : this.attr("x");
+                            dy = (diry < 0) ? -this.attr("y") - this.attrs.height * y * diry / this._.sy : this.attr("y");
+                            cx = this.attr("cx") * dirx;
+                            cy = this.attr("cy") * diry;
+                        } else {
+                            s.filter = "progid:DXImageTransform.Microsoft.Matrix(M11=" + dirx +
+                                ", M12=0, M21=0, M22=" + diry +
+                                ", Dx=0, Dy=0, sizingmethod='auto expand', filtertype='bilinear')";
+                        }
+                    } else {
+                        if (this.transformations) {
+                            this.transformations[2] = "";
+                            this.node.setAttribute("transform", this.transformations.join(" "));
+                        } else {
+                            s.filter = "";
+                        }
+                    }
+                    switch (this.type) {
+                        case "rect":
+                        case "image":
+                            this.attr({
+                                width: this.attrs.width * x * dirx / this._.sx,
+                                height: this.attrs.height * y * diry / this._.sy,
+                                x: dx,
+                                y: dy
+                            });
+                            break;
+                        case "circle":
+                        case "ellipse":
+                            this.attr({
+                                rx: this.attrs.rx * x * dirx / this._.sx,
+                                ry: this.attrs.ry * y * diry / this._.sy,
+                                r: this.attrs.r * x * diry / this._.sx,
+                                cx: cx,
+                                cy: cy
+                            });
+                            break;
+                        case "path":
+                            var path = Raphael.pathToRelative(Raphael.parsePathString(this.attr("path"))), 
+                                skip = true,
+                                dim = Raphael.pathDimensions(this.attrs.path),
+                                dx = -dim.width * (x - 1) / 2,
+                                dy = -dim.height * (y - 1) / 2;
+                            for (var i = 0, ii = path.length; i < ii; i++) {
+                                if (path[i][0].toUpperCase() == "M" && skip) {
+                                    continue;
+                                } else {
+                                    skip = false;
+                                }
+                                if (path[i][0].toUpperCase() == "A") {
+                                    path[i][path[i].length - 2] *= x * dirx;
+                                    path[i][path[i].length - 1] *= y * diry;
+                                } else {
+                                    for (var j = 1, jj = path[i].length; j < jj; j++) {
+                                        path[i][j] *= (j % 2) ? x * dirx / this._.sx : y * diry / this._.sy;
+                                    }
+                                }
+                            }
+                            var dim2 = Raphael.pathDimensions(path),
+                                dx = dim.x + dim.width / 2 - dim2.x - dim2.width / 2,
+                                dy = dim.y + dim.height / 2 - dim2.y - dim2.height / 2;
+                            path = Raphael.pathToRelative(path);
+                            path[0][1] += dx;
+                            path[0][2] += dy;
+                            
+                            this.attr({path: path.join(" ")});
+                    }
+                }
+                this._.sx = x;
+                this._.sy = y;
+                return this;
+            };
+            Element.prototype.animate = function (params, ms, callback) {
+                clearTimeout(this.animation_in_progress);
+                var from = {}, to = {}, diff = {}, t = {x: 0, y: 0};
+                for (var attr in params) {
+                    if (attr in availableAnimAttrs) {
+                        from[attr] = this.attr(attr);
+                        if (typeof from[attr] == "undefined") {
+                            from[attr] = availableAttrs[attr];
+                        }
+                        to[attr] = params[attr];
+                        switch (availableAnimAttrs[attr]) {
+                            case "number":
+                                diff[attr] = (to[attr] - from[attr]) / ms;
+                                break;
+                            case "colour":
+                                from[attr] = Raphael.getRGB(from[attr]);
+                                var toColour = Raphael.getRGB(to[attr]);
+                                diff[attr] = {
+                                    r: (toColour.r - from[attr].r) / ms,
+                                    g: (toColour.g - from[attr].g) / ms,
+                                    b: (toColour.b - from[attr].b) / ms
+                                };
+                                break;
+                            case "path":
+                                var pathes = Raphael.pathEqualiser(from[attr], to[attr]);
+                                from[attr] = pathes[0];
+                                to[attr] = pathes[1];
+                                diff[attr] = [];
+                                for (var i = 0, ii = from[attr].length; i < ii; i++) {
+                                    diff[attr][i] = [0];
+                                    for (var j = 1, jj = from[attr][i].length; j < jj; j++) {
+                                        diff[attr][i][j] = (to[attr][i][j] - from[attr][i][j]) / ms;
+                                    }
+                                }
+                                break;
+                            case "csv":
+                                var values = params[attr].split(/[, ]+/);
+                                if (attr == "translation") {
+                                    from[attr] = [0, 0];
+                                    diff[attr] = [values[0] / ms, values[1] / ms];
+                                } else {
+                                    from[attr] = from[attr].split(/[, ]+/);
+                                    diff[attr] = [(values[0] - from[attr][0]) / ms, (values[1] - from[attr][0]) / ms];
+                                }
+                                to[attr] = values;
+                        }
+                    }
+                }
+                var start = new Date(),
+                    prev = 0,
+                    that = this;
+                (function () {
+                    var time = (new Date()).getTime() - start.getTime(),
+                        set = {},
+                        now;
+                    if (time < ms) {
+                        for (var attr in from) {
+                            switch (availableAnimAttrs[attr]) {
+                                case "number":
+                                    now = +from[attr] + time * diff[attr];
+                                    break;
+                                case "colour":
+                                    now = "rgb(" + [
+                                        Math.round(from[attr].r + time * diff[attr].r),
+                                        Math.round(from[attr].g + time * diff[attr].g),
+                                        Math.round(from[attr].b + time * diff[attr].b)
+                                    ].join(",") + ")";
+                                    break;
+                                case "path":
+                                    now = [];
+                                    for (var i = 0, ii = from[attr].length; i < ii; i++) {
+                                        now[i] = [from[attr][i][0]];
+                                        for (var j = 1, jj = from[attr][i].length; j < jj; j++) {
+                                            now[i][j] = from[attr][i][j] + time * diff[attr][i][j];
+                                        }
+                                        now[i] = now[i].join(" ");
+                                    }
+                                    now = now.join(" ");
+                                    break;
+                                case "csv":
+                                    if (attr == "translation") {
+                                        var x = diff[attr][0] * (time - prev),
+                                            y = diff[attr][1] * (time - prev);
+                                        t.x += x;
+                                        t.y += y;
+                                        now = [x, y].join(" ");
+                                    } else {
+                                        now = [+from[attr][0] + time * diff[attr][0], +from[attr][1] + time * diff[attr][1]].join(" ");
+                                    }
+                                    break;
+                            }
+                            if (attr == "font-size") {
+                                set[attr] = now + "px";
+                            } else {
+                                set[attr] = now;
+                            }
+                        }
+                        that.attr(set);
+                        that.animation_in_progress = setTimeout(arguments.callee, 0);
+                        C.safari();
+                    } else {
+                        if (t.x || t.y) {
+                            that.translate(-t.x, -t.y);
+                        }
+                        that.attr(params);
+                        clearTimeout(that.animation_in_progress);
+                        C.safari();
+                        (typeof callback == "function") && callback.call(that);
+                    }
+                    prev = time;
+                })();
+                return this;
+            };
+            
+            // depricated
             Element.prototype.animateTo = function (x, y, ms, callback) {
                 clearTimeout(this.animation_in_progress);
                 if ("cx" in this.attrs || "x" in this.attrs) {
@@ -1473,21 +1700,14 @@ var Raphael = (function (type) {
                         return this;
                     }
                     var dy = y - Y,
-                        dx = x - X,
-                        coeff = dy / dx,
-                        plus = Y - coeff * X,
-                        alpha = Math.atan(this.coeff);
-                    this.xs = this.step * Math.cos(alpha);
-                    if (x < X) {
-                        this.xs = -this.xs;
-                    }
+                        dx = x - X;
                     var start = new Date(),
                         that = this;
                     (function () {
                         var time = (new Date()).getTime() - start.getTime();
                         if (time < ms) {
                             var x1 = X + time * dx / ms;
-                            var y1 = x1 * coeff + plus;
+                            var y1 = Y + time * dy / ms;
                             that.attr(is_round ? {cx: x1, cy: y1} : {x: x1, y: y1});
                             that.animation_in_progress = setTimeout(arguments.callee, 1);
                             C.safari();
@@ -1505,67 +1725,46 @@ var Raphael = (function (type) {
                     M: function (x, y) {
                         this.moveTo(x, y);
                     },
-                    m: function (x, y) {
-                        this.moveTo(this.last.x + x, this.last.y + y);
-                    },
                     C: function (x1, y1, x2, y2, x3, y3) {
                         this.curveTo(x1, y1, x2, y2, x3, y3);
                     },
-                    c: function (x1, y1, x2, y2, x3, y3) {
-                        this.curveTo(this.last.x + x1, this.last.y + y1, this.last.x + x2, this.last.y + y2, this.last.x + x3, this.last.y + y3);
+                    Q: function (x1, y1, x2, y2) {
+                        this.qcurveTo(x1, y1, x2, y2);
+                    },
+                    T: function (x, y) {
+                        this.qcurveTo(x, y);
                     },
                     S: function (x1, y1, x2, y2) {
                         p.curveTo(x1, y1, x2, y2);
                     },
-                    s: function (x1, y1, x2, y2) {
-                        this.curveTo(this.last.x + x1, this.last.y + y1, this.last.x + x2, this.last.y + y2);
-                    },
                     L: function (x, y) {
                         p.lineTo(x, y);
-                    },
-                    l: function (x, y) {
-                        this.lineTo(this.last.x + x, this.last.y + y);
                     },
                     H: function (x) {
                         this.lineTo(x, this.last.y);
                     },
-                    h: function (x) {
-                        this.lineTo(this.last.x + x, this.last.y);
-                    },
                     V: function (y) {
                         this.lineTo(this.last.x, y);
-                    },
-                    v: function (y) {
-                        this.lineTo(this.last.x, this.last.y + y);
                     },
                     A: function (rx, ry, xaxisrotation, largearcflag, sweepflag, x, y) {
                         this.arcTo(rx, ry, largearcflag, sweepflag, x, y);
                     },
-                    a: function (rx, ry, xaxisrotation, largearcflag, sweepflag, x, y) {
-                        this.arcTo(this.last.x + rx, this.last.y + ry, largearcflag, sweethisflag, this.last.x + x, this.last.y + y);
-                    },
-                    z: function () {
+                    Z: function () {
                         this.andClose();
                     }
                 };
-                path.replace(/([mzlhvcsqta])\s*((-?\d*\.?\d*\s*,?\s*)+)/ig, function (a, b, c) {
-                    var params = [];
-                    c.replace(/(-?\d*\.?\d*)\s*,?\s*/ig, function (a, b) {
-                        b && params.push(+b);
-                    });
-                    while (params.length >= commands[b].length) {
-                        commands[b].apply(p, params.splice(0, commands[b].length));
-                        if (!commands[b].length) {
-                            break;
-                        };
-                    }
-                });
+
+                path = Raphael.pathToAbsolute(path);
+                for (var i = 0, ii = path.length; i < ii; i++) {
+                    var b = path[i].shift();
+                    commands[b].apply(p, path[i]);
+                }
             };
             return r;
         } else {
             return function () {};
         }
-    })((!(window.SVGPreserveAspectRatio && window.SVGPreserveAspectRatio.SVG_PRESERVEASPECTRATIO_XMINYMIN == 2)) ? "VML" : "SVG");
+    })((!window.SVGAngle) ? "VML" : "SVG");
 
 
 Raphael.vml = !(Raphael.svg = (Raphael.type == "SVG"));
@@ -1672,6 +1871,57 @@ Raphael.rgb2hsb = function (red, green, blue) {
     }
     return {h: hue, s: saturation, b: brightness};
 };
+Raphael.getRGB = function (colour) {
+    var red, green, blue,
+        rgb = colour.match(/^\s*((#[a-f\d]{6})|(#[a-f\d]{3})|rgb\(\s*(\d+,\s*\d+,\s*\d+)\s*\)|rgb\(\s*(\d+%,\s*\d+%,\s*\d+%)\s*\)|hsb\(\s*(\d+,\s*\d+,\s*\d+)\s*\)|hsb\(\s*(\d+%,\s*\d+%,\s*\d+%)\s*\))\s*$/i);
+    if (rgb) {
+        if (rgb[2]) {
+            blue = parseInt(rgb[2].substring(5), 16);
+            green = parseInt(rgb[2].substring(3, 5), 16);
+            red = parseInt(rgb[2].substring(1, 3), 16);
+        }
+        if (rgb[3]) {
+            blue = parseInt(rgb[3].substring(3) + rgb[3].substring(3), 16);
+            green = parseInt(rgb[3].substring(2, 3) + rgb[3].substring(2, 3), 16);
+            red = parseInt(rgb[3].substring(1, 2) + rgb[3].substring(1, 2), 16);
+        }
+        if (rgb[4]) {
+            rgb = rgb[4].split(/\s*,\s*/);
+            red = parseInt(rgb[0], 10);
+            green = parseInt(rgb[1], 10);
+            blue = parseInt(rgb[2], 10);
+        }
+        if (rgb[5]) {
+            rgb = rgb[5].split(/\s*,\s*/);
+            red = parseInt(rgb[0], 10) * 2.55;
+            green = parseInt(rgb[1], 10) * 2.55;
+            blue = parseInt(rgb[2], 10) * 2.55;
+        }
+        if (rgb[6]) {
+            rgb = rgb[6].split(/\s*,\s*/);
+            red = parseInt(rgb[0], 10);
+            green = parseInt(rgb[1], 10);
+            blue = parseInt(rgb[2], 10);
+            return this.hsb2rgb(red, green, blue);
+        }
+        if (rgb[7]) {
+            rgb = rgb[7].split(/\s*,\s*/);
+            red = parseInt(rgb[0], 10) * 2.55;
+            green = parseInt(rgb[1], 10) * 2.55;
+            blue = parseInt(rgb[2], 10) * 2.55;
+            return this.hsb2rgb(red, green, blue);
+        }
+        var rgb = {r: red, g: green, b: blue};
+        var r = Math.round(red).toString(16);
+        (r.length == 1) && (r = "0" + r);
+        var g = Math.round(green).toString(16);
+        (g.length == 1) && (g = "0" + g);
+        var b = Math.round(blue).toString(16);
+        (b.length == 1) && (b = "0" + b);
+        rgb.hex = "#" + r + g + b;
+        return rgb;
+    }
+};
 Raphael.getColor = function (value) {
     var start = arguments.callee.start = arguments.callee.start || {h: 0, s: 1, b: value || .75};
     var rgb = this.hsb2rgb(start.h, start.s, start.b);
@@ -1687,4 +1937,256 @@ Raphael.getColor = function (value) {
 };
 Raphael.getColor.reset = function () {
     this.start = undefined;
+};
+Raphael.parsePathString = function (pathString) {
+    var paramCounts = {a: 7, c: 6, h: 1, l: 2, m: 2, q: 4, s: 4, t: 2, v: 1, z: 0};
+    var data = [];
+    pathString.replace(/([achlmqstvz])\s*((-?\d*\.?\d*\s*,?\s*)+)/ig, function (a, b, c) {
+        var params = [], name = b.toLowerCase();
+        c.replace(/(-?\d*\.?\d*)\s*,?\s*/ig, function (a, b) {
+            b && params.push(+b);
+        });
+        while (params.length >= paramCounts[name]) {
+            data.push([b].concat(params.splice(0, paramCounts[name])));
+            if (!paramCounts[name]) {
+                break;
+            };
+        }
+    });
+    return data;
+};
+Raphael.pathDimensions = function (path) {
+    var pathArray = path;
+    if (typeof path == "string") {
+        pathArray = this.parsePathString(path);
+    }
+    pathArray = this.pathToAbsolute(pathArray);
+    var x = [], y = [], length = 0;
+    for (var i = 0, ii = pathArray.length; i < ii; i++) {
+        switch (pathArray[i][0]) {
+            case "Z":
+                break;
+            case "A":
+                x.push(pathArray[i][pathArray[i].length - 2]);
+                y.push(pathArray[i][pathArray[i].length - 1]);
+                break;
+            default:
+                for (var j = 1, jj = pathArray[i].length; j < jj; j++) {
+                    if (j % 2) {
+                        x.push(pathArray[i][j]);
+                    } else {
+                        y.push(pathArray[i][j]);
+                    }
+                }
+        }
+    }
+    var minx = Math.min.apply(Math, x),
+        miny = Math.min.apply(Math, y);
+    return {
+        x: minx,
+        y: miny,
+        width: Math.max.apply(Math, x) - minx,
+        height: Math.max.apply(Math, y) - miny,
+        X: x,
+        Y: y
+    };
+};
+Raphael.pathToRelative = function (pathArray) {
+    var res = [];
+    if (typeof pathArray == "string") {
+        pathArray = this.parsePathString(pathArray);
+    }
+    var x = 0, y = 0, start = 0;
+    if (pathArray[0][0] == "M") {
+        x = pathArray[0][1];
+        y = pathArray[0][2];
+        start++;
+        res.push(pathArray[0]);
+    }
+    for (var i = start, ii = pathArray.length; i < ii; i++) {
+        res[i] = [];
+        if (pathArray[i][0] != pathArray[i][0].toLowerCase()) {
+            res[i][0] = pathArray[i][0].toLowerCase();
+            switch (res[i][0]) {
+                case "a":
+                    res[i][1] = pathArray[i][1];
+                    res[i][2] = pathArray[i][2];
+                    res[i][3] = 0;
+                    res[i][4] = pathArray[i][4];
+                    res[i][5] = pathArray[i][5];
+                    res[i][6] = +(pathArray[i][6] - x).toFixed(3);
+                    res[i][7] = +(pathArray[i][7] - y).toFixed(3);
+                    break;
+                case "v":
+                    res[i][1] = +(pathArray[i][1] - y).toFixed(3);
+                    break;
+                default:
+                    for (var j = 1, jj = pathArray[i].length; j < jj; j++) {
+                        res[i][j] = +(pathArray[i][j] - ((j % 2) ? x : y)).toFixed(3);
+                    }
+            }
+        } else {
+            res[i] = pathArray[i];
+        }
+        switch (res[i][0]) {
+            case "z":
+                break;
+            case "h": 
+                x += res[i][res[i].length - 1];
+                break;
+            case "v":
+                y += res[i][res[i].length - 1];
+                break;
+            default:
+                x += res[i][res[i].length - 2];
+                y += res[i][res[i].length - 1];
+        }
+    }
+    return res;
+};
+Raphael.pathToAbsolute = function (pathArray) {
+    var res = [];
+    if (typeof pathArray == "string") {
+        pathArray = this.parsePathString(pathArray);
+    }
+    var x = 0, y = 0, start = 0;
+    if (pathArray[0][0] == "M") {
+        x = +pathArray[0][1];
+        y = +pathArray[0][2];
+        start++;
+        res[0] = pathArray[0];
+    }
+    for (var i = start, ii = pathArray.length; i < ii; i++) {
+        res[i] = [];
+        if (pathArray[i][0] != pathArray[i][0].toUpperCase()) {
+            res[i][0] = pathArray[i][0].toUpperCase();
+            switch (res[i][0]) {
+                case "A":
+                    res[i][1] = pathArray[i][1];
+                    res[i][2] = pathArray[i][2];
+                    res[i][3] = 0;
+                    res[i][4] = pathArray[i][4];
+                    res[i][5] = pathArray[i][5];
+                    res[i][6] = +(pathArray[i][6] + x).toFixed(3);
+                    res[i][7] = +(pathArray[i][7] + y).toFixed(3);
+                    break;
+                case "V":
+                    res[i][1] = +pathArray[i][1] + y;
+                    break;
+                default:
+                    for (var j = 1, jj = pathArray[i].length; j < jj; j++) {
+                        res[i][j] = +pathArray[i][j] + ((j % 2) ? x : y);
+                    }
+            }
+        } else {
+            res[i] = pathArray[i];
+        }
+        switch (res[i][0]) {
+            case "Z":
+                break;
+            case "H": 
+                x = res[i][1];
+                break;
+            case "V":
+                y = res[i][1];
+                break;
+            default:
+                x = res[i][res[i].length - 2];
+                y = res[i][res[i].length - 1];
+        }
+    }
+    return res;
+};
+Raphael.pathEqualiser = function (path1, path2) {
+    var data = [this.pathToAbsolute(this.parsePathString(path1)), this.pathToAbsolute(this.parsePathString(path2))],
+        attrs = [{x: 0, y: 0, bx: 0, by: 0, X: 0, Y: 0}, {x: 0, y: 0, bx: 0, by: 0, X: 0, Y: 0}],
+        processPath = function (path, d) {
+            if (!path) {
+                return ["U"];
+            }
+            switch (path[0]) {
+                case "M":
+                    d.X = path[1];
+                    d.Y = path[2];
+                    break;
+                case "S":
+                    var nx = d.x + (d.x - (d.bx || d.x));
+                    var ny = d.y + (d.y - (d.by || d.y));
+                    path = ["C", nx, ny, path[1], path[2], path[3], path[4]];
+                    break;
+                case "T":
+                    var nx = d.x + (d.x - (d.bx || d.x));
+                    var ny = d.y + (d.y - (d.by || d.y));
+                    path = ["Q", nx, ny, path[1], path[2]];
+                    break;
+                case "H":
+                    path = ["L", path[1], d.y];
+                    break;
+                case "V":
+                    path = ["L", d.x, path[1]];
+                    break;
+                case "Z":
+                    path = ["L", d.X, d.Y];
+                    break;
+            }
+            return path;
+        },
+        edgeCases = function (a, b, i) {
+            if (data[a][i][0] == "M" && data[b][i][0] != "M") {
+                data[b].splice(i, 0, ["M", attrs[b].x, attrs[b].y]);
+                attrs[a].bx = data[a][i][data[a][i].length - 4] || 0;
+                attrs[a].by = data[a][i][data[a][i].length - 3] || 0;
+                attrs[a].x = data[a][i][data[a][i].length - 2];
+                attrs[a].y = data[a][i][data[a][i].length - 1];
+                return true;
+            } else if (data[a][i][0] == "L" && data[b][i][0] == "C") {
+                data[a][i] = ["C", attrs[a].x, attrs[a].y, data[a][i][1], data[a][i][2], data[a][i][1], data[a][i][2]];
+            } else if (data[a][i][0] == "L" && data[b][i][0] == "Q") {
+                data[a][i] = ["Q", data[a][i][1], data[a][i][2], data[a][i][1], data[a][i][2]];
+            } else if (data[a][i][0] == "Q" && data[b][i][0] == "C") {
+                var x = data[b][i][data[b][i].length - 2];
+                var y = data[b][i][data[b][i].length - 1];
+                data[b].splice(i + 1, 0, ["Q", x, y, x, y]);
+                data[a].splice(i, 0, ["C", attrs[a].x, attrs[a].y, attrs[a].x, attrs[a].y, attrs[a].x, attrs[a].y]);
+                i++;
+                attrs[b].bx = data[b][i][data[b][i].length - 4] || 0;
+                attrs[b].by = data[b][i][data[b][i].length - 3] || 0;
+                attrs[b].x = data[b][i][data[b][i].length - 2];
+                attrs[b].y = data[b][i][data[b][i].length - 1];
+                return true;
+            } else if (data[a][i][0] == "A" && data[b][i][0] == "C") {
+                var x = data[b][i][data[b][i].length - 2];
+                var y = data[b][i][data[b][i].length - 1];
+                data[b].splice(i + 1, 0, ["A", 0, 0, data[a][i][3], data[a][i][4], data[a][i][5], x, y]);
+                data[a].splice(i, 0, ["C", attrs[a].x, attrs[a].y, attrs[a].x, attrs[a].y, attrs[a].x, attrs[a].y]);
+                i++;
+                attrs[b].bx = data[b][i][data[b][i].length - 4] || 0;
+                attrs[b].by = data[b][i][data[b][i].length - 3] || 0;
+                attrs[b].x = data[b][i][data[b][i].length - 2];
+                attrs[b].y = data[b][i][data[b][i].length - 1];
+                return true;
+            } else if (data[a][i][0] == "U") {
+                data[a][i][0] = data[b][i][0];
+                for (var j = 1, jj = data[b][i].length; j < jj; j++) {
+                    data[a][i][j] = (j % 2) ? attrs[a].x : attrs[a].y;
+                }
+            }
+            return false;
+        };
+    for (var i = 0; i < Math.max(data[0].length, data[1].length); i++) {
+        data[0][i] = processPath(data[0][i], attrs[0]);
+        data[1][i] = processPath(data[1][i], attrs[1]);
+        if (data[0][i][0] != data[1][i][0] && (edgeCases(0, 1, i) || edgeCases(1, 0, i))) {
+            continue;
+        }
+        attrs[0].bx = data[0][i][data[0][i].length - 4] || 0;
+        attrs[0].by = data[0][i][data[0][i].length - 3] || 0;
+        attrs[0].x = data[0][i][data[0][i].length - 2];
+        attrs[0].y = data[0][i][data[0][i].length - 1];
+        attrs[1].bx = data[1][i][data[1][i].length - 4] || 0;
+        attrs[1].by = data[1][i][data[1][i].length - 3] || 0;
+        attrs[1].x = data[1][i][data[1][i].length - 2];
+        attrs[1].y = data[1][i][data[1][i].length - 1];
+    }
+    return data;
 };
