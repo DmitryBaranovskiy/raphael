@@ -24,13 +24,14 @@
             <div>
                 <div>
                     <div id="column-1">
-                        <h2 id="Raphael">
+                        <h2>Main Function</h2>
+                        <h3 id="Raphael">
                             Raphael
-                        </h2>
+                        </h3>
                         <p>
                             Function that creates canvas for future drawing.
                         </p>
-                        <h3>Parameters</h3>
+                        <h4>Parameters</h4>
                         <ol>
                             <li>container <em>HTMLElement</em> or <em>string</em></li>
                             <li>width <em>number</em></li>
@@ -43,293 +44,290 @@
                             <li>width <em>number</em></li>
                             <li>height <em>number</em></li>
                         </ol>
-                        <h3>Usage</h3>
+                        <h4>Usage</h4>
                         <pre class="javascript code"><code>
 // Creates canvas 320&nbsp;×&nbsp;200 at 10, 50</code>
 <code>var paper = Raphael(10, 50, 320, 200);</code>
 <code>var paper = Raphael(document.getElementById("notepad"), 320, 200);</code>
 <code>var paper = Raphael("notepad", 320, 200);</code></pre>
                         <h2 id="Element">
-                            Element
+                            Element’s generic methods
                         </h2>
                         <p>
-                            Object-wrapper for SVG/VML elements. Returned by Raphael methods.
+                            Each object created on the canvas share the same generic methods:
                         </p>
-                        <h2 id="zero">
-                            Element[0]
-                        </h2>
+                        <h3 id="node">
+                            node
+                        </h3>
                         <p>
                             Gives you reference to DOM object, so you can assign event handlers or just randomly mess around.
                         </p>
-                        <h3>Usage</h3>
+                        <h4>Usage</h4>
                         <pre class="javascript code"><code>var c = paper.circle(10, 10, 10);</code>
-<code>c[0].onclick = function () { c.attr("fill", "red"); };</code></pre>
-                        <h2 id="rotate">
-                            Element.rotate
-                        </h2>
+<code>c.node.onclick = function () { c.attr("fill", "red"); };</code></pre>
+                        <h3 id="rotate">
+                            rotate
+                        </h3>
                         <p>
                             Rotates element by given degree around its center.
                         </p>
-                        <h3>Parameters</h3>
+                        <h4>Parameters</h4>
                         <ol>
-                            <li>degree <em>number</em></li>
+                            <li>degree <em>number</em> Degree of rotation (0 – 360°)</li>
+                            <li>isAbsolute <em>boolean</em> [optional] Will rotation be relative or absolute</li>
                         </ol>
-                        <h3>Usage</h3>
+                        <h4>Usage</h4>
                         <pre class="javascript code"><code>var c = paper.circle(10, 10, 10);</code>
 <code>c.rotate(45);</code></pre>
-                        <h2 id="translate">
-                            Element.translate
-                        </h2>
+                        <h3 id="translate">
+                            translate
+                        </h3>
                         <p>
                             Moves element around the canvas by given dimensions.
                         </p>
-                        <h3>Parameters</h3>
+                        <h4>Parameters</h4>
                         <ol>
-                            <li>dx <em>number</em></li>
-                            <li>dy <em>number</em></li>
+                            <li>dx <em>number</em> Pixels of translation by X</li>
+                            <li>dy <em>number</em> Pixels of translation by Y</li>
                         </ol>
-                        <h3>Usage</h3>
+                        <h4>Usage</h4>
                         <pre class="javascript code"><code>var c = paper.circle(10, 10, 10);</code>
 <code>c.translate(10, 10);</code></pre>
-                        <h2 id="matrix">
-                            Element.matrix
-                        </h2>
-                        <p>
-                            Performs matrix transformation on element.
-                        </p>
-                        <h3>Parameters</h3>
-                        <ol>
-                            <li>xx <em>number</em></li>
-                            <li>xy <em>number</em></li>
-                            <li>yx <em>number</em></li>
-                            <li>yy <em>number</em></li>
-                            <li>dx <em>number</em></li>
-                            <li>dy <em>number</em></li>
-                        </ol>
-                        <h3>Usage</h3>
-                        <pre class="javascript code"><code>var c = paper.circle(10, 10, 10);</code>
-<code>// reflects circle down</code>
-<code>c.matrix(1, 0, 0, -1, 0, 0);</code></pre>
-                        <h2 id="scale">
-                            Element.scale
-                        </h2>
+                        <h3 id="scale">
+                            scale
+                        </h3>
                         <p>
                             Scales element by given amount of times.
                         </p>
-                        <h3>Parameters</h3>
+                        <h4>Parameters</h4>
                         <ol>
                             <li>Xtimes <em>number</em></li>
                             <li>Ytimes <em>number</em></li>
                         </ol>
-                        <h3>Usage</h3>
+                        <h4>Usage</h4>
                         <pre class="javascript code"><code>var c = paper.circle(10, 10, 10);</code>
 <code>c.scale(1.5, 1.5);</code></pre>
-                        <h2 id="attr">
-                            Element.attr
-                        </h2>
+                        <h3 id="attr">
+                            attr
+                        </h3>
                         <p>
                             Sets attributes of elements.
                         </p>
-                        <h3>Parameters</h3>
+                        <h4>Parameters</h4>
                         <ol>
                             <li>params <em>object</em></li>
                         </ol>
                         <p>or</p>
                         <ol>
-                            <li>attribute <em>string</em></li>
+                            <li>attributeName <em>string</em></li>
                             <li>value <em>string</em></li>
                         </ol>
-                        <h3>Possible parameters</h3>
+                        <h4>Possible parameters</h4>
                         <ul>
-                            <li>cx</li>
-                            <li>cy</li>
-                            <li>dasharray</li>
-                            <li>fill-opacity</li>
-                            <li>fill</li>
-                            <li>font-family</li>
-                            <li>font-size</li>
-                            <li>font-weight</li>
-                            <li>font</li>
-                            <li>gradient</li>
-                            <li>height</li>
-                            <li>joinstyle</li>
-                            <li>opacity</li>
-                            <li>r</li>
-                            <li>rx</li>
-                            <li>ry</li>
-                            <li>stroke-opacity</li>
-                            <li>stroke-width</li>
-                            <li>stroke</li>
-                            <li>width</li>
-                            <li>x</li>
-                            <li>y</li>
+                            <li>cx <em>number</em></li>
+                            <li>cy <em>number</em></li>
+                            <li>dasharray <em>string</em> [“-”, “.”, “-.”, “-..”, “. ”, “- ”, “--”, “- .”, “--.”, “--..”]</li>
+                            <li>fill <em>colour</em></li>
+                            <li>fill-opacity <em>number</em></li>
+                            <li>font <em>string</em></li>
+                            <li>font-family <em>string</em></li>
+                            <li>font-size <em>number</em></li>
+                            <li>font-weight <em>string</em></li>
+                            <li>gradient <em>object</em></li>
+                            <li>height <em>number</em></li>
+                            <li>opacity <em>number</em></li>
+                            <li>path <em>pathString</em></li>
+                            <li>r <em>number</em></li>
+                            <li>rotation <em>number</em></li>
+                            <li>rx <em>number</em></li>
+                            <li>ry <em>number</em></li>
+                            <li>scale <em>CSV</em></li>
+                            <li>stroke <em>colour</em></li>
+                            <li>stroke-linecap <em>string</em> [“butt”, “square”, “round”, “miter”]</li>
+                            <li>stroke-linejoin <em>string</em> [“butt”, “square”, “round”, “miter”]</li>
+                            <li>stroke-miterlimit <em>number</em></li>
+                            <li>stroke-opacity <em>number</em></li>
+                            <li>stroke-width <em>number</em></li>
+                            <li>translation <em>CSV</em></li>
+                            <li>width <em>number</em></li>
+                            <li>x <em>number</em></li>
+                            <li>y <em>number</em></li>
                         </ul>
-                        <h3>Usage</h3>
+                        <h4>Usage</h4>
                         <pre class="javascript code"><code>var c = paper.circle(10, 10, 10);</code>
 <code>c.attr("fill", "black");</code>
 <code>c.attr({fill: "#000", stroke: "#f00", opacity: 0.5});</code></pre>
-                        <h2 id="getBBox">
-                            Element.getBBox
-                        </h2>
+                        <h3 id="getBBox">
+                            getBBox
+                        </h3>
                         <p>
                             Returns dimensions of given element.
                         </p>
-                        <h3>Parameters</h3>
-                        <ol>
-                            <li>n/a</li>
-                        </ol>
-                        <h3>Usage</h3>
+                        <h4>Usage</h4>
                         <pre class="javascript code"><code>var c = paper.circle(10, 10, 10);</code>
 <code>var width = c.getBBox().width;</code></pre>
-                        <h2 id="toFront">
-                            Element.toFront
-                        </h2>
+                        <h3 id="toFront">
+                            toFront
+                        </h3>
                         <p>
                             Moves element to front in hierarchy.
                         </p>
-                        <h3>Parameters</h3>
-                        <ol>
-                            <li>n/a</li>
-                        </ol>
-                        <h3>Usage</h3>
+                        <h4>Usage</h4>
                         <pre class="javascript code"><code>var c = paper.circle(10, 10, 10);</code>
 <code>c.toFront();</code></pre>
-                        <h2 id="circle">
+                        <h3 id="toBack">
+                            toBack
+                        </h3>
+                        <p>
+                            Moves element to back in hierarchy.
+                        </p>
+                        <h4>Usage</h4>
+                        <pre class="javascript code"><code>var c = paper.circle(10, 10, 10);</code>
+<code>c.toBack();</code></pre>
+                        <h2>Graphic Primitives</h2>
+                        <h3 id="circle">
                             circle
-                        </h2>
+                        </h3>
                         <p>
                             Creates circle.
                         </p>
-                        <h3>Parameters</h3>
+                        <h4>Parameters</h4>
                         <ol>
-                            <li>x <em>number</em></li>
-                            <li>y <em>number</em></li>
-                            <li>r <em>number</em></li>
+                            <li>x <em>number</em> X coordinate of the centre</li>
+                            <li>y <em>number</em> Y coordinate of the centre</li>
+                            <li>r <em>number</em> radius</li>
                         </ol>
-                        <h3>Usage</h3>
+                        <h4>Usage</h4>
                         <pre class="javascript code"><code>var c = paper.circle(10, 10, 10);</code></pre>
-                        <h2 id="rect">
+                        <h3 id="rect">
                             rect
-                        </h2>
+                        </h3>
                         <p>
                             Creates rectangle.
                         </p>
-                        <h3>Parameters</h3>
+                        <h4>Parameters</h4>
                         <ol>
-                            <li>x <em>number</em></li>
-                            <li>y <em>number</em></li>
+                            <li>x <em>number</em> X coordinate of top left corner</li>
+                            <li>y <em>number</em> Y coordinate of top left corner</li>
                             <li>width <em>number</em></li>
                             <li>height <em>number</em></li>
-                            <li>r <em>number</em> [optional]</li>
+                            <li>r <em>number</em> [optional] radius for rounded corners, default is 0</li>
                         </ol>
-                        <h3>Usage</h3>
+                        <h4>Usage</h4>
                         <pre class="javascript code"><code>// regular rectangle</code>
 <code>var c = paper.rect(10, 10, 10, 10);</code>
 <code>// rounded rectangle</code>
 <code>var c = paper.rect(10, 10, 100, 50, 10);</code></pre>
-                        <h2 id="ellipse">
+                        <h3 id="ellipse">
                             ellipse
-                        </h2>
+                        </h3>
                         <p>
                             Creates an ellipse.
                         </p>
-                        <h3>Parameters</h3>
+                        <h4>Parameters</h4>
                         <ol>
+                            <li>x <em>number</em> X coordinate of the centre</li>
+                            <li>y <em>number</em> X coordinate of the centre</li>
+                            <li>rx <em>number</em> Horisontal radius</li>
+                            <li>ry <em>number</em> Vertical radius</li>
+                        </ol>
+                        <h4>Usage</h4>
+                        <pre class="javascript code"><code>var c = paper.ellipse(100, 100, 30, 40);</code></pre>
+                        <h3 id="image">
+                            image
+                        </h3>
+                        <p>
+                            Embeds an image in SVG/VML area.
+                        </p>
+                        <h4>Parameters</h4>
+                        <ol>
+                            <li>src <em>string</em></li>
                             <li>x <em>number</em></li>
                             <li>y <em>number</em></li>
-                            <li>rx <em>number</em></li>
-                            <li>ry <em>number</em></li>
+                            <li>width <em>number</em></li>
+                            <li>height <em>number</em></li>
                         </ol>
-                        <h3>Usage</h3>
-                        <pre class="javascript code"><code>var c = paper.ellipse(100, 100, 30, 40);</code></pre>
-                        <h2 id="path">
+                        <h4>Usage</h4>
+                        <pre class="javascript code"><code>var c = paper.image("apple.png", 10, 10, 100, 100);</code></pre>
+                        <h3 id="path">
                             path
-                        </h2>
+                        </h3>
                         <p>
                             Initialise path drawing. In general case this function returns empty path object. To draw path use built in methods like <code>lineTo</code> and <code>curveTo</code>.
                         </p>
-                        <h3>Parameters</h3>
+                        <h4>Parameters</h4>
                         <ol>
                             <li>params <em>object</em> Similar to object for <code><a href="#attr">attr</a></code> method</li>
                             <li>pathString <em>string</em> [optional] path in SVG path string format. See SVG documentation.</li>
                         </ol>
-                        <h3>Usage</h3>
+                        <h4>Usage</h4>
                         <pre class="javascript code"><code>var c = paper.path({stroke: "#036"}).moveTo(10, 10).lineTo(50, 50);</code></pre>
-                        <h2 id="absolutely">
+                        <h2>Path Methods</h2>
+                        <h3 id="absolutely">
                             absolutely
-                        </h2>
+                        </h3>
                         <p>
                             Sets trigger to count all following units as absolute ones, unless said otherwise. [<em>on by default</em>]
                         </p>
-                        <h3>Usage</h3>
+                        <h4>Usage</h4>
                         <pre class="javascript code"><code>var c = paper.path({stroke: "#036"}).absolutely()
     .moveTo(10, 10).lineTo(50, 50);</code></pre>
-                        <h2 id="relatively">
+                        <h3 id="relatively">
                             relatively
-                        </h2>
+                        </h3>
                         <p>
                             Sets trigger to count all following units as relative ones, unless said otherwise.
                         </p>
-                        <h3>Usage</h3>
+                        <h4>Usage</h4>
                         <pre class="javascript code"><code>var c = paper.path({stroke: "#036"}).relatively()
     .moveTo(10, 10).lineTo(50, 50);</code></pre>
-                        <h2 id="redraw">
-                            redraw
-                        </h2>
-                        <p>
-                            Redraws the path. Make sense to use when points has been changed. This is possible via accessing <code>path</code>
-                            property of the object. This property is array of objects representing commands given to path.
-                        </p>
-                        <h3>Usage</h3>
-                        <pre class="javascript code"><code>c.path[3].arg[2] = 20;</code>
-<code>c.redraw();</code></pre>
-                        <h2 id="moveTo">
+                        <h3 id="moveTo">
                             moveTo
-                        </h2>
+                        </h3>
                         <p>
                             Moves drawing point to given coordinates.
                         </p>
-                        <h3>Parameters</h3>
+                        <h4>Parameters</h4>
                         <ol>
                             <li>x <em>number</em></li>
                             <li>y <em>number</em></li>
                         </ol>
-                        <h3>Usage</h3>
+                        <h4>Usage</h4>
                         <pre class="javascript code"><code>var c = paper.path({stroke: "#036"}).moveTo(10, 10).lineTo(50, 50);</code></pre>
-                        <h2 id="lineTo">
+                        <h3 id="lineTo">
                             lineTo
-                        </h2>
+                        </h3>
                         <p>
                             Draws straight line to given coordinates.
                         </p>
-                        <h3>Parameters</h3>
+                        <h4>Parameters</h4>
                         <ol>
                             <li>x <em>number</em></li>
                             <li>y <em>number</em></li>
                         </ol>
-                        <h3>Usage</h3>
+                        <h4>Usage</h4>
                         <pre class="javascript code"><code>var c = paper.path({stroke: "#036"}).moveTo(10, 10).lineTo(50, 50);</code></pre>
-                        <h2 id="cplineTo">
+                        <h3 id="cplineTo">
                             cplineTo
-                        </h2>
+                        </h3>
                         <p>
                             Draws curved line to given coordinates. Line will have horizontal anchors on start and on finish.
                         </p>
-                        <h3>Parameters</h3>
+                        <h4>Parameters</h4>
                         <ol>
                             <li>x <em>number</em></li>
                             <li>y <em>number</em></li>
                             <li>width <em>number</em></li>
                         </ol>
-                        <h3>Usage</h3>
+                        <h4>Usage</h4>
                         <pre class="javascript code"><code>var c = paper.path({stroke: "#036"}).moveTo(10, 10).cplineTo(50, 50);</code></pre>
-                        <h2 id="curveTo">
+                        <h3 id="curveTo">
                             curveTo
-                        </h2>
+                        </h3>
                         <p>
-                            Draws curved line to given coordinates.
+                            Draws bicubic curve to given coordinates.
                         </p>
-                        <h3>Parameters</h3>
+                        <h4>Parameters</h4>
                         <ol>
                             <li>x1 <em>number</em></li>
                             <li>y1 <em>number</em></li>
@@ -338,20 +336,35 @@
                             <li>x3 <em>number</em></li>
                             <li>y3 <em>number</em></li>
                         </ol>
-                        <h3>Usage</h3>
+                        <h4>Usage</h4>
                         <pre class="javascript code"><code>var c = paper.path({stroke: "#036"}).moveTo(10, 10).curveTo(10, 15, 45, 45, 50, 50);</code></pre>
-                        <h2 id="addRoundedCorner">
+                        <h3 id="qcurveTo">
+                            qcurveTo
+                        </h3>
+                        <p>
+                            Draws quadratic curve to given coordinates.
+                        </p>
+                        <h4>Parameters</h4>
+                        <ol>
+                            <li>x1 <em>number</em></li>
+                            <li>y1 <em>number</em></li>
+                            <li>x2 <em>number</em></li>
+                            <li>y2 <em>number</em></li>
+                        </ol>
+                        <h4>Usage</h4>
+                        <pre class="javascript code"><code>var c = paper.path({stroke: "#036"}).moveTo(10, 10).curveTo(10, 15, 45, 45, 50, 50);</code></pre>
+                        <h3 id="addRoundedCorner">
                             addRoundedCorner
-                        </h2>
+                        </h3>
                         <p>
                             Draws quarter of circle form current point.
                         </p>
-                        <h3>Parameters</h3>
+                        <h4>Parameters</h4>
                         <ol>
                             <li>r <em>number</em></li>
                             <li>dir <em>string</em> two letters direction</li>
                         </ol>
-                        <h3>Possible dir values</h3>
+                        <h4>Possible dir values</h4>
                         <dl>
                             <dt>lu</dt>
                             <dd>left up</dd>
@@ -370,40 +383,16 @@
                             <dt>dl</dt>
                             <dd>down left</dd>
                         </dl>
-                        <h3>Usage</h3>
+                        <h4>Usage</h4>
                         <pre class="javascript code"><code>var c = paper.path({stroke: "#036"}).moveTo(10, 10).addRoundedCorner(10, "rd");</code></pre>
-                        <h2 id="andClose">
+                        <h3 id="andClose">
                             andClose
-                        </h2>
+                        </h3>
                         <p>
                             Closes the path.
                         </p>
-                        <h3>Usage</h3>
+                        <h4>Usage</h4>
                         <pre class="javascript code"><code>var c = paper.path({stroke: "#036"}).moveTo(10, 10).andClose();</code></pre>
-                        <h2 id="image">
-                            image
-                        </h2>
-                        <p>
-                            Embeds an image in SVG/VML area.
-                        </p>
-                        <h3>Parameters</h3>
-                        <ol>
-                            <li>src <em>string</em></li>
-                            <li>x <em>number</em></li>
-                            <li>y <em>number</em></li>
-                            <li>width <em>number</em></li>
-                            <li>height <em>number</em></li>
-                        </ol>
-                        <h3>Usage</h3>
-                        <pre class="javascript code"><code>var c = paper.image("apple.png", 10, 10, 100, 100);</code></pre>
-                        <h2 id="group">
-                            group
-                        </h2>
-                        <p>
-                            Creates a group. Could be useful if you want to group your objects in layers, etc.
-                        </p>
-                        <h3>Usage</h3>
-                        <pre class="javascript code"><code>var c = paper.group();</code></pre>
                     </div>
                     <div id="column-2">
                         <h2>
@@ -412,38 +401,33 @@
                         <h2>
                             Contents
                         </h2>
-                        <ul>
+                        <ul id="contents">
                             <li>
                                 <a href="reference.html#Raphael"><code>Raphael</code></a>
                             </li>
                             <li>
-                                <a href="reference.html#Element"><code>Element</code></a>
-                                <ul>
-                                    <li>
-                                        <a href="reference.html#zero"><code>0</code></a>
-                                    </li>
-                                    <li>
-                                        <a href="reference.html#rotate"><code>rotate</code></a>
-                                    </li>
-                                    <li>
-                                        <a href="reference.html#translate"><code>translate</code></a>
-                                    </li>
-                                    <li>
-                                        <a href="reference.html#matrix"><code>matrix</code></a>
-                                    </li>
-                                    <li>
-                                        <a href="reference.html#scale"><code>scale</code></a>
-                                    </li>
-                                    <li>
-                                        <a href="reference.html#attr"><code>attr</code></a>
-                                    </li>
-                                    <li>
-                                        <a href="reference.html#getBBox"><code>getBBox</code></a>
-                                    </li>
-                                    <li>
-                                        <a href="reference.html#toFront"><code>toFront</code></a>
-                                    </li>
-                                </ul>
+                                <a href="reference.html#node"><code>node</code></a>
+                            </li>
+                            <li>
+                                <a href="reference.html#rotate"><code>rotate</code></a>
+                            </li>
+                            <li>
+                                <a href="reference.html#translate"><code>translate</code></a>
+                            </li>
+                            <li>
+                                <a href="reference.html#scale"><code>scale</code></a>
+                            </li>
+                            <li>
+                                <a href="reference.html#attr"><code>attr</code></a>
+                            </li>
+                            <li>
+                                <a href="reference.html#getBBox"><code>getBBox</code></a>
+                            </li>
+                            <li>
+                                <a href="reference.html#toFront"><code>toFront</code></a>
+                            </li>
+                            <li>
+                                <a href="reference.html#toBack"><code>toBack</code></a>
                             </li>
                             <li>
                                 <a href="reference.html#circle"><code>circle</code></a>
@@ -455,6 +439,9 @@
                                 <a href="reference.html#ellipse"><code>ellipse</code></a>
                             </li>
                             <li>
+                                <a href="reference.html#image"><code>image</code></a>
+                            </li>
+                            <li>
                                 <a href="reference.html#path"><code>path</code></a>
                                 <ul>
                                     <li>
@@ -462,9 +449,6 @@
                                     </li>
                                     <li>
                                         <a href="reference.html#relatively"><code>relatively</code></a>
-                                    </li>
-                                    <li>
-                                        <a href="reference.html#redraw"><code>redraw</code></a>
                                     </li>
                                     <li>
                                         <a href="reference.html#moveTo"><code>moveTo</code></a>
@@ -479,21 +463,15 @@
                                         <a href="reference.html#curveTo"><code>curveTo</code></a>
                                     </li>
                                     <li>
+                                        <a href="reference.html#qcurveTo"><code>qcurveTo</code></a>
+                                    </li>
+                                    <li>
                                         <a href="reference.html#addRoundedCorner"><code>addRoundedCorner</code></a>
                                     </li>
                                     <li>
                                         <a href="reference.html#andClose"><code>andClose</code></a>
                                     </li>
                                 </ul>
-                            </li>
-                            <li>
-                                <a href="reference.html#image"><code>image</code></a>
-                            </li>
-                            <li>
-                                <a href="reference.html#group"><code>group</code></a>
-                            </li>
-                            <li>
-                                <a href="reference.html#linerect"><code>linerect</code></a>
                             </li>
                         </ul>
                     </div>
