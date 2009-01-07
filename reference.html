@@ -157,6 +157,21 @@
                         <pre class="javascript code"><code>var c = paper.circle(10, 10, 10);</code>
 <code>c.attr("fill", "black");</code>
 <code>c.attr({fill: "#000", stroke: "#f00", opacity: 0.5});</code></pre>
+                        <h3 id="animate">
+                            animate
+                        </h3>
+                        <p>
+                            Linearly changes attribute from current to specified in given amount of milliseconds.
+                        </p>
+                        <h4>Parameters</h4>
+                        <ol>
+                            <li>newAttrs <em>object</em></li>
+                            <li>ms <em>number</em></li>
+                            <li>callback <em>function</em> [optional]</li>
+                        </ol>
+                        <h4>Usage</h4>
+                        <pre class="javascript code"><code>var c = paper.circle(10, 10, 10);</code>
+<code>c.animate({cx: 20, r: 20}, 2000);</code></pre>
                         <h3 id="getBBox">
                             getBBox
                         </h3>
@@ -419,6 +434,9 @@
                             </li>
                             <li>
                                 <a href="reference.html#attr"><code>attr</code></a>
+                            </li>
+                            <li>
+                                <a href="reference.html#attr"><code>animate</code></a>
                             </li>
                             <li>
                                 <a href="reference.html#getBBox"><code>getBBox</code></a>
