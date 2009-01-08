@@ -68,8 +68,8 @@ Rotates element by given degree around its center.
 
 ##### Parameters
 
-   1. degree number Degree of rotation (0 – 360°)
-   2. isAbsolute boolean [optional] Will rotation be relative or absolute
+1. degree number Degree of rotation (0 – 360°)
+2. isAbsolute boolean [optional] Will rotation be relative or absolute
 
 ##### Usage
 
@@ -82,8 +82,8 @@ Moves element around the canvas by given dimensions.
 
 ##### Parameters
 
-   1. dx number Pixels of translation by X
-   2. dy number Pixels of translation by Y
+1. dx number Pixels of translation by X
+2. dy number Pixels of translation by Y
 
 ##### Usage
 
@@ -96,8 +96,8 @@ Scales element by given amount of times.
 
 ##### Parameters
 
-   1. Xtimes number
-   2. Ytimes number
+1. Xtimes number
+2. Ytimes number
 
 ##### Usage
 
@@ -110,43 +110,43 @@ Sets attributes of elements.
 
 ##### Parameters
 
-   1. params object
+1. params object
 
 or
 
-   1. attributeName string
-   2. value string
+1. attributeName string
+2. value string
 
 ###### Possible parameters
 
-    * cx number
-    * cy number
-    * dasharray string [“-”, “.”, “-.”, “-..”, “. ”, “- ”, “--”, “- .”, “--.”, “--..”]
-    * fill colour
-    * fill-opacity number
-    * font string
-    * font-family string
-    * font-size number
-    * font-weight string
-    * gradient object
-    * height number
-    * opacity number
-    * path pathString
-    * r number
-    * rotation number
-    * rx number
-    * ry number
-    * scale CSV
-    * stroke colour
-    * stroke-linecap string [“butt”, “square”, “round”, “miter”]
-    * stroke-linejoin string [“butt”, “square”, “round”, “miter”]
-    * stroke-miterlimit number
-    * stroke-opacity number
-    * stroke-width number
-    * translation CSV
-    * width number
-    * x number
-    * y number
+* cx number
+* cy number
+* dasharray string [“-”, “.”, “-.”, “-..”, “. ”, “- ”, “--”, “- .”, “--.”, “--..”]
+* fill colour
+* fill-opacity number
+* font string
+* font-family string
+* font-size number
+* font-weight string
+* gradient object
+* height number
+* opacity number
+* path pathString
+* r number
+* rotation number
+* rx number
+* ry number
+* scale CSV
+* stroke colour
+* stroke-linecap string [“butt”, “square”, “round”, “miter”]
+* stroke-linejoin string [“butt”, “square”, “round”, “miter”]
+* stroke-miterlimit number
+* stroke-opacity number
+* stroke-width number
+* translation CSV
+* width number
+* x number
+* y number
 
 ##### Usage
 
@@ -160,9 +160,9 @@ Linearly changes attribute from current to specified in given amount of millisec
 
 ##### Parameters
 
-   1. newAttrs object
-   2. ms number
-   3. callback function [optional]
+1. newAttrs object
+2. ms number
+3. callback function [optional]
 
 ##### Usage
 
@@ -204,9 +204,9 @@ Creates circle.
 
 ##### Parameters
 
-   1. x number X coordinate of the centre
-   2. y number Y coordinate of the centre
-   3. r number radius
+1. x number X coordinate of the centre
+2. y number Y coordinate of the centre
+3. r number radius
 
 ##### Usage
 
@@ -218,11 +218,11 @@ Creates rectangle.
 
 ##### Parameters
 
-   1. x number X coordinate of top left corner
-   2. y number Y coordinate of top left corner
-   3. width number
-   4. height number
-   5. r number [optional] radius for rounded corners, default is 0
+1. x number X coordinate of top left corner
+2. y number Y coordinate of top left corner
+3. width number
+4. height number
+5. r number [optional] radius for rounded corners, default is 0
 
 ##### Usage
 
@@ -237,10 +237,10 @@ Creates an ellipse.
 
 ##### Parameters
 
-   1. x number X coordinate of the centre
-   2. y number X coordinate of the centre
-   3. rx number Horisontal radius
-   4. ry number Vertical radius
+1. x number X coordinate of the centre
+2. y number X coordinate of the centre
+3. rx number Horisontal radius
+4. ry number Vertical radius
 
 ##### Usage
 
@@ -252,11 +252,11 @@ Embeds an image in SVG/VML area.
 
 ##### Parameters
 
-   1. src string
-   2. x number
-   3. y number
-   4. width number
-   5. height number
+1. src string
+2. x number
+3. y number
+4. width number
+5. height number
 
 ##### Usage
 
@@ -268,8 +268,8 @@ Initialise path drawing. In general case this function returns empty path object
 
 ##### Parameters
 
-   1. params object Similar to object for attr method
-   2. pathString string [optional] path in SVG path string format. See SVG documentation.
+1. params object Similar to object for attr method
+2. pathString string [optional] path in SVG path string format. See SVG documentation.
 
 ##### Usage
 
@@ -301,8 +301,8 @@ Moves drawing point to given coordinates.
 
 ##### Parameters
 
-   1. x number
-   2. y number
+1. x number
+2. y number
 
 ##### Usage
 
@@ -314,8 +314,8 @@ Draws straight line to given coordinates.
 
 ##### Parameters
 
-   1. x number
-   2. y number
+1. x number
+2. y number
 
 ##### Usage
 
@@ -327,9 +327,9 @@ Draws curved line to given coordinates. Line will have horizontal anchors on sta
 
 ##### Parameters
 
-   1. x number
-   2. y number
-   3. width number
+1. x number
+2. y number
+3. width number
 
 ##### Usage
 
@@ -341,12 +341,12 @@ Draws bicubic curve to given coordinates.
 
 ##### Parameters
 
-   1. x1 number
-   2. y1 number
-   3. x2 number
-   4. y2 number
-   5. x3 number
-   6. y3 number
+1. x1 number
+2. y1 number
+3. x2 number
+4. y2 number
+5. x3 number
+6. y3 number
 
 ##### Usage
 
@@ -358,10 +358,10 @@ Draws quadratic curve to given coordinates.
 
 ##### Parameters
 
-   1. x1 number
-   2. y1 number
-   3. x2 number
-   4. y2 number
+1. x1 number
+2. y1 number
+3. x2 number
+4. y2 number
 
 ##### Usage
 
@@ -373,8 +373,8 @@ Draws quarter of circle form current point.
 
 ##### Parameters
 
-   1. r number
-   2. dir string two letters direction
+1. r number
+2. dir string two letters direction
 
 Possible dir values
 
@@ -397,9 +397,9 @@ Closes the path.
 
 ##### Usage
 
-var c = paper.path({stroke: "#036"}).moveTo(10, 10).andClose();
+    var c = paper.path({stroke: "#036"}).moveTo(10, 10).andClose();
 
-# License
+## License
 
 http://www.opensource.org/licenses/mit-license.php
 
