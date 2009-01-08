@@ -1,5 +1,5 @@
 /*
- * Raphael 0.6 - JavaScript Vector Library
+ * Raphael 0.6.1 - JavaScript Vector Library
  *
  * Copyright (c) 2008 Dmitry Baranovskiy (http://raphaeljs.com)
  * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
@@ -8,7 +8,7 @@ var Raphael = (function (type) {
         var r = function () {
             return r._create.apply(r, arguments);
         };
-        r.version = "0.6";
+        r.version = "0.6.1";
         r.type = type;
         var availableAttrs = {cx: 0, cy: 0, fill: "#fff", "fill-opacity": 1, font: '16px "Arial"', "font-family": '"Arial"', "font-size": "16", gradient: 0, height: 0, opacity: 1, path: "M0,0", r: 0, rotation: 0, rx: 0, ry: 0, scale: "1 1", stroke: "#000", "stroke-dasharray": "", "stroke-linecap": "butt", "stroke-linejoin": "butt", "stroke-miterlimit": 0, "stroke-opacity": 1, "stroke-width": 1, translation: "0 0", width: 0, x: 0, y: 0},
             availableAnimAttrs = {cx: "number", cy: "number", fill: "colour", "fill-opacity": "number", "font-size": "number", height: "number", opacity: "number", path: "path", r: "number", rotation: "number", rx: "number", ry: "number", scale: "csv", stroke: "colour", "stroke-opacity": "number", "stroke-width": "number", translation: "csv", width: "number", x: "number", y: "number"},
@@ -273,7 +273,7 @@ var Raphael = (function (type) {
                 params["font"] && (s.font = params["font"]);
                 params["font-weight"] && (s.fontWeight = params["font-weight"]);
                 if (typeof params.opacity != "undefined" || typeof params["stroke-width"] != "undefined" || typeof params.fill != "undefined" || typeof params.stroke != "undefined") {
-                    o = o.shape || o[0];
+                    o = o.shape || o.node;
                     var fill = (o.getElementsByTagName("fill") && o.getElementsByTagName("fill")[0]) || document.createElement("rvml:fill");
                     if ("fill-opacity" in params || "opacity" in params) {
                         fill.opacity = ((params["fill-opacity"] + 1 || 2) - 1) * ((params.opacity + 1 || 2) - 1);
@@ -437,11 +437,15 @@ var Raphael = (function (type) {
                         this.textpath.v = ["m", Math.round(attr.x), ", ", Math.round(attr.y - 2), "l", Math.round(attr.x) + 1, ", ", Math.round(attr.y - 2)].join("");
                         return;
                     case "path":
-                        var dim = Raphael.pathDimensions(this.attrs.path),
-                        x = dim.x;
-                        y = dim.y;
-                        w = dim.width;
-                        h = dim.height;
+                        if (!this.attrs.path) {
+                            x = y = w = h = 0;
+                        } else {
+                            var dim = Raphael.pathDimensions(this.attrs.path),
+                            x = dim.x;
+                            y = dim.y;
+                            w = dim.width;
+                            h = dim.height;
+                        }
                         break;
                     default:
                         x = 0;
@@ -1455,12 +1459,6 @@ var Raphael = (function (type) {
             };
             C.group = function () {
                 return theGroup(this);
-            };
-            C.linerect = function (x, y, w, h, r) {
-                if (r && parseInt(r, 10)) {
-                    return this.path({stroke: "#000"}).moveTo(x + r, y).lineTo(x + w - r, y).addRoundedCorner(r, "rd").lineTo(x + w, y + h - r).addRoundedCorner(r, "dl").lineTo(x + r, y + h).addRoundedCorner(r, "lu").lineTo(x, y + r).addRoundedCorner(r, "ur").andClose();
-                }
-                return this.path({stroke: "#000"}).moveTo(x, y).lineTo(x + w, y).lineTo(x + w, y + h).lineTo(x, y + h).andClose();
             };
             C.drawGrid = function (x, y, w, h, wv, hv, color) {
                 color = color || "#000";
