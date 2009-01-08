@@ -31,16 +31,16 @@ Function that creates a canvas on which to draw.
 
 ##### Parameters
 
-   1. container HTMLElement or string
-   2. width number
-   3. height number
+1. container HTMLElement or string
+2. width number
+3. height number
 
 or
 
-   1. x number
-   2. y number
-   3. width number
-   4. height number
+1. x number
+2. y number
+3. width number
+4. height number
 
 ##### Usage
 
