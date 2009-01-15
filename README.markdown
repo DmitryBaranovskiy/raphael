@@ -169,6 +169,16 @@ Linearly changes attribute from current to specified in given amount of millisec
     var c = paper.circle(10, 10, 10);
     c.animate({cx: 20, r: 20}, 2000);
 
+#### stop
+
+Stops current animation of the element
+
+##### Usage
+
+    var c = paper.circle(10, 10, 10);
+    c.animate({cx: 20, r: 20}, 2000);
+    document.body.onclick = function () { c.stop(); };
+
 #### getBBox
 
 Returns dimensions of given element.
@@ -195,6 +205,26 @@ Moves element to back in hierarchy.
 
     var c = paper.circle(10, 10, 10);
     c.toBack();
+    
+#### insertBefore
+
+Inserts current object before the given one
+
+##### Usage
+
+    var r = paper.rect(10, 10, 10, 10);
+    var c = paper.circle(10, 10, 10);
+    c.insertBefore(r);
+    
+#### insertAfter
+
+Inserts current object after the given one
+
+##### Usage
+
+    var c = paper.circle(10, 10, 10);
+    var r = paper.rect(10, 10, 10, 10);
+    c.insertAfter(r);
     
 ### Graphic Primitives
 
@@ -378,14 +408,14 @@ Draws quarter of circle form current point.
 
 Possible dir values
 
-* lu: left up
-* ld: left down
-* ru: right up
-* rd: right down
-* ur: up right
-* ul: up left
-* dr: down right
-* dl: down left
+* “lu”: left up
+* “ld”: left down
+* “ru”: right up
+* “rd”: right down
+* “ur”: up right
+* “ul”: up left
+* “dr”: down right
+* “dl”: down left
 
 ##### Usage
 
@@ -403,4 +433,4 @@ Closes the path.
 
 http://www.opensource.org/licenses/mit-license.php
 
-Copyright (c) 2008 Dmitry Baranovskiy (http://raphaeljs.com)
+Copyright © 2008 – 2009 Dmitry Baranovskiy (http://raphaeljs.com)
