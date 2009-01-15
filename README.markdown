@@ -384,7 +384,7 @@ Draws a bicubic curve to the given coordinates.
 
 ##### Usage
 
-  var c = paper.path({stroke: "#036"}).moveTo(10, 10).curveTo(10, 15, 45, 45, 50, 50);
+    var c = paper.path({stroke: "#036"}).moveTo(10, 10).curveTo(10, 15, 45, 45, 50, 50);
 
 #### qcurveTo
 
@@ -408,7 +408,7 @@ Draws a quarter of a circle from the current drawing point.
 ##### Parameters
 
 1. r number
-2. dir string two letters direction
+2. dir string Two-letter directional instruction, as described below.
 
 Possible dir values
 

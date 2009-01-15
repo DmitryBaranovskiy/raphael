@@ -29,7 +29,7 @@
                             Raphael
                         </h3>
                         <p>
-                            Function that creates canvas for future drawing.
+                            Creates a canvas object on which to draw. You must do this first, as all future calls to drawing methods from this instance will be bound to this canvas.
                         </p>
                         <h4>Parameters</h4>
                         <ol>
@@ -45,84 +45,89 @@
                             <li>height <em>number</em></li>
                         </ol>
                         <h4>Usage</h4>
-                        <pre class="javascript code"><code>
-// Creates canvas 320&nbsp;×&nbsp;200 at 10, 50</code>
-<code>var paper = Raphael(10, 50, 320, 200);</code>
-<code>var paper = Raphael(document.getElementById("notepad"), 320, 200);</code>
-<code>var paper = Raphael("notepad", 320, 200);</code></pre>
+                        <pre class="javascript code"><code>// Each of the following examples create a canvas that is 320px wide by 200px high
+// Canvas is created at the viewport's 10,50 coordinate
+var paper = Raphael(10, 50, 320, 200);
+// Canvas is created at the top left corner of the #notepad element (or its top right corner in dir="rtl" elements)
+var paper = Raphael(document.getElementById("notepad"), 320, 200);
+// Same as above
+var paper = Raphael("notepad", 320, 200);</code></pre>
                         <h2 id="Element">
                             Element’s generic methods
                         </h2>
                         <p>
-                            Each object created on the canvas share the same generic methods:
+                            Each object created on the canvas shares these same generic methods:
                         </p>
                         <h3 id="node">
                             node
                         </h3>
                         <p>
-                            Gives you reference to DOM object, so you can assign event handlers or just randomly mess around.
+                            Gives you a reference to the DOM object, so you can assign event handlers or just mess around.
                         </p>
                         <h4>Usage</h4>
-                        <pre class="javascript code"><code>var c = paper.circle(10, 10, 10);</code>
-<code>c.node.onclick = function () { c.attr("fill", "red"); };</code></pre>
+                        <pre class="javascript code"><code>var c = paper.circle(10, 10, 10); // draw a circle at coordinate 10,10 with radius of 10
+c.node.onclick = function () { c.attr("fill", "red"); };</code></pre>
                         <h3 id="rotate">
                             rotate
                         </h3>
                         <p>
-                            Rotates element by given degree around its center.
+                            Rotates the element by the given degree from either its 0,0 corner or its center point.
                         </p>
                         <h4>Parameters</h4>
                         <ol>
                             <li>degree <em>number</em> Degree of rotation (0 – 360°)</li>
-                            <li>isAbsolute <em>boolean</em> [optional] Will rotation be relative or absolute</li>
+                            <li>isAbsolute <em>boolean</em> [optional] Specifies the rotation point. Use <code>true</code> to rotate the element around its center point. The default, <code>false</code>, rotates the element from its 0,0 coordinate.</li>
                         </ol>
                         <h4>Usage</h4>
-                        <pre class="javascript code"><code>var c = paper.circle(10, 10, 10);</code>
-<code>c.rotate(45);</code></pre>
+                        <pre class="javascript code"><code>var c = paper.circle(10, 10, 10);
+c.rotate(45);        // rotation is relative
+c.rotate(45, true);  // rotation is absolute</code></pre>
                         <h3 id="translate">
                             translate
                         </h3>
                         <p>
-                            Moves element around the canvas by given dimensions.
+                            Moves the element around the canvas by the given distances.
                         </p>
                         <h4>Parameters</h4>
                         <ol>
-                            <li>dx <em>number</em> Pixels of translation by X</li>
-                            <li>dy <em>number</em> Pixels of translation by Y</li>
+                            <li>dx <em>number</em> Pixels of translation by X axis</li>
+                            <li>dy <em>number</em> Pixels of translation by Y axis</li>
                         </ol>
                         <h4>Usage</h4>
-                        <pre class="javascript code"><code>var c = paper.circle(10, 10, 10);</code>
-<code>c.translate(10, 10);</code></pre>
+                        <pre class="javascript code"><code>var c = paper.circle(10, 10, 10);
+c.translate(10, 10); // moves the circle down the canvas, in a diagonal line</code></pre>
                         <h3 id="scale">
                             scale
                         </h3>
                         <p>
-                            Scales element by given amount of times.
+                            Resizes the element by the given multiplier.
                         </p>
                         <h4>Parameters</h4>
                         <ol>
-                            <li>Xtimes <em>number</em></li>
-                            <li>Ytimes <em>number</em></li>
+                            <li>Xtimes <em>number</em> Amount to scale horizontally</li>
+                            <li>Ytimes <em>number</em> Amount to scale vertically</li>
                         </ol>
                         <h4>Usage</h4>
-                        <pre class="javascript code"><code>var c = paper.circle(10, 10, 10);</code>
-<code>c.scale(1.5, 1.5);</code></pre>
+                        <pre class="javascript code"><code>var c = paper.circle(10, 10, 10);
+c.scale(1.5, 1.5); // makes the circle 1.5 times larger
+c.scale(.5, .75);  // makes the circle half as wide, and 75% as high</code></pre>
                         <h3 id="attr">
                             attr
                         </h3>
                         <p>
-                            Sets attributes of elements.
+                            Sets the attributes of elements directly.
                         </p>
                         <h4>Parameters</h4>
-                        <ol>
-                            <li>params <em>object</em></li>
-                        </ol>
-                        <p>or</p>
                         <ol>
                             <li>attributeName <em>string</em></li>
                             <li>value <em>string</em></li>
                         </ol>
+                        <p>or</p>
+                        <ol>
+                            <li>params <em>object</em></li>
+                        </ol>
                         <h4>Possible parameters</h4>
+                        <p>Please refer to the <a href="http://www.w3.org/TR/SVG/" title="The W3C Recommendation for the SVG language describes these properties in detail.">SVG specification</a> for an explanation of these parameters.</p>
                         <ul>
                             <li>cx <em>number</em></li>
                             <li>cy <em>number</em></li>
@@ -154,19 +159,19 @@
                             <li>y <em>number</em></li>
                         </ul>
                         <h4>Usage</h4>
-                        <pre class="javascript code"><code>var c = paper.circle(10, 10, 10);</code>
-<code>c.attr("fill", "black");</code>
-<code>c.attr({fill: "#000", stroke: "#f00", opacity: 0.5});</code></pre>
+                        <pre class="javascript code"><code>var c = paper.circle(10, 10, 10);
+c.attr("fill", "black");                              // using strings
+c.attr({fill: "#000", stroke: "#f00", opacity: 0.5}); // using params object</code></pre>
                         <h3 id="animate">
                             animate
                         </h3>
                         <p>
-                            Linearly changes attribute from current to specified in given amount of milliseconds.
+                            Linearly changes an attribute from its current value to its specified value in the given amount of milliseconds.
                         </p>
                         <h4>Parameters</h4>
                         <ol>
-                            <li>newAttrs <em>object</em></li>
-                            <li>ms <em>number</em></li>
+                            <li>newAttrs <em>object</em> A parameters object of the animation results.</li>
+                            <li>ms <em>number</em> The duration of the animation, given in milliseconds.</li>
                             <li>callback <em>function</em> [optional]</li>
                         </ol>
                         <h4>Usage</h4>
@@ -176,7 +181,7 @@
                             getBBox
                         </h3>
                         <p>
-                            Returns dimensions of given element.
+                            Returns the dimensions of an element.
                         </p>
                         <h4>Usage</h4>
                         <pre class="javascript code"><code>var c = paper.circle(10, 10, 10);</code>
@@ -185,7 +190,7 @@
                             toFront
                         </h3>
                         <p>
-                            Moves element to front in hierarchy.
+                            Moves the element so it is the closest to the viewer’s eyes, on top of other elements.
                         </p>
                         <h4>Usage</h4>
                         <pre class="javascript code"><code>var c = paper.circle(10, 10, 10);</code>
@@ -194,7 +199,7 @@
                             toBack
                         </h3>
                         <p>
-                            Moves element to back in hierarchy.
+                            Moves the element so it is the furthest from the viewer’s eyes, behind other elements.
                         </p>
                         <h4>Usage</h4>
                         <pre class="javascript code"><code>var c = paper.circle(10, 10, 10);</code>
@@ -224,7 +229,7 @@
                             circle
                         </h3>
                         <p>
-                            Creates circle.
+                            Draws a circle.
                         </p>
                         <h4>Parameters</h4>
                         <ol>
@@ -238,7 +243,7 @@
                             rect
                         </h3>
                         <p>
-                            Creates rectangle.
+                            Draws a rectangle.
                         </p>
                         <h4>Parameters</h4>
                         <ol>
@@ -251,13 +256,13 @@
                         <h4>Usage</h4>
                         <pre class="javascript code"><code>// regular rectangle</code>
 <code>var c = paper.rect(10, 10, 10, 10);</code>
-<code>// rounded rectangle</code>
+<code>// rectangle with rounded corners</code>
 <code>var c = paper.rect(10, 10, 100, 50, 10);</code></pre>
                         <h3 id="ellipse">
                             ellipse
                         </h3>
                         <p>
-                            Creates an ellipse.
+                            Draws an ellipse.
                         </p>
                         <h4>Parameters</h4>
                         <ol>
@@ -272,15 +277,15 @@
                             image
                         </h3>
                         <p>
-                            Embeds an image in SVG/VML area.
+                            Embeds an image into the SVG/VML canvas.
                         </p>
                         <h4>Parameters</h4>
                         <ol>
-                            <li>src <em>string</em></li>
-                            <li>x <em>number</em></li>
-                            <li>y <em>number</em></li>
-                            <li>width <em>number</em></li>
-                            <li>height <em>number</em></li>
+                            <li>src <em>string</em> URI of the source image</li>
+                            <li>x <em>number</em> X coordinate position</li>
+                            <li>y <em>number</em> Y coordinate position</li>
+                            <li>width <em>number</em> Width of the image</li>
+                            <li>height <em>number</em> Height of the image</li>
                         </ol>
                         <h4>Usage</h4>
                         <pre class="javascript code"><code>var c = paper.image("apple.png", 10, 10, 100, 100);</code></pre>
@@ -288,21 +293,22 @@
                             path
                         </h3>
                         <p>
-                            Initialise path drawing. In general case this function returns empty path object. To draw path use built in methods like <code>lineTo</code> and <code>curveTo</code>.
+                            Initialises path drawing. Typically, this function returns an empty <code>path</code> object and to draw paths you use its built-in methods like <code>lineTo</code> and <code>curveTo</code>. However, you can also specify a path literally by supplying the path data as a second argument.
                         </p>
                         <h4>Parameters</h4>
                         <ol>
-                            <li>params <em>object</em> Similar to object for <code><a href="#attr">attr</a></code> method</li>
-                            <li>pathString <em>string</em> [optional] path in SVG path string format. See SVG documentation.</li>
+                            <li>params <em>object</em> Attributes for the resulting path as described in the <code><a href="#attr">attr</a></code> reference.</li>
+                            <li>pathString <em>string</em> [optional] Path data in <a href="http://www.w3.org/TR/SVG/paths.html#PathData" title="Details of a path's data attribute's format are described in the SVG specification.">SVG path string format</a>.</li>
                         </ol>
                         <h4>Usage</h4>
-                        <pre class="javascript code"><code>var c = paper.path({stroke: "#036"}).moveTo(10, 10).lineTo(50, 50);</code></pre>
+                        <pre class="javascript code"><code>var c = paper.path({stroke: "#036"}).moveTo(10, 10).lineTo(50, 50); // draw a diagonal line
+var c = paper.path({stroke: "#036"}, "M 10 10 L 50 50");            // same</code></pre>
                         <h2>Path Methods</h2>
                         <h3 id="absolutely">
                             absolutely
                         </h3>
                         <p>
-                            Sets trigger to count all following units as absolute ones, unless said otherwise. [<em>on by default</em>]
+                            Sets a trigger to count all following units as absolute ones, unless said otherwise. (This is on by default.)
                         </p>
                         <h4>Usage</h4>
                         <pre class="javascript code"><code>var c = paper.path({stroke: "#036"}).absolutely()
@@ -311,7 +317,7 @@
                             relatively
                         </h3>
                         <p>
-                            Sets trigger to count all following units as relative ones, unless said otherwise.
+                            Sets a trigger to count all following units as relative ones, unless said otherwise.
                         </p>
                         <h4>Usage</h4>
                         <pre class="javascript code"><code>var c = paper.path({stroke: "#036"}).relatively()
@@ -320,33 +326,35 @@
                             moveTo
                         </h3>
                         <p>
-                            Moves drawing point to given coordinates.
+                            Moves the drawing point to the given coordinates.
                         </p>
                         <h4>Parameters</h4>
                         <ol>
-                            <li>x <em>number</em></li>
-                            <li>y <em>number</em></li>
+                            <li>x <em>number</em> X coordinate</li>
+                            <li>y <em>number</em> Y coordinate</li>
                         </ol>
                         <h4>Usage</h4>
-                        <pre class="javascript code"><code>var c = paper.path({stroke: "#036"}).moveTo(10, 10).lineTo(50, 50);</code></pre>
+                        <pre class="javascript code"><code>// Begins drawing the path at coordinate 10,10
+var c = paper.path({stroke: "#036"}).moveTo(10, 10).lineTo(50, 50);</code></pre>
                         <h3 id="lineTo">
                             lineTo
                         </h3>
                         <p>
-                            Draws straight line to given coordinates.
+                            Draws a straight line to the given coordinates.
                         </p>
                         <h4>Parameters</h4>
                         <ol>
-                            <li>x <em>number</em></li>
-                            <li>y <em>number</em></li>
+                            <li>x <em>number</em> X coordinate</li>
+                            <li>y <em>number</em> Y coordinate</li>
                         </ol>
                         <h4>Usage</h4>
-                        <pre class="javascript code"><code>var c = paper.path({stroke: "#036"}).moveTo(10, 10).lineTo(50, 50);</code></pre>
+                        <pre class="javascript code"><code>// Draws a line starting from 10,10 to 50,50
+var c = paper.path({stroke: "#036"}).moveTo(10, 10).lineTo(50, 50);</code></pre>
                         <h3 id="cplineTo">
                             cplineTo
                         </h3>
                         <p>
-                            Draws curved line to given coordinates. Line will have horizontal anchors on start and on finish.
+                            Draws a curved line to the given coordinates. The line will have horizontal anchors on start and on finish.
                         </p>
                         <h4>Parameters</h4>
                         <ol>
@@ -360,7 +368,7 @@
                             curveTo
                         </h3>
                         <p>
-                            Draws bicubic curve to given coordinates.
+                            Draws a bicubic curve to the given coordinates.
                         </p>
                         <h4>Parameters</h4>
                         <ol>
@@ -377,7 +385,7 @@
                             qcurveTo
                         </h3>
                         <p>
-                            Draws quadratic curve to given coordinates.
+                            Draws a quadratic curve to the given coordinates.
                         </p>
                         <h4>Parameters</h4>
                         <ol>
@@ -392,14 +400,14 @@
                             addRoundedCorner
                         </h3>
                         <p>
-                            Draws quarter of circle form current point.
+                            Draws a quarter of a circle from the current drawing point.
                         </p>
                         <h4>Parameters</h4>
                         <ol>
                             <li>r <em>number</em></li>
-                            <li>dir <em>string</em> two letters direction</li>
+                            <li>dir <em>string</em> Two-letter directional instruction, as described below.</li>
                         </ol>
-                        <h4>Possible dir values</h4>
+                        <h4>Possible <code>dir</code> values</h4>
                         <dl>
                             <dt>lu</dt>
                             <dd>left up</dd>
@@ -424,7 +432,7 @@
                             andClose
                         </h3>
                         <p>
-                            Closes the path.
+                            Closes the path being drawn.
                         </p>
                         <h4>Usage</h4>
                         <pre class="javascript code"><code>var c = paper.path({stroke: "#036"}).moveTo(10, 10).andClose();</code></pre>
