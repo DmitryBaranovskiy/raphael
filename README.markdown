@@ -4,13 +4,15 @@ Cross-browser vector graphics the easy way.
 
 ## What is it?
 
-Raphaël is a small JavaScript library that should simplify your work with vector graphics on the web. In case you want to create your own specific chart or image crop-n-rotate widget, you can simply achieve it with this library.
+Raphaël is a small JavaScript library that should simplify your work with vector graphics on the web. If you want to create your own specific chart or image crop and rotate widget, for example, you can achieve it simply and easily with this library.
 
-Raphaël uses SVG and VML as a base for graphics creation. Because of that every created object is a DOM object so you can attach JavaScript event handlers or modify objects later. Raphaël’s goal is to provide an adapter that will make drawing cross-browser and easy. Currently library supports Firefox 3.0+, Safari 3.0+, Opera 9.5+ and Internet Explorer 6.0+.
+Raphaël uses the SVG W3C Recommendation and VML (mostly equivalent Internet Explorer implementation) as a base for creating graphics. This means every graphical object you create is also a DOM object, so you can attach JavaScript event handlers or modify them later. Raphaël’s goal is to provide an adapter that will make drawing vector art (similar to Flash) compatible cross-browser and easy.
+
+Raphaël currently supports Firefox 3.0+, Safari 3.0+, Opera 9.5+ and Internet Explorer 6.0+.
 
 ## How to use it?
 
-Download and include raphael.js into your HTML page, then use it as simply as:
+Download and include ‘raphael.js’ (or, ‘raphael-packed.js’ for a minimized version) into your HTML page. When it’s loaded, use it as simply as:
 
     // Creates canvas 320 × 200 at 10, 50
     var paper = Raphael(10, 50, 320, 200);
@@ -23,11 +25,13 @@ Download and include raphael.js into your HTML page, then use it as simply as:
     
 ## Reference
 
+This section provides a function reference for the Raphaël JavaScript library.
+
 ### Main Function
 
 #### Raphael
 
-Function that creates a canvas on which to draw.
+Creates a canvas object on which to draw. You must do this first, as all future calls to drawing methods from this instance will be bound to this canvas.
 
 ##### Parameters
 
@@ -44,84 +48,90 @@ or
 
 ##### Usage
 
-    // Creates canvas 320 × 200 at 10, 50
+    // Each of the following examples create a canvas that is 320px wide by 200px high
+    // Canvas is created at the viewport’s 10,50 coordinate
     var paper = Raphael(10, 50, 320, 200);
+    // Canvas is created at the top left corner of the #notepad element (or its top right corner in dir="rtl" elements)
     var paper = Raphael(document.getElementById("notepad"), 320, 200);
+    // Same as above
     var paper = Raphael("notepad", 320, 200);
     
 ### Element’s generic methods
 
-Each object created on the canvas share the same generic methods:
+Each object created on the canvas shares these same generic methods:
 
 #### node
 
-Gives you reference to DOM object, so you can assign event handlers or just randomly mess around.
+Gives you a reference to the DOM object, so you can assign event handlers or just mess around.
 
 ##### Usage
 
-    var c = paper.circle(10, 10, 10);
+    var c = paper.circle(10, 10, 10); // draw a circle at coordinate 0,0 with radius 10
     c.node.onclick = function () { c.attr("fill", "red"); };
 
 #### rotate
 
-Rotates element by given degree around its center.
+Rotates the element by the given degree from either its 0,0 corner or its centre point.
 
 ##### Parameters
 
 1. degree number Degree of rotation (0 – 360°)
-2. isAbsolute boolean [optional] Will rotation be relative or absolute
+2. isAbsolute boolean \[optional\] Specifies the rotation point. Use ‘true’ to rotate the element around its centre point. The default, ‘false’, rotates the element from its 0,0 coordinate.
 
 ##### Usage
 
     var c = paper.circle(10, 10, 10);
-    c.rotate(45);
+    c.rotate(45);        // rotation is relative
+    c.rotate(45, true);  // rotation is absolute
 
 #### translate
 
-Moves element around the canvas by given dimensions.
+Moves the element around the canvas by the given distances.
 
 ##### Parameters
 
-1. dx number Pixels of translation by X
-2. dy number Pixels of translation by Y
+1. dx number Pixels of translation by X axis
+2. dy number Pixels of translation by Y axis
 
 ##### Usage
 
     var c = paper.circle(10, 10, 10);
-    c.translate(10, 10);
+    c.translate(10, 10); // moves the circle down the canvas, in a diagonal line
 
 #### scale
 
-Scales element by given amount of times.
+Resizes the element by the given multiplier.
 
 ##### Parameters
 
-1. Xtimes number
-2. Ytimes number
+1. Xtimes number Amount to scale horizontally
+2. Ytimes number Amount to scale vertically
 
 ##### Usage
 
     var c = paper.circle(10, 10, 10);
-    c.scale(1.5, 1.5);
+    c.scale(1.5, 1.5); // makes the circle 1.5 times larger
+    c.scale(.5, .75);  // makes the circle half as wide, and 75% as high
 
 #### attr
 
-Sets attributes of elements.
+Sets the attributes of elements directly.
 
 ##### Parameters
-
-1. params object
-
-or
 
 1. attributeName string
 2. value string
 
+or
+
+1. params object
+
 ###### Possible parameters
+
+Please refer to the [SVG specification](http://www.w3.org/TR/SVG/) for an explanation of these parameters.
 
 * cx number
 * cy number
-* dasharray string [“-”, “.”, “-.”, “-..”, “. ”, “- ”, “--”, “- .”, “--.”, “--..”]
 * fill colour
 * fill-opacity number
 * font string
@@ -138,6 +148,7 @@ or
 * ry number
 * scale CSV
 * stroke colour
+* stroke-dasharray string [“-”, “.”, “-.”, “-..”, “. ”, “- ”, “--”, “- .”, “--.”, “--..”]
 * stroke-linecap string [“butt”, “square”, “round”, “miter”]
 * stroke-linejoin string [“butt”, “square”, “round”, “miter”]
 * stroke-miterlimit number
@@ -151,37 +162,27 @@ or
 ##### Usage
 
     var c = paper.circle(10, 10, 10);
-    c.attr("fill", "black");
-    c.attr({fill: "#000", stroke: "#f00", opacity: 0.5});
+    c.attr("fill", "black");                              // using strings
+    c.attr({fill: "#000", stroke: "#f00", opacity: 0.5}); // using params object
 
 #### animate
 
-Linearly changes attribute from current to specified in given amount of milliseconds.
+Linearly changes an attribute from its current value to its specified value in the given amount of milliseconds.
 
 ##### Parameters
 
-1. newAttrs object
-2. ms number
-3. callback function [optional]
+1. newAttrs object A parameters object of the animation results.
+2. ms number The duration of the animation, given in milliseconds.
+3. callback function \[optional\]
 
 ##### Usage
 
     var c = paper.circle(10, 10, 10);
     c.animate({cx: 20, r: 20}, 2000);
-
-#### stop
-
-Stops current animation of the element
-
-##### Usage
-
-    var c = paper.circle(10, 10, 10);
-    c.animate({cx: 20, r: 20}, 2000);
-    document.body.onclick = function () { c.stop(); };
 
 #### getBBox
 
-Returns dimensions of given element.
+Returns the dimensions of an element.
 
 ##### Usage
 
@@ -190,7 +191,7 @@ Returns dimensions of given element.
 
 #### toFront
 
-Moves element to front in hierarchy.
+Moves the element so it is the closest to the viewer’s eyes, on top of other elements.
 
 ##### Usage
 
@@ -199,7 +200,7 @@ Moves element to front in hierarchy.
 
 #### toBack
 
-Moves element to back in hierarchy.
+Moves the element so it is the furthest from the viewer’s eyes, behind other elements.
 
 ##### Usage
 
@@ -215,7 +216,7 @@ Inserts current object before the given one
     var r = paper.rect(10, 10, 10, 10);
     var c = paper.circle(10, 10, 10);
     c.insertBefore(r);
-    
+
 #### insertAfter
 
 Inserts current object after the given one
@@ -225,12 +226,12 @@ Inserts current object after the given one
     var c = paper.circle(10, 10, 10);
     var r = paper.rect(10, 10, 10, 10);
     c.insertAfter(r);
-    
+
 ### Graphic Primitives
 
 #### circle
 
-Creates circle.
+Draws a circle.
 
 ##### Parameters
 
@@ -244,7 +245,7 @@ Creates circle.
 
 #### rect
 
-Creates rectangle.
+Draws a rectangle.
 
 ##### Parameters
 
@@ -252,18 +253,18 @@ Creates rectangle.
 2. y number Y coordinate of top left corner
 3. width number
 4. height number
-5. r number [optional] radius for rounded corners, default is 0
+5. r number \[optional\] radius for rounded corners, default is 0
 
 ##### Usage
 
     // regular rectangle
     var c = paper.rect(10, 10, 10, 10);
-    // rounded rectangle
+    // rectangle with rounded corners
     var c = paper.rect(10, 10, 100, 50, 10);
 
 #### ellipse
 
-Creates an ellipse.
+Draws an ellipse.
 
 ##### Parameters
 
@@ -278,15 +279,15 @@ Creates an ellipse.
 
 #### image
 
-Embeds an image in SVG/VML area.
+Embeds an image into the SVG/VML canvas.
 
 ##### Parameters
 
-1. src string
-2. x number
-3. y number
-4. width number
-5. height number
+1. src string URI of the source image
+2. x number X coordinate position
+3. y number Y coordinate position
+4. width number Width of the image
+5. height number Height of the image
 
 ##### Usage
 
@@ -294,31 +295,32 @@ Embeds an image in SVG/VML area.
 
 #### path
 
-Initialise path drawing. In general case this function returns empty path object. To draw path use built in methods like lineTo and curveTo.
+Initialises path drawing. Typically, this function returns an empty ‘path’ object and to draw paths you use its built-in methods like ‘lineTo’ and ‘curveTo’. However, you can also specify a path literally by supplying the path data as a second argument.
 
 ##### Parameters
 
-1. params object Similar to object for attr method
-2. pathString string [optional] path in SVG path string format. See SVG documentation.
+1. params object Attributes for the resulting path as described in the ‘attr’ reference.
+2. pathString string \[optional\] Path data in [SVG path string format](http://www.w3.org/TR/SVG/paths.html#PathData).
 
 ##### Usage
 
-    var c = paper.path({stroke: "#036"}).moveTo(10, 10).lineTo(50, 50);
+    var c = paper.path({stroke: "#036"}).moveTo(10, 10).lineTo(50, 50); // draw a diagonal line
+    var c = paper.path({stroke: "#036"}, "M 10 10 L 50 50");            // same
 
 ### Path Methods
 
 #### absolutely
 
-Sets trigger to count all following units as absolute ones, unless said otherwise. [on by default]
+Sets a trigger to count all following units as absolute ones, unless said otherwise. (This is on by default.)
 
-Usage
+##### Usage
 
     var c = paper.path({stroke: "#036"}).absolutely()
         .moveTo(10, 10).lineTo(50, 50);
 
 #### relatively
 
-Sets trigger to count all following units as relative ones, unless said otherwise.
+Sets a trigger to count all following units as relative ones, unless said otherwise.
 
 ##### Usage
 
@@ -327,33 +329,35 @@ Sets trigger to count all following units as relative ones, unless said otherwis
 
 #### moveTo
 
-Moves drawing point to given coordinates.
+Moves the drawing point to the given coordinates.
 
 ##### Parameters
 
-1. x number
-2. y number
+1. x number X coordinate
+2. y number Y coordinate
 
 ##### Usage
 
+    // Begins drawing the path at coordinate 10,10
     var c = paper.path({stroke: "#036"}).moveTo(10, 10).lineTo(50, 50);
 
 #### lineTo
 
-Draws straight line to given coordinates.
+Draws a straight line to the given coordinates.
 
 ##### Parameters
 
-1. x number
-2. y number
+1. x number X coordinate
+2. y number Y coordinate
 
 ##### Usage
 
+    // Draws a line starting from 10,10 to 50,50
     var c = paper.path({stroke: "#036"}).moveTo(10, 10).lineTo(50, 50);
 
 #### cplineTo
 
-Draws curved line to given coordinates. Line will have horizontal anchors on start and on finish.
+Draws a curved line to the given coordinates. The line will have horizontal anchors on start and on finish.
 
 ##### Parameters
 
@@ -367,7 +371,7 @@ Draws curved line to given coordinates. Line will have horizontal anchors on sta
 
 #### curveTo
 
-Draws bicubic curve to given coordinates.
+Draws a bicubic curve to the given coordinates.
 
 ##### Parameters
 
@@ -384,7 +388,7 @@ Draws bicubic curve to given coordinates.
 
 #### qcurveTo
 
-Draws quadratic curve to given coordinates.
+Draws a quadratic curve to the given coordinates.
 
 ##### Parameters
 
@@ -399,7 +403,7 @@ Draws quadratic curve to given coordinates.
 
 #### addRoundedCorner
 
-Draws quarter of circle form current point.
+Draws a quarter of a circle from the current drawing point.
 
 ##### Parameters
 
@@ -408,14 +412,14 @@ Draws quarter of circle form current point.
 
 Possible dir values
 
-* “lu”: left up
-* “ld”: left down
-* “ru”: right up
-* “rd”: right down
-* “ur”: up right
-* “ul”: up left
-* “dr”: down right
-* “dl”: down left
+* dl: down left
+* dr: down right
+* ld: left down
+* lu: left up
+* rd: right down
+* ru: right up
+* ul: up left
+* ur: up right
 
 ##### Usage
 
@@ -423,7 +427,7 @@ Possible dir values
 
 #### andClose
 
-Closes the path.
+Closes the path being drawn.
 
 ##### Usage
 
@@ -431,6 +435,6 @@ Closes the path.
 
 ## License
 
-http://www.opensource.org/licenses/mit-license.php
+[http://www.opensource.org/licenses/mit-license.php](http://www.opensource.org/licenses/mit-license.php)
 
-Copyright © 2008 – 2009 Dmitry Baranovskiy (http://raphaeljs.com)
+Copyright (c) 2008 Dmitry Baranovskiy (http://raphaeljs.com)
