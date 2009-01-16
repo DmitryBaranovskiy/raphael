@@ -1,5 +1,5 @@
 /*
- * Raphael 0.6.2 - JavaScript Vector Library
+ * Raphael 0.6.3 - JavaScript Vector Library
  *
  * Copyright (c) 2008 – 2009 Dmitry Baranovskiy (http://raphaeljs.com)
  * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
@@ -8,7 +8,7 @@ var Raphael = (function (type) {
         var r = function () {
             return r._create.apply(r, arguments);
         };
-        r.version = "0.6.2";
+        r.version = "0.6.3";
         r.type = type;
         var availableAttrs = {cx: 0, cy: 0, fill: "#fff", "fill-opacity": 1, font: '16px "Arial"', "font-family": '"Arial"', "font-size": "16", gradient: 0, height: 0, opacity: 1, path: "M0,0", r: 0, rotation: 0, rx: 0, ry: 0, scale: "1 1", stroke: "#000", "stroke-dasharray": "", "stroke-linecap": "butt", "stroke-linejoin": "butt", "stroke-miterlimit": 0, "stroke-opacity": 1, "stroke-width": 1, translation: "0 0", width: 0, x: 0, y: 0},
             availableAnimAttrs = {cx: "number", cy: "number", fill: "colour", "fill-opacity": "number", "font-size": "number", height: "number", opacity: "number", path: "path", r: "number", rotation: "number", rx: "number", ry: "number", scale: "csv", stroke: "colour", "stroke-opacity": "number", "stroke-width": "number", translation: "csv", width: "number", x: "number", y: "number"},
@@ -267,6 +267,10 @@ var Raphael = (function (type) {
                 if (params.scale) {
                     var xy = params.scale.split(/[, ]+/);
                     o.scale(xy[0], xy[1]);
+                }
+                if (o.type == "image" && params.opacity) {
+                    o.node.filterOpacity = " progid:DXImageTransform.Microsoft.Alpha(opacity=" + (params.opacity * 100) + ")";
+                    o.node.style.filter = (o.node.filterMatrix || "") + (o.node.filterOpacity || "");
                 }
                 params["font-family"] && (s.fontFamily = params["font-family"]);
                 params["font-size"] && (s.fontSize = params["font-size"]);
@@ -744,7 +748,11 @@ var Raphael = (function (type) {
                 width = width || "320px";
                 height = height || "200px";
                 cs.clip = "rect(0 " + width + " " + height + " 0)";
-                cs.position = "absolute";
+                // cs.margin = "-2px -2px 0 0";
+                // cs.padding = "-2px -2px 0 0";
+                cs.top = "-2px";
+                cs.left = "-2px";
+                cs.position = "relative";
                 rs.width  = width;
                 rs.height = height;
                 r.coordsize = (width == "100%" ? width : parseFloat(width)) + " " + (height == "100%" ? height : parseFloat(height));
@@ -1512,16 +1520,18 @@ var Raphael = (function (type) {
                             cx = this.attr("cx") * dirx;
                             cy = this.attr("cy") * diry;
                         } else {
-                            s.filter = "progid:DXImageTransform.Microsoft.Matrix(M11=" + dirx +
+                            this.node.filterMatrix = " progid:DXImageTransform.Microsoft.Matrix(M11=" + dirx +
                                 ", M12=0, M21=0, M22=" + diry +
                                 ", Dx=0, Dy=0, sizingmethod='auto expand', filtertype='bilinear')";
+                            s.filter = (this.node.filterMatrix || "") + (this.node.filterOpacity || "");
                         }
                     } else {
                         if (this.transformations) {
                             this.transformations[2] = "";
                             this.node.setAttribute("transform", this.transformations.join(" "));
                         } else {
-                            s.filter = "";
+                            this.node.filterMatrix = "";
+                            s.filter = (this.node.filterMatrix || "") + (this.node.filterOpacity || "");
                         }
                     }
                     switch (this.type) {
