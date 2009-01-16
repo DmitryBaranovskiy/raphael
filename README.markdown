@@ -6,13 +6,13 @@ Cross-browser vector graphics the easy way.
 
 Raphaël is a small JavaScript library that should simplify your work with vector graphics on the web. If you want to create your own specific chart or image crop and rotate widget, for example, you can achieve it simply and easily with this library.
 
-Raphaël uses the SVG W3C Recommendation and VML (mostly equivalent Internet Explorer implementation) as a base for creating graphics. This means every graphical object you create is also a DOM object, so you can attach JavaScript event handlers or modify them later. Raphaël’s goal is to provide an adapter that will make drawing vector art (similar to Flash) compatible cross-browser and easy.
+Raphaël uses the [SVG W3C Recommendation](http://www.w3.org/TR/SVG/) and [VML](http://msdn.microsoft.com/en-us/library/bb264280.aspx) (a mostly equivalent implementation for Internet Explorer) as a base for drawing graphics. This means every graphical object you create is also a DOM object, so you can attach JavaScript event handlers or modify them later. Raphaël’s goal is to provide an adapter that will make drawing vector art cross-browser compatible and easy to do.
 
 Raphaël currently supports Firefox 3.0+, Safari 3.0+, Opera 9.5+ and Internet Explorer 6.0+.
 
 ## How to use it?
 
-Download and include ‘raphael.js’ (or, ‘raphael-packed.js’ for a minimized version) into your HTML page. When it’s loaded, use it as simply as:
+Download and include `raphael.js` (or, `raphael-packed.js` for a minimized version) into your HTML page. When it's loaded, use it as simply as:
 
     // Creates canvas 320 × 200 at 10, 50
     var paper = Raphael(10, 50, 320, 200);
@@ -49,7 +49,7 @@ or
 ##### Usage
 
     // Each of the following examples create a canvas that is 320px wide by 200px high
-    // Canvas is created at the viewport’s 10,50 coordinate
+    // Canvas is created at the viewport's 10,50 coordinate
     var paper = Raphael(10, 50, 320, 200);
     // Canvas is created at the top left corner of the #notepad element (or its top right corner in dir="rtl" elements)
     var paper = Raphael(document.getElementById("notepad"), 320, 200);
@@ -66,7 +66,7 @@ Gives you a reference to the DOM object, so you can assign event handlers or jus
 
 ##### Usage
 
-    var c = paper.circle(10, 10, 10); // draw a circle at coordinate 0,0 with radius 10
+    var c = paper.circle(10, 10, 10); // draw a circle at coordinate 10,10 with radius of 10
     c.node.onclick = function () { c.attr("fill", "red"); };
 
 #### rotate
@@ -76,7 +76,7 @@ Rotates the element by the given degree from either its 0,0 corner or its centre
 ##### Parameters
 
 1. degree number Degree of rotation (0 – 360°)
-2. isAbsolute boolean \[optional\] Specifies the rotation point. Use ‘true’ to rotate the element around its centre point. The default, ‘false’, rotates the element from its 0,0 coordinate.
+2. isAbsolute boolean \[optional\] Specifies the rotation point. Use `true` to rotate the element around its center point. The default, `false`, rotates the element from its 0,0 coordinate.
 
 ##### Usage
 
@@ -132,6 +132,7 @@ Please refer to the [SVG specification](http://www.w3.org/TR/SVG/) for an explan
 
 * cx number
 * cy number
+* dasharray string \[“-”, “.”, “-.”, “-..”, “. ”, “- ”, “--”, “- .”, “--.”, “--..”\]
 * fill colour
 * fill-opacity number
 * font string
@@ -148,9 +149,8 @@ Please refer to the [SVG specification](http://www.w3.org/TR/SVG/) for an explan
 * ry number
 * scale CSV
 * stroke colour
-* stroke-dasharray string [“-”, “.”, “-.”, “-..”, “. ”, “- ”, “--”, “- .”, “--.”, “--..”]
-* stroke-linecap string [“butt”, “square”, “round”, “miter”]
-* stroke-linejoin string [“butt”, “square”, “round”, “miter”]
+* stroke-linecap string \[“butt”, “square”, “round”, “miter”\]
+* stroke-linejoin string \[“butt”, “square”, “round”, “miter”\]
 * stroke-miterlimit number
 * stroke-opacity number
 * stroke-width number
@@ -295,11 +295,11 @@ Embeds an image into the SVG/VML canvas.
 
 #### path
 
-Initialises path drawing. Typically, this function returns an empty ‘path’ object and to draw paths you use its built-in methods like ‘lineTo’ and ‘curveTo’. However, you can also specify a path literally by supplying the path data as a second argument.
+Initialises path drawing. Typically, this function returns an empty `path` object and to draw paths you use its built-in methods like `lineTo` and `curveTo`. However, you can also specify a path literally by supplying the path data as a second argument.
 
 ##### Parameters
 
-1. params object Attributes for the resulting path as described in the ‘attr’ reference.
+1. params object Attributes for the resulting path as described in the `attr` reference.
 2. pathString string \[optional\] Path data in [SVG path string format](http://www.w3.org/TR/SVG/paths.html#PathData).
 
 ##### Usage
@@ -437,4 +437,4 @@ Closes the path being drawn.
 
 [http://www.opensource.org/licenses/mit-license.php](http://www.opensource.org/licenses/mit-license.php)
 
-Copyright (c) 2008 Dmitry Baranovskiy (http://raphaeljs.com)
+Copyright (c) 2008 Dmitry Baranovskiy ([http://raphaeljs.com](http://raphaeljs.com/))
