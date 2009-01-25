@@ -293,6 +293,20 @@ Embeds an image into the SVG/VML canvas.
 
     var c = paper.image("apple.png", 10, 10, 100, 100);
 
+#### text
+
+Draws a text string.
+
+##### Parameters
+
+1. x number X coordinate position
+2. y number Y coordinate position
+3. text string The text string to draw.
+
+##### Usage
+
+    var t = paper.text(10, 10, "Look mom, I'm scalable!");
+
 #### path
 
 Initialises path drawing. Typically, this function returns an empty `path` object and to draw paths you use its built-in methods like `lineTo` and `curveTo`. However, you can also specify a path literally by supplying the path data as a second argument.
