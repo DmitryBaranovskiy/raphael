@@ -171,9 +171,34 @@ Linearly changes an attribute from its current value to its specified value in t
 
 ##### Parameters
 
-1. newAttrs object A parameters object of the animation results.
+1. newAttrs object A parameters object of the animation results. (Not all attributes can be animated.)
 2. ms number The duration of the animation, given in milliseconds.
 3. callback function \[optional\]
+
+##### Attributes that can be animated
+
+The `newAttrs` parameter accepts an object whose properties are the attributes to animate. However, not all attributes listed in the `attr` method reference can be animated. The following is a list of those properties that can be animated:
+
+* cx number
+* cy number
+* fill colour
+* fill-opacity number
+* font-size number
+* height number
+* opacity number
+* path pathString
+* r number
+* rotation number
+* rx number
+* ry number
+* scale CSV
+* stroke colour
+* stroke-opacity number
+* stroke-width number
+* translation CSV
+* width number
+* x number
+* y number
 
 ##### Usage
 

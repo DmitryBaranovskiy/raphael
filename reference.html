@@ -170,10 +170,34 @@ c.attr({fill: "#000", stroke: "#f00", opacity: 0.5}); // using params object</co
                         </p>
                         <h4>Parameters</h4>
                         <ol>
-                            <li>newAttrs <em>object</em> A parameters object of the animation results.</li>
+                            <li>newAttrs <em>object</em> A parameters object of the animation results. (Not all attributes can be animated.)</li>
                             <li>ms <em>number</em> The duration of the animation, given in milliseconds.</li>
                             <li>callback <em>function</em> [optional]</li>
                         </ol>
+                        <h4>Attributes that can be animated</h4>
+                        <p>The <code>newAttrs</code> parameter accepts an object whose properties are the attributes to animate. However, not all attributes listed in the <code>attr</code> method reference can be animated. The following is a list of those properties that can be animated:</p>
+                        <ul>
+                            <li>cx <em>number</em></li>
+                            <li>cy <em>number</em></li>
+                            <li>fill <em>colour</em></li>
+                            <li>fill-opacity <em>number</em></li>
+                            <li>font-size <em>number</em></li>
+                            <li>height <em>number</em></li>
+                            <li>opacity <em>number</em></li>
+                            <li>path <em>pathString</em></li>
+                            <li>r <em>number</em></li>
+                            <li>rotation <em>number</em></li>
+                            <li>rx <em>number</em></li>
+                            <li>ry <em>number</em></li>
+                            <li>scale <em>CSV</em></li>
+                            <li>stroke <em>colour</em></li>
+                            <li>stroke-opacity <em>number</em></li>
+                            <li>stroke-width <em>number</em></li>
+                            <li>translation <em>CSV</em></li>
+                            <li>width <em>number</em></li>
+                            <li>x <em>number</em></li>
+                            <li>y <em>number</em></li>
+                        </ul>
                         <h4>Usage</h4>
                         <pre class="javascript code"><code>var c = paper.circle(10, 10, 10);</code>
 <code>c.animate({cx: 20, r: 20}, 2000);</code></pre>
