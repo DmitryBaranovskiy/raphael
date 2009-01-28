@@ -591,15 +591,15 @@ var Raphael = (function (type) {
                 return this;
             };
             Element.prototype.insertAfter = function (element) {
-				if (element.Group.nextSibling) {
-					element.Group.parentNode.insertBefore(this.Group, element.Group.nextSibling);
-				} else {
-					element.Group.parentNode.appendChild(this.Group);
-				}
+                if (element.Group.nextSibling) {
+                    element.Group.parentNode.insertBefore(this.Group, element.Group.nextSibling);
+                } else {
+                    element.Group.parentNode.appendChild(this.Group);
+                }
                 return this;
             };
             Element.prototype.insertBefore = function (element) {
-				element.Group.parentNode.insertBefore(this.Group, element.Group);
+                element.Group.parentNode.insertBefore(this.Group, element.Group);
                 return this;
             };
             var theCircle = function (vml, x, y, r) {
@@ -1275,11 +1275,11 @@ var Raphael = (function (type) {
                 } else {
                     element.node.parentNode.appendChild(this.node);
                 }
-				return this;
+                return this;
             };
             Element.prototype.insertBefore = function (element) {
                 element.node.parentNode.insertBefore(this.node, element.node);
-				return this;
+                return this;
             };
             var theCircle = function (svg, x, y, r) {
                 var el = document.createElementNS(svg.svgns, "circle");
