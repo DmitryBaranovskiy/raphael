@@ -590,6 +590,18 @@ var Raphael = (function (type) {
                 }
                 return this;
             };
+            Element.prototype.insertAfter = function (element) {
+				if (element.Group.nextSibling) {
+					element.Group.parentNode.insertBefore(this.Group, element.Group.nextSibling);
+				} else {
+					element.Group.parentNode.appendChild(this.Group);
+				}
+                return this;
+            };
+            Element.prototype.insertBefore = function (element) {
+				element.Group.parentNode.insertBefore(this.Group, element.Group);
+                return this;
+            };
             var theCircle = function (vml, x, y, r) {
                 var g = document.createElement("rvml:group");
                 var o = document.createElement("rvml:oval");
@@ -1257,6 +1269,18 @@ var Raphael = (function (type) {
                 }
                 return this;
             };
+            Element.prototype.insertAfter = function (element) {
+                if (element.node.nextSibling) {
+                    element.node.parentNode.insertBefore(this.node, element.node.nextSibling);
+                } else {
+                    element.node.parentNode.appendChild(this.node);
+                }
+				return this;
+            };
+            Element.prototype.insertBefore = function (element) {
+                element.node.parentNode.insertBefore(this.node, element.node);
+				return this;
+            };
             var theCircle = function (svg, x, y, r) {
                 var el = document.createElementNS(svg.svgns, "circle");
                 el.setAttribute("cx", x);
@@ -1699,16 +1723,6 @@ var Raphael = (function (type) {
                     prev = time;
                 })();
                 return this;
-            };
-            Element.prototype.insertAfter = function (element) {
-                if (element.node.nextSibling) {
-                    element.node.parentNode.insertBefore(this.node, element.node.nextSibling);
-                } else {
-                    element.node.parentNode.appendChild(this.node);
-                }
-            };
-            Element.prototype.insertBefore = function (element) {
-                element.node.parentNode.insertBefore(this.node, element.node);
             };
             
             C.pathfinder = function (p, path) {
