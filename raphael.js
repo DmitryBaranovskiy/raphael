@@ -1,5 +1,5 @@
 /*
- * Raphael 0.6.3 - JavaScript Vector Library
+ * Raphael 0.6.4 - JavaScript Vector Library
  *
  * Copyright (c) 2008 – 2009 Dmitry Baranovskiy (http://raphaeljs.com)
  * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
@@ -8,7 +8,7 @@ var Raphael = (function (type) {
         var r = function () {
             return r._create.apply(r, arguments);
         };
-        r.version = "0.6.3";
+        r.version = "0.6.4";
         r.type = type;
         var availableAttrs = {cx: 0, cy: 0, fill: "#fff", "fill-opacity": 1, font: '16px "Arial"', "font-family": '"Arial"', "font-size": "16", gradient: 0, height: 0, opacity: 1, path: "M0,0", r: 0, rotation: 0, rx: 0, ry: 0, scale: "1 1", stroke: "#000", "stroke-dasharray": "", "stroke-linecap": "butt", "stroke-linejoin": "butt", "stroke-miterlimit": 0, "stroke-opacity": 1, "stroke-width": 1, translation: "0 0", width: 0, x: 0, y: 0},
             availableAnimAttrs = {cx: "number", cy: "number", fill: "colour", "fill-opacity": "number", "font-size": "number", height: "number", opacity: "number", path: "path", r: "number", rotation: "number", rx: "number", ry: "number", scale: "csv", stroke: "colour", "stroke-opacity": "number", "stroke-width": "number", translation: "csv", width: "number", x: "number", y: "number"},
@@ -234,10 +234,10 @@ var Raphael = (function (type) {
                     this.attrs.path += "z";
                     return this;
                 };
-                if (typeof pathString == "string") {
+                if (pathString) {
                     p.absolutely();
                     p.attrs.path = "";
-                    C.pathfinder(p, pathString);
+                    C.pathfinder(p, "" + pathString);
                 }
                 p.setBox();
                 setFillAndStroke(p, params);
@@ -753,6 +753,7 @@ var Raphael = (function (type) {
                     document.createStyleSheet().addRule("rvml\\:*", "behavior:url(#default#VML)");
                 }
                 var c = document.createElement("div"),
+                    d = document.createElement("div"),
                     r = C.canvas = document.createElement("rvml:group"),
                     cs = c.style, rs = r.style;
                 C.width = width;
@@ -762,7 +763,9 @@ var Raphael = (function (type) {
                 cs.clip = "rect(0 " + width + " " + height + " 0)";
                 cs.top = "-2px";
                 cs.left = "-2px";
-                cs.position = "relative";
+                cs.position = "absolute";
+                rs.position = "absolute";
+                d.style.position = "relative";
                 rs.width  = width;
                 rs.height = height;
                 r.coordsize = (width == "100%" ? width : parseFloat(width)) + " " + (height == "100%" ? height : parseFloat(height));
@@ -776,8 +779,9 @@ var Raphael = (function (type) {
 
                 r.appendChild(b);
                 c.appendChild(r);
+                d.appendChild(c);
                 if (container == 1) {
-                    document.body.appendChild(c);
+                    document.body.appendChild(d);
                     cs.position = "absolute";
                     cs.left = x + "px";
                     cs.top = y + "px";
@@ -793,9 +797,9 @@ var Raphael = (function (type) {
                     cs.width = container.style.width = width;
                     cs.height = container.style.height = height;
                     if (container.firstChild) {
-                        container.insertBefore(c, container.firstChild);
+                        container.insertBefore(d, container.firstChild);
                     } else {
-                        container.appendChild(c);
+                        container.appendChild(d);
                     }
                 }
                 for (var prop in C) {
@@ -815,7 +819,7 @@ var Raphael = (function (type) {
                 return container;
             };
             C.remove = function () {
-                C.canvas.parentNode.parentNode.removeChild(C.canvas.parentNode);
+                C.canvas.parentNode.parentNode.parentNode.removeChild(C.canvas.parentNode.parentNode);
             };
         }
         if (type == "SVG") {
@@ -995,10 +999,10 @@ var Raphael = (function (type) {
                     this.attrs.path = oldD + "Z ";
                     return this;
                 };
-                if (typeof pathString == "string") {
-                    p.attrs.path = pathString;
+                if (pathString) {
+                    p.attrs.path = "" + pathString;
                     p.absolutely();
-                    C.pathfinder(p, pathString);
+                    C.pathfinder(p, p.attrs.path);
                 }
                 if (params) {
                     setFillAndStroke(p, params);
@@ -1511,7 +1515,7 @@ var Raphael = (function (type) {
                 return p;
             };
             C.safari = function () {
-                if (r.type == "SVG") {
+                if (navigator.vendor == "Apple Computer, Inc.") {
                     var rect = C.rect(-C.width, -C.height, C.width * 3, C.height * 3).attr({stroke: "none"});
                     setTimeout(function () {rect.remove();}, 0);
                 }
@@ -1947,7 +1951,7 @@ Raphael.getColor.reset = function () {
 Raphael.parsePathString = function (pathString) {
     var paramCounts = {a: 7, c: 6, h: 1, l: 2, m: 2, q: 4, s: 4, t: 2, v: 1, z: 0};
     var data = [];
-    pathString.replace(/([achlmqstvz])\s*((-?\d*\.?\d*\s*,?\s*)+)/ig, function (a, b, c) {
+    pathString.replace(/([achlmqstvz])[\s,]*((-?\d*\.?\d*\s*,?\s*)+)/ig, function (a, b, c) {
         var params = [], name = b.toLowerCase();
         c.replace(/(-?\d*\.?\d*)\s*,?\s*/ig, function (a, b) {
             b && params.push(+b);
@@ -1959,6 +1963,13 @@ Raphael.parsePathString = function (pathString) {
             };
         }
     });
+    data.toString = function () {
+        var res = "";
+        for (var i = 0, ii = this.length; i < ii; i++) {
+            res += this[i][0] + this[i].join(",").substring(2);
+        }
+        return res;
+    };
     return data;
 };
 Raphael.pathDimensions = function (path) {
@@ -2048,6 +2059,7 @@ Raphael.pathToRelative = function (pathArray) {
                 y += res[i][res[i].length - 1];
         }
     }
+    res.toString = pathArray.toString;
     return res;
 };
 Raphael.pathToAbsolute = function (pathArray) {
@@ -2101,6 +2113,7 @@ Raphael.pathToAbsolute = function (pathArray) {
                 y = res[i][res[i].length - 1];
         }
     }
+    res.toString = pathArray.toString;
     return res;
 };
 Raphael.pathEqualiser = function (path1, path2) {

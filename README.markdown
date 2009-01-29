@@ -132,7 +132,6 @@ Please refer to the [SVG specification](http://www.w3.org/TR/SVG/) for an explan
 
 * cx number
 * cy number
-* dasharray string \[“-”, “.”, “-.”, “-..”, “. ”, “- ”, “--”, “- .”, “--.”, “--..”\]
 * fill colour
 * fill-opacity number
 * font string
@@ -149,6 +148,7 @@ Please refer to the [SVG specification](http://www.w3.org/TR/SVG/) for an explan
 * ry number
 * scale CSV
 * stroke colour
+* stroke-dasharray string \[“-”, “.”, “-.”, “-..”, “. ”, “- ”, “--”, “- .”, “--.”, “--..”\]
 * stroke-linecap string \[“butt”, “square”, “round”, “miter”\]
 * stroke-linejoin string \[“butt”, “square”, “round”, “miter”\]
 * stroke-miterlimit number
