@@ -1949,8 +1949,18 @@ Raphael.getColor.reset = function () {
     this.start = undefined;
 };
 Raphael.parsePathString = function (pathString) {
-    var paramCounts = {a: 7, c: 6, h: 1, l: 2, m: 2, q: 4, s: 4, t: 2, v: 1, z: 0};
-    var data = [];
+    var paramCounts = {a: 7, c: 6, h: 1, l: 2, m: 2, q: 4, s: 4, t: 2, v: 1, z: 0},
+        data = [],
+        toString = function () {
+            var res = "";
+            for (var i = 0, ii = this.length; i < ii; i++) {
+                res += this[i][0] + this[i].join(",").substring(2);
+            }
+            return res;
+        };
+    if (pathString.toString.toString() == toString.toString()) {
+        return pathString;
+    }
     pathString.replace(/([achlmqstvz])[\s,]*((-?\d*\.?\d*\s*,?\s*)+)/ig, function (a, b, c) {
         var params = [], name = b.toLowerCase();
         c.replace(/(-?\d*\.?\d*)\s*,?\s*/ig, function (a, b) {
@@ -1963,13 +1973,7 @@ Raphael.parsePathString = function (pathString) {
             };
         }
     });
-    data.toString = function () {
-        var res = "";
-        for (var i = 0, ii = this.length; i < ii; i++) {
-            res += this[i][0] + this[i].join(",").substring(2);
-        }
-        return res;
-    };
+    data.toString = toString;
     return data;
 };
 Raphael.pathDimensions = function (path) {
