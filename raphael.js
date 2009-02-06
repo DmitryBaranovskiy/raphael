@@ -16,6 +16,7 @@ function Raphael() {
         paper: {},
         element: {}
     };
+    R.fn = {};
     var availableAttrs = {cx: 0, cy: 0, fill: "#fff", "fill-opacity": 1, font: '16px "Arial"', "font-family": '"Arial"', "font-size": "16", gradient: 0, height: 0, opacity: 1, path: "M0,0", r: 0, rotation: 0, rx: 0, ry: 0, scale: "1 1", stroke: "#000", "stroke-dasharray": "", "stroke-linecap": "butt", "stroke-linejoin": "butt", "stroke-miterlimit": 0, "stroke-opacity": 1, "stroke-width": 1, translation: "0 0", width: 0, x: 0, y: 0},
         availableAnimAttrs = {cx: "number", cy: "number", fill: "colour", "fill-opacity": "number", "font-size": "number", height: "number", opacity: "number", path: "path", r: "number", rotation: "number", rx: "number", ry: "number", scale: "csv", stroke: "colour", "stroke-opacity": "number", "stroke-width": "number", translation: "csv", width: "number", x: "number", y: "number"};
     R._.paper.circle = function (x, y, r) {
@@ -738,7 +739,9 @@ function Raphael() {
     var script = document.getElementsByTagName("script"),
         newscript = document.createElement("script");
     script = script[script.length - 1];
+    var path = script.src.match(/.*\//);
+    path = path ? path[0] : "";
     newscript.type = "text/javascript";
-    newscript.src = window.SVGAngle ? "raphael-svg.js" : "raphael-vml.js";
+    newscript.src = path + (window.SVGAngle ? "raphael-svg.js" : "raphael-vml.js");
     script.parentNode.appendChild(newscript);
 })(Raphael);

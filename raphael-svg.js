@@ -659,6 +659,11 @@
                 container[prop] = R._.paper[prop];
             }
         }
+        for (var prop in R.fn) {
+            if (!container[prop]) {
+                container[prop] = R.fn[prop];
+            }
+        }
         container.clear();
         return container;
     };

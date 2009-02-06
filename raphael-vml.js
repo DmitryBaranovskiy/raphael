@@ -698,29 +698,7 @@
         return res;
     };
     R._.theGroup = function (vml) {
-        var el = document.createElement("rvml:group"), els = el.style;
-        els.position = "absolute";
-        els.left = 0;
-        els.top = 0;
-        els.width = vml.width;
-        els.height = vml.height;
-        if (vml.canvas) {
-            vml.canvas.appendChild(el);
-        }
-        var res = new Element(el, el, vml);
-        for (var f in vml) {
-            if (f.charAt(0) != "_" && typeof vml[f] == "function") {
-                res[f] = (function (f) {
-                    return function () {
-                        var e = vml[f].apply(vml, arguments);
-                        el.appendChild(e[0].parentNode);
-                        return e;
-                    };
-                })(f);
-            }
-        }
-        res.type = "group";
-        return res;
+        return this;
     };
     R._create = function () {
         // container, width, height
@@ -802,6 +780,11 @@
         }
         for (var prop in R._.paper) {
             container[prop] = R._.paper[prop];
+        }
+        for (var prop in R.fn) {
+            if (!container[prop]) {
+                container[prop] = R.fn[prop];
+            }
         }
         container.clear = function () {
             var todel = [];
