@@ -1440,7 +1440,7 @@ function Raphael() {
                 o.appendChild(stroke);
             }
             if (res.type == "text") {
-                var span = document.createElement("span");//,
+                var span = document.createElement("span"),
                     s = span.style;
                 s.font = res.attrs.font;
                 res.node.parentNode.appendChild(span);
@@ -1448,7 +1448,7 @@ function Raphael() {
                 res.W = res.attrs.w = span.offsetWidth;
                 res.H = res.attrs.h = span.offsetHeight;
                 res.X = res.attrs.x - Math.round(res.W / 2);
-                res.Y = res.attrs.y - res.H / 2;
+                res.Y = res.attrs.y - Math.round(res.H / 2);
                 res.node.parentNode.removeChild(span);
             }
         };
