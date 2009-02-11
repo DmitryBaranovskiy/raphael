@@ -1009,7 +1009,6 @@ function Raphael() {
             el.setAttribute("x", x);
             el.setAttribute("y", y);
             el.setAttribute("text-anchor", "middle");
-            el.setAttribute("fill", "#000");
             if (text) {
                 el.appendChild(document.createTextNode(text));
             }
@@ -1020,8 +1019,8 @@ function Raphael() {
             res.attrs = res.attrs || {};
             res.attrs.x = x;
             res.attrs.y = y;
-            res.attrs.fill = "#000";
             res.type = "text";
+            setFillAndStroke(res, {font: '10px "Arial"', stroke: "none", fill: "#000"});
             return res;
         };
         theGroup = function (svg) {
@@ -1354,7 +1353,8 @@ function Raphael() {
             return p;
         };
         setFillAndStroke = function (o, params) {
-            var s = o[0].style;
+            var s = o.node.style,
+                res = o;
             o.attrs = o.attrs || {};
             for (var par in params) {
                 o.attrs[par] = params[par];
@@ -1439,6 +1439,18 @@ function Raphael() {
                 }
                 o.appendChild(stroke);
             }
+            if (res.type == "text") {
+                var span = document.createElement("span");//,
+                    s = span.style;
+                s.font = res.attrs.font;
+                res.node.parentNode.appendChild(span);
+                span.innerText = res.node.string;
+                res.W = res.attrs.w = span.offsetWidth;
+                res.H = res.attrs.h = span.offsetHeight;
+                res.X = res.attrs.x - Math.round(res.W / 2);
+                res.Y = res.attrs.y - res.H / 2;
+                res.node.parentNode.removeChild(span);
+            }
         };
         addGrdientFill = function (o, gradient) {
             o.attrs = o.attrs || {};
@@ -1520,7 +1532,7 @@ function Raphael() {
         };
         Element.prototype.setBox = function (params) {
             var gs = this.Group.style,
-                os = this[0].style;
+                os = (this.shape && this.shape.style) || this.node.style;
             for (var i in params) {
                 this.attrs[i] = params[i];
             }
@@ -1546,7 +1558,11 @@ function Raphael() {
                     break;
                 case "text":
                     this.textpath.v = ["m", Math.round(attr.x), ", ", Math.round(attr.y - 2), "l", Math.round(attr.x) + 1, ", ", Math.round(attr.y - 2)].join("");
-                    return;
+                    x = attr.x - Math.round(this.W / 2);
+                    y = attr.y - this.H / 2;
+                    w = this.W;
+                    h = this.H;
+                    break;
                 case "path":
                     if (!this.attrs.path) {
                         x = 0;
@@ -1568,13 +1584,13 @@ function Raphael() {
                     h = this.vml.height;
                     break;
             }
-            if (this.type == "path") {
+            if (this.type == "path" || this.type == "text") {
                 var left = Math.round(this.vml.width / 2 - w / 2 - x),
                     top = Math.round(this.vml.height / 2 - h / 2 - y);
                 gs.left = - left + "px";
                 gs.top = - top + "px";
-                this.X = left;
-                this.Y = top;
+                this.X = this.type == "text" ? x : left;
+                this.Y = this.type == "text" ? y : top;
                 this.W = w;
                 this.H = h;
                 os.top = top + "px";
@@ -1715,12 +1731,12 @@ function Raphael() {
             g.appendChild(o);
             vml.canvas.appendChild(g);
             var res = new Element(o, g, vml);
+            res.type = "circle";
             setFillAndStroke(res, {stroke: "#000", fill: "none"});
             res.setBox({x: x - r, y: y - r, width: r * 2, height: r * 2});
             res.attrs.cx = x;
             res.attrs.cy = y;
             res.attrs.r = r;
-            res.type = "circle";
             return res;
         };
         theRect = function (vml, x, y, w, h, r) {
@@ -1732,6 +1748,7 @@ function Raphael() {
             g.appendChild(o);
             vml.canvas.appendChild(g);
             var res = new Element(o, g, vml);
+            res.type = "rect";
             setFillAndStroke(res, {stroke: "#000"});
             res.setBox({x: x, y: y, width: w, height: h});
             res.attrs.x = x;
@@ -1739,7 +1756,6 @@ function Raphael() {
             res.attrs.w = w;
             res.attrs.h = h;
             res.attrs.r = r;
-            res.type = "rect";
             return res;
         };
         theEllipse = function (vml, x, y, rx, ry) {
@@ -1748,13 +1764,13 @@ function Raphael() {
             g.appendChild(o);
             vml.canvas.appendChild(g);
             var res = new Element(o, g, vml);
+            res.type = "ellipse";
             setFillAndStroke(res, {stroke: "#000"});
             res.setBox({x: x - rx, y: y - ry, width: rx * 2, height: ry * 2});
             res.attrs.cx = x;
             res.attrs.cy = y;
             res.attrs.rx = rx;
             res.attrs.ry = ry;
-            res.type = "ellipse";
             return res;
         };
         theImage = function (vml, src, x, y, w, h) {
@@ -1773,7 +1789,6 @@ function Raphael() {
             return res;
         };
         theText = function (vml, x, y, text) {
-            // @TODO: setTheBox
             var g = document.createElement("rvml:group"), gs = g.style;
             var el = document.createElement("rvml:shape"), ol = el.style;
             var path = document.createElement("rvml:path"), ps = path.style;
@@ -1803,7 +1818,7 @@ function Raphael() {
             res.attrs.y = y;
             res.attrs.w = 1;
             res.attrs.h = 1;
-            setFillAndStroke(res, {stroke: "none", fill: "#000"});
+            setFillAndStroke(res, {font: '10px "Arial"', stroke: "none", fill: "#000"});
             return res;
         };
         theGroup = function (vml) {
