@@ -1379,10 +1379,11 @@ function Raphael() {
                 o.node.filterOpacity = " progid:DXImageTransform.Microsoft.Alpha(opacity=" + (params.opacity * 100) + ")";
                 o.node.style.filter = (o.node.filterMatrix || "") + (o.node.filterOpacity || "");
             }
+            params.font && (s.font = params.font);
             params["font-family"] && (s.fontFamily = params["font-family"]);
             params["font-size"] && (s.fontSize = params["font-size"]);
-            params["font"] && (s.font = params["font"]);
             params["font-weight"] && (s.fontWeight = params["font-weight"]);
+            params["font-style"] && (s.fontStyle = params["font-style"]);
             if (typeof params.opacity != "undefined" || typeof params["stroke-width"] != "undefined" || typeof params.fill != "undefined" || typeof params.stroke != "undefined") {
                 o = o.shape || o.node;
                 var fill = (o.getElementsByTagName("fill") && o.getElementsByTagName("fill")[0]) || document.createElement("rvml:fill");
@@ -1442,7 +1443,11 @@ function Raphael() {
             if (res.type == "text") {
                 var span = document.createElement("span"),
                     s = span.style;
-                s.font = res.attrs.font;
+                res.attrs.font && (s.font = res.attrs.font);
+                res.attrs["font-family"] && (s.fontFamily = res.attrs["font-family"]);
+                res.attrs["font-size"] && (s.fontSize = res.attrs["font-size"]);
+                res.attrs["font-weight"] && (s.fontWeight = res.attrs["font-weight"]);
+                res.attrs["font-style"] && (s.fontStyle = res.attrs["font-style"]);
                 res.node.parentNode.appendChild(span);
                 span.innerText = res.node.string;
                 res.W = res.attrs.w = span.offsetWidth;
@@ -1688,17 +1693,17 @@ function Raphael() {
                     params = arguments[0];
                 }
                 if (params) {
-                    setFillAndStroke(this, params);
-                    this.setBox(params);
                     if (params.gradient) {
                         addGrdientFill(this, params.gradient);
                     }
                     if (params.text && this.type == "text") {
-                        this[0].string = params.text;
+                        this.node.string = params.text;
                     }
                     if (params.id) {
-                        this[0].id = params.id;
+                        this.node.id = params.id;
                     }
+                    setFillAndStroke(this, params);
+                    this.setBox(params);
                 }
             }
             return this;
