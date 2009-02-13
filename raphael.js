@@ -454,7 +454,7 @@ function Raphael() {
 
     // SVG
     if (R.svg) {
-        thePath = function (params, pathString, SVG) {
+        var thePath = function (params, pathString, SVG) {
             var el = document.createElementNS(SVG.svgns, "path");
             el.setAttribute("fill", "none");
             if (SVG.canvas) {
@@ -640,7 +640,7 @@ function Raphael() {
             }
             return p;
         };
-        addGrdientFill = function (o, gradient, SVG) {
+        var addGrdientFill = function (o, gradient, SVG) {
             var el = document.createElementNS(SVG.svgns, gradient.type + "Gradient");
             el.id = "raphael-gradient-" + Raphael.idGenerator++;
             if (gradient.vector && gradient.vector.length) {
@@ -661,13 +661,13 @@ function Raphael() {
             };
             o.setAttribute("fill", "url(#" + el.id + ")");
         };
-        updatePosition = function (o) {
+        var updatePosition = function (o) {
             if (o.pattern) {
                 var bbox = o.node.getBBox();
                 o.pattern.setAttribute("patternTransform", "translate(" + [bbox.x, bbox.y].join(",") + ")");
             }
         };
-        setFillAndStroke = function (o, params) {
+        var setFillAndStroke = function (o, params) {
             var dasharray = {
                 "-": [3, 1],
                 ".": [1, 1],
@@ -916,7 +916,7 @@ function Raphael() {
             element.node.parentNode.insertBefore(this.node, element.node);
             return this;
         };
-        theCircle = function (svg, x, y, r) {
+        var theCircle = function (svg, x, y, r) {
             var el = document.createElementNS(svg.svgns, "circle");
             el.setAttribute("cx", x);
             el.setAttribute("cy", y);
@@ -935,7 +935,7 @@ function Raphael() {
             res.type = "circle";
             return res;
         };
-        theRect = function (svg, x, y, w, h, r) {
+        var theRect = function (svg, x, y, w, h, r) {
             var el = document.createElementNS(svg.svgns, "rect");
             el.setAttribute("x", x);
             el.setAttribute("y", y);
@@ -963,7 +963,7 @@ function Raphael() {
             res.type = "rect";
             return res;
         };
-        theEllipse = function (svg, x, y, rx, ry) {
+        var theEllipse = function (svg, x, y, rx, ry) {
             var el = document.createElementNS(svg.svgns, "ellipse");
             el.setAttribute("cx", x);
             el.setAttribute("cy", y);
@@ -984,7 +984,7 @@ function Raphael() {
             res.type = "ellipse";
             return res;
         };
-        theImage = function (svg, src, x, y, w, h) {
+        var theImage = function (svg, src, x, y, w, h) {
             var el = document.createElementNS(svg.svgns, "image");
             el.setAttribute("x", x);
             el.setAttribute("y", y);
@@ -1004,7 +1004,7 @@ function Raphael() {
             res.type = "image";
             return res;
         };
-        theText = function (svg, x, y, text) {
+        var theText = function (svg, x, y, text) {
             var el = document.createElementNS(svg.svgns, "text");
             el.setAttribute("x", x);
             el.setAttribute("y", y);
@@ -1023,7 +1023,7 @@ function Raphael() {
             setFillAndStroke(res, {font: '10px "Arial"', stroke: "none", fill: "#000"});
             return res;
         };
-        theGroup = function (svg) {
+        var theGroup = function (svg) {
             var el = document.createElementNS(svg.svgns, "g");
             if (svg.canvas) {
                 svg.canvas.appendChild(el);
@@ -1352,7 +1352,7 @@ function Raphael() {
             }
             return p;
         };
-        setFillAndStroke = function (o, params) {
+        var setFillAndStroke = function (o, params) {
             var s = o.node.style,
                 res = o;
             o.attrs = o.attrs || {};
@@ -1457,7 +1457,18 @@ function Raphael() {
                 res.node.parentNode.removeChild(span);
             }
         };
-        addGrdientFill = function (o, gradient) {
+        var getAngle = function (a, b, c, d) {
+            var angle = Math.round(Math.atan((parseFloat(c, 10) - parseFloat(a, 10)) / (parseFloat(d, 10) - parseFloat(b, 10))) * 57.29) || 0;
+            if (!angle && parseFloat(a, 10) < parseFloat(b, 10)) {
+                angle = 180;
+            }
+            angle -= 180;
+            if (angle < 0) {
+                angle += 360;
+            }
+            return angle;
+        };
+        var addGrdientFill = function (o, gradient) {
             o.attrs = o.attrs || {};
             o.attrs.gradient = gradient;
             o = o.shape || o[0];
@@ -1483,8 +1494,8 @@ function Raphael() {
                         colors.push(gradient.dots[i].offset + " " + gradient.dots[i].color);
                     }
                 };
-                var fillOpacity = gradient.dots[0].opacity || 1;
-                var fillOpacity2 = gradient.dots[gradient.dots.length - 1].opacity || 1;
+                var fillOpacity = typeof gradient.dots[0].opacity == "undefined" ? 1 : gradient.dots[0].opacity;
+                var fillOpacity2 = typeof gradient.dots[gradient.dots.length - 1].opacity == "undefined" ? 1 : gradient.dots[gradient.dots.length - 1].opacity;
                 if (colors) {
                     fill.colors.value = colors.join(",");
                     fillOpacity2 += fillOpacity;
@@ -1494,8 +1505,7 @@ function Raphael() {
                 fill.setAttribute("opacity", fillOpacity);
                 fill.setAttribute("opacity2", fillOpacity2);
                 if (gradient.vector) {
-                    var angle = Math.round(Math.atan((parseFloat(gradient.vector[3], 10) - parseFloat(gradient.vector[1], 10)) / (parseFloat(gradient.vector[2], 10) - parseFloat(gradient.vector[0], 10))) * 57.29) || 0;
-                    fill.angle = 270 - angle;
+                    fill.angle = getAngle.apply(null, gradient.vector);
                 }
                 if (gradient.type.toLowerCase() == "radial") {
                     fill.focus = "100%";
@@ -1670,7 +1680,7 @@ function Raphael() {
                 };
                 return values;
             }
-            if (this[0].tagName.toLowerCase() == "group") {
+            if (this.node.tagName.toLowerCase() == "group") {
                 var children = this[0].childNodes;
                 this.attrs = this.attrs || {};
                 if (arguments.length == 2) {
@@ -1730,7 +1740,7 @@ function Raphael() {
             element.Group.parentNode.insertBefore(this.Group, element.Group);
             return this;
         };
-        theCircle = function (vml, x, y, r) {
+        var theCircle = function (vml, x, y, r) {
             var g = document.createElement("rvml:group");
             var o = document.createElement("rvml:oval");
             g.appendChild(o);
@@ -1744,7 +1754,7 @@ function Raphael() {
             res.attrs.r = r;
             return res;
         };
-        theRect = function (vml, x, y, w, h, r) {
+        var theRect = function (vml, x, y, w, h, r) {
             var g = document.createElement("rvml:group");
             var o = document.createElement(r ? "rvml:roundrect" : "rvml:rect");
             if (r) {
@@ -1763,7 +1773,7 @@ function Raphael() {
             res.attrs.r = r;
             return res;
         };
-        theEllipse = function (vml, x, y, rx, ry) {
+        var theEllipse = function (vml, x, y, rx, ry) {
             var g = document.createElement("rvml:group");
             var o = document.createElement("rvml:oval");
             g.appendChild(o);
@@ -1778,7 +1788,7 @@ function Raphael() {
             res.attrs.ry = ry;
             return res;
         };
-        theImage = function (vml, src, x, y, w, h) {
+        var theImage = function (vml, src, x, y, w, h) {
             var g = document.createElement("rvml:group");
             var o = document.createElement("rvml:image");
             o.src = src;
@@ -1793,7 +1803,7 @@ function Raphael() {
             res.attrs.h = h;
             return res;
         };
-        theText = function (vml, x, y, text) {
+        var theText = function (vml, x, y, text) {
             var g = document.createElement("rvml:group"), gs = g.style;
             var el = document.createElement("rvml:shape"), ol = el.style;
             var path = document.createElement("rvml:path"), ps = path.style;
@@ -1826,7 +1836,7 @@ function Raphael() {
             setFillAndStroke(res, {font: '10px "Arial"', stroke: "none", fill: "#000"});
             return res;
         };
-        theGroup = function (vml) {
+        var theGroup = function (vml) {
             return this;
         };
         R._create = function () {
