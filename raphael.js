@@ -1,16 +1,17 @@
 /*
- * Raphael 0.7 - JavaScript Vector Library
+ * Raphael 0.7.dev - JavaScript Vector Library
  *
  * Copyright (c) 2008 – 2009 Dmitry Baranovskiy (http://raphaeljs.com)
  * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
  */
-function Raphael() {
-    return Raphael._create.apply(Raphael, arguments);
-};
 
 
-(function (R) {
-    R.version = "0.7";
+var Raphael = (function () {
+    var create,
+        R = function () {
+            return create.apply(R, arguments);
+        };
+    R.version = "0.7.dev";
     R.type = (window.SVGAngle ? "SVG" : "VML");
     R.svg = !(R.vml = R.type == "VML");
     R.idGenerator = 0;
@@ -23,8 +24,8 @@ function Raphael() {
         return  "Your browser " + (this.vml ? "doesn't ": "") + "support" + (this.svg ? "s": "") +
                 " SVG.\nYou are running " + unescape("Rapha%EBl%20") + this.version;
     };
-    // generic utilities
-    R.hsb2rgb = function (hue, saturation, brightness) {
+    // colour utilities
+    var hsb2rgb = function (hue, saturation, brightness) {
         if (typeof hue == "object" && "h" in hue && "s" in hue && "b" in hue) {
             brightness = hue.b;
             saturation = hue.s;
@@ -35,22 +36,20 @@ function Raphael() {
             blue;
         if (brightness == 0) {
             return {r: 0, g: 0, b: 0, hex: "#000"};
-        } else {
-            var i = Math.floor(hue * 6),
-                f = (hue * 6) - i,
-                p = brightness * (1 - saturation),
-                q = brightness * (1 - (saturation * f)),
-                t = brightness * (1 - (saturation * (1 - f)));
-            [
-                function () {red = brightness; green = t; blue = p;},
-                function () {red = q; green = brightness; blue = p;},
-                function () {red = p; green = brightness; blue = t;},
-                function () {red = p; green = q; blue = brightness;},
-                function () {red = t; green = p; blue = brightness;},
-                function () {red = brightness; green = p; blue = q;},
-                function () {red = brightness; green = t; blue = p;}
-            ][i]();
         }
+        if (hue > 1 || saturation > 1 || brightness > 1) {
+            hue /= 255;
+            saturation /= 255;
+            brightness /= 255;
+        }
+        var i = Math.floor(hue * 6),
+            f = (hue * 6) - i,
+            p = brightness * (1 - saturation),
+            q = brightness * (1 - (saturation * f)),
+            t = brightness * (1 - (saturation * (1 - f)));
+        red = [brightness, q, p, p, t, brightness, brightness][i];
+        green = [t, brightness, brightness, q, p, p, t][i];
+        blue = [p, p, t, brightness, brightness, q, p][i];
         var rgb = {r: red, g: green, b: blue};
         red *= 255;
         green *= 255;
@@ -70,7 +69,7 @@ function Raphael() {
         rgb.hex = "#" + r + g + b;
         return rgb;
     };
-    R.rgb2hsb = function (red, green, blue) {
+    var rgb2hsb = function (red, green, blue) {
         if (typeof red == "object" && "r" in red && "g" in red && "b" in red) {
             blue = red.b;
             green = red.g;
@@ -119,9 +118,15 @@ function Raphael() {
         }
         return {h: hue, s: saturation, b: brightness};
     };
-    R.getRGB = function (colour) {
+    var getRGB = function (colour) {
+        if (!colour) {
+            return {r: 0, g: 0, b: 0, hex: "#000"};
+        }
+        if (colour == "none") {
+            return {r: -1, g: -1, b: -1, hex: "none"};
+        }
         var red, green, blue,
-            rgb = colour.match(/^\s*((#[a-f\d]{6})|(#[a-f\d]{3})|rgb\(\s*(\d+,\s*\d+,\s*\d+)\s*\)|rgb\(\s*(\d+%,\s*\d+%,\s*\d+%)\s*\)|hsb\(\s*(\d+,\s*\d+,\s*\d+)\s*\)|hsb\(\s*(\d+%,\s*\d+%,\s*\d+%)\s*\))\s*$/i);
+            rgb = colour.match(/^\s*((#[a-f\d]{6})|(#[a-f\d]{3})|rgb\(\s*([\d\.]+\s*,\s*[\d\.]+\s*,\s*[\d\.]+)\s*\)|rgb\(\s*([\d\.]+%\s*,\s*[\d\.]+%\s*,\s*[\d\.]+%)\s*\)|hsb\(\s*([\d\.]+\s*,\s*[\d\.]+\s*,\s*[\d\.]+)\s*\)|hsb\(\s*([\d\.]+%\s*,\s*[\d\.]+%\s*,\s*[\d\.]+%)\s*\))\s*$/i);
         if (rgb) {
             if (rgb[2]) {
                 blue = parseInt(rgb[2].substring(5), 16);
@@ -135,29 +140,29 @@ function Raphael() {
             }
             if (rgb[4]) {
                 rgb = rgb[4].split(/\s*,\s*/);
-                red = parseInt(rgb[0], 10);
-                green = parseInt(rgb[1], 10);
-                blue = parseInt(rgb[2], 10);
+                red = parseFloat(rgb[0], 10);
+                green = parseFloat(rgb[1], 10);
+                blue = parseFloat(rgb[2], 10);
             }
             if (rgb[5]) {
                 rgb = rgb[5].split(/\s*,\s*/);
-                red = parseInt(rgb[0], 10) * 2.55;
-                green = parseInt(rgb[1], 10) * 2.55;
-                blue = parseInt(rgb[2], 10) * 2.55;
+                red = parseFloat(rgb[0], 10) * 2.55;
+                green = parseFloat(rgb[1], 10) * 2.55;
+                blue = parseFloat(rgb[2], 10) * 2.55;
             }
             if (rgb[6]) {
                 rgb = rgb[6].split(/\s*,\s*/);
-                red = parseInt(rgb[0], 10);
-                green = parseInt(rgb[1], 10);
-                blue = parseInt(rgb[2], 10);
-                return this.hsb2rgb(red, green, blue);
+                red = parseFloat(rgb[0], 10);
+                green = parseFloat(rgb[1], 10);
+                blue = parseFloat(rgb[2], 10);
+                return hsb2rgb(red, green, blue);
             }
             if (rgb[7]) {
                 rgb = rgb[7].split(/\s*,\s*/);
-                red = parseInt(rgb[0], 10) * 2.55;
-                green = parseInt(rgb[1], 10) * 2.55;
-                blue = parseInt(rgb[2], 10) * 2.55;
-                return this.hsb2rgb(red, green, blue);
+                red = parseFloat(rgb[0], 10) * 2.55;
+                green = parseFloat(rgb[1], 10) * 2.55;
+                blue = parseFloat(rgb[2], 10) * 2.55;
+                return hsb2rgb(red, green, blue);
             }
             var rgb = {r: red, g: green, b: blue};
             var r = Math.round(red).toString(16);
@@ -168,11 +173,13 @@ function Raphael() {
             (b.length == 1) && (b = "0" + b);
             rgb.hex = "#" + r + g + b;
             return rgb;
+        } else {
+            return {r: -1, g: -1, b: -1, hex: "none"};
         }
     };
     R.getColor = function (value) {
         var start = arguments.callee.start = arguments.callee.start || {h: 0, s: 1, b: value || .75};
-        var rgb = this.hsb2rgb(start.h, start.s, start.b);
+        var rgb = hsb2rgb(start.h, start.s, start.b);
         start.h += .075;
         if (start.h > 1) {
             start.h = 0;
@@ -186,6 +193,7 @@ function Raphael() {
     R.getColor.reset = function () {
         this.start = undefined;
     };
+    // path utilities
     R.parsePathString = function (pathString) {
         var paramCounts = {a: 7, c: 6, h: 1, l: 2, m: 2, q: 4, s: 4, t: 2, v: 1, z: 0},
             data = [],
@@ -214,12 +222,12 @@ function Raphael() {
         data.toString = toString;
         return data;
     };
-    R.pathDimensions = function (path) {
+    var pathDimensions = function (path) {
         var pathArray = path;
         if (typeof path == "string") {
-            pathArray = this.parsePathString(path);
+            pathArray = Raphael.parsePathString(path);
         }
-        pathArray = this.pathToAbsolute(pathArray);
+        pathArray = pathToAbsolute(pathArray);
         var x = [], y = [], length = 0;
         for (var i = 0, ii = pathArray.length; i < ii; i++) {
             switch (pathArray[i][0]) {
@@ -250,7 +258,7 @@ function Raphael() {
             Y: y
         };
     };
-    R.pathToRelative = function (pathArray) {
+    var pathToRelative = function (pathArray) {
         var res = [];
         if (typeof pathArray == "string") {
             pathArray = this.parsePathString(pathArray);
@@ -304,10 +312,10 @@ function Raphael() {
         res.toString = pathArray.toString;
         return res;
     };
-    R.pathToAbsolute = function (pathArray) {
+    var pathToAbsolute = function (pathArray) {
         var res = [];
         if (typeof pathArray == "string") {
-            pathArray = this.parsePathString(pathArray);
+            pathArray = R.parsePathString(pathArray);
         }
         var x = 0, y = 0, start = 0;
         if (pathArray[0][0] == "M") {
@@ -358,8 +366,8 @@ function Raphael() {
         res.toString = pathArray.toString;
         return res;
     };
-    R.pathEqualiser = function (path1, path2) {
-        var data = [this.pathToAbsolute(this.parsePathString(path1)), this.pathToAbsolute(this.parsePathString(path2))],
+    var pathEqualiser = function (path1, path2) {
+        var data = [pathToAbsolute(this.parsePathString(path1)), pathToAbsolute(this.parsePathString(path2))],
             attrs = [{x: 0, y: 0, bx: 0, by: 0, X: 0, Y: 0}, {x: 0, y: 0, bx: 0, by: 0, X: 0, Y: 0}],
             processPath = function (path, d) {
                 if (!path) {
@@ -653,7 +661,7 @@ function Raphael() {
             for (var i = 0, ii = gradient.dots.length; i < ii; i++) {
                 var stop = document.createElementNS(SVG.svgns, "stop");
                 stop.setAttribute("offset", gradient.dots[i].offset ? gradient.dots[i].offset : (i == 0) ? "0%" : "100%");
-                stop.setAttribute("stop-color", gradient.dots[i].color || "#fff");
+                stop.setAttribute("stop-color", getRGB(gradient.dots[i].color).hex || "#fff");
                 if (typeof gradient.dots[i].opacity != "undefined") {
                     stop.setAttribute("stop-opacity", gradient.dots[i].opacity);
                 }
@@ -786,6 +794,11 @@ function Raphael() {
                             updatePosition(o);
                             break;
                         }
+                    case "stroke":
+                        o.node.style[att] = getRGB(value).hex;
+                        // Need following line for Firefox
+                        o.node.setAttribute(att, getRGB(value).hex);
+                        break;
                     default :
                         var cssrule = att.replace(/(\-.)/g, function (w) {
                             return w.substring(1).toUpperCase();
@@ -830,7 +843,7 @@ function Raphael() {
                     this.attr({x: this.attrs.x + x, y: this.attrs.y + y});
                     break;
                 case "path":
-                    var path = Raphael.pathToRelative(this.attrs.path);
+                    var path = pathToRelative(this.attrs.path);
                     path[0][1] += +x;
                     path[0][2] += +y;
                     this.attr({path: path.join(" ")});
@@ -838,7 +851,7 @@ function Raphael() {
             }
             return this;
         };
-        Element.prototype.rotate = function (deg, isAbsolute) {
+        Element.prototype.rotate = function (deg, isAbsolute, cx, cy) {
             if (deg == undefined) {
                 return this._.rt.deg;
             }
@@ -849,8 +862,10 @@ function Raphael() {
                 this._.rt.deg += deg;
             }
 
+            cx = cx || bbox.x + bbox.width / 2;
+            cy = cy || bbox.y + bbox.height / 2;
             if (this._.rt.deg) {
-                this.transformations[0] = ("rotate(" + this._.rt.deg + " " + (bbox.x + bbox.width / 2) + " " + (bbox.y + bbox.height / 2) + ")");
+                this.transformations[0] = ("rotate(" + this._.rt.deg + " " + cx + " " + cy + ")");
             } else {
                 this.transformations[0] = "";
             }
@@ -1043,7 +1058,7 @@ function Raphael() {
             i.type = "group";
             return i;
         };
-        R._create = function () {
+        create = function () {
             // container, width, height
             // x, y, width, height
             if (typeof arguments[0] == "string") {
@@ -1345,7 +1360,7 @@ function Raphael() {
                 p.attrs.path = "";
                 paper.pathfinder(p, "" + pathString);
             }
-            p.setBox();
+            // p.setBox();
             setFillAndStroke(p, params);
             if (params.gradient) {
                 addGrdientFill(p, params.gradient);
@@ -1402,7 +1417,7 @@ function Raphael() {
                         fill.src = isURL[1];
                         fill.type = "tile";
                     } else {
-                        fill.color = params.fill;
+                        fill.color = getRGB(params.fill).hex;
                         fill.src = "";
                         fill.type = "solid";
                     }
@@ -1416,7 +1431,7 @@ function Raphael() {
                     stroke.on = false;
                 }
                 if (stroke.on && params.stroke) {
-                    stroke.color = params.stroke;
+                    stroke.color = getRGB(params.stroke).hex;
                 }
                 stroke.opacity = ((params["stroke-opacity"] + 1 || 2) - 1) * ((params.opacity + 1 || 2) - 1);
                 params["stroke-linejoin"] && (stroke.joinstyle = params["stroke-linejoin"] || "miter");
@@ -1483,15 +1498,15 @@ function Raphael() {
                 fill.method = "none";
                 fill.type = (gradient.type.toLowerCase() == "linear") ? "gradient" : "gradientTitle";
                 if (typeof gradient.dots[0].color != "undefined") {
-                    fill.color = gradient.dots[0].color || "#000";
+                    fill.color = getRGB(gradient.dots[0].color).hex;
                 }
                 if (typeof gradient.dots[gradient.dots.length - 1].color != "undefined") {
-                    fill.color2 = gradient.dots[gradient.dots.length - 1].color || "#000";
+                    fill.color2 = getRGB(gradient.dots[gradient.dots.length - 1].color).hex;
                 }
                 var colors = [];
                 for (var i = 0, ii = gradient.dots.length; i < ii; i++) {
                     if (gradient.dots[i].offset) {
-                        colors.push(gradient.dots[i].offset + " " + gradient.dots[i].color);
+                        colors.push(gradient.dots[i].offset + " " + getRGB(gradient.dots[i].color).hex);
                     }
                 };
                 var fillOpacity = typeof gradient.dots[0].opacity == "undefined" ? 1 : gradient.dots[0].opacity;
@@ -1533,7 +1548,7 @@ function Raphael() {
                 sy: 1
             };
         };
-        Element.prototype.rotate = function (deg, isAbsolute) {
+        Element.prototype.rotate = function (deg, isAbsolute, cx, cy) {
             if (deg == undefined) {
                 return this._.rt;
             }
@@ -1542,10 +1557,11 @@ function Raphael() {
             } else {
                 this._.rt += deg;
             }
+            this.setBox(null, cx, cy);
             this.Group.style.rotation = this._.rt;
             return this;
         };
-        Element.prototype.setBox = function (params) {
+        Element.prototype.setBox = function (params, cx, cy) {
             var gs = this.Group.style,
                 os = (this.shape && this.shape.style) || this.node.style;
             for (var i in params) {
@@ -1585,7 +1601,7 @@ function Raphael() {
                         w = this.vml.width;
                         h = this.vml.height;
                     } else {
-                        var dim = Raphael.pathDimensions(this.attrs.path),
+                        var dim = pathDimensions(this.attrs.path),
                         x = dim.x;
                         y = dim.y;
                         w = dim.width;
@@ -1599,32 +1615,40 @@ function Raphael() {
                     h = this.vml.height;
                     break;
             }
+            cx = cx || x + w / 2;
+            cy = cy || y + h / 2;
+            var left = cx - this.vml.width / 2,
+                top = cy - this.vml.height / 2;
             if (this.type == "path" || this.type == "text") {
-                var left = Math.round(this.vml.width / 2 - w / 2 - x),
-                    top = Math.round(this.vml.height / 2 - h / 2 - y);
-                gs.left = - left + "px";
-                gs.top = - top + "px";
-                this.X = this.type == "text" ? x : left;
-                this.Y = this.type == "text" ? y : top;
+                gs.left = left + "px";
+                gs.top = top + "px";
+                this.X = this.type == "text" ? x : -left;
+                this.Y = this.type == "text" ? y : -top;
                 this.W = w;
                 this.H = h;
-                os.top = top + "px";
-                os.left = left + "px";
+                os.left = -left + "px";
+                os.top = -top + "px";
+                // var left = Math.round(this.vml.width / 2 - w / 2 - x),
+                //     top = Math.round(this.vml.height / 2 - h / 2 - y);
+                // gs.left = - left + "px";
+                // gs.top = - top + "px";
+                // this.X = this.type == "text" ? x : left;
+                // this.Y = this.type == "text" ? y : top;
+                // this.W = w;
+                // this.H = h;
+                // os.top = top + "px";
+                // os.left = left + "px";
             } else {
-                var left = this.vml.width / 2 - w / 2,
-                    top = this.vml.height / 2 - h / 2;
-                gs.position = "absolute";
-                gs.left = x - left + "px";
-                gs.top = y - top + "px";
+                gs.left = left + "px";
+                gs.top = top + "px";
                 this.X = x - left;
                 this.Y = y - top;
                 this.W = w;
                 this.H = h;
                 gs.width = this.vml.width + "px";
                 gs.height = this.vml.height + "px";
-                os.position = "absolute";
-                os.top = top + "px";
-                os.left = left + "px";
+                os.left = x - left + "px";
+                os.top = y - top + "px";
                 os.width = w + "px";
                 os.height = h + "px";
             }
@@ -1645,7 +1669,7 @@ function Raphael() {
             this._.ty += +y;
             if (this.type == "path") {
                 var path = this.attrs.path;
-                path = Raphael.pathToRelative(path);
+                path = pathToRelative(path);
                 path[0][1] += +x;
                 path[0][2] += +y;
                 this.attr({path: path.join(" ")});
@@ -1713,7 +1737,7 @@ function Raphael() {
                         this.node.id = params.id;
                     }
                     setFillAndStroke(this, params);
-                    this.setBox(params);
+                    // this.setBox(params);
                 }
             }
             return this;
@@ -1748,10 +1772,10 @@ function Raphael() {
             var res = new Element(o, g, vml);
             res.type = "circle";
             setFillAndStroke(res, {stroke: "#000", fill: "none"});
-            res.setBox({x: x - r, y: y - r, width: r * 2, height: r * 2});
             res.attrs.cx = x;
             res.attrs.cy = y;
             res.attrs.r = r;
+            res.setBox({x: x - r, y: y - r, width: r * 2, height: r * 2});
             return res;
         };
         var theRect = function (vml, x, y, w, h, r) {
@@ -1765,12 +1789,12 @@ function Raphael() {
             var res = new Element(o, g, vml);
             res.type = "rect";
             setFillAndStroke(res, {stroke: "#000"});
-            res.setBox({x: x, y: y, width: w, height: h});
             res.attrs.x = x;
             res.attrs.y = y;
             res.attrs.w = w;
             res.attrs.h = h;
             res.attrs.r = r;
+            res.setBox({x: x, y: y, width: w, height: h});
             return res;
         };
         var theEllipse = function (vml, x, y, rx, ry) {
@@ -1781,11 +1805,11 @@ function Raphael() {
             var res = new Element(o, g, vml);
             res.type = "ellipse";
             setFillAndStroke(res, {stroke: "#000"});
-            res.setBox({x: x - rx, y: y - ry, width: rx * 2, height: ry * 2});
             res.attrs.cx = x;
             res.attrs.cy = y;
             res.attrs.rx = rx;
             res.attrs.ry = ry;
+            res.setBox({x: x - rx, y: y - ry, width: rx * 2, height: ry * 2});
             return res;
         };
         var theImage = function (vml, src, x, y, w, h) {
@@ -1796,11 +1820,11 @@ function Raphael() {
             vml.canvas.appendChild(g);
             var res = new Element(o, g, vml);
             res.type = "image";
-            res.setBox({x: x, y: y, width: w, height: h});
             res.attrs.x = x;
             res.attrs.y = y;
             res.attrs.w = w;
             res.attrs.h = h;
+            res.setBox({x: x, y: y, width: w, height: h});
             return res;
         };
         var theText = function (vml, x, y, text) {
@@ -1836,10 +1860,7 @@ function Raphael() {
             setFillAndStroke(res, {font: '10px "Arial"', stroke: "none", fill: "#000"});
             return res;
         };
-        var theGroup = function (vml) {
-            return this;
-        };
-        R._create = function () {
+        create = function () {
             // container, width, height
             // x, y, width, height
             var container, width, height;
@@ -2097,7 +2118,7 @@ function Raphael() {
             }
         };
 
-        path = Raphael.pathToAbsolute(path);
+        path = pathToAbsolute(path);
         for (var i = 0, ii = path.length; i < ii; i++) {
             var b = path[i].shift();
             commands[b].apply(p, path[i]);
@@ -2167,9 +2188,9 @@ function Raphael() {
                     });
                     break;
                 case "path":
-                    var path = Raphael.pathToRelative(Raphael.parsePathString(this.attr("path"))), 
+                    var path = pathToRelative(Raphael.parsePathString(this.attr("path"))), 
                         skip = true,
-                        dim = Raphael.pathDimensions(this.attrs.path),
+                        dim = pathDimensions(this.attrs.path),
                         dx = -dim.width * (x - 1) / 2,
                         dy = -dim.height * (y - 1) / 2;
                     for (var i = 0, ii = path.length; i < ii; i++) {
@@ -2187,10 +2208,10 @@ function Raphael() {
                             }
                         }
                     }
-                    var dim2 = Raphael.pathDimensions(path),
+                    var dim2 = pathDimensions(path),
                         dx = dim.x + dim.width / 2 - dim2.x - dim2.width / 2,
                         dy = dim.y + dim.height / 2 - dim2.y - dim2.height / 2;
-                    path = Raphael.pathToRelative(path);
+                    path = pathToRelative(path);
                     path[0][1] += dx;
                     path[0][2] += dy;
                     
@@ -2216,8 +2237,8 @@ function Raphael() {
                         diff[attr] = (to[attr] - from[attr]) / ms;
                         break;
                     case "colour":
-                        from[attr] = Raphael.getRGB(from[attr]);
-                        var toColour = Raphael.getRGB(to[attr]);
+                        from[attr] = getRGB(from[attr]);
+                        var toColour = getRGB(to[attr]);
                         diff[attr] = {
                             r: (toColour.r - from[attr].r) / ms,
                             g: (toColour.g - from[attr].g) / ms,
@@ -2225,7 +2246,7 @@ function Raphael() {
                         };
                         break;
                     case "path":
-                        var pathes = Raphael.pathEqualiser(from[attr], to[attr]);
+                        var pathes = pathEqualiser(from[attr], to[attr]);
                         from[attr] = pathes[0];
                         to[attr] = pathes[1];
                         diff[attr] = [];
@@ -2314,7 +2335,5 @@ function Raphael() {
         })();
         return this;
     };
-
-
-
-})(Raphael);
+    return R;
+})();
