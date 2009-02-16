@@ -67,16 +67,43 @@ var paper = Raphael("notepad", 320, 200);</code></pre>
                         <h4>Usage</h4>
                         <pre class="javascript code"><code>var c = paper.circle(10, 10, 10); // draw a circle at coordinate 10,10 with radius of 10
 c.node.onclick = function () { c.attr("fill", "red"); };</code></pre>
+                        <h3 id="remove">
+                            remove
+                        </h3>
+                        <p>
+                            Removes element from the DOM. You can’t use it after this method call.
+                        </p>
+                        <h4>Usage</h4>
+                        <pre class="javascript code"><code>var c = paper.circle(10, 10, 10);
+c.remove();</code></pre>
+                        <h3 id="hide">
+                            hide
+                        </h3>
+                        <p>
+                            Makes element invisible.
+                        </p>
+                        <h4>Usage</h4>
+                        <pre class="javascript code"><code>var c = paper.circle(10, 10, 10);
+c.hide();</code></pre>
+                        <h3 id="show">
+                            show
+                        </h3>
+                        <p>
+                            Makes element visible.
+                        </p>
+                        <h4>Usage</h4>
+                        <pre class="javascript code"><code>var c = paper.circle(10, 10, 10);
+c.show();</code></pre>
                         <h3 id="rotate">
                             rotate
                         </h3>
                         <p>
-                            Rotates the element by the given degree from either its 0,0 corner or its center point.
+                            Rotates the element by the given degree from its center point.
                         </p>
                         <h4>Parameters</h4>
                         <ol>
                             <li>degree <em>number</em> Degree of rotation (0 – 360°)</li>
-                            <li>isAbsolute <em>boolean</em> [optional] Specifies the rotation point. Use <code>true</code> to rotate the element around its center point. The default, <code>false</code>, rotates the element from its 0,0 coordinate.</li>
+                            <li>isAbsolute <em>boolean</em> [optional] Specifies is degree is relative to previous position (<code>false</code>) or is it absolute angle (<code>true</code>)</li>
                         </ol>
                         <h4>Usage</h4>
                         <pre class="javascript code"><code>var c = paper.circle(10, 10, 10);
@@ -125,6 +152,14 @@ c.scale(.5, .75);  // makes the circle half as wide, and 75% as high</code></pre
                         <p>or</p>
                         <ol>
                             <li>params <em>object</em></li>
+                        </ol>
+                        <p>or</p>
+                        <ol>
+                            <li>attributeName <em>string</em> in this case method returns current value for given attribute name</li>
+                        </ol>
+                        <p>or</p>
+                        <ol>
+                            <li>attributeNames <em>array</em> in this case method returns array of current values for given attribute names</li>
                         </ol>
                         <h4>Possible parameters</h4>
                         <p>Please refer to the <a href="http://www.w3.org/TR/SVG/" title="The W3C Recommendation for the SVG language describes these properties in detail.">SVG specification</a> for an explanation of these parameters.</p>
@@ -474,6 +509,24 @@ var c = paper.path({stroke: "#036"}).moveTo(10, 10).lineTo(50, 50);</code></pre>
                         </p>
                         <h4>Usage</h4>
                         <pre class="javascript code"><code>var c = paper.path({stroke: "#036"}).moveTo(10, 10).andClose();</code></pre>
+                        <h3 id="getColor">
+                            getColor
+                        </h3>
+                        <p>
+                            Returns a colour object for the next colour in spectrum
+                        </p>
+                        <h4>Parameters</h4>
+                        <ol>
+                            <li>value <em>number</em> brightness [optional]</li>
+                        </ol>
+                        <h4>Usage</h4>
+                        <pre class="javascript code"><code>var c = paper.path({stroke: Raphael.getColor()}, "M10,10L100,100")</code></pre>
+                        <h3 id="getColor-reset">
+                            getColor.reset
+                        </h3>
+                        <p>
+                            Resets getColor function, so it will start from the beginning
+                        </p>
                     </div>
                     <div id="column-2">
                         <h2>
@@ -490,6 +543,15 @@ var c = paper.path({stroke: "#036"}).moveTo(10, 10).lineTo(50, 50);</code></pre>
                                 <a href="reference.html#node"><code>node</code></a>
                             </li>
                             <li>
+                                <a href="reference.html#remove"><code>remove</code></a>
+                            </li>
+                            <li>
+                                <a href="reference.html#hide"><code>hide</code></a>
+                            </li>
+                            <li>
+                                <a href="reference.html#show"><code>show</code></a>
+                            </li>
+                            <li>
                                 <a href="reference.html#rotate"><code>rotate</code></a>
                             </li>
                             <li>
@@ -502,7 +564,7 @@ var c = paper.path({stroke: "#036"}).moveTo(10, 10).lineTo(50, 50);</code></pre>
                                 <a href="reference.html#attr"><code>attr</code></a>
                             </li>
                             <li>
-                                <a href="reference.html#attr"><code>animate</code></a>
+                                <a href="reference.html#animate"><code>animate</code></a>
                             </li>
                             <li>
                                 <a href="reference.html#getBBox"><code>getBBox</code></a>
@@ -557,6 +619,12 @@ var c = paper.path({stroke: "#036"}).moveTo(10, 10).lineTo(50, 50);</code></pre>
                                     </li>
                                 </ul>
                             </li>
+                            <li>
+                                <a href="#getColor"><code>getColor</code></a>
+                            </li>
+                            <li>
+                                <a href="#getColor-reset"><code>getColor.reset</code></a>
+                            </li>
                         </ul>
                     </div>
                     <div  id="footer">
@@ -564,8 +632,7 @@ var c = paper.path({stroke: "#036"}).moveTo(10, 10).lineTo(50, 50);</code></pre>
                             <a href="http://creativecommons.org/licenses/by-sa/3.0/" title="Creative Commons Attribution-ShareAlike 3.0 Unported" rel="license">Some Rights Reserved</a> by <a href="http://dmitry.baranovskiy.com/">Dmitry Baranovskiy</a>
                         </h3>
                         <h3 id="font">
-                            Font by <a href="http://www.exljbris.nl">Jos Buivenga</a> · Logo by <a href="http://wasabicube.com/">Wasabicube</a> ·
-                            Work at this project started as 20% time at <a href="http://www.atlassian.com/" title="Atlassian — Software to Track, Test &#38; Collaborate, from Enterprises to Open Source Projects.">Atlassian</a>
+                            A font by <a href="http://www.exljbris.nl">Jos Buivenga</a> | Logo by <a href="http://wasabicube.com/">Wasabicube</a>
                         </h3>
                     </div>
                 </div>
