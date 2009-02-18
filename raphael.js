@@ -18,7 +18,7 @@ var Raphael = (function () {
     var paper = {};
     R.fn = {};
     var availableAttrs = {cx: 0, cy: 0, fill: "#fff", "fill-opacity": 1, font: '16px "Arial"', "font-family": '"Arial"', "font-size": "16", gradient: 0, height: 0, opacity: 1, path: "M0,0", r: 0, rotation: 0, rx: 0, ry: 0, scale: "1 1", stroke: "#000", "stroke-dasharray": "", "stroke-linecap": "butt", "stroke-linejoin": "butt", "stroke-miterlimit": 0, "stroke-opacity": 1, "stroke-width": 1, translation: "0 0", width: 0, x: 0, y: 0},
-        availableAnimAttrs = {cx: "number", cy: "number", fill: "colour", "fill-opacity": "number", "font-size": "number", height: "number", opacity: "number", path: "path", r: "number", rotation: "number", rx: "number", ry: "number", scale: "csv", stroke: "colour", "stroke-opacity": "number", "stroke-width": "number", translation: "csv", width: "number", x: "number", y: "number"};
+        availableAnimAttrs = {cx: "number", cy: "number", fill: "colour", "fill-opacity": "number", "font-size": "number", height: "number", opacity: "number", path: "path", r: "number", rotation: "csv", rx: "number", ry: "number", scale: "csv", stroke: "colour", "stroke-opacity": "number", "stroke-width": "number", translation: "csv", width: "number", x: "number", y: "number"};
 
     R.toString = function () {
         return  "Your browser " + (this.vml ? "doesn't ": "") + "support" + (this.svg ? "s": "") +
@@ -69,56 +69,11 @@ var Raphael = (function () {
         rgb.hex = "#" + r + g + b;
         return rgb;
     };
-    var rgb2hsb = function (red, green, blue) {
-        if (typeof red == "object" && "r" in red && "g" in red && "b" in red) {
-            blue = red.b;
-            green = red.g;
-            red = red.r;
-        }
-        if (typeof red == "string" && red.charAt(0) == "#") {
-            if (red.length == 4) {
-                blue = parseInt(red.substring(3), 16);
-                green = parseInt(red.substring(2, 3), 16);
-                red = parseInt(red.substring(1, 2), 16);
-            } else {
-                blue = parseInt(red.substring(5), 16);
-                green = parseInt(red.substring(3, 5), 16);
-                red = parseInt(red.substring(1, 3), 16);
-            }
-        }
-        if (red > 1 || green > 1 || blue > 1) {
-            red /= 255;
-            green /= 255;
-            blue /= 255;
-        }
-        var max = Math.max(red, green, blue),
-            min = Math.min(red, green, blue),
-            hue,
-            saturation,
-            brightness = max;
-        if (min == max) {
-            return {h: 0, s: 0, b: max};
-        } else {
-            var delta = (max - min);
-            saturation = delta / max;
-            if (red == max) {
-                hue = (green - blue) / delta;
-            } else if (green == max) {
-                hue = 2 + ((blue - red) / delta);
-            } else {
-                hue = 4 + ((red - green) / delta);
-            }
-            hue /= 6;
-            if (hue < 0) {
-                hue += 1;
-            }
-            if (hue > 1) {
-                hue -= 1;
-            }
-        }
-        return {h: hue, s: saturation, b: brightness};
-    };
     var getRGB = function (colour) {
+        var htmlcolors = {aliceblue: "#f0f8ff", amethyst: "#96c", antiquewhite: "#faebd7", aqua: "#0ff", aquamarine: "#7fffd4", azure: "#f0ffff", beige: "#f5f5dc", bisque: "#ffe4c4", black: "#000", blanchedalmond: "#ffebcd", blue: "#00f", blueviolet: "#8a2be2", brown: "#a52a2a", burlywood: "#deb887", cadetblue: "#5f9ea0", chartreuse: "#7fff00", chocolate: "#d2691e", coral: "#ff7f50", cornflowerblue: "#6495ed", cornsilk: "#fff8dc", crimson: "#dc143c", cyan: "#0ff", darkblue: "#00008b", darkcyan: "#008b8b", darkgoldenrod: "#b8860b", darkgray: "#a9a9a9", darkgreen: "#006400", darkkhaki: "#bdb76b", darkmagenta: "#8b008b", darkolivegreen: "#556b2f", darkorange: "#ff8c00", darkorchid: "#9932cc", darkred: "#8b0000", darksalmon: "#e9967a", darkseagreen: "#8fbc8f", darkslateblue: "#483d8b", darkslategray: "#2f4f4f", darkturquoise: "#00ced1", darkviolet: "#9400d3", deeppink: "#ff1493", deepskyblue: "#00bfff", dimgray: "#696969", dodgerblue: "#1e90ff", firebrick: "#b22222", floralwhite: "#fffaf0", forestgreen: "#228b22", fuchsia: "#f0f", gainsboro: "#dcdcdc", ghostwhite: "#f8f8ff", gold: "#ffd700", goldenrod: "#daa520", gray: "#808080", green: "#008000", greenyellow: "#adff2f", honeydew: "#f0fff0", hotpink: "#ff69b4", indianred: "#cd5c5c", indigo: "#4b0082", ivory: "#fffff0", khaki: "#f0e68c", lavender: "#e6e6fa", lavenderblush: "#fff0f5", lawngreen: "#7cfc00", lemonchiffon: "#fffacd", lightblue: "#add8e6", lightcoral: "#f08080", lightcyan: "#e0ffff", lightgoldenrodyellow: "#fafad2", lightgreen: "#90ee90", lightgrey: "#d3d3d3", lightpink: "#ffb6c1", lightsalmon: "#ffa07a", lightsalmon: "#ffa07a", lightseagreen: "#20b2aa", lightskyblue: "#87cefa", lightslategray: "#789", lightsteelblue: "#b0c4de", lightyellow: "#ffffe0", lime: "#0f0", limegreen: "#32cd32", linen: "#faf0e6", magenta: "#f0f", maroon: "#800000", mediumaquamarine: "#66cdaa", mediumblue: "#0000cd", mediumorchid: "#ba55d3", mediumpurple: "#9370db", mediumseagreen: "#3cb371", mediumslateblue: "#7b68ee", mediumslateblue: "#7b68ee", mediumspringgreen: "#00fa9a", mediumturquoise: "#48d1cc", mediumvioletred: "#c71585", midnightblue: "#191970", mintcream: "#f5fffa", mistyrose: "#ffe4e1", moccasin: "#ffe4b5", navajowhite: "#ffdead", navy: "#000080", oldlace: "#fdf5e6", olive: "#808000", olivedrab: "#6b8e23", orange: "#ffa500", orangered: "#ff4500", orchid: "#da70d6", palegoldenrod: "#eee8aa", palegreen: "#98fb98", paleturquoise: "#afeeee", palevioletred: "#db7093", papayawhip: "#ffefd5", peachpuff: "#ffdab9", peru: "#cd853f", pink: "#ffc0cb", plum: "#dda0dd", powderblue: "#b0e0e6", purple: "#800080", red: "#f00", rosybrown: "#bc8f8f", royalblue: "#4169e1", saddlebrown: "#8b4513", salmon: "#fa8072", sandybrown: "#f4a460", seagreen: "#2e8b57", seashell: "#fff5ee", sienna: "#a0522d", silver: "#c0c0c0", skyblue: "#87ceeb", slateblue: "#6a5acd", slategray: "#708090", snow: "#fffafa", springgreen: "#00ff7f", steelblue: "#4682b4", tan: "#d2b48c", teal: "#008080", thistle: "#d8bfd8", tomato: "#ff6347", turquoise: "#40e0d0", violet: "#ee82ee", wheat: "#f5deb3", white: "#fff", whitesmoke: "#f5f5f5", yellow: "#ff0", yellowgreen: "#9acd32"};
+        if (colour.toString().toLowerCase() in htmlcolors) {
+            colour = htmlcolors[colour.toString().toLowerCase()];
+        }
         if (!colour) {
             return {r: 0, g: 0, b: 0, hex: "#000"};
         }
@@ -261,7 +216,7 @@ var Raphael = (function () {
     var pathToRelative = function (pathArray) {
         var res = [];
         if (typeof pathArray == "string") {
-            pathArray = this.parsePathString(pathArray);
+            pathArray = R.parsePathString(pathArray);
         }
         var x = 0, y = 0, start = 0;
         if (pathArray[0][0] == "M") {
@@ -367,7 +322,7 @@ var Raphael = (function () {
         return res;
     };
     var pathEqualiser = function (path1, path2) {
-        var data = [pathToAbsolute(this.parsePathString(path1)), pathToAbsolute(this.parsePathString(path2))],
+        var data = [pathToAbsolute(R.parsePathString(path1)), pathToAbsolute(R.parsePathString(path2))],
             attrs = [{x: 0, y: 0, bx: 0, by: 0, X: 0, Y: 0}, {x: 0, y: 0, bx: 0, by: 0, X: 0, Y: 0}],
             processPath = function (path, d) {
                 if (!path) {
@@ -851,19 +806,27 @@ var Raphael = (function () {
             }
             return this;
         };
-        Element.prototype.rotate = function (deg, isAbsolute, cx, cy) {
+        Element.prototype.rotate = function (deg, cx, cy) {
             if (deg == undefined) {
                 return this._.rt.deg;
             }
             var bbox = this.getBBox();
-            if (isAbsolute) {
+            deg = deg.toString().split(/[, ]+/);
+            if (deg.length - 1) {
+                cx = parseFloat(deg[1], 10);
+                cy = parseFloat(deg[2], 10);
+            }
+            deg = parseFloat(deg[0], 10);
+            if (cx != null) {
                 this._.rt.deg = deg;
             } else {
                 this._.rt.deg += deg;
             }
-
-            cx = cx || bbox.x + bbox.width / 2;
-            cy = cy || bbox.y + bbox.height / 2;
+            if (cy == null) {
+                cx = null;
+            }
+            cx = cx == null ? bbox.x + bbox.width / 2 : cx;
+            cy = cy == null ? bbox.y + bbox.height / 2 : cy;
             if (this._.rt.deg) {
                 this.transformations[0] = ("rotate(" + this._.rt.deg + " " + cx + " " + cy + ")");
             } else {
@@ -1380,7 +1343,7 @@ var Raphael = (function () {
                 paper.pathfinder(o, params.path);
             }
             if (params.rotation != null) {
-                o.Group.style.rotation = params.rotation;
+                o.rotate(params.rotation, true);
             }
             if (params.translation) {
                 var xy = params.translation.split(/[, ]+/);
@@ -1548,14 +1511,23 @@ var Raphael = (function () {
                 sy: 1
             };
         };
-        Element.prototype.rotate = function (deg, isAbsolute, cx, cy) {
-            if (deg == undefined) {
+        Element.prototype.rotate = function (deg, cx, cy) {
+            if (deg == null) {
                 return this._.rt;
             }
-            if (isAbsolute) {
+            deg = deg.toString().split(/[, ]+/);
+            if (deg.length - 1) {
+                cx = parseFloat(deg[1], 10);
+                cy = parseFloat(deg[2], 10);
+            }
+            deg = parseFloat(deg[0], 10);
+            if (cx != null) {
                 this._.rt = deg;
             } else {
                 this._.rt += deg;
+            }
+            if (cy == null) {
+                cx = null;
             }
             this.setBox(null, cx, cy);
             this.Group.style.rotation = this._.rt;
@@ -1615,8 +1587,8 @@ var Raphael = (function () {
                     h = this.vml.height;
                     break;
             }
-            cx = cx || x + w / 2;
-            cy = cy || y + h / 2;
+            cx = (cx == null) ? x + w / 2 : cx;
+            cy = (cy == null) ? y + h / 2 : cy;
             var left = cx - this.vml.width / 2,
                 top = cy - this.vml.height / 2;
             if (this.type == "path" || this.type == "text") {
@@ -1628,16 +1600,6 @@ var Raphael = (function () {
                 this.H = h;
                 os.left = -left + "px";
                 os.top = -top + "px";
-                // var left = Math.round(this.vml.width / 2 - w / 2 - x),
-                //     top = Math.round(this.vml.height / 2 - h / 2 - y);
-                // gs.left = - left + "px";
-                // gs.top = - top + "px";
-                // this.X = this.type == "text" ? x : left;
-                // this.Y = this.type == "text" ? y : top;
-                // this.W = w;
-                // this.H = h;
-                // os.top = top + "px";
-                // os.left = left + "px";
             } else {
                 gs.left = left + "px";
                 gs.top = top + "px";
@@ -1704,41 +1666,26 @@ var Raphael = (function () {
                 };
                 return values;
             }
-            if (this.node.tagName.toLowerCase() == "group") {
-                var children = this[0].childNodes;
-                this.attrs = this.attrs || {};
-                if (arguments.length == 2) {
-                    this.attrs[arguments[0]] = arguments[1];
-                } else if (arguments.length == 1 || typeof arguments[0] == "object") {
-                    for (var j in arguments[0]) {
-                        this.attrs[j] = arguments[0][j];
-                    }
+            var params;
+            if (arguments.length == 2) {
+                params = {};
+                params[arguments[0]] = arguments[1];
+            }
+            if (arguments.length == 1 && typeof arguments[0] == "object") {
+                params = arguments[0];
+            }
+            if (params) {
+                if (params.gradient) {
+                    addGrdientFill(this, params.gradient);
                 }
-                for (var i = 0, ii = children.length; i < ii; i++) {
-                    this.attr.apply(new item(children[i], this[0], this.vml), arguments);
+                if (params.text && this.type == "text") {
+                    this.node.string = params.text;
                 }
-            } else {
-                var params;
-                if (arguments.length == 2) {
-                    params = {};
-                    params[arguments[0]] = arguments[1];
+                if (params.id) {
+                    this.node.id = params.id;
                 }
-                if (arguments.length == 1 && typeof arguments[0] == "object") {
-                    params = arguments[0];
-                }
-                if (params) {
-                    if (params.gradient) {
-                        addGrdientFill(this, params.gradient);
-                    }
-                    if (params.text && this.type == "text") {
-                        this.node.string = params.text;
-                    }
-                    if (params.id) {
-                        this.node.id = params.id;
-                    }
-                    setFillAndStroke(this, params);
-                    // this.setBox(params);
-                }
+                setFillAndStroke(this, params);
+                this.setBox(params);
             }
             return this;
         };
@@ -1991,64 +1938,6 @@ var Raphael = (function () {
             };
         })(events[i]);
     }
-
-    // Set
-    var Set = function (itemsArray) {
-        this.items = [];
-        if (itemsArray && itemsArray.constructor == Array) {
-            for (var i = itemsArray.length; i--;) {
-                if (itemsArray[i].constructor == Element) {
-                    this.items[this.items.length] = itemsArray[i];
-                }
-            }
-        }
-    };
-    Set.prototype.add = function (item) {
-        if (item && item.constructor == Element) {
-            this.items[this.items.length] = item;
-        }
-        return this;
-    };
-    Set.prototype.remove = function (item) {
-        if (item && item.constructor == Element) {
-            for (var i = this.items.length; i--;) {
-                if (this.items[i] == item) {
-                    this.items.splice(i, 1);
-                    return this;
-                }
-            }
-        }
-        return this;
-    };
-    for (var method in Element.prototype) {
-        Set.prototype[method] = (function (methodname) {
-            return function () {
-                for (var i = this.items.length; i--;) {
-                    this.items[i][methodname].apply(this.items[i], arguments);
-                }
-                return this;
-            };
-        })(method);
-    }
-    Set.prototype.getBBox = function () {
-        var x = [], y = [], w = [], h = [];
-        for (var i = this.items.length; i--;) {
-            var box = this.items[i].getBBox();
-            x.push(box.x);
-            y.push(box.y);
-            w.push(box.x + box.width);
-            h.push(box.y + box.height);
-        }
-        x = Math.min(x);
-        y = Math.min(y);
-        return {
-            x: x,
-            y: y,
-            w: Math.max(w) - x,
-            h: Math.max(h) - y
-        };
-    };
-
     paper.circle = function (x, y, r) {
         return theCircle(this, x, y, r);
     };
@@ -2224,7 +2113,10 @@ var Raphael = (function () {
     };
     Element.prototype.animate = function (params, ms, callback) {
         clearTimeout(this.animation_in_progress);
-        var from = {}, to = {}, diff = {}, t = {x: 0, y: 0};
+        var from = {},
+            to = {},
+            diff = {},
+            t = {x: 0, y: 0};
         for (var attr in params) {
             if (attr in availableAnimAttrs) {
                 from[attr] = this.attr(attr);
@@ -2258,10 +2150,13 @@ var Raphael = (function () {
                         }
                         break;
                     case "csv":
-                        var values = params[attr].split(/[, ]+/);
+                        var values = params[attr].toString().split(/[, ]+/);
                         if (attr == "translation") {
                             from[attr] = [0, 0];
                             diff[attr] = [values[0] / ms, values[1] / ms];
+                        } else if (attr == "rotation") {
+                            from[attr] = [0, values[1], values[2]];
+                            diff[attr] = [values[0] / ms, 0, 0];
                         } else {
                             from[attr] = from[attr].split(/[, ]+/);
                             diff[attr] = [(values[0] - from[attr][0]) / ms, (values[1] - from[attr][0]) / ms];
@@ -2308,6 +2203,9 @@ var Raphael = (function () {
                                 t.x += x;
                                 t.y += y;
                                 now = [x, y].join(" ");
+                            } else if (attr == "rotation") {
+                                now = +from[attr][0] + time * diff[attr][0];
+                                from[attr][1] && (now += "," + from[attr][1] + "," + from[attr][2]);
                             } else {
                                 now = [+from[attr][0] + time * diff[attr][0], +from[attr][1] + time * diff[attr][1]].join(" ");
                             }
@@ -2323,9 +2221,7 @@ var Raphael = (function () {
                 that.animation_in_progress = setTimeout(arguments.callee, 0);
                 paper.safari();
             } else {
-                if (t.x || t.y) {
-                    that.translate(-t.x, -t.y);
-                }
+                (t.x || t.y) && that.translate(-t.x, -t.y);
                 that.attr(params);
                 clearTimeout(that.animation_in_progress);
                 paper.safari();
@@ -2335,5 +2231,61 @@ var Raphael = (function () {
         })();
         return this;
     };
+
+    // Set
+    var Set = function (itemsArray) {
+        this.items = [];
+        if (itemsArray && itemsArray.constructor == Array) {
+            for (var i = itemsArray.length; i--;) {
+                if (itemsArray[i].constructor == Element) {
+                    this.items[this.items.length] = itemsArray[i];
+                }
+            }
+        }
+    };
+    Set.prototype.push = function (item) {
+        if (item && item.constructor == Element) {
+            this.items[this.items.length] = item;
+            this[this.items.length] = item;
+        }
+        return this;
+    };
+    Set.prototype.pull = function (id) {
+        var res = this.items.splice(id, 1)[0];
+        for (var j = id, jj = this.items.length; j < jj; j++) {
+            this[j] = this[j + 1];
+        }
+        delete this[jj + 1];
+        return res;
+    };
+    for (var method in Element.prototype) {
+        Set.prototype[method] = (function (methodname) {
+            return function () {
+                for (var i = this.items.length; i--;) {
+                    this.items[i][methodname].apply(this.items[i], arguments);
+                }
+                return this;
+            };
+        })(method);
+    }
+    Set.prototype.getBBox = function () {
+        var x = [], y = [], w = [], h = [];
+        for (var i = this.items.length; i--;) {
+            var box = this.items[i].getBBox();
+            x.push(box.x);
+            y.push(box.y);
+            w.push(box.x + box.width);
+            h.push(box.y + box.height);
+        }
+        x = Math.min.apply(Math, x);
+        y = Math.min.apply(Math, y);
+        return {
+            x: x,
+            y: y,
+            width: Math.max.apply(Math, w) - x,
+            height: Math.max.apply(Math, h) - y
+        };
+    };
+
     return R;
 })();
