@@ -7,7 +7,8 @@
 
 
 var Raphael = (function () {
-    var create,
+    var separator = /[, ]+/,
+        create,
         R = function () {
             return create.apply(R, arguments);
         };
@@ -50,10 +51,10 @@ var Raphael = (function () {
         red = [brightness, q, p, p, t, brightness, brightness][i];
         green = [t, brightness, brightness, q, p, p, t][i];
         blue = [p, p, t, brightness, brightness, q, p][i];
-        var rgb = {r: red, g: green, b: blue};
         red *= 255;
         green *= 255;
         blue *= 255;
+        var rgb = {r: red, g: green, b: blue};
         var r = Math.round(red).toString(16);
         if (r.length == 1) {
             r = "0" + r;
@@ -322,7 +323,7 @@ var Raphael = (function () {
         return res;
     };
     var pathEqualiser = function (path1, path2) {
-        var data = [pathToAbsolute(R.parsePathString(path1)), pathToAbsolute(R.parsePathString(path2))],
+        var data = [pathToAbsolute(Raphael.parsePathString(path1)), pathToAbsolute(Raphael.parsePathString(path2))],
             attrs = [{x: 0, y: 0, bx: 0, by: 0, X: 0, Y: 0}, {x: 0, y: 0, bx: 0, by: 0, X: 0, Y: 0}],
             processPath = function (path, d) {
                 if (!path) {
@@ -707,11 +708,11 @@ var Raphael = (function () {
                         o.rotate(value, true);
                         break;
                     case "translation":
-                        var xy = value.split(/[, ]+/);
+                        var xy = value.split(separator);
                         o.translate(xy[0], xy[1]);
                         break;
                     case "scale":
-                        var xy = value.split(/[, ]+/);
+                        var xy = value.split(separator);
                         o.scale(xy[0], xy[1]);
                         break;
                     case "fill":
@@ -807,11 +808,11 @@ var Raphael = (function () {
             return this;
         };
         Element.prototype.rotate = function (deg, cx, cy) {
-            if (deg == undefined) {
+            if (deg == null) {
                 return this._.rt.deg;
             }
             var bbox = this.getBBox();
-            deg = deg.toString().split(/[, ]+/);
+            deg = deg.toString().split(separator);
             if (deg.length - 1) {
                 cx = parseFloat(deg[1], 10);
                 cy = parseFloat(deg[2], 10);
@@ -1346,11 +1347,11 @@ var Raphael = (function () {
                 o.rotate(params.rotation, true);
             }
             if (params.translation) {
-                var xy = params.translation.split(/[, ]+/);
+                var xy = params.translation.split(separator);
                 o.translate(xy[0], xy[1]);
             }
             if (params.scale) {
-                var xy = params.scale.split(/[, ]+/);
+                var xy = params.scale.split(separator);
                 o.scale(xy[0], xy[1]);
             }
             if (o.type == "image" && params.opacity) {
@@ -1506,31 +1507,33 @@ var Raphael = (function () {
             this._ = {
                 tx: 0,
                 ty: 0,
-                rt: 0,
+                rt: {deg:0},
                 sx: 1,
                 sy: 1
             };
         };
         Element.prototype.rotate = function (deg, cx, cy) {
             if (deg == null) {
-                return this._.rt;
+                return this._.rt.deg;
             }
-            deg = deg.toString().split(/[, ]+/);
+            deg = deg.toString().split(separator);
             if (deg.length - 1) {
                 cx = parseFloat(deg[1], 10);
                 cy = parseFloat(deg[2], 10);
             }
             deg = parseFloat(deg[0], 10);
-            if (cx != null) {
-                this._.rt = deg;
-            } else {
-                this._.rt += deg;
-            }
             if (cy == null) {
                 cx = null;
             }
+            if (cx != null) {
+                this._.rt.deg = deg;
+            } else {
+                this._.rt.deg += deg;
+            }
+            this._.rt.cx = cx;
+            this._.rt.cy = cy;
             this.setBox(null, cx, cy);
-            this.Group.style.rotation = this._.rt;
+            this.Group.style.rotation = this._.rt.deg;
             return this;
         };
         Element.prototype.setBox = function (params, cx, cy) {
@@ -1539,6 +1542,8 @@ var Raphael = (function () {
             for (var i in params) {
                 this.attrs[i] = params[i];
             }
+            cx = cx || this._.rt.cx;
+            cy = cy || this._.rt.cy;
             var attr = this.attrs, x, y, w, h;
             switch (this.type) {
                 case "circle": 
@@ -1917,15 +1922,16 @@ var Raphael = (function () {
     // Events
     var addEvent = (function () {
         if (document.addEventListener) {
-            return function (obj, type, fn) {
-                obj.addEventListener(type, fn, false);
+            return function (obj, type, fn, element) {
+                obj.addEventListener(type, function (e) {
+                    return fn.call(element, e);
+                }, false);
             };
         } else if (document.attachEvent) {
-            return function (obj, type, fn) {
-                var f = function (e) {
-                    fn.call(this, e || window.event);
-                };
-                obj.attachEvent("on" + type, f);
+            return function (obj, type, fn, element) {
+                obj.attachEvent("on" + type, function (e) {
+                    return fn.call(element, e || window.event);
+                });
             };
         }
     })();
@@ -1933,7 +1939,7 @@ var Raphael = (function () {
     for (var i = events.length; i--;) {
         (function (eventName) {
             Element.prototype[eventName] = function (fn) {
-                addEvent(this.node, eventName, fn);
+                addEvent(this.node, eventName, fn, this);
                 return this;
             };
         })(events[i]);
@@ -2150,15 +2156,16 @@ var Raphael = (function () {
                         }
                         break;
                     case "csv":
-                        var values = params[attr].toString().split(/[, ]+/);
+                        var values = params[attr].toString().split(separator),
+                            from2 = from[attr].toString().split(separator);
                         if (attr == "translation") {
                             from[attr] = [0, 0];
                             diff[attr] = [values[0] / ms, values[1] / ms];
                         } else if (attr == "rotation") {
-                            from[attr] = [0, values[1], values[2]];
-                            diff[attr] = [values[0] / ms, 0, 0];
+                            from[attr] = (from2[1] == values[1] && from2[2] == values[2]) ? from2 : [0, values[1], values[2]];
+                            diff[attr] = [(values[0] - from[attr][0]) / ms, 0, 0];
                         } else {
-                            from[attr] = from[attr].split(/[, ]+/);
+                            from[attr] = from[attr].split(separator);
                             diff[attr] = [(values[0] - from[attr][0]) / ms, (values[1] - from[attr][0]) / ms];
                         }
                         to[attr] = values;
@@ -2245,8 +2252,9 @@ var Raphael = (function () {
     };
     Set.prototype.push = function (item) {
         if (item && item.constructor == Element) {
-            this.items[this.items.length] = item;
-            this[this.items.length] = item;
+            var len = this.items.length;
+            this.items[len] = item;
+            this[len] = item;
         }
         return this;
     };
