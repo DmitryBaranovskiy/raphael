@@ -26,7 +26,7 @@ var Raphael = (function () {
                 " SVG.\nYou are running " + unescape("Rapha%EBl%20") + this.version;
     };
     // colour utilities
-    var hsb2rgb = function (hue, saturation, brightness) {
+    R.hsb2rgb = function (hue, saturation, brightness) {
         if (typeof hue == "object" && "h" in hue && "s" in hue && "b" in hue) {
             brightness = hue.b;
             saturation = hue.s;
@@ -70,6 +70,55 @@ var Raphael = (function () {
         rgb.hex = "#" + r + g + b;
         return rgb;
     };
+    R.rgb2hsb = function (red, green, blue) {
+        if (typeof red == "object" && "r" in red && "g" in red && "b" in red) {
+            blue = red.b;
+            green = red.g;
+            red = red.r;
+        }
+        if (typeof red == "string" && red.charAt(0) == "#") {
+            if (red.length == 4) {
+                blue = parseInt(red.substring(3), 16);
+                green = parseInt(red.substring(2, 3), 16);
+                red = parseInt(red.substring(1, 2), 16);
+            } else {
+                blue = parseInt(red.substring(5), 16);
+                green = parseInt(red.substring(3, 5), 16);
+                red = parseInt(red.substring(1, 3), 16);
+            }
+        }
+        if (red > 1 || green > 1 || blue > 1) {
+            red /= 255;
+            green /= 255;
+            blue /= 255;
+        }
+        var max = Math.max(red, green, blue),
+            min = Math.min(red, green, blue),
+            hue,
+            saturation,
+            brightness = max;
+        if (min == max) {
+            return {h: 0, s: 0, b: max};
+        } else {
+            var delta = (max - min);
+            saturation = delta / max;
+            if (red == max) {
+                hue = (green - blue) / delta;
+            } else if (green == max) {
+                hue = 2 + ((blue - red) / delta);
+            } else {
+                hue = 4 + ((red - green) / delta);
+            }
+            hue /= 6;
+            if (hue < 0) {
+                hue += 1;
+            }
+            if (hue > 1) {
+                hue -= 1;
+            }
+        }
+        return {h: hue, s: saturation, b: brightness};
+    };
     var getRGB = function (colour) {
         var htmlcolors = {aliceblue: "#f0f8ff", amethyst: "#96c", antiquewhite: "#faebd7", aqua: "#0ff", aquamarine: "#7fffd4", azure: "#f0ffff", beige: "#f5f5dc", bisque: "#ffe4c4", black: "#000", blanchedalmond: "#ffebcd", blue: "#00f", blueviolet: "#8a2be2", brown: "#a52a2a", burlywood: "#deb887", cadetblue: "#5f9ea0", chartreuse: "#7fff00", chocolate: "#d2691e", coral: "#ff7f50", cornflowerblue: "#6495ed", cornsilk: "#fff8dc", crimson: "#dc143c", cyan: "#0ff", darkblue: "#00008b", darkcyan: "#008b8b", darkgoldenrod: "#b8860b", darkgray: "#a9a9a9", darkgreen: "#006400", darkkhaki: "#bdb76b", darkmagenta: "#8b008b", darkolivegreen: "#556b2f", darkorange: "#ff8c00", darkorchid: "#9932cc", darkred: "#8b0000", darksalmon: "#e9967a", darkseagreen: "#8fbc8f", darkslateblue: "#483d8b", darkslategray: "#2f4f4f", darkturquoise: "#00ced1", darkviolet: "#9400d3", deeppink: "#ff1493", deepskyblue: "#00bfff", dimgray: "#696969", dodgerblue: "#1e90ff", firebrick: "#b22222", floralwhite: "#fffaf0", forestgreen: "#228b22", fuchsia: "#f0f", gainsboro: "#dcdcdc", ghostwhite: "#f8f8ff", gold: "#ffd700", goldenrod: "#daa520", gray: "#808080", green: "#008000", greenyellow: "#adff2f", honeydew: "#f0fff0", hotpink: "#ff69b4", indianred: "#cd5c5c", indigo: "#4b0082", ivory: "#fffff0", khaki: "#f0e68c", lavender: "#e6e6fa", lavenderblush: "#fff0f5", lawngreen: "#7cfc00", lemonchiffon: "#fffacd", lightblue: "#add8e6", lightcoral: "#f08080", lightcyan: "#e0ffff", lightgoldenrodyellow: "#fafad2", lightgreen: "#90ee90", lightgrey: "#d3d3d3", lightpink: "#ffb6c1", lightsalmon: "#ffa07a", lightsalmon: "#ffa07a", lightseagreen: "#20b2aa", lightskyblue: "#87cefa", lightslategray: "#789", lightsteelblue: "#b0c4de", lightyellow: "#ffffe0", lime: "#0f0", limegreen: "#32cd32", linen: "#faf0e6", magenta: "#f0f", maroon: "#800000", mediumaquamarine: "#66cdaa", mediumblue: "#0000cd", mediumorchid: "#ba55d3", mediumpurple: "#9370db", mediumseagreen: "#3cb371", mediumslateblue: "#7b68ee", mediumslateblue: "#7b68ee", mediumspringgreen: "#00fa9a", mediumturquoise: "#48d1cc", mediumvioletred: "#c71585", midnightblue: "#191970", mintcream: "#f5fffa", mistyrose: "#ffe4e1", moccasin: "#ffe4b5", navajowhite: "#ffdead", navy: "#000080", oldlace: "#fdf5e6", olive: "#808000", olivedrab: "#6b8e23", orange: "#ffa500", orangered: "#ff4500", orchid: "#da70d6", palegoldenrod: "#eee8aa", palegreen: "#98fb98", paleturquoise: "#afeeee", palevioletred: "#db7093", papayawhip: "#ffefd5", peachpuff: "#ffdab9", peru: "#cd853f", pink: "#ffc0cb", plum: "#dda0dd", powderblue: "#b0e0e6", purple: "#800080", red: "#f00", rosybrown: "#bc8f8f", royalblue: "#4169e1", saddlebrown: "#8b4513", salmon: "#fa8072", sandybrown: "#f4a460", seagreen: "#2e8b57", seashell: "#fff5ee", sienna: "#a0522d", silver: "#c0c0c0", skyblue: "#87ceeb", slateblue: "#6a5acd", slategray: "#708090", snow: "#fffafa", springgreen: "#00ff7f", steelblue: "#4682b4", tan: "#d2b48c", teal: "#008080", thistle: "#d8bfd8", tomato: "#ff6347", turquoise: "#40e0d0", violet: "#ee82ee", wheat: "#f5deb3", white: "#fff", whitesmoke: "#f5f5f5", yellow: "#ff0", yellowgreen: "#9acd32"};
         if (colour.toString().toLowerCase() in htmlcolors) {
@@ -111,14 +160,14 @@ var Raphael = (function () {
                 red = parseFloat(rgb[0], 10);
                 green = parseFloat(rgb[1], 10);
                 blue = parseFloat(rgb[2], 10);
-                return hsb2rgb(red, green, blue);
+                return Raphael.hsb2rgb(red, green, blue);
             }
             if (rgb[7]) {
                 rgb = rgb[7].split(/\s*,\s*/);
                 red = parseFloat(rgb[0], 10) * 2.55;
                 green = parseFloat(rgb[1], 10) * 2.55;
                 blue = parseFloat(rgb[2], 10) * 2.55;
-                return hsb2rgb(red, green, blue);
+                return Raphael.hsb2rgb(red, green, blue);
             }
             var rgb = {r: red, g: green, b: blue};
             var r = Math.round(red).toString(16);
@@ -135,7 +184,7 @@ var Raphael = (function () {
     };
     R.getColor = function (value) {
         var start = arguments.callee.start = arguments.callee.start || {h: 0, s: 1, b: value || .75};
-        var rgb = hsb2rgb(start.h, start.s, start.b);
+        var rgb = Raphael.hsb2rgb(start.h, start.s, start.b);
         start.h += .075;
         if (start.h > 1) {
             start.h = 0;
@@ -1608,8 +1657,8 @@ var Raphael = (function () {
             } else {
                 gs.left = left + "px";
                 gs.top = top + "px";
-                this.X = x - left;
-                this.Y = y - top;
+                this.X = x;
+                this.Y = y;
                 this.W = w;
                 this.H = h;
                 gs.width = this.vml.width + "px";
@@ -1856,7 +1905,7 @@ var Raphael = (function () {
             d.style.position = "relative";
             rs.width  = width;
             rs.height = height;
-            r.coordsize = (width == "100%" ? width : parseFloat(width)) + " " + (height == "100%" ? height : parseFloat(height));
+            r.coordsize = (/%$/.test(width) ? width : parseFloat(width, 10)) + " " + (/%$/.test(height) ? height : parseFloat(height, 10));
             r.coordorigin = "0 0";
 
             var b = document.createElement("rvml:rect"), bs = b.style;
