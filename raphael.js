@@ -18,7 +18,7 @@ var Raphael = (function () {
     R.idGenerator = 0;
     var paper = {};
     R.fn = {};
-    var availableAttrs = {cx: 0, cy: 0, fill: "#fff", "fill-opacity": 1, font: '16px "Arial"', "font-family": '"Arial"', "font-size": "16", gradient: 0, height: 0, opacity: 1, path: "M0,0", r: 0, rotation: 0, rx: 0, ry: 0, scale: "1 1", stroke: "#000", "stroke-dasharray": "", "stroke-linecap": "butt", "stroke-linejoin": "butt", "stroke-miterlimit": 0, "stroke-opacity": 1, "stroke-width": 1, translation: "0 0", width: 0, x: 0, y: 0},
+    var availableAttrs = {cx: 0, cy: 0, fill: "#fff", "fill-opacity": 1, font: '16px "Arial"', "font-family": '"Arial"', "font-size": "16", gradient: 0, height: 0, opacity: 1, path: "M0,0", r: 0, rotation: 0, rx: 0, ry: 0, scale: "1 1", src: "", stroke: "#000", "stroke-dasharray": "", "stroke-linecap": "butt", "stroke-linejoin": "butt", "stroke-miterlimit": 0, "stroke-opacity": 1, "stroke-width": 1, translation: "0 0", width: 0, x: 0, y: 0},
         availableAnimAttrs = {cx: "number", cy: "number", fill: "colour", "fill-opacity": "number", "font-size": "number", height: "number", opacity: "number", path: "path", r: "number", rotation: "csv", rx: "number", ry: "number", scale: "csv", stroke: "colour", "stroke-opacity": "number", "stroke-width": "number", translation: "csv", width: "number", x: "number", y: "number"};
 
     R.toString = function () {
@@ -736,6 +736,11 @@ var Raphael = (function () {
                     case "gradient":
                         addGrdientFill(o.node, value, o.svg);
                         break;
+                    case "src":
+                        if (o.type == "image") {
+                            o.node.setAttributeNS(svg.xlink, "href", value);
+                        }
+                        break;
                     case "stroke-width":
                         o.node.style.strokeWidth = value;
                         // Need following line for Firefox
@@ -1403,6 +1408,9 @@ var Raphael = (function () {
                 var xy = params.scale.split(separator);
                 o.scale(xy[0], xy[1]);
             }
+            if (o.type == "image" && params.src) {
+                o.node.src = params.src;
+            }
             if (o.type == "image" && params.opacity) {
                 o.node.filterOpacity = " progid:DXImageTransform.Microsoft.Alpha(opacity=" + (params.opacity * 100) + ")";
                 o.node.style.filter = (o.node.filterMatrix || "") + (o.node.filterOpacity || "");
@@ -1988,7 +1996,7 @@ var Raphael = (function () {
     for (var i = events.length; i--;) {
         (function (eventName) {
             Element.prototype[eventName] = function (fn) {
-                addEvent(this.node, eventName, fn, this);
+                (typeof fn == "function") && addEvent(this.node, eventName, fn, this);
                 return this;
             };
         })(events[i]);
