@@ -2088,7 +2088,7 @@ var Raphael = (function () {
         }
         y = y || x;
         var dx, dy, cx, cy;
-        if (x != 0 && !(x == 1 && y == 1)) {
+        if (x != 0) {
             var dirx = Math.round(x / Math.abs(x)),
                 diry = Math.round(y / Math.abs(y)),
                 s = this.node.style;
