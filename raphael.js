@@ -9,11 +9,13 @@
 var Raphael = (function () {
     var separator = /[, ]+/,
         create,
+        doc = document,
+        win = window,
         R = function () {
             return create.apply(R, arguments);
         };
     R.version = "0.7.dev";
-    R.type = (window.SVGAngle ? "SVG" : "VML");
+    R.type = (win.SVGAngle ? "SVG" : "VML");
     R.svg = !(R.vml = R.type == "VML");
     R.idGenerator = 0;
     var paper = {};
@@ -24,6 +26,10 @@ var Raphael = (function () {
     R.toString = function () {
         return  "Your browser " + (this.vml ? "doesn't ": "") + "support" + (this.svg ? "s": "") +
                 " SVG.\nYou are running " + unescape("Rapha%EBl%20") + this.version;
+    };
+    R.setWindow = function (newwin) {
+        win = newwin;
+        doc = win.document;
     };
     // colour utilities
     R.hsb2rgb = function (hue, saturation, brightness) {
@@ -464,11 +470,77 @@ var Raphael = (function () {
         }
         return data;
     };
+    var toGradient = function (gradient) {
+        if (typeof gradient == "string") {
+            gradient = gradient.split(separator);
+            var angle = gradient.shift();
+            if (angle.toLowerCase() == "v") {
+                angle = 90;
+            } else if (angle.toLowerCase() == "h") {
+                angle = 0;
+            } else {
+                angle = parseFloat(angle, 10);
+            }
+            angle = -angle;
+            var grobj = {angle: angle, type: "linear", dots: [], vector: [0, 0, Math.cos(angle * Math.PI / 180).toFixed(3), Math.sin(angle * Math.PI / 180).toFixed(3)]};
+            var max = 1 / (Math.max(Math.abs(grobj.vector[2]), Math.abs(grobj.vector[3])) || 1);
+            grobj.vector[2] *= max;
+            grobj.vector[3] *= max;
+            if (grobj.vector[2] < 0) {
+                grobj.vector[0] = -grobj.vector[2];
+                grobj.vector[2] = 0;
+            }
+            if (grobj.vector[3] < 0) {
+                grobj.vector[1] = -grobj.vector[3];
+                grobj.vector[3] = 0;
+            }
+            grobj.vector[0] = grobj.vector[0].toFixed(3);
+            grobj.vector[1] = grobj.vector[1].toFixed(3);
+            grobj.vector[2] = grobj.vector[2].toFixed(3);
+            grobj.vector[3] = grobj.vector[3].toFixed(3);
+            for (var i = 0, ii = gradient.length; i < ii; i++) {
+                var dot = {};
+                if (gradient[i].indexOf(":") != -1) {
+                    var par = gradient[i].match(/^([^:]*):(\d*)/);
+                    dot.color = getRGB(par[1]).hex;
+                    dot.offset = par[2] + "%";
+                } else {
+                    dot.color = getRGB(gradient[i]).hex;
+                }
+                grobj.dots.push(dot);
+            }
+            for (var i = 1, ii = grobj.dots.length - 1; i < ii; i++) {
+                if (!grobj.dots[i].offset) {
+                    var start = parseFloat(grobj.dots[i - 1].offset || 0, 10),
+                        end = false;
+                    for (var j = i + 1; j < ii; j++) {
+                        if (grobj.dots[j].offset) {
+                            end = grobj.dots[j].offset;
+                            break;
+                        }
+                    }
+                    if (!end) {
+                        end = 100;
+                        j = ii;
+                    }
+                    end = parseFloat(end, 10);
+                    var d = (end - start) / (j - i + 1);
+                    for (; i < j; i++) {
+                        start += d;
+                        grobj.dots[i].offset = start + "%";
+                    }
+                }
+            }
+            return grobj;
+        } else {
+            return gradient;
+        }
+    };
 
     // SVG
     if (R.svg) {
         var thePath = function (params, pathString, SVG) {
-            var el = document.createElementNS(SVG.svgns, "path");
+            var el = doc.createElementNS(SVG.svgns, "path");
             el.setAttribute("fill", "none");
             if (SVG.canvas) {
                 SVG.canvas.appendChild(el);
@@ -654,7 +726,8 @@ var Raphael = (function () {
             return p;
         };
         var addGrdientFill = function (o, gradient, SVG) {
-            var el = document.createElementNS(SVG.svgns, gradient.type + "Gradient");
+            gradient = toGradient(gradient);
+            var el = doc.createElementNS(SVG.svgns, (gradient.type || "linear") + "Gradient");
             el.id = "raphael-gradient-" + Raphael.idGenerator++;
             if (gradient.vector && gradient.vector.length) {
                 el.setAttribute("x1", gradient.vector[0]);
@@ -663,16 +736,23 @@ var Raphael = (function () {
                 el.setAttribute("y2", gradient.vector[3]);
             }
             SVG.defs.appendChild(el);
+            var isopacity = true;
             for (var i = 0, ii = gradient.dots.length; i < ii; i++) {
-                var stop = document.createElementNS(SVG.svgns, "stop");
+                var stop = doc.createElementNS(SVG.svgns, "stop");
+                if (gradient.dots[i].offset) {
+                    isopacity = false;
+                }
                 stop.setAttribute("offset", gradient.dots[i].offset ? gradient.dots[i].offset : (i == 0) ? "0%" : "100%");
                 stop.setAttribute("stop-color", getRGB(gradient.dots[i].color).hex || "#fff");
-                if (typeof gradient.dots[i].opacity != "undefined") {
-                    stop.setAttribute("stop-opacity", gradient.dots[i].opacity);
-                }
+                // ignoring opacity for internal points, because VML doesn't support it
                 el.appendChild(stop);
             };
+            if (isopacity && typeof gradient.dots[ii - 1].opacity != "undefined") {
+                stop.setAttribute("stop-opacity", gradient.dots[ii - 1].opacity);
+            }
             o.setAttribute("fill", "url(#" + el.id + ")");
+            o.style.opacity = 1;
+            o.setAttribute("opacity", 1);
         };
         var updatePosition = function (o) {
             if (o.pattern) {
@@ -733,9 +813,6 @@ var Raphael = (function () {
                     case "height":
                         o.node.setAttribute(att, value);
                         break;
-                    case "gradient":
-                        addGrdientFill(o.node, value, o.svg);
-                        break;
                     case "src":
                         if (o.type == "image") {
                             o.node.setAttributeNS(svg.xlink, "href", value);
@@ -755,7 +832,7 @@ var Raphael = (function () {
                     case "text":
                         if (o.type == "text") {
                             o.node.childNodes.length && o.node.removeChild(o.node.firstChild);
-                            o.node.appendChild(document.createTextNode(value));
+                            o.node.appendChild(doc.createTextNode(value));
                         }
                         break;
                     case "rotation":
@@ -772,8 +849,8 @@ var Raphael = (function () {
                     case "fill":
                         var isURL = value.match(/^url\(([^\)]+)\)$/i);
                         if (isURL) {
-                            var el = document.createElementNS(o.svg.svgns, "pattern");
-                            var ig = document.createElementNS(o.svg.svgns, "image");
+                            var el = doc.createElementNS(o.svg.svgns, "pattern");
+                            var ig = doc.createElementNS(o.svg.svgns, "image");
                             el.id = "raphael-pattern-" + Raphael.idGenerator++;
                             el.setAttribute("x", 0);
                             el.setAttribute("y", 0);
@@ -783,7 +860,7 @@ var Raphael = (function () {
                             ig.setAttributeNS(o.svg.xlink, "href", isURL[1]);
                             el.appendChild(ig);
 
-                            var img = document.createElement("img");
+                            var img = doc.createElement("img");
                             img.style.position = "absolute";
                             img.style.top = "-9999em";
                             img.style.left = "-9999em";
@@ -792,10 +869,10 @@ var Raphael = (function () {
                                 el.setAttribute("height", this.offsetHeight);
                                 ig.setAttribute("width", this.offsetWidth);
                                 ig.setAttribute("height", this.offsetHeight);
-                                document.body.removeChild(this);
+                                doc.body.removeChild(this);
                                 paper.safari();
                             };
-                            document.body.appendChild(img);
+                            doc.body.appendChild(img);
                             img.src = isURL[1];
                             o.svg.defs.appendChild(el);
                             o.node.style.fill = "url(#" + el.id + ")";
@@ -804,11 +881,30 @@ var Raphael = (function () {
                             updatePosition(o);
                             break;
                         }
+                        delete params.gradient;
+                        delete o.attrs.gradient;
+                        if (typeof o.attrs.opacity != "undefined" && typeof params.opacity == "undefined" ) {
+                            o.node.style.opacity = o.attrs.opacity;
+                            // Need following line for Firefox
+                            o.node.setAttribute("opacity", o.attrs.opacity);
+                        }
                     case "stroke":
                         o.node.style[att] = getRGB(value).hex;
                         // Need following line for Firefox
                         o.node.setAttribute(att, getRGB(value).hex);
                         break;
+                    case "gradient":
+                        addGrdientFill(o.node, value, o.svg);
+                        break;
+                    case "opacity":
+                        if (o.attrs.gradient) {
+                            var gradient = document.getElementById(o.node.getAttribute("fill").replace(/^url\(#|\)$/g, ""));
+                            if (gradient) {
+                                var stops = gradient.getElementsByTagName("stop");
+                                stops[stops.length - 1].setAttribute("stop-opacity", value);
+                            }
+                            break;
+                        }
                     default :
                         var cssrule = att.replace(/(\-.)/g, function (w) {
                             return w.substring(1).toUpperCase();
@@ -950,7 +1046,7 @@ var Raphael = (function () {
             return this;
         };
         var theCircle = function (svg, x, y, r) {
-            var el = document.createElementNS(svg.svgns, "circle");
+            var el = doc.createElementNS(svg.svgns, "circle");
             el.setAttribute("cx", x);
             el.setAttribute("cy", y);
             el.setAttribute("r", r);
@@ -969,7 +1065,7 @@ var Raphael = (function () {
             return res;
         };
         var theRect = function (svg, x, y, w, h, r) {
-            var el = document.createElementNS(svg.svgns, "rect");
+            var el = doc.createElementNS(svg.svgns, "rect");
             el.setAttribute("x", x);
             el.setAttribute("y", y);
             el.setAttribute("width", w);
@@ -997,7 +1093,7 @@ var Raphael = (function () {
             return res;
         };
         var theEllipse = function (svg, x, y, rx, ry) {
-            var el = document.createElementNS(svg.svgns, "ellipse");
+            var el = doc.createElementNS(svg.svgns, "ellipse");
             el.setAttribute("cx", x);
             el.setAttribute("cy", y);
             el.setAttribute("rx", rx);
@@ -1018,7 +1114,7 @@ var Raphael = (function () {
             return res;
         };
         var theImage = function (svg, src, x, y, w, h) {
-            var el = document.createElementNS(svg.svgns, "image");
+            var el = doc.createElementNS(svg.svgns, "image");
             el.setAttribute("x", x);
             el.setAttribute("y", y);
             el.setAttribute("width", w);
@@ -1038,12 +1134,12 @@ var Raphael = (function () {
             return res;
         };
         var theText = function (svg, x, y, text) {
-            var el = document.createElementNS(svg.svgns, "text");
+            var el = doc.createElementNS(svg.svgns, "text");
             el.setAttribute("x", x);
             el.setAttribute("y", y);
             el.setAttribute("text-anchor", "middle");
             if (text) {
-                el.appendChild(document.createTextNode(text));
+                el.appendChild(doc.createTextNode(text));
             }
             if (svg.canvas) {
                 svg.canvas.appendChild(el);
@@ -1057,7 +1153,7 @@ var Raphael = (function () {
             return res;
         };
         var theGroup = function (svg) {
-            var el = document.createElementNS(svg.svgns, "g");
+            var el = doc.createElementNS(svg.svgns, "g");
             if (svg.canvas) {
                 svg.canvas.appendChild(el);
             }
@@ -1076,11 +1172,18 @@ var Raphael = (function () {
             i.type = "group";
             return i;
         };
+        var setSize = function (width, height) {
+            this.width = width || this.width;
+            this.height = height || this.height;
+            this.canvas.setAttribute("width", this.width);
+            this.canvas.setAttribute("height", this.height);
+            return this;
+        };
         create = function () {
             // container, width, height
             // x, y, width, height
             if (typeof arguments[0] == "string") {
-                var container = document.getElementById(arguments[0]);
+                var container = doc.getElementById(arguments[0]);
                 var width = arguments[1];
                 var height = arguments[2];
             }
@@ -1099,13 +1202,13 @@ var Raphael = (function () {
             if (!container) {
                 throw new Error("SVG container not found.");
             }
-            paper.canvas = document.createElementNS(paper.svgns, "svg");
+            paper.canvas = doc.createElementNS(paper.svgns, "svg");
             paper.canvas.setAttribute("width", width || 320);
             paper.width = width || 320;
             paper.canvas.setAttribute("height", height || 200);
             paper.height = height || 200;
             if (container == 1) {
-                document.body.appendChild(paper.canvas);
+                doc.body.appendChild(paper.canvas);
                 paper.canvas.style.position = "absolute";
                 paper.canvas.style.left = x + "px";
                 paper.canvas.style.top = y + "px";
@@ -1122,7 +1225,7 @@ var Raphael = (function () {
                     while (this.canvas.firstChild) {
                         this.canvas.removeChild(this.canvas.firstChild);
                     }
-                    this.defs = document.createElementNS(paper.svgns, "defs");
+                    this.defs = doc.createElementNS(paper.svgns, "defs");
                     this.canvas.appendChild(this.defs);
                 }
             };
@@ -1155,13 +1258,13 @@ var Raphael = (function () {
     // VML
     if (R.vml) {
         thePath = function (params, pathString, VML) {
-            var g = document.createElement("rvml:group"), gl = g.style;
+            var g = doc.createElement("rvml:group"), gl = g.style;
             gl.position = "absolute";
             gl.left = 0;
             gl.top = 0;
             gl.width = VML.width + "px";
             gl.height = VML.height + "px";
-            var el = document.createElement("rvml:shape"), ol = el.style;
+            var el = doc.createElement("rvml:shape"), ol = el.style;
             ol.width = VML.width + "px";
             ol.height = VML.height + "px";
             el.path = "";
@@ -1420,16 +1523,16 @@ var Raphael = (function () {
             params["font-size"] && (s.fontSize = params["font-size"]);
             params["font-weight"] && (s.fontWeight = params["font-weight"]);
             params["font-style"] && (s.fontStyle = params["font-style"]);
-            if (typeof params.opacity != "undefined" || typeof params["stroke-width"] != "undefined" || typeof params.fill != "undefined" || typeof params.stroke != "undefined") {
+            if (typeof params.opacity != "undefined" || typeof params["stroke-width"] != "undefined" || typeof params.fill != "undefined" || typeof params.stroke != "undefined" || params["stroke-width"] || params["stroke-opacity"] || params["stroke-dasharray"] || params["stroke-miterlimit"] || params["stroke-linejoin"] || params["stroke-linecap"]) {
                 o = o.shape || o.node;
-                var fill = (o.getElementsByTagName("fill") && o.getElementsByTagName("fill")[0]) || document.createElement("rvml:fill");
+                var fill = (o.getElementsByTagName("fill") && o.getElementsByTagName("fill")[0]) || doc.createElement("rvml:fill");
                 if ("fill-opacity" in params || "opacity" in params) {
                     fill.opacity = ((params["fill-opacity"] + 1 || 2) - 1) * ((params.opacity + 1 || 2) - 1);
                 }
                 if (params.fill) {
                     fill.on = true;
                 }
-                if (fill.on == undefined || params.fill == "none") {
+                if (typeof fill.on == "undefined" || params.fill == "none") {
                     fill.on = false;
                 }
                 if (fill.on && params.fill) {
@@ -1444,11 +1547,11 @@ var Raphael = (function () {
                     }
                 }
                 o.appendChild(fill);
-                var stroke = (o.getElementsByTagName("stroke") && o.getElementsByTagName("stroke")[0]) || document.createElement("rvml:stroke");
-                if ((params.stroke && params.stroke != "none") || params["stroke-width"] || params["stroke-opacity"] || params["stroke-dasharray"]) {
+                var stroke = (o.getElementsByTagName("stroke") && o.getElementsByTagName("stroke")[0]) || doc.createElement("rvml:stroke");
+                if ((params.stroke && params.stroke != "none") || params["stroke-width"] || typeof params["stroke-opacity"] != "undefined" || params["stroke-dasharray"] || params["stroke-miterlimit"] || params["stroke-linejoin"] || params["stroke-linecap"]) {
                     stroke.on = true;
                 }
-                if (params.stroke == "none" || typeof stroke.on == "undefined") {
+                if (params.stroke == "none" || typeof stroke.on == "undefined" || params.stroke == 0) {
                     stroke.on = false;
                 }
                 if (stroke.on && params.stroke) {
@@ -1477,7 +1580,7 @@ var Raphael = (function () {
                 o.appendChild(stroke);
             }
             if (res.type == "text") {
-                var span = document.createElement("span"),
+                var span = doc.createElement("span"),
                     s = span.style;
                 res.attrs.font && (s.font = res.attrs.font);
                 res.attrs["font-family"] && (s.fontFamily = res.attrs["font-family"]);
@@ -1505,6 +1608,7 @@ var Raphael = (function () {
             return angle;
         };
         var addGrdientFill = function (o, gradient) {
+            gradient = toGradient(gradient);
             o.attrs = o.attrs || {};
             o.attrs.gradient = gradient;
             o = o.shape || o[0];
@@ -1512,12 +1616,12 @@ var Raphael = (function () {
             if (fill.length) {
                 fill = fill[0];
             } else {
-                fill = document.createElement("rvml:fill");
+                fill = doc.createElement("rvml:fill");
             }
             if (gradient.dots.length) {
                 fill.on = true;
                 fill.method = "none";
-                fill.type = (gradient.type.toLowerCase() == "linear") ? "gradient" : "gradientTitle";
+                fill.type = ((gradient.type + "").toLowerCase() == "radial") ? "gradientTitle" : "gradient";
                 if (typeof gradient.dots[0].color != "undefined") {
                     fill.color = getRGB(gradient.dots[0].color).hex;
                 }
@@ -1530,20 +1634,20 @@ var Raphael = (function () {
                         colors.push(gradient.dots[i].offset + " " + getRGB(gradient.dots[i].color).hex);
                     }
                 };
-                var fillOpacity = typeof gradient.dots[0].opacity == "undefined" ? 1 : gradient.dots[0].opacity;
-                var fillOpacity2 = typeof gradient.dots[gradient.dots.length - 1].opacity == "undefined" ? 1 : gradient.dots[gradient.dots.length - 1].opacity;
-                if (colors) {
+                var fillOpacity = typeof gradient.dots[gradient.dots.length - 1].opacity == "undefined" ? 1 : gradient.dots[gradient.dots.length - 1].opacity;
+                if (colors.length) {
                     fill.colors.value = colors.join(",");
-                    fillOpacity2 += fillOpacity;
-                    fillOpacity = fillOpacity2 - fillOpacity;
-                    fillOpacity2 -= fillOpacity;
+                    fillOpacity = 1;
+                } else {
+                    fill.colors.value = "0% " + fill.color;
                 }
-                fill.setAttribute("opacity", fillOpacity);
-                fill.setAttribute("opacity2", fillOpacity2);
-                if (gradient.vector) {
+                fill.opacity = fillOpacity;
+                if (typeof gradient.angle != "undefined") {
+                    fill.angle = (-gradient.angle + 270) % 360;
+                } else if (gradient.vector) {
                     fill.angle = getAngle.apply(null, gradient.vector);
                 }
-                if (gradient.type.toLowerCase() == "radial") {
+                if ((gradient.type + "").toLowerCase() == "radial") {
                     fill.focus = "100%";
                     fill.focusposition = "0.5 0.5";
                 }
@@ -1774,8 +1878,8 @@ var Raphael = (function () {
             return this;
         };
         var theCircle = function (vml, x, y, r) {
-            var g = document.createElement("rvml:group");
-            var o = document.createElement("rvml:oval");
+            var g = doc.createElement("rvml:group");
+            var o = doc.createElement("rvml:oval");
             g.appendChild(o);
             vml.canvas.appendChild(g);
             var res = new Element(o, g, vml);
@@ -1788,8 +1892,8 @@ var Raphael = (function () {
             return res;
         };
         var theRect = function (vml, x, y, w, h, r) {
-            var g = document.createElement("rvml:group");
-            var o = document.createElement(r ? "rvml:roundrect" : "rvml:rect");
+            var g = doc.createElement("rvml:group");
+            var o = doc.createElement(r ? "rvml:roundrect" : "rvml:rect");
             if (r) {
                 o.arcsize = r / (Math.min(w, h));
             }
@@ -1807,8 +1911,8 @@ var Raphael = (function () {
             return res;
         };
         var theEllipse = function (vml, x, y, rx, ry) {
-            var g = document.createElement("rvml:group");
-            var o = document.createElement("rvml:oval");
+            var g = doc.createElement("rvml:group");
+            var o = doc.createElement("rvml:oval");
             g.appendChild(o);
             vml.canvas.appendChild(g);
             var res = new Element(o, g, vml);
@@ -1822,8 +1926,8 @@ var Raphael = (function () {
             return res;
         };
         var theImage = function (vml, src, x, y, w, h) {
-            var g = document.createElement("rvml:group");
-            var o = document.createElement("rvml:image");
+            var g = doc.createElement("rvml:group");
+            var o = doc.createElement("rvml:image");
             o.src = src;
             g.appendChild(o);
             vml.canvas.appendChild(g);
@@ -1837,9 +1941,9 @@ var Raphael = (function () {
             return res;
         };
         var theText = function (vml, x, y, text) {
-            var g = document.createElement("rvml:group"), gs = g.style;
-            var el = document.createElement("rvml:shape"), ol = el.style;
-            var path = document.createElement("rvml:path"), ps = path.style;
+            var g = doc.createElement("rvml:group"), gs = g.style;
+            var el = doc.createElement("rvml:shape"), ol = el.style;
+            var path = doc.createElement("rvml:path"), ps = path.style;
             path.v = ["m", Math.round(x), ", ", Math.round(y - 2), "l", Math.round(x) + 1, ", ", Math.round(y - 2)].join("");
             path.textpathok = true;
             ol.width = vml.width;
@@ -1849,7 +1953,7 @@ var Raphael = (function () {
             gs.top = 0;
             gs.width = vml.width;
             gs.height = vml.height;
-            var o = document.createElement("rvml:textpath");
+            var o = doc.createElement("rvml:textpath");
             o.string = text;
             o.on = true;
             o.coordsize = vml.coordsize;
@@ -1869,12 +1973,21 @@ var Raphael = (function () {
             setFillAndStroke(res, {font: '10px "Arial"', stroke: "none", fill: "#000"});
             return res;
         };
+        var setSize = function (width, height) {
+            this.width = width || this.width;
+            this.height = height || this.height;
+            this.canvas.style.width = this.width + "px";
+            this.canvas.style.height = this.height + "px";
+            this.canvas.parentNode.style.clip = "rect(0 " + this.width + " " + this.height + " 0)";
+            this.canvas.coordsize = this.width + " " + this.height;
+            return this;
+        };
         create = function () {
             // container, width, height
             // x, y, width, height
             var container, width, height;
             if (typeof arguments[0] == "string") {
-                container = document.getElementById(arguments[0]);
+                container = doc.getElementById(arguments[0]);
                 width = arguments[1];
                 height = arguments[2];
             }
@@ -1893,13 +2006,13 @@ var Raphael = (function () {
             if (!container) {
                 throw new Error("VML container not found.");
             }
-            if (!document.namespaces["rvml"]) {
-                document.namespaces.add("rvml","urn:schemas-microsoft-com:vml");
-                document.createStyleSheet().addRule("rvml\\:*", "behavior:url(#default#VML)");
+            if (!doc.namespaces["rvml"]) {
+                doc.namespaces.add("rvml","urn:schemas-microsoft-com:vml");
+                doc.createStyleSheet().addRule("rvml\\:*", "behavior:url(#default#VML)");
             }
-            var c = document.createElement("div"),
-                d = document.createElement("div"),
-                r = paper.canvas = document.createElement("rvml:group"),
+            var c = doc.createElement("div"),
+                d = doc.createElement("div"),
+                r = paper.canvas = doc.createElement("rvml:group"),
                 cs = c.style, rs = r.style;
             paper.width = width;
             paper.height = height;
@@ -1916,7 +2029,7 @@ var Raphael = (function () {
             r.coordsize = (/%$/.test(width) ? width : parseFloat(width, 10)) + " " + (/%$/.test(height) ? height : parseFloat(height, 10));
             r.coordorigin = "0 0";
 
-            var b = document.createElement("rvml:rect"), bs = b.style;
+            var b = doc.createElement("rvml:rect"), bs = b.style;
             bs.left = bs.top = 0;
             bs.width  = rs.width;
             bs.height = rs.height;
@@ -1926,7 +2039,7 @@ var Raphael = (function () {
             c.appendChild(r);
             d.appendChild(c);
             if (container == 1) {
-                document.body.appendChild(d);
+                doc.body.appendChild(d);
                 cs.position = "absolute";
                 cs.left = x + "px";
                 cs.top = y + "px";
@@ -1978,16 +2091,16 @@ var Raphael = (function () {
 
     // Events
     var addEvent = (function () {
-        if (document.addEventListener) {
+        if (doc.addEventListener) {
             return function (obj, type, fn, element) {
                 obj.addEventListener(type, function (e) {
                     return fn.call(element, e);
                 }, false);
             };
-        } else if (document.attachEvent) {
+        } else if (doc.attachEvent) {
             return function (obj, type, fn, element) {
                 obj.attachEvent("on" + type, function (e) {
-                    return fn.call(element, e || window.event);
+                    return fn.call(element, e || win.event);
                 });
             };
         }
@@ -2079,6 +2192,7 @@ var Raphael = (function () {
     paper.set = function (itemsArray) {
         return new Set(itemsArray);
     };
+    paper.setSize = setSize;
     Element.prototype.stop = function () {
         clearTimeout(this.animation_in_progress);
     };
