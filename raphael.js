@@ -472,7 +472,7 @@ var Raphael = (function () {
     };
     var toGradient = function (gradient) {
         if (typeof gradient == "string") {
-            gradient = gradient.split(separator);
+            gradient = gradient.split(/\s*\/\s*/);
             var angle = gradient.shift();
             if (angle.toLowerCase() == "v") {
                 angle = 90;
@@ -500,13 +500,9 @@ var Raphael = (function () {
             grobj.vector[3] = grobj.vector[3].toFixed(3);
             for (var i = 0, ii = gradient.length; i < ii; i++) {
                 var dot = {};
-                if (gradient[i].indexOf(":") != -1) {
-                    var par = gradient[i].match(/^([^:]*):(\d*)/);
-                    dot.color = getRGB(par[1]).hex;
-                    dot.offset = par[2] + "%";
-                } else {
-                    dot.color = getRGB(gradient[i]).hex;
-                }
+                var par = gradient[i].match(/^([^:]*):?([\d\.]*)/);
+                dot.color = getRGB(par[1]).hex;
+                par[2] && (dot.offset = par[2] + "%");
                 grobj.dots.push(dot);
             }
             for (var i = 1, ii = grobj.dots.length - 1; i < ii; i++) {
@@ -752,7 +748,9 @@ var Raphael = (function () {
             }
             o.setAttribute("fill", "url(#" + el.id + ")");
             o.style.opacity = 1;
+            o.style.fillOpacity = 1;
             o.setAttribute("opacity", 1);
+            o.setAttribute("fill-opacity", 1);
         };
         var updatePosition = function (o) {
             if (o.pattern) {
@@ -888,6 +886,11 @@ var Raphael = (function () {
                             // Need following line for Firefox
                             o.node.setAttribute("opacity", o.attrs.opacity);
                         }
+                        if (typeof o.attrs["fill-opacity"] != "undefined" && typeof params["fill-opacity"] == "undefined" ) {
+                            o.node.style.fillOpacity = o.attrs["fill-opacity"];
+                            // Need following line for Firefox
+                            o.node.setAttribute("fill-opacity", o.attrs["fill-opacity"]);
+                        }
                     case "stroke":
                         o.node.style[att] = getRGB(value).hex;
                         // Need following line for Firefox
@@ -897,6 +900,7 @@ var Raphael = (function () {
                         addGrdientFill(o.node, value, o.svg);
                         break;
                     case "opacity":
+                    case "fill-opacity":
                         if (o.attrs.gradient) {
                             var gradient = document.getElementById(o.node.getAttribute("fill").replace(/^url\(#|\)$/g, ""));
                             if (gradient) {
@@ -1610,6 +1614,7 @@ var Raphael = (function () {
         var addGrdientFill = function (o, gradient) {
             gradient = toGradient(gradient);
             o.attrs = o.attrs || {};
+            var attrs = o.attrs;
             o.attrs.gradient = gradient;
             o = o.shape || o[0];
             var fill = o.getElementsByTagName("fill");
@@ -1634,10 +1639,10 @@ var Raphael = (function () {
                         colors.push(gradient.dots[i].offset + " " + getRGB(gradient.dots[i].color).hex);
                     }
                 };
-                var fillOpacity = typeof gradient.dots[gradient.dots.length - 1].opacity == "undefined" ? 1 : gradient.dots[gradient.dots.length - 1].opacity;
+                var fillOpacity = typeof gradient.dots[gradient.dots.length - 1].opacity == "undefined" ? (typeof attrs.opacity == "undefined" ? 1 : attrs.opacity) : gradient.dots[gradient.dots.length - 1].opacity;
                 if (colors.length) {
                     fill.colors.value = colors.join(",");
-                    fillOpacity = 1;
+                    fillOpacity = typeof attrs.opacity == "undefined" ? 1 : attrs.opacity;
                 } else {
                     fill.colors.value = "0% " + fill.color;
                 }
