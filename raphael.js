@@ -472,7 +472,7 @@ var Raphael = (function () {
     };
     var toGradient = function (gradient) {
         if (typeof gradient == "string") {
-            gradient = gradient.split(/\s*\/\s*/);
+            gradient = gradient.split(/\s*\-\s*/);
             var angle = gradient.shift();
             if (angle.toLowerCase() == "v") {
                 angle = 90;
@@ -827,12 +827,6 @@ var Raphael = (function () {
                     case "stroke-dasharray":
                         addDashes(o, value);
                         break;
-                    // case "text":
-                    //     if (o.type == "text") {
-                    //         o.node.childNodes.length && o.node.removeChild(o.node.firstChild);
-                    //         o.node.appendChild(doc.createTextNode(value));
-                    //     }
-                    //     break;
                     case "rotation":
                         o.rotate(value, true);
                         break;
