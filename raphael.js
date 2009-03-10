@@ -827,12 +827,12 @@ var Raphael = (function () {
                     case "stroke-dasharray":
                         addDashes(o, value);
                         break;
-                    case "text":
-                        if (o.type == "text") {
-                            o.node.childNodes.length && o.node.removeChild(o.node.firstChild);
-                            o.node.appendChild(doc.createTextNode(value));
-                        }
-                        break;
+                    // case "text":
+                    //     if (o.type == "text") {
+                    //         o.node.childNodes.length && o.node.removeChild(o.node.firstChild);
+                    //         o.node.appendChild(doc.createTextNode(value));
+                    //     }
+                    //     break;
                     case "rotation":
                         o.rotate(value, true);
                         break;
@@ -919,6 +919,7 @@ var Raphael = (function () {
                         break;
                 }
             }
+            tuneText(o, params);
         };
         var Element = function (node, svg) {
             var X = 0,
@@ -950,7 +951,7 @@ var Raphael = (function () {
                 case "rect":
                 case "image":
                 case "text":
-                    this.attr({x: this.attrs.x + x, y: this.attrs.y + y});
+                    this.attr({x: this.attrs.x + +x, y: this.attrs.y + +y});
                     break;
                 case "path":
                     var path = pathToRelative(this.attrs.path);
@@ -1137,14 +1138,47 @@ var Raphael = (function () {
             res.type = "image";
             return res;
         };
+        var leading = 1.2;
+        var tuneText = function (element, params) {
+            if (element.type != "text") {
+                return;
+            }
+            var fontSize = element.node.firstChild ? parseInt(doc.defaultView.getComputedStyle(element.node.firstChild, "").getPropertyValue("font-size"), 10) : 10;
+            var height = 0;
+            
+            if ("text" in params) {
+                while (element.node.firstChild) {
+                    element.node.removeChild(element.node.firstChild);
+                }
+                var texts = (params.text + "").split("\n");
+                for (var i = 0, ii = texts.length; i < ii; i++) {
+                    var tspan = doc.createElementNS(element.svg.svgns, "tspan");
+                    i && tspan.setAttribute("dy", fontSize * leading);
+                    tspan.setAttribute("x", element.attrs.x);
+                    tspan.appendChild(doc.createTextNode(texts[i]));
+                    element.node.appendChild(tspan);
+                    height += fontSize * leading;
+                }
+            } else if ("font" in params || "font-size" in params) {
+                var texts = element.node.getElementsByTagName("tspan");
+                for (var i = 0, ii = texts.length; i < ii; i++) {
+                    i && texts[i].setAttribute("dy", fontSize * leading);
+                    height += fontSize * leading;
+                }
+            }
+            height -= fontSize * (leading - 1);
+            var dif = height / 2 - fontSize;
+            if (dif) {
+                element.node.setAttribute("y", element.attrs.y - dif);
+            }
+            setTimeout(function () {
+            });
+        };
         var theText = function (svg, x, y, text) {
             var el = doc.createElementNS(svg.svgns, "text");
             el.setAttribute("x", x);
             el.setAttribute("y", y);
             el.setAttribute("text-anchor", "middle");
-            if (text) {
-                el.appendChild(doc.createTextNode(text));
-            }
             if (svg.canvas) {
                 svg.canvas.appendChild(el);
             }
@@ -1153,7 +1187,7 @@ var Raphael = (function () {
             res.attrs.x = x;
             res.attrs.y = y;
             res.type = "text";
-            setFillAndStroke(res, {font: '10px "Arial"', stroke: "none", fill: "#000"});
+            setFillAndStroke(res, {font: '10px "Arial"', stroke: "none", fill: "#000", text: text});
             return res;
         };
         var theGroup = function (svg) {
