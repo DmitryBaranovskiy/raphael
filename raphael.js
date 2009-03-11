@@ -1,5 +1,5 @@
 /*
- * Raphael 0.7.dev - JavaScript Vector Library
+ * Raphael 0.7 - JavaScript Vector Library
  *
  * Copyright (c) 2008 – 2009 Dmitry Baranovskiy (http://raphaeljs.com)
  * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
@@ -14,13 +14,13 @@ var Raphael = (function () {
         R = function () {
             return create.apply(R, arguments);
         };
-    R.version = "0.7.dev";
+    R.version = "0.7";
     R.type = (win.SVGAngle ? "SVG" : "VML");
     R.svg = !(R.vml = R.type == "VML");
     R.idGenerator = 0;
     var paper = {};
     R.fn = {};
-    var availableAttrs = {cx: 0, cy: 0, fill: "#fff", "fill-opacity": 1, font: '16px "Arial"', "font-family": '"Arial"', "font-size": "16", gradient: 0, height: 0, opacity: 1, path: "M0,0", r: 0, rotation: 0, rx: 0, ry: 0, scale: "1 1", src: "", stroke: "#000", "stroke-dasharray": "", "stroke-linecap": "butt", "stroke-linejoin": "butt", "stroke-miterlimit": 0, "stroke-opacity": 1, "stroke-width": 1, translation: "0 0", width: 0, x: 0, y: 0},
+    var availableAttrs = {cx: 0, cy: 0, fill: "#fff", "fill-opacity": 1, font: '10px "Arial"', "font-family": '"Arial"', "font-size": "10", gradient: 0, height: 0, opacity: 1, path: "M0,0", r: 0, rotation: 0, rx: 0, ry: 0, scale: "1 1", src: "", stroke: "#000", "stroke-dasharray": "", "stroke-linecap": "butt", "stroke-linejoin": "butt", "stroke-miterlimit": 0, "stroke-opacity": 1, "stroke-width": 1, translation: "0 0", width: 0, x: 0, y: 0},
         availableAnimAttrs = {cx: "number", cy: "number", fill: "colour", "fill-opacity": "number", "font-size": "number", height: "number", opacity: "number", path: "path", r: "number", rotation: "csv", rx: "number", ry: "number", scale: "csv", stroke: "colour", "stroke-opacity": "number", "stroke-width": "number", translation: "csv", width: "number", x: "number", y: "number"};
 
     R.toString = function () {
@@ -309,7 +309,7 @@ var Raphael = (function () {
             switch (res[i][0]) {
                 case "z":
                     break;
-                case "h": 
+                case "h":
                     x += res[i][res[i].length - 1];
                     break;
                 case "v":
@@ -365,7 +365,7 @@ var Raphael = (function () {
             switch (res[i][0]) {
                 case "Z":
                     break;
-                case "H": 
+                case "H":
                     x = res[i][1];
                     break;
                 case "V":
@@ -924,7 +924,7 @@ var Raphael = (function () {
             }
             var fontSize = element.node.firstChild ? parseInt(doc.defaultView.getComputedStyle(element.node.firstChild, "").getPropertyValue("font-size"), 10) : 10;
             var height = 0;
-            
+
             if ("text" in params) {
                 while (element.node.firstChild) {
                     element.node.removeChild(element.node.firstChild);
@@ -1184,7 +1184,7 @@ var Raphael = (function () {
             res.attrs.x = x;
             res.attrs.y = y;
             res.type = "text";
-            setFillAndStroke(res, {font: '10px "Arial"', stroke: "none", fill: "#000", text: text});
+            setFillAndStroke(res, {font: availableAttrs.font, stroke: "none", fill: "#000", text: text});
             return res;
         };
         var theGroup = function (svg) {
@@ -1743,7 +1743,7 @@ var Raphael = (function () {
             cy = cy || this._.rt.cy;
             var attr = this.attrs, x, y, w, h;
             switch (this.type) {
-                case "circle": 
+                case "circle":
                     x = attr.cx - attr.r;
                     y = attr.cy - attr.r;
                     w = h = attr.r * 2;
@@ -2006,7 +2006,7 @@ var Raphael = (function () {
             res.attrs.y = y;
             res.attrs.w = 1;
             res.attrs.h = 1;
-            setFillAndStroke(res, {font: '10px "Arial"', stroke: "none", fill: "#000"});
+            setFillAndStroke(res, {font: availableAttrs.font, stroke: "none", fill: "#000"});
             return res;
         };
         var setSize = function (width, height) {
@@ -2129,20 +2129,39 @@ var Raphael = (function () {
     var addEvent = (function () {
         if (doc.addEventListener) {
             return function (obj, type, fn, element) {
-                obj.addEventListener(type, function (e) {
+                var f = function (e) {
                     return fn.call(element, e);
-                }, false);
+                };
+                obj.addEventListener(type, f, false);
+                return function () {
+                    obj.removeEventListener(type, f, false);
+                    return true;
+                };
             };
         } else if (doc.attachEvent) {
             return function (obj, type, fn, element) {
-                obj.attachEvent("on" + type, function (e) {
+                var f = function (e) {
                     return fn.call(element, e || win.event);
-                });
-                // if (type == "mouseout") {
-                //     obj.attachEvent("onmouseleave", function (e) {
-                //         return fn.call(element, e || win.event);
-                //     });
-                // }
+                };
+                obj.attachEvent("on" + type, f);
+                var detacher = function () {
+                    obj.detachEvent("on" + type, f);
+                    return true;
+                };
+                if (type == "mouseover") {
+                    obj.attachEvent("onmouseenter", f);
+                    return function () {
+                        obj.detachEvent("onmouseenter", f);
+                        return detacher();
+                    };
+                } else if (type == "mouseout") {
+                    obj.attachEvent("onmouseleave", f);
+                    return function () {
+                        obj.detachEvent("onmouseleave", f);
+                        return detacher();
+                    };
+                }
+                return detacher;
             };
         }
     })();
@@ -2150,9 +2169,24 @@ var Raphael = (function () {
     for (var i = events.length; i--;) {
         (function (eventName) {
             Element.prototype[eventName] = function (fn) {
-                (typeof fn == "function") && addEvent(this.node, eventName, fn, this);
+                if (typeof fn == "function") {
+                    this.events = this.events || {};
+                    this.events[eventName] = this.events[eventName] || {};
+                    this.events[eventName][fn] = this.events[eventName][fn] || [];
+                    this.events[eventName][fn].push(addEvent(this.node, eventName, fn, this));
+                }
                 return this;
             };
+            Element.prototype["un" + eventName] = function (fn) {
+                this.events &&
+                this.events[eventName] &&
+                this.events[eventName][fn] &&
+                this.events[eventName][fn].length &&
+                this.events[eventName][fn].shift()() &&
+                !this.events[eventName][fn].length &&
+                delete this.events[eventName][fn];
+            };
+
         })(events[i]);
     }
     paper.circle = function (x, y, r) {
@@ -2295,7 +2329,7 @@ var Raphael = (function () {
                     });
                     break;
                 case "path":
-                    var path = pathToRelative(Raphael.parsePathString(this.attr("path"))), 
+                    var path = pathToRelative(Raphael.parsePathString(this.attr("path"))),
                         skip = true,
                         dim = pathDimensions(this.attrs.path),
                         dx = -dim.width * (x - 1) / 2,
@@ -2321,7 +2355,7 @@ var Raphael = (function () {
                     path = pathToRelative(path);
                     path[0][1] += dx;
                     path[0][2] += dy;
-                    
+
                     this.attr({path: path.join(" ")});
             }
         }
