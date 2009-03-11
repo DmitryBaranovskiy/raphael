@@ -328,7 +328,9 @@ var Raphael = (function () {
         if (typeof pathArray == "string") {
             pathArray = R.parsePathString(pathArray);
         }
-        var x = 0, y = 0, start = 0;
+        var x = 0,
+            y = 0,
+            start = 0;
         if (pathArray[0][0] == "M") {
             x = +pathArray[0][1];
             y = +pathArray[0][2];
@@ -337,8 +339,8 @@ var Raphael = (function () {
         }
         for (var i = start, ii = pathArray.length; i < ii; i++) {
             res[i] = [];
-            if (pathArray[i][0] != pathArray[i][0].toUpperCase()) {
-                res[i][0] = pathArray[i][0].toUpperCase();
+            if (pathArray[i][0] != (pathArray[i][0] + "").toUpperCase()) {
+                res[i][0] = (pathArray[i][0] + "").toUpperCase();
                 switch (res[i][0]) {
                     case "A":
                         res[i][1] = pathArray[i][1];
@@ -915,6 +917,43 @@ var Raphael = (function () {
             }
             tuneText(o, params);
         };
+        var leading = 1.2;
+        var tuneText = function (element, params) {
+            if (element.type != "text" || !("text" in params || "font" in params || "font-size" in params || "x" in params)) {
+                return;
+            }
+            var fontSize = element.node.firstChild ? parseInt(doc.defaultView.getComputedStyle(element.node.firstChild, "").getPropertyValue("font-size"), 10) : 10;
+            var height = 0;
+            
+            if ("text" in params) {
+                while (element.node.firstChild) {
+                    element.node.removeChild(element.node.firstChild);
+                }
+                var texts = (params.text + "").split("\n");
+                for (var i = 0, ii = texts.length; i < ii; i++) {
+                    var tspan = doc.createElementNS(element.svg.svgns, "tspan");
+                    i && tspan.setAttribute("dy", fontSize * leading);
+                    i && tspan.setAttribute("x", element.attrs.x);
+                    tspan.appendChild(doc.createTextNode(texts[i]));
+                    element.node.appendChild(tspan);
+                    height += fontSize * leading;
+                }
+            } else {
+                var texts = element.node.getElementsByTagName("tspan");
+                for (var i = 0, ii = texts.length; i < ii; i++) {
+                    i && texts[i].setAttribute("dy", fontSize * leading);
+                    i && texts[i].setAttribute("x", element.attrs.x);
+                    height += fontSize * leading;
+                }
+            }
+            height -= fontSize * (leading - 1);
+            var dif = height / 2 - fontSize;
+            if (dif) {
+                element.node.setAttribute("y", element.attrs.y - dif);
+            }
+            setTimeout(function () {
+            });
+        };
         var Element = function (node, svg) {
             var X = 0,
                 Y = 0;
@@ -1131,42 +1170,6 @@ var Raphael = (function () {
             res.attrs.height = h;
             res.type = "image";
             return res;
-        };
-        var leading = 1.2;
-        var tuneText = function (element, params) {
-            if (element.type != "text") {
-                return;
-            }
-            var fontSize = element.node.firstChild ? parseInt(doc.defaultView.getComputedStyle(element.node.firstChild, "").getPropertyValue("font-size"), 10) : 10;
-            var height = 0;
-            
-            if ("text" in params) {
-                while (element.node.firstChild) {
-                    element.node.removeChild(element.node.firstChild);
-                }
-                var texts = (params.text + "").split("\n");
-                for (var i = 0, ii = texts.length; i < ii; i++) {
-                    var tspan = doc.createElementNS(element.svg.svgns, "tspan");
-                    i && tspan.setAttribute("dy", fontSize * leading);
-                    tspan.setAttribute("x", element.attrs.x);
-                    tspan.appendChild(doc.createTextNode(texts[i]));
-                    element.node.appendChild(tspan);
-                    height += fontSize * leading;
-                }
-            } else if ("font" in params || "font-size" in params) {
-                var texts = element.node.getElementsByTagName("tspan");
-                for (var i = 0, ii = texts.length; i < ii; i++) {
-                    i && texts[i].setAttribute("dy", fontSize * leading);
-                    height += fontSize * leading;
-                }
-            }
-            height -= fontSize * (leading - 1);
-            var dif = height / 2 - fontSize;
-            if (dif) {
-                element.node.setAttribute("y", element.attrs.y - dif);
-            }
-            setTimeout(function () {
-            });
         };
         var theText = function (svg, x, y, text) {
             var el = doc.createElementNS(svg.svgns, "text");
@@ -2135,6 +2138,11 @@ var Raphael = (function () {
                 obj.attachEvent("on" + type, function (e) {
                     return fn.call(element, e || win.event);
                 });
+                // if (type == "mouseout") {
+                //     obj.attachEvent("onmouseleave", function (e) {
+                //         return fn.call(element, e || win.event);
+                //     });
+                // }
             };
         }
     })();
