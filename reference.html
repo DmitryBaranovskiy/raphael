@@ -105,6 +105,12 @@ c.show();</code></pre>
                             <li>degree <em>number</em> Degree of rotation (0 – 360°)</li>
                             <li>isAbsolute <em>boolean</em> [optional] Specifies is degree is relative to previous position (<code>false</code>) or is it absolute angle (<code>true</code>)</li>
                         </ol>
+                        <p>or</p>
+                        <ol>
+                            <li>degree <em>number</em> Degree of rotation (0 – 360°)</li>
+                            <li>cx <em>number</em> [optional] X coordinate of the origin of rotation</li>
+                            <li>cY <em>number</em> [optional] Y coordinate of the origin of rotation</li>
+                        </ol>
                         <h4>Usage</h4>
                         <pre class="javascript code"><code>var c = paper.circle(10, 10, 10);
 c.rotate(45);        // rotation is relative
@@ -172,7 +178,7 @@ c.scale(.5, .75);  // makes the circle half as wide, and 75% as high</code></pre
                             <li>font-family <em>string</em></li>
                             <li>font-size <em>number</em></li>
                             <li>font-weight <em>string</em></li>
-                            <li>gradient <em>object</em></li>
+                            <li>gradient <em>object|string</em> "‹angle›-‹colour›[-‹colour›[:‹offset›]]*-‹colour›"</li>
                             <li>height <em>number</em></li>
                             <li>opacity <em>number</em></li>
                             <li>path <em>pathString</em></li>
@@ -181,6 +187,7 @@ c.scale(.5, .75);  // makes the circle half as wide, and 75% as high</code></pre
                             <li>rx <em>number</em></li>
                             <li>ry <em>number</em></li>
                             <li>scale <em>CSV</em></li>
+                            <li>src <em>string</em> (URL)</li>
                             <li>stroke <em>colour</em></li>
                             <li>stroke-dasharray <em>string</em> [“-”, “.”, “-.”, “-..”, “. ”, “- ”, “--”, “- .”, “--.”, “--..”]</li>
                             <li>stroke-linecap <em>string</em> [“butt”, “square”, “round”, “miter”]</li>
@@ -348,11 +355,22 @@ c.attr({fill: "#000", stroke: "#f00", opacity: 0.5}); // using params object</co
                         </ol>
                         <h4>Usage</h4>
                         <pre class="javascript code"><code>var c = paper.image("apple.png", 10, 10, 100, 100);</code></pre>
+                        <h3 id="set">
+                            set
+                        </h3>
+                        <p>
+                            Creates array-like object to keep and operate couple of elements at once. Warning: it doesn’t create any elements for itself in the page.
+                        </p>
+                        <h4>Usage</h4>
+                        <pre class="javascript code"><code>var st = paper.set();</code>
+<code>st.push(paper.circle(10, 10, 5));</code>
+<code>st.push(paper.circle(30, 10, 5));</code>
+<code>st.attr({fill: "red"});</code></pre>
                         <h3 id="text">
                             text
                         </h3>
                         <p>
-                            Draws a text string.
+                            Draws a text string. If you need line breaks, put “\n” in the string.
                         </p>
                         <h4>Parameters</h4>
                         <ol>
@@ -509,6 +527,27 @@ var c = paper.path({stroke: "#036"}).moveTo(10, 10).lineTo(50, 50);</code></pre>
                         </p>
                         <h4>Usage</h4>
                         <pre class="javascript code"><code>var c = paper.path({stroke: "#036"}).moveTo(10, 10).andClose();</code></pre>
+                        <h3 id="setSize">
+                            setSize
+                        </h3>
+                        <p>
+                            If you need to change dimensions of the canvas call this method
+                        </p>
+                        <h4>Parameters</h4>
+                        <ol>
+                            <li>width <em>number</em> new width of the canvas</li>
+                            <li>height <em>number</em> new height of the canvas</li>
+                        </ol>
+                        <h3 id="setWindow">
+                            setWindow
+                        </h3>
+                        <p>
+                            Should be called before main Raphael method. Sets which window should be used for drawing. Default is the current one. You need to use it if you want to draw inside <code>iframe</code>
+                        </p>
+                        <h4>Parameters</h4>
+                        <ol>
+                            <li>window <em>object</em></li>
+                        </ol>
                         <h3 id="getColor">
                             getColor
                         </h3>
@@ -537,87 +576,99 @@ var c = paper.path({stroke: "#036"}).moveTo(10, 10).lineTo(50, 50);</code></pre>
                         </h2>
                         <ul id="contents">
                             <li>
-                                <a href="reference.html#Raphael"><code>Raphael</code></a>
+                                <a href="#Raphael"><code>Raphael</code></a>
                             </li>
                             <li>
-                                <a href="reference.html#node"><code>node</code></a>
+                                <a href="#node"><code>node</code></a>
                             </li>
                             <li>
-                                <a href="reference.html#remove"><code>remove</code></a>
+                                <a href="#remove"><code>remove</code></a>
                             </li>
                             <li>
-                                <a href="reference.html#hide"><code>hide</code></a>
+                                <a href="#hide"><code>hide</code></a>
                             </li>
                             <li>
-                                <a href="reference.html#show"><code>show</code></a>
+                                <a href="#show"><code>show</code></a>
                             </li>
                             <li>
-                                <a href="reference.html#rotate"><code>rotate</code></a>
+                                <a href="#rotate"><code>rotate</code></a>
                             </li>
                             <li>
-                                <a href="reference.html#translate"><code>translate</code></a>
+                                <a href="#translate"><code>translate</code></a>
                             </li>
                             <li>
-                                <a href="reference.html#scale"><code>scale</code></a>
+                                <a href="#scale"><code>scale</code></a>
                             </li>
                             <li>
-                                <a href="reference.html#attr"><code>attr</code></a>
+                                <a href="#attr"><code>attr</code></a>
                             </li>
                             <li>
-                                <a href="reference.html#animate"><code>animate</code></a>
+                                <a href="#animate"><code>animate</code></a>
                             </li>
                             <li>
-                                <a href="reference.html#getBBox"><code>getBBox</code></a>
+                                <a href="#getBBox"><code>getBBox</code></a>
                             </li>
                             <li>
-                                <a href="reference.html#toFront"><code>toFront</code></a>
+                                <a href="#toFront"><code>toFront</code></a>
                             </li>
                             <li>
-                                <a href="reference.html#toBack"><code>toBack</code></a>
+                                <a href="#toBack"><code>toBack</code></a>
                             </li>
                             <li>
-                                <a href="reference.html#circle"><code>circle</code></a>
+                                <a href="#circle"><code>circle</code></a>
                             </li>
                             <li>
-                                <a href="reference.html#rect"><code>rect</code></a>
+                                <a href="#rect"><code>rect</code></a>
                             </li>
                             <li>
-                                <a href="reference.html#ellipse"><code>ellipse</code></a>
+                                <a href="#ellipse"><code>ellipse</code></a>
                             </li>
                             <li>
-                                <a href="reference.html#image"><code>image</code></a>
+                                <a href="#image"><code>image</code></a>
                             </li>
                             <li>
-                                <a href="reference.html#path"><code>path</code></a>
+                                <a href="#set"><code>set</code></a>
+                            </li>
+                            <li>
+                                <a href="#text"><code>text</code></a>
+                            </li>
+                            <li>
+                                <a href="#path"><code>path</code></a>
                                 <ul>
                                     <li>
-                                        <a href="reference.html#absolutely"><code>absolutely</code></a>
+                                        <a href="#absolutely"><code>absolutely</code></a>
                                     </li>
                                     <li>
-                                        <a href="reference.html#relatively"><code>relatively</code></a>
+                                        <a href="#relatively"><code>relatively</code></a>
                                     </li>
                                     <li>
-                                        <a href="reference.html#moveTo"><code>moveTo</code></a>
+                                        <a href="#moveTo"><code>moveTo</code></a>
                                     </li>
                                     <li>
-                                        <a href="reference.html#lineTo"><code>lineTo</code></a>
+                                        <a href="#lineTo"><code>lineTo</code></a>
                                     </li>
                                     <li>
-                                        <a href="reference.html#cplineTo"><code>cplineTo</code></a>
+                                        <a href="#cplineTo"><code>cplineTo</code></a>
                                     </li>
                                     <li>
-                                        <a href="reference.html#curveTo"><code>curveTo</code></a>
+                                        <a href="#curveTo"><code>curveTo</code></a>
                                     </li>
                                     <li>
-                                        <a href="reference.html#qcurveTo"><code>qcurveTo</code></a>
+                                        <a href="#qcurveTo"><code>qcurveTo</code></a>
                                     </li>
                                     <li>
-                                        <a href="reference.html#addRoundedCorner"><code>addRoundedCorner</code></a>
+                                        <a href="#addRoundedCorner"><code>addRoundedCorner</code></a>
                                     </li>
                                     <li>
-                                        <a href="reference.html#andClose"><code>andClose</code></a>
+                                        <a href="#andClose"><code>andClose</code></a>
                                     </li>
                                 </ul>
+                            </li>
+                            <li>
+                                <a href="#setSize"><code>setSize</code></a>
+                            </li>
+                            <li>
+                                <a href="#setWindow"><code>setWindow</code></a>
                             </li>
                             <li>
                                 <a href="#getColor"><code>getColor</code></a>
