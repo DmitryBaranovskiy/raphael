@@ -1,5 +1,5 @@
 /*
- * Raphael 0.7.1 - JavaScript Vector Library
+ * Raphael 0.7.2 - JavaScript Vector Library
  *
  * Copyright (c) 2008 – 2009 Dmitry Baranovskiy (http://raphaeljs.com)
  * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
@@ -14,7 +14,7 @@ var Raphael = (function () {
         R = function () {
             return create.apply(R, arguments);
         };
-    R.version = "0.7.1";
+    R.version = "0.7.2";
     R.type = (win.SVGAngle ? "SVG" : "VML");
     R.svg = !(R.vml = R.type == "VML");
     R.idGenerator = 0;
@@ -82,16 +82,11 @@ var Raphael = (function () {
             green = red.g;
             red = red.r;
         }
-        if (typeof red == "string" && red.charAt(0) == "#") {
-            if (red.length == 4) {
-                blue = parseInt(red.substring(3), 16);
-                green = parseInt(red.substring(2, 3), 16);
-                red = parseInt(red.substring(1, 2), 16);
-            } else {
-                blue = parseInt(red.substring(5), 16);
-                green = parseInt(red.substring(3, 5), 16);
-                red = parseInt(red.substring(1, 3), 16);
-            }
+        if (typeof red == "string") {
+            var clr = getRGB(red);
+            red = clr.r;
+            green = clr.g;
+            blue = clr.b;
         }
         if (red > 1 || green > 1 || blue > 1) {
             red /= 255;
@@ -218,9 +213,9 @@ var Raphael = (function () {
         if (pathString.toString.toString() == toString.toString()) {
             return pathString;
         }
-        pathString.replace(/([achlmqstvz])[\s,]*((-?\d*\.?\d*\s*,?\s*)+)/ig, function (a, b, c) {
+        pathString.replace(/([achlmqstvz])[\s,]*((-?\d*(?:e-?\d+|\.?\d*)\s*,?\s*)+)/ig, function (a, b, c) {
             var params = [], name = b.toLowerCase();
-            c.replace(/(-?\d*\.?\d*)\s*,?\s*/ig, function (a, b) {
+            c.replace(/(-?\d*(?:e-?\d+|\.?\d*))\s*,?\s*/ig, function (a, b) {
                 b && params.push(+b);
             });
             while (params.length >= paramCounts[name]) {
@@ -970,31 +965,6 @@ var Raphael = (function () {
                 sy: 1
             };
         };
-        Element.prototype.translate = function (x, y) {
-            if (x == undefined && y == undefined) {
-                return {x: this._.tx, y: this._.ty};
-            }
-            this._.tx += +x;
-            this._.ty += +y;
-            switch (this.type) {
-                case "circle":
-                case "ellipse":
-                    this.attr({cx: this.attrs.cx + x, cy: this.attrs.cy + y});
-                    break;
-                case "rect":
-                case "image":
-                case "text":
-                    this.attr({x: this.attrs.x + +x, y: this.attrs.y + +y});
-                    break;
-                case "path":
-                    var path = pathToRelative(this.attrs.path);
-                    path[0][1] += +x;
-                    path[0][2] += +y;
-                    this.attr({path: path.join(" ")});
-                break;
-            }
-            return this;
-        };
         Element.prototype.rotate = function (deg, cx, cy) {
             if (deg == null) {
                 return this._.rt.deg;
@@ -1214,7 +1184,7 @@ var Raphael = (function () {
             this.canvas.setAttribute("height", this.height);
             return this;
         };
-        create = function () {
+        var create = function () {
             // container, width, height
             // x, y, width, height
             if (typeof arguments[0] == "string") {
@@ -1293,18 +1263,18 @@ var Raphael = (function () {
     // VML
     if (R.vml) {
         thePath = function (params, pathString, VML) {
-            var g = doc.createElement("rvml:group"), gl = g.style;
+            var g = createNode("group"), gl = g.style;
             gl.position = "absolute";
             gl.left = 0;
             gl.top = 0;
             gl.width = VML.width + "px";
             gl.height = VML.height + "px";
-            var el = doc.createElement("rvml:shape"), ol = el.style;
+            var el = createNode("shape"), ol = el.style;
             ol.width = VML.width + "px";
             ol.height = VML.height + "px";
             el.path = "";
             if (params["class"]) {
-                el.className = params["class"];
+                el.className = "rvml " + params["class"];
             }
             el.coordsize = this.coordsize;
             el.coordorigin = this.coordorigin;
@@ -1560,7 +1530,7 @@ var Raphael = (function () {
             params["font-style"] && (s.fontStyle = params["font-style"]);
             if (typeof params.opacity != "undefined" || typeof params["stroke-width"] != "undefined" || typeof params.fill != "undefined" || typeof params.stroke != "undefined" || params["stroke-width"] || params["stroke-opacity"] || params["stroke-dasharray"] || params["stroke-miterlimit"] || params["stroke-linejoin"] || params["stroke-linecap"]) {
                 o = o.shape || o.node;
-                var fill = (o.getElementsByTagName("fill") && o.getElementsByTagName("fill")[0]) || doc.createElement("rvml:fill");
+                var fill = (o.getElementsByTagName("fill") && o.getElementsByTagName("fill")[0]) || createNode("fill");
                 if ("fill-opacity" in params || "opacity" in params) {
                     fill.opacity = ((+params["fill-opacity"] + 1 || 2) - 1) * ((+params.opacity + 1 || 2) - 1);
                 }
@@ -1582,7 +1552,7 @@ var Raphael = (function () {
                     }
                 }
                 o.appendChild(fill);
-                var stroke = (o.getElementsByTagName("stroke") && o.getElementsByTagName("stroke")[0]) || doc.createElement("rvml:stroke");
+                var stroke = (o.getElementsByTagName("stroke") && o.getElementsByTagName("stroke")[0]) || createNode("stroke");
                 if ((params.stroke && params.stroke != "none") || params["stroke-width"] || typeof params["stroke-opacity"] != "undefined" || params["stroke-dasharray"] || params["stroke-miterlimit"] || params["stroke-linejoin"] || params["stroke-linecap"]) {
                     stroke.on = true;
                 }
@@ -1652,7 +1622,7 @@ var Raphael = (function () {
             if (fill.length) {
                 fill = fill[0];
             } else {
-                fill = doc.createElement("rvml:fill");
+                fill = createNode("fill");
             }
             if (gradient.dots.length) {
                 fill.on = true;
@@ -1825,22 +1795,6 @@ var Raphael = (function () {
             this.Group.style.display = "block";
             return this;
         };
-        Element.prototype.translate = function (x, y) {
-            if (x == undefined && y == undefined) {
-                return {x: this._.tx, y: this._.ty};
-            }
-            this._.tx += +x;
-            this._.ty += +y;
-            if (this.type == "path") {
-                var path = this.attrs.path;
-                path = pathToRelative(path);
-                path[0][1] += +x;
-                path[0][2] += +y;
-                this.attr({path: path.join(" ")});
-            }
-            this.setBox({x: this._.tx, y: this._.ty});
-            return this;
-        };
         Element.prototype.getBBox = function () {
             return {
                 x: this.X,
@@ -1914,8 +1868,8 @@ var Raphael = (function () {
             return this;
         };
         var theCircle = function (vml, x, y, r) {
-            var g = doc.createElement("rvml:group");
-            var o = doc.createElement("rvml:oval");
+            var g = createNode("group");
+            var o = createNode("oval");
             g.appendChild(o);
             vml.canvas.appendChild(g);
             var res = new Element(o, g, vml);
@@ -1928,8 +1882,8 @@ var Raphael = (function () {
             return res;
         };
         var theRect = function (vml, x, y, w, h, r) {
-            var g = doc.createElement("rvml:group");
-            var o = doc.createElement(r ? "rvml:roundrect" : "rvml:rect");
+            var g = createNode("group");
+            var o = createNode(r ? "roundrect" : "rect");
             if (r) {
                 o.arcsize = r / (Math.min(w, h));
             }
@@ -1947,8 +1901,8 @@ var Raphael = (function () {
             return res;
         };
         var theEllipse = function (vml, x, y, rx, ry) {
-            var g = doc.createElement("rvml:group");
-            var o = doc.createElement("rvml:oval");
+            var g = createNode("group");
+            var o = createNode("oval");
             g.appendChild(o);
             vml.canvas.appendChild(g);
             var res = new Element(o, g, vml);
@@ -1962,8 +1916,8 @@ var Raphael = (function () {
             return res;
         };
         var theImage = function (vml, src, x, y, w, h) {
-            var g = doc.createElement("rvml:group");
-            var o = doc.createElement("rvml:image");
+            var g = createNode("group");
+            var o = createNode("image");
             o.src = src;
             g.appendChild(o);
             vml.canvas.appendChild(g);
@@ -1977,9 +1931,9 @@ var Raphael = (function () {
             return res;
         };
         var theText = function (vml, x, y, text) {
-            var g = doc.createElement("rvml:group"), gs = g.style;
-            var el = doc.createElement("rvml:shape"), ol = el.style;
-            var path = doc.createElement("rvml:path"), ps = path.style;
+            var g = createNode("group"), gs = g.style;
+            var el = createNode("shape"), ol = el.style;
+            var path = createNode("path"), ps = path.style;
             path.v = ["m", Math.round(x), ", ", Math.round(y - 2), "l", Math.round(x) + 1, ", ", Math.round(y - 2)].join("");
             path.textpathok = true;
             ol.width = vml.width;
@@ -1989,7 +1943,7 @@ var Raphael = (function () {
             gs.top = 0;
             gs.width = vml.width;
             gs.height = vml.height;
-            var o = doc.createElement("rvml:textpath");
+            var o = createNode("textpath");
             o.string = text;
             o.on = true;
             o.coordsize = vml.coordsize;
@@ -2018,7 +1972,20 @@ var Raphael = (function () {
             this.canvas.coordsize = this.width + " " + this.height;
             return this;
         };
-        create = function () {
+        doc.createStyleSheet().addRule(".rvml", "behavior:url(#default#VML)");
+        try {
+            if (!doc.namespaces.rvml) {
+                doc.namespaces.add("rvml","urn:schemas-microsoft-com:vml");
+            }
+            var createNode = function (tagName) {
+                return doc.createElement('<rvml:' + tagName + ' class="rvml">');
+            };
+        } catch (e) {
+            var createNode = function (tagName) {
+                return doc.createElement('<' + tagName + ' xmlns="urn:schemas-microsoft.com:vml" class="rvml">');
+            };
+        }
+        var create = function () {
             // container, width, height
             // x, y, width, height
             var container, width, height;
@@ -2042,19 +2009,15 @@ var Raphael = (function () {
             if (!container) {
                 throw new Error("VML container not found.");
             }
-            if (!doc.namespaces["rvml"]) {
-                doc.namespaces.add("rvml","urn:schemas-microsoft-com:vml");
-                doc.createStyleSheet().addRule("rvml\\:*", "behavior:url(#default#VML)");
-            }
             var c = doc.createElement("div"),
                 d = doc.createElement("div"),
-                r = paper.canvas = doc.createElement("rvml:group"),
+                r = paper.canvas = createNode("group"),
                 cs = c.style, rs = r.style;
             paper.width = width;
             paper.height = height;
             width = width || "320px";
             height = height || "200px";
-            cs.clip = "rect(0 " + width + " " + height + " 0)";
+            cs.clip = "rect(0 " + width + "px " + height + "px 0)";
             cs.top = "-2px";
             cs.left = "-2px";
             cs.position = "absolute";
@@ -2065,7 +2028,7 @@ var Raphael = (function () {
             r.coordsize = (/%$/.test(width) ? width : parseFloat(width, 10)) + " " + (/%$/.test(height) ? height : parseFloat(height, 10));
             r.coordorigin = "0 0";
 
-            var b = doc.createElement("rvml:rect"), bs = b.style;
+            var b = createNode("rect"), bs = b.style;
             bs.left = bs.top = 0;
             bs.width  = rs.width;
             bs.height = rs.height;
@@ -2211,17 +2174,16 @@ var Raphael = (function () {
     };
     paper.drawGrid = function (x, y, w, h, wv, hv, color) {
         color = color || "#000";
-        var p = this.path({stroke: color, "stroke-width": 1})
-                .moveTo(x, y).lineTo(x + w, y).lineTo(x + w, y + h).lineTo(x, y + h).lineTo(x, y),
+        var path = ["M", x, y, "L", x + w, y, x + w, y + h, x, y + h, x, y],
             rowHeight = h / hv,
             columnWidth = w / wv;
         for (var i = 1; i < hv; i++) {
-            p.moveTo(x, y + i * rowHeight).lineTo(x + w, y + i * rowHeight);
+            path = path.concat(["M", x, y + i * rowHeight, "L", x + w, y + i * rowHeight]);
         }
         for (var i = 1; i < wv; i++) {
-            p.moveTo(x + i * columnWidth, y).lineTo(x + i * columnWidth, y + h);
+            path = path.concat(["M", x + i * columnWidth, y, "L", x + i * columnWidth, y + h]);
         }
-        return p;
+        return this.path({stroke: color, "stroke-width": 1}, path.join(","));
     };
     paper.pathfinder = function (p, path) {
         var commands = {
@@ -2485,10 +2447,36 @@ var Raphael = (function () {
         })();
         return this;
     };
+    Element.prototype.translate = function (x, y) {
+        if (x == null) {
+            return {x: this._.tx, y: this._.ty};
+        }
+        this._.tx += +x;
+        this._.ty += +y;
+        switch (this.type) {
+            case "circle":
+            case "ellipse":
+                this.attr({cx: this.attrs.cx + x, cy: this.attrs.cy + y});
+                break;
+            case "rect":
+            case "image":
+            case "text":
+                this.attr({x: this.attrs.x + +x, y: this.attrs.y + +y});
+                break;
+            case "path":
+                var path = pathToRelative(this.attrs.path);
+                path[0][1] += +x;
+                path[0][2] += +y;
+                this.attr({path: path.join(" ")});
+            break;
+        }
+        return this;
+    };
 
     // Set
     var Set = function (itemsArray) {
         this.items = [];
+        this.length = (itemsArray && itemsArray.length) || 0;
         if (itemsArray && itemsArray.constructor == Array) {
             for (var i = itemsArray.length; i--;) {
                 if (itemsArray[i].constructor == Element) {
@@ -2502,6 +2490,7 @@ var Raphael = (function () {
             var len = this.items.length;
             this.items[len] = item;
             this[len] = item;
+            this.length++;
         }
         return this;
     };
@@ -2511,6 +2500,7 @@ var Raphael = (function () {
             this[j] = this[j + 1];
         }
         delete this[jj + 1];
+        this.length--;
         return res;
     };
     for (var method in Element.prototype) {
