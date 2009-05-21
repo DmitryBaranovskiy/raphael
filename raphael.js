@@ -18,7 +18,8 @@ window.Raphael = (function () {
         availableAnimAttrs = {cx: "number", cy: "number", fill: "colour", "fill-opacity": "number", "font-size": "number", height: "number", opacity: "number", path: "path", r: "number", rotation: "csv", rx: "number", ry: "number", scale: "csv", stroke: "colour", "stroke-opacity": "number", "stroke-width": "number", translation: "csv", width: "number", x: "number", y: "number"},
         events = ["click", "dblclick", "mousedown", "mousemove", "mouseout", "mouseover", "mouseup"];
     R.version = "0.7.4";
-    R.type = (window.SVGAngle ? "SVG" : "VML");
+    R.type = (window.SVGAngle || document.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#BasicStructure", "1.1")
+ ? "SVG" : "VML");
     R.svg = !(R.vml = R.type == "VML");
     R.idGenerator = 0;
     R.fn = {};
