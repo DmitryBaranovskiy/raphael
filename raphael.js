@@ -979,38 +979,36 @@ window.Raphael = (function () {
             tuneText(o, params);
         };
         var leading = 1.2;
-        var tuneText = function (element, params) {
-            if (element.type != "text" || !("text" in params || "font" in params || "font-size" in params || "x" in params)) {
+        var tuneText = function (el, params) {
+            if (el.type != "text" || !("text" in params || "font" in params || "font-size" in params || "x" in params)) {
                 return;
             }
-            var fontSize = element.node.firstChild ? parseInt(doc.defaultView.getComputedStyle(element.node.firstChild, "").getPropertyValue("font-size"), 10) : 10;
-            var height = 0;
+            var fontSize = el.node.firstChild ? parseInt(doc.defaultView.getComputedStyle(el.node.firstChild, "").getPropertyValue("font-size"), 10) : 10;
 
             if ("text" in params) {
-                while (element.node.firstChild) {
-                    element.node.removeChild(element.node.firstChild);
+                while (el.node.firstChild) {
+                    el.node.removeChild(el.node.firstChild);
                 }
                 var texts = (params.text + "").split("\n");
                 for (var i = 0, ii = texts.length; i < ii; i++) {
-                    var tspan = doc.createElementNS(element.svg.svgns, "tspan");
+                    var tspan = doc.createElementNS(el.svg.svgns, "tspan");
                     i && tspan.setAttribute("dy", fontSize * leading);
-                    i && tspan.setAttribute("x", element.attrs.x);
+                    i && tspan.setAttribute("x", el.attrs.x);
                     tspan.appendChild(doc.createTextNode(texts[i]));
-                    element.node.appendChild(tspan);
-                    height += fontSize * leading;
+                    el.node.appendChild(tspan);
                 }
             } else {
-                var texts = element.node.getElementsByTagName("tspan");
+                var texts = el.node.getElementsByTagName("tspan");
                 for (var i = 0, ii = texts.length; i < ii; i++) {
                     i && texts[i].setAttribute("dy", fontSize * leading);
-                    i && texts[i].setAttribute("x", element.attrs.x);
-                    height += fontSize * leading;
+                    i && texts[i].setAttribute("x", el.attrs.x);
                 }
             }
-            height -= fontSize * (leading - 1);
-            var dif = height / 2 - fontSize;
+            el.node.setAttribute("y", el.attrs.y);
+            var bb = el.getBBox();
+            var dif = el.attrs.y - (bb.y + bb.height / 2);
             if (dif) {
-                element.node.setAttribute("y", element.attrs.y - dif);
+                el.node.setAttribute("y", el.attrs.y + dif);
             }
         };
         var Element = function (node, svg) {
@@ -1072,15 +1070,11 @@ window.Raphael = (function () {
         Element.prototype.getBBox = function () {
             var bbox = this.node.getBBox();
             if (this.type == "text") {
-                var chr0 = this.node.getExtentOfChar(0);
-                if (chr0.height > bbox.height) {
-                    var chrl = this.node.getExtentOfChar(this.node.getNumberOfChars() - 1);
-                    return {
-                        x: chr0.x,
-                        y: chr0.y,
-                        width: chrl.x - chr0.x + chrl.width,
-                        height: chr0.height
-                    };
+                bbox = {x: bbox.x, y: Infinity, width: bbox.width, height: 0};
+                for (var i = 0, ii = this.node.getNumberOfChars(); i < ii; i++) {
+                    var bb = this.node.getExtentOfChar(i);
+                    (bb.y < bbox.y) && (bbox.y = bb.y);
+                    (bb.y + bb.height - bbox.y > bbox.height) && (bbox.height = bb.y + bb.height - bbox.y);
                 }
             }
             return bbox;
@@ -1867,9 +1861,17 @@ window.Raphael = (function () {
                 os.top = y - top + "px";
                 os.width = w + "px";
                 os.height = h + "px";
-                if (this.type == "rect" && this.attrs.r != params.r) {
+                var arcsize = (+params.r || 0) / (Math.min(w, h));
+                if (this.type == "rect" && this.arcsize != arcsize) {
                     // We should recplace element with the new one
-                    // this.node.arcsize = (params.r || 0) / (Math.min(w, h));
+                    var o = createNode("roundrect");
+                    o.arcsize = arcsize;
+                    this.Group.appendChild(o);
+                    this.node.parentNode.removeChild(this.node);
+                    this.node = o;
+                    this.arcsize = arcsize;
+                    setFillAndStroke(this, this.attrs);
+                    this.setBox(this.attrs);
                 }
             }
         };
@@ -1971,9 +1973,10 @@ window.Raphael = (function () {
             return res;
         };
         var theRect = function (vml, x, y, w, h, r) {
-            var g = createNode("group");
-            var o = createNode("roundrect");
-            o.arcsize = (+r || 0) / (Math.min(w, h));
+            var g = createNode("group"),
+                o = createNode("roundrect"),
+                arcsize = (+r || 0) / (Math.min(w, h));
+            o.arcsize = arcsize;
             g.appendChild(o);
             vml.canvas.appendChild(g);
             var res = new Element(o, g, vml);
@@ -1983,7 +1986,8 @@ window.Raphael = (function () {
             res.attrs.y = y;
             res.attrs.w = w;
             res.attrs.h = h;
-            res.attrs.r = r;
+            res.attrs.r = +r;
+            res.arcsize = arcsize;
             res.setBox({x: x, y: y, width: w, height: h});
             return res;
         };
@@ -2310,11 +2314,11 @@ window.Raphael = (function () {
         !+y && (y = x);
         var dx, dy, dcx, dcy;
         if (x != 0) {
-            var bb = this.getBBox(),
+            var bb = this.type == "path" ? pathDimensions(this.attrs.path) : this.getBBox(),
                 rcx = bb.x + bb.width / 2,
                 rcy = bb.y + bb.height / 2;
-            cx = cx || rcx;
-            cy = cy || rcy;
+            cx = isNaN(cx) ? rcx : cx;
+            cy = isNaN(cy) ? rcy : cy;
             var dirx = Math.round(x / Math.abs(x)),
                 diry = Math.round(y / Math.abs(y)),
                 s = this.node.style,
@@ -2324,7 +2328,7 @@ window.Raphael = (function () {
             dy = this.attr("y");
             dcx = this.attr("cx");
             dcy = this.attr("cy");
-            if (dirx != 1 || diry != 1) {
+            if (!(this.type in {rect: 1, circle: 1, ellipse: 1}) && (dirx != 1 || diry != 1)) {
                 if (this.transformations) {
                     this.transformations[2] = "scale(" + [dirx, diry] + ")";
                     this.node.setAttribute("transform", this.transformations.join(" "));
@@ -2338,6 +2342,7 @@ window.Raphael = (function () {
                         ", Dx=0, Dy=0, sizingmethod='auto expand', filtertype='bilinear')";
                     s.filter = (this.node.filterMatrix || "") + (this.node.filterOpacity || "");
                 }
+            return this;
             } else {
                 if (this.transformations) {
                     this.transformations[2] = "";
@@ -2372,7 +2377,7 @@ window.Raphael = (function () {
                     });
                     break;
                 case "path":
-                    var path = pathToRelative(R.parsePathString(this.attr("path"))),
+                    var path = pathToRelative(R.parsePathString(this.attrs.path)),
                         skip = true;
                     for (var i = 0, ii = path.length; i < ii; i++) {
                         if (path[i][0].toUpperCase() == "M" && skip) {
@@ -2610,6 +2615,73 @@ window.Raphael = (function () {
             height: Math.max.apply(Math, h) - y
         };
     };
+
+    R.registerFont = function (font) {
+        if (!font.face) {
+            return;
+        }
+        this.fonts = this.fonts || {};
+        if (this.fonts[font.face["font-family"]]) {
+            this.fonts[font.face["font-family"]].push(font);
+        } else {
+            this.fonts[font.face["font-family"]] = [font];
+        }
+        font.face["units-per-em"] = parseInt(font.face["units-per-em"], 10);
+        
+        for (var glyph in font.glyphs) {
+            var path = font.glyphs[glyph];
+            if (path.d) {
+                path.d = "M" + path.d.replace(/[mlcxtrv]/g, function (command) {
+                    return {l: "L", c: "C", x: "z", t: "m", r: "l", v: "c"}[command] || "M";
+                }) + "z";
+            }
+        }
+    };
+    paper.getFont = function (family, weight, style, stretch) {
+        stretch = stretch || "normal";
+        style = style || "normal";
+        weight = +weight || {normal: 400, bold: 700, lighter: 300, bolder: 800}[weight] || 400;
+        var font = R.fonts[family];
+        if (!font) {
+            var name = new RegExp("(^|\\s)" + family.replace(/[^\w\d\s+!~.:_-]/g, "") + "(\\s|$)", "i");
+            for (var fontName in R.fonts) {
+                if (name.test(fontName)) {
+                    font = R.fonts[fontName];
+                    break;
+                }
+            }
+        }
+        var thefont;
+        if (font) {
+            for (var i = 0, ii = font.length; i < ii; i++) {
+                thefont = font[i];
+                if (thefont.face["font-weight"] == weight && (thefont.face["font-style"] == style || !thefont.face["font-style"]) && thefont.face["font-stretch"] == stretch) {
+                    break;
+                }
+            }
+        }
+        return thefont;
+    };
+    
+    paper.print = function (x, y, string, font, size) {
+        var out = this.set(),
+            letters = (string + "").split(""),
+            shift = 0,
+            path = "",
+            scale;
+        if (font) {
+            scale = (size || 16) / font.face["units-per-em"];
+            for (var i = 0, ii = letters.length; i < ii; i++) {
+                var prev = i && font.glyphs[letters[i - 1]] || {},
+                    curr = font.glyphs[letters[i]];
+                shift += i ? (prev.w || font.w) + (prev.k && prev.k[letters[i]] || 0) : 0;
+                curr && curr.d && out.push(this.path({fill: "#000", stroke: "none"}, curr.d).translate(shift, 0));
+            }
+            out.scale(scale, scale, 0, y).translate(x, (size || 16) / 2);
+        }
+        return out;
+    };
+    
 
     R.noConflict = function () {
         var r = window.Raphael;
