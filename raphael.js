@@ -576,7 +576,6 @@ window.Raphael = (function () {
     if (R.svg) {
         var thePath = function (params, pathString, SVG) {
             var el = doc.createElementNS(SVG.svgns, "path");
-            el.setAttribute("fill", "none");
             if (SVG.canvas) {
                 SVG.canvas.appendChild(el);
             }
@@ -756,8 +755,12 @@ window.Raphael = (function () {
                 paper.pathfinder(p, p.attrs.path);
             }
             if (params) {
-                setFillAndStroke(p, params);
+                params.fill = params.fill || "none";
+                params.stroke = params.stroke || "#000";
+            } else {
+                params = {fill: "none", stroke: "#000"};
             }
+            setFillAndStroke(p, params);
             return p;
         };
         var addGrdientFill = function (o, gradient, SVG) {
@@ -829,6 +832,12 @@ window.Raphael = (function () {
                 }
                 var value = params[att];
                 o.attrs[att] = value;
+                if (att == "x" && o.attrs.dx) {
+                    value += o.attrs.dx;
+                }
+                if (att == "y" && o.attrs.dy) {
+                    value += o.attrs.dy;
+                }
                 switch (att) {
                     // Hyperlink
                     case "href":
@@ -899,7 +908,7 @@ window.Raphael = (function () {
                         break;
                     case "scale":
                         var xy = (value + "").split(separator);
-                        o.scale(+xy[0] || 1, +xy[1] || +xy[0] || 1);
+                        o.scale(+xy[0] || 1, +xy[1] || +xy[0] || 1, +xy[2] || null, +xy[3] || null);
                         break;
                     case "fill":
                         var isURL = value.match(/^url\(([^\)]+)\)$/i);
@@ -1541,6 +1550,12 @@ window.Raphael = (function () {
                 paper.pathfinder(p, "" + pathString);
             }
             // p.setBox();
+            if (params) {
+                params.fill = params.fill || "none";
+                params.stroke = params.stroke || "#000";
+            } else {
+                params = {fill: "none", stroke: "#000"};
+            }
             setFillAndStroke(p, params);
             if (params.gradient) {
                 addGrdientFill(p, params.gradient);
@@ -1571,7 +1586,7 @@ window.Raphael = (function () {
             }
             if (params.scale) {
                 var xy = (params.scale + "").split(separator);
-                o.scale(xy[0], xy[1]);
+                o.scale(+xy[0] || 1, +xy[1] || +xy[0] || 1, +xy[2] || null, +xy[3] || null);
             }
             if (o.type == "image" && params.src) {
                 o.node.src = params.src;
@@ -1840,30 +1855,30 @@ window.Raphael = (function () {
             var left = cx - this.vml.width / 2,
                 top = cy - this.vml.height / 2;
             if (this.type == "path" || this.type == "text") {
-                gs.left = left + "px";
-                gs.top = top + "px";
+                (gs.left != left + "px") && (gs.left = left + "px");
+                (gs.top != top + "px") && (gs.top = top + "px");
                 this.X = this.type == "text" ? x : -left;
                 this.Y = this.type == "text" ? y : -top;
                 this.W = w;
                 this.H = h;
-                os.left = -left + "px";
-                os.top = -top + "px";
+                (os.left != -left + "px") && (os.left = -left + "px");
+                (os.top != -top + "px") && (os.top = -top + "px");
             } else {
-                gs.left = left + "px";
-                gs.top = top + "px";
+                (gs.left != left + "px") && (gs.left = left + "px");
+                (gs.top != top + "px") && (gs.top = top + "px");
                 this.X = x;
                 this.Y = y;
                 this.W = w;
                 this.H = h;
-                gs.width = this.vml.width + "px";
-                gs.height = this.vml.height + "px";
-                os.left = x - left + "px";
-                os.top = y - top + "px";
-                os.width = w + "px";
-                os.height = h + "px";
+                (gs.width != this.vml.width + "px") && (gs.width = this.vml.width + "px");
+                (gs.height != this.vml.height + "px") && (gs.height = this.vml.height + "px");
+                (os.left != x - left + "px") && (os.left = x - left + "px");
+                (os.top != y - top + "px") && (os.top = y - top + "px");
+                (os.width != w + "px") && (os.width = w + "px");
+                (os.height != h + "px") && (os.height = h + "px");
                 var arcsize = (+params.r || 0) / (Math.min(w, h));
                 if (this.type == "rect" && this.arcsize != arcsize) {
-                    // We should recplace element with the new one
+                    // We should replace element with the new one
                     var o = createNode("roundrect");
                     o.arcsize = arcsize;
                     this.Group.appendChild(o);
@@ -1962,7 +1977,6 @@ window.Raphael = (function () {
             var g = createNode("group");
             var o = createNode("oval");
             g.appendChild(o);
-            vml.canvas.appendChild(g);
             var res = new Element(o, g, vml);
             res.type = "circle";
             setFillAndStroke(res, {stroke: "#000", fill: "none"});
@@ -1970,6 +1984,7 @@ window.Raphael = (function () {
             res.attrs.cy = y;
             res.attrs.r = r;
             res.setBox({x: x - r, y: y - r, width: r * 2, height: r * 2});
+            vml.canvas.appendChild(g);
             return res;
         };
         var theRect = function (vml, x, y, w, h, r) {
@@ -1978,7 +1993,6 @@ window.Raphael = (function () {
                 arcsize = (+r || 0) / (Math.min(w, h));
             o.arcsize = arcsize;
             g.appendChild(o);
-            vml.canvas.appendChild(g);
             var res = new Element(o, g, vml);
             res.type = "rect";
             setFillAndStroke(res, {stroke: "#000"});
@@ -1989,13 +2003,13 @@ window.Raphael = (function () {
             res.attrs.r = +r;
             res.arcsize = arcsize;
             res.setBox({x: x, y: y, width: w, height: h});
+            vml.canvas.appendChild(g);
             return res;
         };
         var theEllipse = function (vml, x, y, rx, ry) {
             var g = createNode("group");
             var o = createNode("oval");
             g.appendChild(o);
-            vml.canvas.appendChild(g);
             var res = new Element(o, g, vml);
             res.type = "ellipse";
             setFillAndStroke(res, {stroke: "#000"});
@@ -2004,6 +2018,7 @@ window.Raphael = (function () {
             res.attrs.rx = rx;
             res.attrs.ry = ry;
             res.setBox({x: x - rx, y: y - ry, width: rx * 2, height: ry * 2});
+            vml.canvas.appendChild(g);
             return res;
         };
         var theImage = function (vml, src, x, y, w, h) {
@@ -2011,7 +2026,6 @@ window.Raphael = (function () {
             var o = createNode("image");
             o.src = src;
             g.appendChild(o);
-            vml.canvas.appendChild(g);
             var res = new Element(o, g, vml);
             res.type = "image";
             res.attrs.x = x;
@@ -2019,6 +2033,7 @@ window.Raphael = (function () {
             res.attrs.w = w;
             res.attrs.h = h;
             res.setBox({x: x, y: y, width: w, height: h});
+            vml.canvas.appendChild(g);
             return res;
         };
         var theText = function (vml, x, y, text) {
@@ -2042,7 +2057,6 @@ window.Raphael = (function () {
             el.appendChild(o);
             el.appendChild(path);
             g.appendChild(el);
-            vml.canvas.appendChild(g);
             var res = new Element(o, g, vml);
             res.shape = el;
             res.textpath = path;
@@ -2053,6 +2067,7 @@ window.Raphael = (function () {
             res.attrs.h = 1;
             setFillAndStroke(res, {font: availableAttrs.font, stroke: "none", fill: "#000"});
             res.setBox();
+            vml.canvas.appendChild(g);
             return res;
         };
         var setSize = function (width, height) {
@@ -2308,7 +2323,7 @@ window.Raphael = (function () {
     };
     Element.prototype.scale = function (x, y, cx, cy) {
         if (x == null && y == null) {
-            return {x: this._.sx, y: this._.sy};
+            return {x: this._.sx, y: this._.sy, toString: function () { return this.x.toFixed(3) + " " + this.y.toFixed(3); }};
         }
         y = y || x;
         !+y && (y = x);
@@ -2324,34 +2339,6 @@ window.Raphael = (function () {
                 s = this.node.style,
                 ncx = cx + (rcx - cx) * x * dirx / this._.sx,
                 ncy = cy + (rcy - cy) * y * diry / this._.sy;
-            dx = this.attr("x");
-            dy = this.attr("y");
-            dcx = this.attr("cx");
-            dcy = this.attr("cy");
-            if (!(this.type in {rect: 1, circle: 1, ellipse: 1}) && (dirx != 1 || diry != 1)) {
-                if (this.transformations) {
-                    this.transformations[2] = "scale(" + [dirx, diry] + ")";
-                    this.node.setAttribute("transform", this.transformations.join(" "));
-                    dx = (dirx < 0) ? -this.attr("x") - this.attrs.width * x * dirx / this._.sx : this.attr("x");
-                    dy = (diry < 0) ? -this.attr("y") - this.attrs.height * y * diry / this._.sy : this.attr("y");
-                    dcx = this.attr("cx") * dirx;
-                    dcy = this.attr("cy") * diry;
-                } else {
-                    this.node.filterMatrix = " progid:DXImageTransform.Microsoft.Matrix(M11=" + dirx +
-                        ", M12=0, M21=0, M22=" + diry +
-                        ", Dx=0, Dy=0, sizingmethod='auto expand', filtertype='bilinear')";
-                    s.filter = (this.node.filterMatrix || "") + (this.node.filterOpacity || "");
-                }
-            return this;
-            } else {
-                if (this.transformations) {
-                    this.transformations[2] = "";
-                    this.node.setAttribute("transform", this.transformations.join(" "));
-                } else {
-                    this.node.filterMatrix = "";
-                    s.filter = (this.node.filterMatrix || "") + (this.node.filterOpacity || "");
-                }
-            }
             switch (this.type) {
                 case "rect":
                 case "image":
@@ -2369,9 +2356,9 @@ window.Raphael = (function () {
                 case "circle":
                 case "ellipse":
                     this.attr({
-                        rx: this.attrs.rx * x * dirx / this._.sx,
-                        ry: this.attrs.ry * y * diry / this._.sy,
-                        r: this.attrs.r * x * dirx / this._.sx,
+                        rx: this.attrs.rx * x / this._.sx,
+                        ry: this.attrs.ry * y / this._.sy,
+                        r: this.attrs.r * x / this._.sx,
                         cx: ncx,
                         cy: ncy
                     });
@@ -2386,13 +2373,14 @@ window.Raphael = (function () {
                             skip = false;
                         }
                         if (this.svg && path[i][0].toUpperCase() == "A") {
-                            path[i][path[i].length - 2] *= x * dirx;
-                            path[i][path[i].length - 1] *= y * diry;
+                            path[i][path[i].length - 2] *= x;
+                            path[i][path[i].length - 1] *= y;
                             path[i][1] *= x;
                             path[i][2] *= y;
                         } else {
                             for (var j = 1, jj = path[i].length; j < jj; j++) {
-                                path[i][j] *= (j % 2) ? x * dirx / this._.sx : y * diry / this._.sy;
+                                // path[i][j] *= (j % 2) ? x * dirx / this._.sx : y * diry / this._.sy;
+                                path[i][j] *= (j % 2) ? x / this._.sx : y / this._.sy;
                             }
                         }
                     }
@@ -2404,6 +2392,34 @@ window.Raphael = (function () {
                     path[0][2] += dy;
                     
                     this.attr({path: path.join(" ")});
+                break;
+            }
+            if (this.type in {text: 1, image:1} && (dirx != 1 || diry != 1)) {
+                if (this.transformations) {
+                    var bb = this.getBBox();
+                    this.transformations[2] = "scale(" + [dirx, diry] + ")";
+                    this.node.setAttribute("transform", this.transformations.join(" "));
+                    dx = (dirx == -1) ? -this.attrs.x * 2 - neww || bb.width : 0;
+                    dy = (diry == -1) ? -this.attrs.y * 2 - newh || bb.height : 0;
+                    this.attr({x: this.attrs.x + dx, y: this.attrs.y + dy});
+                    this.attrs.dx = dx;
+                    this.attrs.dy = dy;
+                } else {
+                    this.node.filterMatrix = " progid:DXImageTransform.Microsoft.Matrix(M11=" + dirx +
+                        ", M12=0, M21=0, M22=" + diry +
+                        ", Dx=0, Dy=0, sizingmethod='auto expand', filtertype='bilinear')";
+                    s.filter = (this.node.filterMatrix || "") + (this.node.filterOpacity || "");
+                }
+            } else {
+                if (this.transformations) {
+                    this.transformations[2] = "";
+                    this.node.setAttribute("transform", this.transformations.join(" "));
+                    this.attrs.dx = 0;
+                    this.attrs.dy = 0;
+                } else {
+                    this.node.filterMatrix = "";
+                    s.filter = (this.node.filterMatrix || "") + (this.node.filterOpacity || "");
+                }
             }
         }
         this._.sx = x;
@@ -2626,14 +2642,16 @@ window.Raphael = (function () {
         } else {
             this.fonts[font.face["font-family"]] = [font];
         }
-        font.face["units-per-em"] = parseInt(font.face["units-per-em"], 10);
-        
-        for (var glyph in font.glyphs) {
-            var path = font.glyphs[glyph];
-            if (path.d) {
-                path.d = "M" + path.d.replace(/[mlcxtrv]/g, function (command) {
-                    return {l: "L", c: "C", x: "z", t: "m", r: "l", v: "c"}[command] || "M";
-                }) + "z";
+        if (!font.svg) {
+            font.face["units-per-em"] = parseInt(font.face["units-per-em"], 10);
+
+            for (var glyph in font.glyphs) {
+                var path = font.glyphs[glyph];
+                if (path.d) {
+                    path.d = "M" + path.d.replace(/[mlcxtrv]/g, function (command) {
+                        return {l: "L", c: "C", x: "z", t: "m", r: "l", v: "c"}[command] || "M";
+                    }) + "z";
+                }
             }
         }
     };
@@ -2662,7 +2680,6 @@ window.Raphael = (function () {
         }
         return thefont;
     };
-    
     paper.print = function (x, y, string, font, size) {
         var out = this.set(),
             letters = (string + "").split(""),
@@ -2681,7 +2698,6 @@ window.Raphael = (function () {
         }
         return out;
     };
-    
 
     R.noConflict = function () {
         var r = window.Raphael;
