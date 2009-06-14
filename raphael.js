@@ -136,7 +136,7 @@ window.Raphael = (function () {
             return {r: -1, g: -1, b: -1, hex: "none"};
         }
         var red, green, blue,
-            rgb = colour.match(/^\s*((#[a-f\d]{6})|(#[a-f\d]{3})|rgb\(\s*([\d\.]+\s*,\s*[\d\.]+\s*,\s*[\d\.]+)\s*\)|rgb\(\s*([\d\.]+%\s*,\s*[\d\.]+%\s*,\s*[\d\.]+%)\s*\)|hsb\(\s*([\d\.]+\s*,\s*[\d\.]+\s*,\s*[\d\.]+)\s*\)|hsb\(\s*([\d\.]+%\s*,\s*[\d\.]+%\s*,\s*[\d\.]+%)\s*\))\s*$/i);
+            rgb = (colour + "").match(/^\s*((#[a-f\d]{6})|(#[a-f\d]{3})|rgb\(\s*([\d\.]+\s*,\s*[\d\.]+\s*,\s*[\d\.]+)\s*\)|rgb\(\s*([\d\.]+%\s*,\s*[\d\.]+%\s*,\s*[\d\.]+%)\s*\)|hsb\(\s*([\d\.]+\s*,\s*[\d\.]+\s*,\s*[\d\.]+)\s*\)|hsb\(\s*([\d\.]+%\s*,\s*[\d\.]+%\s*,\s*[\d\.]+%)\s*\))\s*$/i);
         if (rgb) {
             if (rgb[2]) {
                 blue = parseInt(rgb[2].substring(5), 16);
@@ -213,8 +213,6 @@ window.Raphael = (function () {
     var pathcache = {}, pathcount = [];
     R.parsePathString = function (pathString) {
         if (pathString in pathcache) {
-            console.log("cache1:" + pathString);
-            console.log("cache2:" + pathcache[pathString]);
             return pathcache[pathString];
         }
         var paramCounts = {a: 7, c: 6, h: 1, l: 2, m: 2, q: 4, s: 4, t: 2, v: 1, z: 0},
@@ -248,7 +246,6 @@ window.Raphael = (function () {
             delete pathcache[pathcount.unshift()];
         }
         pathcount.push(pathString);
-        // console.log("data:" + pathString + ":" + data);
         pathcache[pathString] = data;
         return data;
     };
@@ -588,11 +585,11 @@ window.Raphael = (function () {
         for (var prop in add) if (add.hasOwnProperty(prop) && !(prop in con)) {
             switch (typeof add[prop]) {
                 case "function":
-                    con[prop] = con === paper ? add[prop] : function () { return add[prop].apply(paper, arguments); };
+                    con[prop] = con === this ? add[prop] : function () { return add[prop].apply(this, arguments); };
                 break;
                 case "object":
                     con[prop] = {};
-                    plugins(con[prop], add[prop]);
+                    plugins.call(this, con[prop], add[prop]);
                 break;
                 default:
                     con[prop] = add[prop];
@@ -787,7 +784,7 @@ window.Raphael = (function () {
                 paper.pathfinder(p, p.attrs.path);
             }
             if (params) {
-                params.fill = params.fill || "none";
+                !params.gradient && (params.fill = params.fill || "none");
                 params.stroke = params.stroke || "#000";
             } else {
                 params = {fill: "none", stroke: "#000"};
@@ -795,7 +792,7 @@ window.Raphael = (function () {
             setFillAndStroke(p, params);
             return p;
         };
-        var addGrdientFill = function (o, gradient, SVG) {
+        var addGradientFill = function (o, gradient, SVG) {
             gradient = toGradient(gradient);
             var el = doc.createElementNS(SVG.svgns, (gradient.type || "linear") + "Gradient");
             el.id = "raphael-gradient-" + R.idGenerator++;
@@ -821,6 +818,7 @@ window.Raphael = (function () {
                 stop.setAttribute("stop-opacity", gradient.dots[ii - 1].opacity);
             }
             o.setAttribute("fill", "url(#" + el.id + ")");
+            o.style.fill = "";
             o.style.opacity = 1;
             o.style.fillOpacity = 1;
             o.setAttribute("opacity", 1);
@@ -1007,7 +1005,7 @@ window.Raphael = (function () {
                         node.setAttribute(att, R.getRGB(value).hex);
                         break;
                     case "gradient":
-                        addGrdientFill(node, value, o.svg);
+                        addGradientFill(node, value, o.svg);
                         break;
                     case "opacity":
                     case "fill-opacity":
@@ -1331,8 +1329,9 @@ window.Raphael = (function () {
                     container[prop] = paper[prop];
                 }
             }
-            plugins(container, R.fn);
+            plugins.call(container, container, R.fn);
             container.clear();
+            container.raphael = R;
             return container;
         };
         paper.remove = function () {
@@ -1341,9 +1340,9 @@ window.Raphael = (function () {
         paper.svgns = "http://www.w3.org/2000/svg";
         paper.xlink = "http://www.w3.org/1999/xlink";
         paper.safari = function () {
-            if (navigator.vendor == "Apple Computer, Inc.") {
+            if ({"Apple Computer, Inc.": 1, "Google Inc.": 1}[navigator.vendor]) {
                 var rect = this.rect(-this.width, -this.height, this.width * 3, this.height * 3).attr({stroke: "none"});
-                setTimeout(function () {rect.remove();}, 0);
+                setTimeout(function () {rect.remove();});
             }
         };
     }
@@ -1584,7 +1583,7 @@ window.Raphael = (function () {
             }
             setFillAndStroke(p, params);
             if (params.gradient) {
-                addGrdientFill(p, params.gradient);
+                addGradientFill(p, params.gradient);
             }
             VML.canvas.appendChild(g);
             return p;
@@ -1730,7 +1729,7 @@ window.Raphael = (function () {
             }
             return angle;
         };
-        var addGrdientFill = function (o, gradient) {
+        var addGradientFill = function (o, gradient) {
             gradient = toGradient(gradient);
             o.attrs = o.attrs || {};
             var attrs = o.attrs;
@@ -1752,18 +1751,18 @@ window.Raphael = (function () {
                 if (typeof gradient.dots[gradient.dots.length - 1].color != "undefined") {
                     fill.color2 = R.getRGB(gradient.dots[gradient.dots.length - 1].color).hex;
                 }
-                var colors = [];
+                var clrs = [];
                 for (var i = 0, ii = gradient.dots.length; i < ii; i++) {
                     if (gradient.dots[i].offset) {
-                        colors.push(gradient.dots[i].offset + " " + R.getRGB(gradient.dots[i].color).hex);
+                        clrs.push(gradient.dots[i].offset + " " + R.getRGB(gradient.dots[i].color).hex);
                     }
                 };
                 var fillOpacity = typeof gradient.dots[gradient.dots.length - 1].opacity == "undefined" ? (typeof attrs.opacity == "undefined" ? 1 : attrs.opacity) : gradient.dots[gradient.dots.length - 1].opacity;
-                if (colors.length) {
-                    fill.colors.value = colors.join(",");
+                if (clrs.length) {
+                    fill.colors.value = clrs.join(",");
                     fillOpacity = typeof attrs.opacity == "undefined" ? 1 : attrs.opacity;
                 } else {
-                    fill.colors.value = "0% " + fill.color;
+                    fill.colors && (fill.colors.value = "0% " + fill.color);
                 }
                 fill.opacity = fillOpacity;
                 if (typeof gradient.angle != "undefined") {
@@ -1907,7 +1906,7 @@ window.Raphael = (function () {
                 var arcsize = (+params.r || 0) / (Math.min(w, h));
                 if (this.type == "rect" && this.arcsize != arcsize && (arcsize || this.arcsize)) {
                     // We should replace element with the new one
-                    var o = createNode("roundrect");
+                    var o = createNode(arcsize ? "roundrect" : "rect");
                     o.arcsize = arcsize;
                     this.Group.appendChild(o);
                     this.node.parentNode.removeChild(this.node);
@@ -1966,7 +1965,7 @@ window.Raphael = (function () {
             }
             if (params) {
                 if (params.gradient) {
-                    addGrdientFill(this, params.gradient);
+                    addGradientFill(this, params.gradient);
                 }
                 if (params.text && this.type == "text") {
                     this.node.string = params.text;
@@ -2017,7 +2016,7 @@ window.Raphael = (function () {
         };
         var theRect = function (vml, x, y, w, h, r) {
             var g = createNode("group"),
-                o = createNode("roundrect"),
+                o = createNode(r ? "roundrect" : "rect"),
                 arcsize = (+r || 0) / (Math.min(w, h));
             o.arcsize = arcsize;
             g.appendChild(o);
@@ -2110,7 +2109,7 @@ window.Raphael = (function () {
         doc.createStyleSheet().addRule(".rvml", "behavior:url(#default#VML)");
         try {
             if (!doc.namespaces.rvml) {
-                doc.namespaces.add("rvml","urn:schemas-microsoft-com:vml");
+                doc.namespaces.add("rvml", "urn:schemas-microsoft-com:vml");
             }
             var createNode = function (tagName) {
                 return doc.createElement('<rvml:' + tagName + ' class="rvml">');
@@ -2183,7 +2182,7 @@ window.Raphael = (function () {
             for (var prop in paper) {
                 container[prop] = paper[prop];
             }
-            plugins(container, R.fn);
+            plugins.call(container, container, R.fn);
             container.clear = function () {
                 var todel = [];
                 for (var i = 0, ii = r.childNodes.length; i < ii; i++) {
@@ -2195,6 +2194,7 @@ window.Raphael = (function () {
                     r.removeChild(todel[i]);
                 }
             };
+            container.raphael = R;
             return container;
         };
         paper.remove = function () {
@@ -2400,10 +2400,11 @@ window.Raphael = (function () {
                             skip = false;
                         }
                         if (this.svg && p[0].toUpperCase() == "A") {
-                            p[path[i].length - 2] *= x;
-                            p[path[i].length - 1] *= y;
-                            p[1] *= x;
-                            p[2] *= y;
+                            p[path[i].length - 2] *= x / this._.sx;
+                            p[path[i].length - 1] *= y / this._.sy;
+                            p[1] *= x / this._.sx;
+                            p[2] *= y / this._.sy;
+                            p[5] = +(dirx + diry ? !!+p[5] : !+p[5]);
                         } else {
                             for (var j = 1, jj = p.length; j < jj; j++) {
                                 p[j] *= (j % 2) ? x / this._.sx : y / this._.sy;
@@ -2446,9 +2447,10 @@ window.Raphael = (function () {
                     s.filter = (this.node.filterMatrix || "") + (this.node.filterOpacity || "");
                 }
             }
+            a.scale = [x, y, cx, cy].join(" ");
+            this._.sx = x;
+            this._.sy = y;
         }
-        this._.sx = x;
-        this._.sy = y;
         return this;
     };
     Element.prototype.animate = function (params, ms, callback) {
@@ -2460,9 +2462,7 @@ window.Raphael = (function () {
         for (var attr in params) {
             if (attr in availableAnimAttrs) {
                 from[attr] = this.attr(attr);
-                if (typeof from[attr] == "undefined") {
-                    from[attr] = availableAttrs[attr];
-                }
+                (typeof from[attr] == "undefined") && (from[attr] = availableAttrs[attr]);
                 to[attr] = params[attr];
                 switch (availableAnimAttrs[attr]) {
                     case "number":
@@ -2490,17 +2490,21 @@ window.Raphael = (function () {
                         }
                         break;
                     case "csv":
-                        var values = params[attr].toString().split(separator),
-                            from2 = from[attr].toString().split(separator);
-                        if (attr == "translation") {
-                            from[attr] = [0, 0];
-                            diff[attr] = [values[0] / ms, values[1] / ms];
-                        } else if (attr == "rotation") {
-                            from[attr] = (from2[1] == values[1] && from2[2] == values[2]) ? from2 : [0, values[1], values[2]];
-                            diff[attr] = [(values[0] - from[attr][0]) / ms, 0, 0];
-                        } else {
-                            from[attr] = (from[attr] + "").split(separator);
-                            diff[attr] = [(values[0] - from[attr][0]) / ms, (values[1] - from[attr][0]) / ms];
+                        var values = (params[attr] + "").split(separator),
+                            from2 = (from[attr] + "").split(separator);
+                        switch (attr) {
+                            case "translation":
+                                from[attr] = [0, 0];
+                                diff[attr] = [values[0] / ms, values[1] / ms];
+                            break;
+                            case "rotation":
+                                from[attr] = (from2[1] == values[1] && from2[2] == values[2]) ? from2 : [0, values[1], values[2]];
+                                diff[attr] = [(values[0] - from[attr][0]) / ms, 0, 0];
+                            break;
+                            case "scale":
+                                params[attr] = values;
+                                from[attr] = (from[attr] + "").split(separator);
+                                diff[attr] = [(values[0] - from[attr][0]) / ms, (values[1] - from[attr][1]) / ms, 0, 0];
                         }
                         to[attr] = values;
                 }
@@ -2509,8 +2513,8 @@ window.Raphael = (function () {
         var start = +new Date,
             prev = 0,
             that = this;
-        (function () {
-            var time = +new Date - start,
+        (function tick() {
+            var time = new Date - start,
                 set = {},
                 now;
             if (time < ms) {
@@ -2538,17 +2542,20 @@ window.Raphael = (function () {
                             now = now.join(" ");
                             break;
                         case "csv":
-                            if (attr == "translation") {
-                                var x = diff[attr][0] * (time - prev),
-                                    y = diff[attr][1] * (time - prev);
-                                t.x += x;
-                                t.y += y;
-                                now = [x, y].join(" ");
-                            } else if (attr == "rotation") {
-                                now = +from[attr][0] + time * diff[attr][0];
-                                from[attr][1] && (now += "," + from[attr][1] + "," + from[attr][2]);
-                            } else {
-                                now = [+from[attr][0] + time * diff[attr][0], +from[attr][1] + time * diff[attr][1]].join(" ");
+                            switch (attr) {
+                                case "translation":
+                                    var x = diff[attr][0] * (time - prev),
+                                        y = diff[attr][1] * (time - prev);
+                                    t.x += x;
+                                    t.y += y;
+                                    now = [x, y].join(" ");
+                                break;
+                                case "rotation":
+                                    now = +from[attr][0] + time * diff[attr][0];
+                                    from[attr][1] && (now += "," + from[attr][1] + "," + from[attr][2]);
+                                break;
+                                case "scale":
+                                    now = [+from[attr][0] + time * diff[attr][0], +from[attr][1] + time * diff[attr][1], (2 in params[attr] ? params[attr][2] : ""), (3 in params[attr] ? params[attr][3] : "")].join(" ");
                             }
                             break;
                     }
@@ -2559,7 +2566,7 @@ window.Raphael = (function () {
                     }
                 }
                 that.attr(set);
-                that.animation_in_progress = setTimeout(arguments.callee, 0);
+                that.animation_in_progress = setTimeout(tick);
                 paper.safari();
             } else {
                 (t.x || t.y) && that.translate(-t.x, -t.y);
@@ -2726,7 +2733,7 @@ window.Raphael = (function () {
 
     R.ninja = function () {
         var r = window.Raphael;
-        delete window.Raphael;
+        // delete window.Raphael;
         if (oldRaphael.was) {
             window.Raphael = oldRaphael.is;
         }
