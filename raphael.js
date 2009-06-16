@@ -283,219 +283,225 @@ window.Raphael = (function () {
         };
     },
         pathToRelative = function (pathArray) {
-        var res = [];
-        if (typeof pathArray == "string") {
-            pathArray = R.parsePathString(pathArray);
-        }
-        var x = 0, y = 0, start = 0;
-        if (pathArray[0][0] == "M") {
-            x = pathArray[0][1];
-            y = pathArray[0][2];
-            start++;
-            res.push(["M", x, y]);
-        }
-        for (var i = start, ii = pathArray.length; i < ii; i++) {
-            var r = res[i] = [],
-                pa = pathArray[i];
-            if (pa[0] != pa[0].toLowerCase()) {
-                r[0] = pa[0].toLowerCase();
-                switch (r[0]) {
-                    case "a":
-                        r[1] = pa[1];
-                        r[2] = pa[2];
-                        r[3] = 0;
-                        r[4] = pa[4];
-                        r[5] = pa[5];
-                        r[6] = +(pa[6] - x).toFixed(3);
-                        r[7] = +(pa[7] - y).toFixed(3);
+            var res = [];
+            if (typeof pathArray == "string") {
+                pathArray = R.parsePathString(pathArray);
+            }
+            var x = 0, y = 0, start = 0;
+            if (pathArray[0][0] == "M") {
+                x = pathArray[0][1];
+                y = pathArray[0][2];
+                start++;
+                res.push(["M", x, y]);
+            }
+            for (var i = start, ii = pathArray.length; i < ii; i++) {
+                var r = res[i] = [],
+                    pa = pathArray[i];
+                if (pa[0] != pa[0].toLowerCase()) {
+                    r[0] = pa[0].toLowerCase();
+                    switch (r[0]) {
+                        case "a":
+                            r[1] = pa[1];
+                            r[2] = pa[2];
+                            r[3] = 0;
+                            r[4] = pa[4];
+                            r[5] = pa[5];
+                            r[6] = +(pa[6] - x).toFixed(3);
+                            r[7] = +(pa[7] - y).toFixed(3);
+                            break;
+                        case "v":
+                            r[1] = (pa[1] - y).toFixed(3);
+                            break;
+                        default:
+                            for (var j = 1, jj = pa.length; j < jj; j++) {
+                                r[j] = +(pa[j] - ((j % 2) ? x : y)).toFixed(3);
+                            }
+                    }
+                } else {
+                    res[i] = pa;
+                }
+                switch (res[i][0]) {
+                    case "z":
+                        break;
+                    case "h":
+                        x += res[i][res[i].length - 1];
                         break;
                     case "v":
-                        r[1] = +(pa[1] - y).toFixed(3);
+                        y += res[i][res[i].length - 1];
                         break;
                     default:
-                        for (var j = 1, jj = pa.length; j < jj; j++) {
-                            r[j] = +(pa[j] - ((j % 2) ? x : y)).toFixed(3);
-                        }
+                        x += res[i][res[i].length - 2];
+                        y += res[i][res[i].length - 1];
                 }
-            } else {
-                res[i] = pa;
             }
-            switch (res[i][0]) {
-                case "z":
-                    break;
-                case "h":
-                    x += res[i][res[i].length - 1];
-                    break;
-                case "v":
-                    y += res[i][res[i].length - 1];
-                    break;
-                default:
-                    x += res[i][res[i].length - 2];
-                    y += res[i][res[i].length - 1];
-            }
-        }
-        res.toString = pathArray.toString;
-        return res;
-    },
+            res.toString = pathArray.toString;
+            return res;
+        },
         pathToAbsolute = function (pathArray) {
-        var res = [];
-        if (typeof pathArray == "string") {
-            pathArray = R.parsePathString(pathArray);
-        }
-        var x = 0,
-            y = 0,
-            start = 0;
-        if (pathArray[0][0] == "M") {
-            x = +pathArray[0][1];
-            y = +pathArray[0][2];
-            start++;
-            res[0] = ["M", x, y];
-        }
-        for (var i = start, ii = pathArray.length; i < ii; i++) {
-            var r = res[i] = [],
-                pa = pathArray[i];
-            if (pa[0] != (pa[0] + "").toUpperCase()) {
-                r[0] = (pa[0] + "").toUpperCase();
-                switch (r[0]) {
-                    case "A":
-                        r[1] = pa[1];
-                        r[2] = pa[2];
-                        r[3] = 0;
-                        r[4] = pa[4];
-                        r[5] = pa[5];
-                        r[6] = +(pa[6] + x).toFixed(3);
-                        r[7] = +(pa[7] + y).toFixed(3);
-                        break;
-                    case "V":
-                        r[1] = +pa[1] + y;
-                        break;
-                    default:
-                        for (var j = 1, jj = pa.length; j < jj; j++) {
-                            r[j] = +pa[j] + ((j % 2) ? x : y);
-                        }
-                }
-            } else {
-                res[i] = pa;
+            var res = [];
+            if (typeof pathArray == "string") {
+                pathArray = R.parsePathString(pathArray);
             }
-            switch (r[0]) {
-                case "Z":
-                    break;
-                case "H":
-                    x = r[1];
-                    break;
-                case "V":
-                    y = r[1];
-                    break;
-                default:
-                    x = res[i][res[i].length - 2];
-                    y = res[i][res[i].length - 1];
+            var x = 0,
+                y = 0,
+                start = 0;
+            if (pathArray[0][0] == "M") {
+                x = +pathArray[0][1];
+                y = +pathArray[0][2];
+                start++;
+                res[0] = ["M", x, y];
             }
-        }
-        res.toString = pathArray.toString;
-        return res;
-    },
-        pecache = {}, pecount = [],
-        pathEqualiser = function (path1, path2) {
-        if ((path1 + path2) in pecache) {
-            return pecache[path1 + path2];
-        }
-        var data = [pathToAbsolute(R.parsePathString(path1)), pathToAbsolute(R.parsePathString(path2))],
-            attrs = [{x: 0, y: 0, bx: 0, by: 0, X: 0, Y: 0}, {x: 0, y: 0, bx: 0, by: 0, X: 0, Y: 0}],
-            processPath = function (path, d) {
-                if (!path) {
-                    return ["U"];
-                }
-                switch (path[0]) {
-                    case "M":
-                        d.X = path[1];
-                        d.Y = path[2];
-                        break;
-                    case "S":
-                        var nx = d.x + (d.x - (d.bx || d.x));
-                        var ny = d.y + (d.y - (d.by || d.y));
-                        path = ["C", nx, ny, path[1], path[2], path[3], path[4]];
-                        break;
-                    case "T":
-                        var nx = d.x + (d.x - (d.bx || d.x));
-                        var ny = d.y + (d.y - (d.by || d.y));
-                        path = ["Q", nx, ny, path[1], path[2]];
-                        break;
-                    case "H":
-                        path = ["L", path[1], d.y];
-                        break;
-                    case "V":
-                        path = ["L", d.x, path[1]];
-                        break;
-                    case "Z":
-                        path = ["L", d.X, d.Y];
-                        break;
-                }
-                return path;
-            },
-            edgeCases = function (a, b, i) {
-                if (data[a][i][0] == "M" && data[b][i][0] != "M") {
-                    data[b].splice(i, 0, ["M", attrs[b].x, attrs[b].y]);
-                    attrs[a].bx = data[a][i][data[a][i].length - 4] || 0;
-                    attrs[a].by = data[a][i][data[a][i].length - 3] || 0;
-                    attrs[a].x = data[a][i][data[a][i].length - 2];
-                    attrs[a].y = data[a][i][data[a][i].length - 1];
-                    return true;
-                } else if (data[a][i][0] == "L" && data[b][i][0] == "C") {
-                    data[a][i] = ["C", attrs[a].x, attrs[a].y, data[a][i][1], data[a][i][2], data[a][i][1], data[a][i][2]];
-                } else if (data[a][i][0] == "L" && data[b][i][0] == "Q") {
-                    data[a][i] = ["Q", data[a][i][1], data[a][i][2], data[a][i][1], data[a][i][2]];
-                } else if (data[a][i][0] == "Q" && data[b][i][0] == "C") {
-                    var x = data[b][i][data[b][i].length - 2];
-                    var y = data[b][i][data[b][i].length - 1];
-                    data[b].splice(i + 1, 0, ["Q", x, y, x, y]);
-                    data[a].splice(i, 0, ["C", attrs[a].x, attrs[a].y, attrs[a].x, attrs[a].y, attrs[a].x, attrs[a].y]);
-                    i++;
-                    attrs[b].bx = data[b][i][data[b][i].length - 4] || 0;
-                    attrs[b].by = data[b][i][data[b][i].length - 3] || 0;
-                    attrs[b].x = data[b][i][data[b][i].length - 2];
-                    attrs[b].y = data[b][i][data[b][i].length - 1];
-                    return true;
-                } else if (data[a][i][0] == "A" && data[b][i][0] == "C") {
-                    var x = data[b][i][data[b][i].length - 2];
-                    var y = data[b][i][data[b][i].length - 1];
-                    data[b].splice(i + 1, 0, ["A", 0, 0, data[a][i][3], data[a][i][4], data[a][i][5], x, y]);
-                    data[a].splice(i, 0, ["C", attrs[a].x, attrs[a].y, attrs[a].x, attrs[a].y, attrs[a].x, attrs[a].y]);
-                    i++;
-                    attrs[b].bx = data[b][i][data[b][i].length - 4] || 0;
-                    attrs[b].by = data[b][i][data[b][i].length - 3] || 0;
-                    attrs[b].x = data[b][i][data[b][i].length - 2];
-                    attrs[b].y = data[b][i][data[b][i].length - 1];
-                    return true;
-                } else if (data[a][i][0] == "U") {
-                    data[a][i][0] = data[b][i][0];
-                    for (var j = 1, jj = data[b][i].length; j < jj; j++) {
-                        data[a][i][j] = (j % 2) ? attrs[a].x : attrs[a].y;
+            for (var i = start, ii = pathArray.length; i < ii; i++) {
+                var r = res[i] = [],
+                    pa = pathArray[i];
+                if (pa[0] != (pa[0] + "").toUpperCase()) {
+                    r[0] = (pa[0] + "").toUpperCase();
+                    switch (r[0]) {
+                        case "A":
+                            r[1] = pa[1];
+                            r[2] = pa[2];
+                            r[3] = 0;
+                            r[4] = pa[4];
+                            r[5] = pa[5];
+                            r[6] = +(pa[6] + x).toFixed(3);
+                            r[7] = +(pa[7] + y).toFixed(3);
+                            break;
+                        case "V":
+                            r[1] = +pa[1] + y;
+                            break;
+                        case "H":
+                            r[1] = +pa[1] + x;
+                            break;
+                        default:
+                            for (var j = 1, jj = pa.length; j < jj; j++) {
+                                r[j] = +pa[j] + ((j % 2) ? x : y);
+                            }
+                    }
+                } else {
+                    r = res[i] = [];
+                    for (var k = 0, kk = pa.length; k < kk; k++) {
+                        res[i][k] = pa[k];
                     }
                 }
-                return false;
-            };
-        for (var i = 0; i < Math.max(data[0].length, data[1].length); i++) {
-            data[0][i] = processPath(data[0][i], attrs[0]);
-            data[1][i] = processPath(data[1][i], attrs[1]);
-            if (data[0][i][0] != data[1][i][0] && (edgeCases(0, 1, i) || edgeCases(1, 0, i))) {
-                continue;
+                switch (r[0]) {
+                    case "Z":
+                        break;
+                    case "H":
+                        x = r[1];
+                        break;
+                    case "V":
+                        y = r[1];
+                        break;
+                    default:
+                        x = res[i][res[i].length - 2];
+                        y = res[i][res[i].length - 1];
+                }
             }
-            attrs[0].bx = data[0][i][data[0][i].length - 4] || 0;
-            attrs[0].by = data[0][i][data[0][i].length - 3] || 0;
-            attrs[0].x = data[0][i][data[0][i].length - 2];
-            attrs[0].y = data[0][i][data[0][i].length - 1];
-            attrs[1].bx = data[1][i][data[1][i].length - 4] || 0;
-            attrs[1].by = data[1][i][data[1][i].length - 3] || 0;
-            attrs[1].x = data[1][i][data[1][i].length - 2];
-            attrs[1].y = data[1][i][data[1][i].length - 1];
-        }
-        if (pecount.length > 20) {
-            delete pecache[pecount.unshift()];
-        }
-        pecount.push(path1 + path2);
-        pecache[path1 + path2] = data;
-        return data;
-    },
+            res.toString = pathArray.toString;
+            return res;
+        },
+        pecache = {}, pecount = [],
+        pathEqualiser = function (path1, path2) {
+            if ((path1 + path2) in pecache) {
+                return pecache[path1 + path2];
+            }
+            var data = [pathToAbsolute(R.parsePathString(path1)), pathToAbsolute(R.parsePathString(path2))],
+                attrs = [{x: 0, y: 0, bx: 0, by: 0, X: 0, Y: 0}, {x: 0, y: 0, bx: 0, by: 0, X: 0, Y: 0}],
+                processPath = function (path, d) {
+                    if (!path) {
+                        return ["U"];
+                    }
+                    switch (path[0]) {
+                        case "M":
+                            d.X = path[1];
+                            d.Y = path[2];
+                            break;
+                        case "S":
+                            var nx = d.x + (d.x - (d.bx || d.x));
+                            var ny = d.y + (d.y - (d.by || d.y));
+                            path = ["C", nx, ny, path[1], path[2], path[3], path[4]];
+                            break;
+                        case "T":
+                            var nx = d.x + (d.x - (d.bx || d.x));
+                            var ny = d.y + (d.y - (d.by || d.y));
+                            path = ["Q", nx, ny, path[1], path[2]];
+                            break;
+                        case "H":
+                            path = ["L", path[1], d.y];
+                            break;
+                        case "V":
+                            path = ["L", d.x, path[1]];
+                            break;
+                        case "Z":
+                            path = ["L", d.X, d.Y];
+                            break;
+                    }
+                    return path;
+                },
+                edgeCases = function (a, b, i) {
+                    if (data[a][i][0] == "M" && data[b][i][0] != "M") {
+                        data[b].splice(i, 0, ["M", attrs[b].x, attrs[b].y]);
+                        attrs[a].bx = data[a][i][data[a][i].length - 4] || 0;
+                        attrs[a].by = data[a][i][data[a][i].length - 3] || 0;
+                        attrs[a].x = data[a][i][data[a][i].length - 2];
+                        attrs[a].y = data[a][i][data[a][i].length - 1];
+                        return true;
+                    } else if (data[a][i][0] == "L" && data[b][i][0] == "C") {
+                        data[a][i] = ["C", attrs[a].x, attrs[a].y, data[a][i][1], data[a][i][2], data[a][i][1], data[a][i][2]];
+                    } else if (data[a][i][0] == "L" && data[b][i][0] == "Q") {
+                        data[a][i] = ["Q", data[a][i][1], data[a][i][2], data[a][i][1], data[a][i][2]];
+                    } else if (data[a][i][0] == "Q" && data[b][i][0] == "C") {
+                        var x = data[b][i][data[b][i].length - 2];
+                        var y = data[b][i][data[b][i].length - 1];
+                        data[b].splice(i + 1, 0, ["Q", x, y, x, y]);
+                        data[a].splice(i, 0, ["C", attrs[a].x, attrs[a].y, attrs[a].x, attrs[a].y, attrs[a].x, attrs[a].y]);
+                        i++;
+                        attrs[b].bx = data[b][i][data[b][i].length - 4] || 0;
+                        attrs[b].by = data[b][i][data[b][i].length - 3] || 0;
+                        attrs[b].x = data[b][i][data[b][i].length - 2];
+                        attrs[b].y = data[b][i][data[b][i].length - 1];
+                        return true;
+                    } else if (data[a][i][0] == "A" && data[b][i][0] == "C") {
+                        var x = data[b][i][data[b][i].length - 2];
+                        var y = data[b][i][data[b][i].length - 1];
+                        data[b].splice(i + 1, 0, ["A", 0, 0, data[a][i][3], data[a][i][4], data[a][i][5], x, y]);
+                        data[a].splice(i, 0, ["C", attrs[a].x, attrs[a].y, attrs[a].x, attrs[a].y, attrs[a].x, attrs[a].y]);
+                        i++;
+                        attrs[b].bx = data[b][i][data[b][i].length - 4] || 0;
+                        attrs[b].by = data[b][i][data[b][i].length - 3] || 0;
+                        attrs[b].x = data[b][i][data[b][i].length - 2];
+                        attrs[b].y = data[b][i][data[b][i].length - 1];
+                        return true;
+                    } else if (data[a][i][0] == "U") {
+                        data[a][i][0] = data[b][i][0];
+                        for (var j = 1, jj = data[b][i].length; j < jj; j++) {
+                            data[a][i][j] = (j % 2) ? attrs[a].x : attrs[a].y;
+                        }
+                    }
+                    return false;
+                };
+            for (var i = 0; i < Math.max(data[0].length, data[1].length); i++) {
+                data[0][i] = processPath(data[0][i], attrs[0]);
+                data[1][i] = processPath(data[1][i], attrs[1]);
+                if (data[0][i][0] != data[1][i][0] && (edgeCases(0, 1, i) || edgeCases(1, 0, i))) {
+                    continue;
+                }
+                attrs[0].bx = data[0][i][data[0][i].length - 4] || 0;
+                attrs[0].by = data[0][i][data[0][i].length - 3] || 0;
+                attrs[0].x = data[0][i][data[0][i].length - 2];
+                attrs[0].y = data[0][i][data[0][i].length - 1];
+                attrs[1].bx = data[1][i][data[1][i].length - 4] || 0;
+                attrs[1].by = data[1][i][data[1][i].length - 3] || 0;
+                attrs[1].x = data[1][i][data[1][i].length - 2];
+                attrs[1].y = data[1][i][data[1][i].length - 1];
+            }
+            if (pecount.length > 20) {
+                delete pecache[pecount.unshift()];
+            }
+            pecount.push(path1 + path2);
+            pecache[path1 + path2] = data;
+            return data;
+        },
         toGradient = function (gradient) {
         if (typeof gradient == "string") {
             gradient = gradient.split(/\s*\-\s*/);
