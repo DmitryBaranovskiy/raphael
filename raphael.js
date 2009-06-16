@@ -318,7 +318,10 @@ window.Raphael = (function () {
                             }
                     }
                 } else {
-                    res[i] = pa;
+                    r = res[i] = [];
+                    for (var k = 0, kk = pa.length; k < kk; k++) {
+                        res[i][k] = pa[k];
+                    }
                 }
                 switch (res[i][0]) {
                     case "z":
