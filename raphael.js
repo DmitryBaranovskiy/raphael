@@ -871,12 +871,12 @@ window.Raphael = (function () {
                     case "target":
                         var pn = node.parentNode;
                         if (pn.tagName.toLowerCase() != "a") {
-                            var hl = doc.createElementNS(o.svg.svgns, "a");
+                            var hl = doc.createElementNS(o.paper.svgns, "a");
                             pn.insertBefore(hl, node);
                             hl.appendChild(node);
                             pn = hl;
                         }
-                        pn.setAttributeNS(o.svg.xlink, att, value);
+                        pn.setAttributeNS(o.paper.xlink, att, value);
                       break;
                     case "path":
                         if (o.type == "path") {
@@ -927,7 +927,7 @@ window.Raphael = (function () {
                         break;
                     case "src":
                         if (o.type == "image") {
-                            node.setAttributeNS(o.svg.xlink, "href", value);
+                            node.setAttributeNS(o.paper.xlink, "href", value);
                         }
                         break;
                     case "stroke-width":
@@ -955,15 +955,15 @@ window.Raphael = (function () {
                     case "fill":
                         var isURL = value.match(/^url\(([^\)]+)\)$/i);
                         if (isURL) {
-                            var el = doc.createElementNS(o.svg.svgns, "pattern");
-                            var ig = doc.createElementNS(o.svg.svgns, "image");
+                            var el = doc.createElementNS(o.paper.svgns, "pattern");
+                            var ig = doc.createElementNS(o.paper.svgns, "image");
                             el.id = "raphael-pattern-" + R.idGenerator++;
                             el.setAttribute("x", 0);
                             el.setAttribute("y", 0);
                             el.setAttribute("patternUnits", "userSpaceOnUse");
                             ig.setAttribute("x", 0);
                             ig.setAttribute("y", 0);
-                            ig.setAttributeNS(o.svg.xlink, "href", isURL[1]);
+                            ig.setAttributeNS(o.paper.xlink, "href", isURL[1]);
                             el.appendChild(ig);
 
                             var img = doc.createElement("img");
@@ -980,7 +980,7 @@ window.Raphael = (function () {
                             };
                             doc.body.appendChild(img);
                             img.src = isURL[1];
-                            o.svg.defs.appendChild(el);
+                            o.paper.defs.appendChild(el);
                             node.style.fill = "url(#" + el.id + ")";
                             node.setAttribute("fill", "url(#" + el.id + ")");
                             o.pattern = el;
@@ -1005,7 +1005,7 @@ window.Raphael = (function () {
                         node.setAttribute(att, R.getRGB(value).hex);
                         break;
                     case "gradient":
-                        addGradientFill(node, value, o.svg);
+                        addGradientFill(node, value, o.paper);
                         break;
                     case "opacity":
                     case "fill-opacity":
@@ -1045,7 +1045,7 @@ window.Raphael = (function () {
                 }
                 var texts = (params.text + "").split("\n");
                 for (var i = 0, ii = texts.length; i < ii; i++) {
-                    var tspan = doc.createElementNS(el.svg.svgns, "tspan");
+                    var tspan = doc.createElementNS(el.paper.svgns, "tspan");
                     i && tspan.setAttribute("dy", fontSize * leading);
                     i && tspan.setAttribute("x", a.x);
                     tspan.appendChild(doc.createTextNode(texts[i]));
@@ -1068,7 +1068,7 @@ window.Raphael = (function () {
                 Y = 0;
             this[0] = node;
             this.node = node;
-            this.svg = svg;
+            this.paper = svg;
             this.attrs = this.attrs || {};
             this.transformations = []; // rotate, translate, scale
             this._ = {
@@ -1298,10 +1298,10 @@ window.Raphael = (function () {
                 throw new Error("SVG container not found.");
             }
             paper.canvas = doc.createElementNS(paper.svgns, "svg");
-            paper.canvas.setAttribute("width", width || 320);
-            paper.width = width || 320;
-            paper.canvas.setAttribute("height", height || 200);
-            paper.height = height || 200;
+            paper.canvas.setAttribute("width", width || 512);
+            paper.width = width || 512;
+            paper.canvas.setAttribute("height", height || 342);
+            paper.height = height || 342;
             if (container == 1) {
                 doc.body.appendChild(paper.canvas);
                 paper.canvas.style.position = "absolute";
@@ -1787,7 +1787,7 @@ window.Raphael = (function () {
             this.Y = 0;
             this.attrs = {};
             this.Group = group;
-            this.vml = vml;
+            this.paper = vml;
             this._ = {
                 tx: 0,
                 ty: 0,
@@ -1818,6 +1818,11 @@ window.Raphael = (function () {
             this._.rt.cy = cy;
             this.setBox(null, cx, cy);
             this.Group.style.rotation = this._.rt.deg;
+            // gradient fix for rotation. TODO
+            // var fill = (this.shape || this.node).getElementsByTagName("fill");
+            // fill = fill[0] || {};
+            // var b = ((360 - this._.rt.deg) - 270) % 360;
+            // typeof fill.angle != "undefined" && (fill.angle = b);
             return this;
         };
         Element.prototype.setBox = function (params, cx, cy) {
@@ -1860,8 +1865,8 @@ window.Raphael = (function () {
                     if (!this.attrs.path) {
                         x = 0;
                         y = 0;
-                        w = this.vml.width;
-                        h = this.vml.height;
+                        w = this.paper.width;
+                        h = this.paper.height;
                     } else {
                         var dim = pathDimensions(this.attrs.path),
                         x = dim.x;
@@ -1873,14 +1878,14 @@ window.Raphael = (function () {
                 default:
                     x = 0;
                     y = 0;
-                    w = this.vml.width;
-                    h = this.vml.height;
+                    w = this.paper.width;
+                    h = this.paper.height;
                     break;
             }
             cx = (cx == null) ? x + w / 2 : cx;
             cy = (cy == null) ? y + h / 2 : cy;
-            var left = cx - this.vml.width / 2,
-                top = cy - this.vml.height / 2;
+            var left = cx - this.paper.width / 2,
+                top = cy - this.paper.height / 2;
             if (this.type == "path" || this.type == "text") {
                 (gs.left != left + "px") && (gs.left = left + "px");
                 (gs.top != top + "px") && (gs.top = top + "px");
@@ -1897,8 +1902,8 @@ window.Raphael = (function () {
                 this.Y = y;
                 this.W = w;
                 this.H = h;
-                (gs.width != this.vml.width + "px") && (gs.width = this.vml.width + "px");
-                (gs.height != this.vml.height + "px") && (gs.height = this.vml.height + "px");
+                (gs.width != this.paper.width + "px") && (gs.width = this.paper.width + "px");
+                (gs.height != this.paper.height + "px") && (gs.height = this.paper.height + "px");
                 (os.left != x - left + "px") && (os.left = x - left + "px");
                 (os.top != y - top + "px") && (os.top = y - top + "px");
                 (os.width != w + "px") && (os.width = w + "px");
@@ -2135,8 +2140,8 @@ window.Raphael = (function () {
                 cs = c.style, rs = r.style;
             paper.width = width;
             paper.height = height;
-            width = width || "320px";
-            height = height || "200px";
+            width = width || "512px";
+            height = height || "342px";
             cs.clip = "rect(0 " + width + "px " + height + "px 0)";
             cs.top = "-2px";
             cs.left = "-2px";
@@ -2399,7 +2404,7 @@ window.Raphael = (function () {
                         } else {
                             skip = false;
                         }
-                        if (this.svg && p[0].toUpperCase() == "A") {
+                        if (R.svg && p[0].toUpperCase() == "A") {
                             p[path[i].length - 2] *= x / this._.sx;
                             p[path[i].length - 1] *= y / this._.sy;
                             p[1] *= x / this._.sx;
@@ -2733,9 +2738,14 @@ window.Raphael = (function () {
 
     R.ninja = function () {
         var r = window.Raphael;
-        // delete window.Raphael;
         if (oldRaphael.was) {
             window.Raphael = oldRaphael.is;
+        } else {
+            try {
+                delete window.Raphael;
+            } catch (e) {
+                window.Raphael = void(0);
+            }
         }
         return r;
     };
