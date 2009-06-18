@@ -591,21 +591,24 @@ window.Raphael = (function () {
         }
     },
         plugins = function (con, add) {
-        for (var prop in add) if (add.hasOwnProperty(prop) && !(prop in con)) {
-            switch (typeof add[prop]) {
-                case "function":
-                    con[prop] = con === this ? add[prop] : function () { return add[prop].apply(this, arguments); };
-                break;
-                case "object":
-                    con[prop] = {};
-                    plugins.call(this, con[prop], add[prop]);
-                break;
-                default:
-                    con[prop] = add[prop];
-                break;
+            var that = this;
+            for (var prop in add) if (add.hasOwnProperty(prop) && !(prop in con)) {
+                switch (typeof add[prop]) {
+                    case "function":
+                        (function (f) {
+                            con[prop] = con === that ? f : function () { return f.apply(that, arguments); };
+                        })(add[prop]);
+                    break;
+                    case "object":
+                        con[prop] = con[prop] || {};
+                        plugins.call(this, con[prop], add[prop]);
+                    break;
+                    default:
+                        con[prop] = add[prop];
+                    break;
+                }
             }
-        }
-    };
+        };
 
     // SVG
     if (R.svg) {
