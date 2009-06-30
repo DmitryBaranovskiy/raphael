@@ -2483,8 +2483,8 @@ window.Raphael = (function () {
     };
 
     R.easing_formulas = {
-        linear: function( time, beg, diff, dur ) {
-          return beg + diff * time;
+        linear: function (time, beg, diff, dur) {
+          return time / dur;
         },
         "<": function (time, beg, diff, dur) {
             return diff * (time /= dur) * time + beg;
@@ -2508,6 +2508,28 @@ window.Raphael = (function () {
             } else {
                 return diff * (7.5625 * (time -= (2.625 / 2.75)) * time + .984375) + beg;
             }
+        },
+        elastic: function (time, beg, diff, dur) {
+            var s = 1.70158,
+                p = 0,
+                s,
+                a = diff;
+            if (time == 0) {
+                return beg;
+            }
+            if ((time /= dur) == 1) {
+                return beg + diff;
+            }
+            if (!p) {
+                p = dur * .3;
+            }
+            if (a < Math.abs(diff)) {
+                a = diff;
+                s = p / 4;
+            } else {
+                s = p / (2 * Math.PI) * Math.asin(diff / a);
+            }
+            return a * Math.pow(2, -10 * time) * Math.sin((time * dur - s) * (2 * Math.PI) / p) + diff + beg;
         }
     };
 
