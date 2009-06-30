@@ -1,5 +1,5 @@
 /*
- * Raphael 0.8.1 - JavaScript Vector Library
+ * Raphael 0.8.2 - JavaScript Vector Library
  *
  * Copyright (c) 2008 - 2009 Dmitry Baranovskiy (http://raphaeljs.com)
  * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
@@ -21,7 +21,7 @@ window.Raphael = (function () {
         availableAttrs = {cx: 0, cy: 0, fill: "#fff", "fill-opacity": 1, font: '10px "Arial"', "font-family": '"Arial"', "font-size": "10", "font-style": "normal", "font-weight": 400, gradient: 0, height: 0, href: "http://raphaeljs.com/", opacity: 1, path: "M0,0", r: 0, rotation: 0, rx: 0, ry: 0, scale: "1 1", src: "", stroke: "#000", "stroke-dasharray": "", "stroke-linecap": "butt", "stroke-linejoin": "butt", "stroke-miterlimit": 0, "stroke-opacity": 1, "stroke-width": 1, target: "_blank", "text-anchor": "middle", title: "Raphael", translation: "0 0", width: 0, x: 0, y: 0},
         availableAnimAttrs = {cx: "number", cy: "number", fill: "colour", "fill-opacity": "number", "font-size": "number", height: "number", opacity: "number", path: "path", r: "number", rotation: "csv", rx: "number", ry: "number", scale: "csv", stroke: "colour", "stroke-opacity": "number", "stroke-width": "number", translation: "csv", width: "number", x: "number", y: "number"},
         events = ["click", "dblclick", "mousedown", "mousemove", "mouseout", "mouseover", "mouseup"];
-    R.version = "0.8";
+    R.version = "0.8.2";
     R.type = (window.SVGAngle || document.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#BasicStructure", "1.1") ? "SVG" : "VML");
     R.svg = !(R.vml = R.type == "VML");
     R.idGenerator = 0;
@@ -2481,8 +2481,47 @@ window.Raphael = (function () {
         }
         return this;
     };
-    Element.prototype.animate = function (params, ms, callback) {
+
+    R.easing_formulas = {
+        linear: function( time, beg, diff, dur ) {
+          return beg + diff * time;
+        },
+        "<": function (time, beg, diff, dur) {
+            return diff * (time /= dur) * time + beg;
+        },
+        ">": function (time, beg, diff, dur) {
+            return -diff * (time /= dur) * (time - 2) + beg;
+        },
+        "<>": function (time, beg, diff, dur) {
+            if ((time /= dur/2) < 1) {
+                return diff / 2 * time * time + beg;
+            }
+            return -diff / 2 * ((--time) * (time - 2) - 1) + beg;
+        },
+        bounce: function (time, beg, diff, dur) {
+            if ((time /= dur) < (1 / 2.75)) {
+                return diff * (7.5625 * time * time) + beg;
+            } else if (time < (2 / 2.75)) {
+                return diff * (7.5625 * (time -= (1.5 / 2.75)) * time + .75) + beg;
+            } else if (time < (2.5 / 2.75)) {
+                return diff * (7.5625 * (time -= (2.25 / 2.75)) * time + .9375) + beg;
+            } else {
+                return diff * (7.5625 * (time -= (2.625 / 2.75)) * time + .984375) + beg;
+            }
+        }
+    };
+
+    // animation easing formulas
+    R.easing = function(easing, time, beg, diff, dur) {
+        return (R.easing_formulas[easing] || R.easing_formulas.linear)(time, beg, diff, dur);
+    };
+
+    Element.prototype.animate = function (params, ms, easing, callback) {
         clearTimeout(this.animation_in_progress);
+        if (typeof easing == "function" || !easing) {
+            callback = easing || null;
+            easing = "linear";
+        }
         var from = {},
             to = {},
             diff = {},
@@ -2546,16 +2585,17 @@ window.Raphael = (function () {
                 set = {},
                 now;
             if (time < ms) {
+                pos = R.easing(easing, time, 0, 1, ms);
                 for (var attr in from) {
                     switch (availableAnimAttrs[attr]) {
                         case "number":
-                            now = +from[attr] + time * diff[attr];
+                            now = +from[attr] + pos * ms * diff[attr];
                             break;
                         case "colour":
                             now = "rgb(" + [
-                                Math.round(from[attr].r + time * diff[attr].r),
-                                Math.round(from[attr].g + time * diff[attr].g),
-                                Math.round(from[attr].b + time * diff[attr].b)
+                                Math.round(from[attr].r + pos * ms * diff[attr].r),
+                                Math.round(from[attr].g + pos * ms * diff[attr].g),
+                                Math.round(from[attr].b + pos * ms * diff[attr].b)
                             ].join(",") + ")";
                             break;
                         case "path":
@@ -2563,7 +2603,7 @@ window.Raphael = (function () {
                             for (var i = 0, ii = from[attr].length; i < ii; i++) {
                                 now[i] = [from[attr][i][0]];
                                 for (var j = 1, jj = from[attr][i].length; j < jj; j++) {
-                                    now[i][j] = from[attr][i][j] + time * diff[attr][i][j];
+                                    now[i][j] = from[attr][i][j] + pos * ms * diff[attr][i][j];
                                 }
                                 now[i] = now[i].join(" ");
                             }
@@ -2579,11 +2619,11 @@ window.Raphael = (function () {
                                     now = [x, y].join(" ");
                                 break;
                                 case "rotation":
-                                    now = +from[attr][0] + time * diff[attr][0];
+                                    now = +from[attr][0] + pos * ms * diff[attr][0];
                                     from[attr][1] && (now += "," + from[attr][1] + "," + from[attr][2]);
                                 break;
                                 case "scale":
-                                    now = [+from[attr][0] + time * diff[attr][0], +from[attr][1] + time * diff[attr][1], (2 in params[attr] ? params[attr][2] : ""), (3 in params[attr] ? params[attr][3] : "")].join(" ");
+                                    now = [+from[attr][0] + pos * ms * diff[attr][0], +from[attr][1] + pos * ms * diff[attr][1], (2 in params[attr] ? params[attr][2] : ""), (3 in params[attr] ? params[attr][3] : "")].join(" ");
                             }
                             break;
                     }
