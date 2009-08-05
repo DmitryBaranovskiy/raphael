@@ -1,5 +1,5 @@
 /*
- * Raphael 0.8.4 - JavaScript Vector Library
+ * Raphael 0.8.5 - JavaScript Vector Library
  *
  * Copyright (c) 2008 - 2009 Dmitry Baranovskiy (http://raphaeljs.com)
  * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
@@ -21,11 +21,14 @@ window.Raphael = (function () {
         availableAttrs = {cx: 0, cy: 0, fill: "#fff", "fill-opacity": 1, font: '10px "Arial"', "font-family": '"Arial"', "font-size": "10", "font-style": "normal", "font-weight": 400, gradient: 0, height: 0, href: "http://raphaeljs.com/", opacity: 1, path: "M0,0", r: 0, rotation: 0, rx: 0, ry: 0, scale: "1 1", src: "", stroke: "#000", "stroke-dasharray": "", "stroke-linecap": "butt", "stroke-linejoin": "butt", "stroke-miterlimit": 0, "stroke-opacity": 1, "stroke-width": 1, target: "_blank", "text-anchor": "middle", title: "Raphael", translation: "0 0", width: 0, x: 0, y: 0},
         availableAnimAttrs = {cx: "number", cy: "number", fill: "colour", "fill-opacity": "number", "font-size": "number", height: "number", opacity: "number", path: "path", r: "number", rotation: "csv", rx: "number", ry: "number", scale: "csv", stroke: "colour", "stroke-opacity": "number", "stroke-width": "number", translation: "csv", width: "number", x: "number", y: "number"},
         events = ["click", "dblclick", "mousedown", "mousemove", "mouseout", "mouseover", "mouseup"];
-    R.version = "0.8.4";
+    R.version = "0.8.5";
     R.type = (window.SVGAngle || document.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#BasicStructure", "1.1") ? "SVG" : "VML");
     R.svg = !(R.vml = R.type == "VML");
     R.idGenerator = 0;
     R.fn = {};
+    R.isArray = function (arr) {
+        return Object.prototype.toString.call(arr) == "[object Array]";
+    };
     R.setWindow = function (newwin) {
         win = newwin;
         doc = win.document;
@@ -1186,7 +1189,7 @@ window.Raphael = (function () {
                 }
                 return this.attrs[arguments[0]];
             }
-            if (arguments.length == 1 && arguments[0] instanceof win.Array) {
+            if (arguments.length == 1 && R.isArray(arguments[0])) {
                 var values = {};
                 for (var j in arguments[0]) {
                     values[arguments[0][j]] = this.attrs[arguments[0][j]];
@@ -1221,7 +1224,8 @@ window.Raphael = (function () {
             return this;
         };
         Element.prototype.insertBefore = function (element) {
-            element.node.parentNode.insertBefore(this.node, element.node);
+            var node = element.node;
+            node.parentNode.insertBefore(this.node, node);
             return this;
         };
         var theCircle = function (svg, x, y, r) {
@@ -1641,7 +1645,10 @@ window.Raphael = (function () {
                 o = o.shape || node;
                 var fill = (o.getElementsByTagName("fill") && o.getElementsByTagName("fill")[0]) || createNode("fill");
                 if ("fill-opacity" in params || "opacity" in params) {
-                    fill.opacity = ((+params["fill-opacity"] + 1 || 2) - 1) * ((+params.opacity + 1 || 2) - 1);
+                    var opacity = ((+params["fill-opacity"] + 1 || 2) - 1) * ((+params.opacity + 1 || 2) - 1);
+                    opacity < 0 && (opacity = 0);
+                    opacity > 1 && (opacity = 1);
+                    fill.opacity = opacity;
                 }
                 params.fill && (fill.on = true);
                 if (typeof fill.on == "undefined" || params.fill == "none") {
@@ -1669,7 +1676,10 @@ window.Raphael = (function () {
                 if (stroke.on && params.stroke) {
                     stroke.color = R.getRGB(params.stroke).hex;
                 }
-                stroke.opacity = ((+params["stroke-opacity"] + 1 || 2) - 1) * ((+params.opacity + 1 || 2) - 1);
+                var opacity = ((+params["stroke-opacity"] + 1 || 2) - 1) * ((+params.opacity + 1 || 2) - 1);
+                opacity < 0 && (opacity = 0);
+                opacity > 1 && (opacity = 1);
+                stroke.opacity = opacity;
                 params["stroke-linejoin"] && (stroke.joinstyle = params["stroke-linejoin"] || "miter");
                 stroke.miterlimit = params["stroke-miterlimit"] || 8;
                 params["stroke-linecap"] && (stroke.endcap = {butt: "flat", square: "square", round: "round"}[params["stroke-linecap"]] || "miter");
@@ -1692,25 +1702,18 @@ window.Raphael = (function () {
                 o.appendChild(stroke);
             }
             if (res.type == "text") {
-                var span = doc.createElement("span"),
-                    s = span.style,
+                var s = paper.span.style,
                     a = res.attrs;
-                s.padding = 0;
-                s.margin = 0;
-                s.lineHeight = 1;
-                s.display = "inline";
                 a.font && (s.font = a.font);
                 a["font-family"] && (s.fontFamily = a["font-family"]);
                 a["font-size"] && (s.fontSize = a["font-size"]);
                 a["font-weight"] && (s.fontWeight = a["font-weight"]);
                 a["font-style"] && (s.fontStyle = a["font-style"]);
-                res.node.parentNode.appendChild(span);
-                span.innerText = res.node.string;
-                res.W = a.w = span.offsetWidth;
-                res.H = a.h = span.offsetHeight;
+                paper.span.innerText = res.node.string;
+                res.W = a.w = paper.span.offsetWidth;
+                res.H = a.h = paper.span.offsetHeight;
                 res.X = a.x;
                 res.Y = a.y + Math.round(res.H / 2);
-                res.node.parentNode.removeChild(span);
 
                 // text-anchor emulation
                 switch (a["text-anchor"]) {
@@ -1967,7 +1970,7 @@ window.Raphael = (function () {
                 }
                 return this.attrs[arguments[0]];
             }
-            if (this.attrs && arguments.length == 1 && arguments[0] instanceof win.Array) {
+            if (this.attrs && arguments.length == 1 && R.isArray(arguments[0])) {
                 var values = {};
                 for (var i = 0, ii = arguments[0].length; i < ii; i++) {
                     values[arguments[0][i]] = this.attrs[arguments[0][i]];
@@ -2180,6 +2183,7 @@ window.Raphael = (function () {
                 x = con.x,
                 y = con.y,
                 width = con.width,
+                s,
                 height = con.height;
             if (!container) {
                 throw new Error("VML container not found.");
@@ -2192,6 +2196,16 @@ window.Raphael = (function () {
             paper.height = height;
             paper.coordsize = width + " " + height;
             paper.coordorigin = "0 0";
+            paper.span = doc.createElement("span");
+            s = paper.span.style;
+            c.appendChild(paper.span);
+            s.position = "absolute";
+            s.left = "-99999px";
+            s.top = "-99999px";
+            s.padding = 0;
+            s.margin = 0;
+            s.lineHeight = 1;
+            s.display = "inline";
             cs.width  = width + "px";
             cs.height = height + "px";
             cs.position = "absolute";
@@ -2489,59 +2503,69 @@ window.Raphael = (function () {
     };
 
     R.easing_formulas = {
-        linear: function (time, beg, diff, dur) {
-          return time / dur;
+        linear: function(n) {
+            return n;
+
         },
-        "<": function (time, beg, diff, dur) {
-            return diff * (time /= dur) * time + beg;
+        "<": function(n) {
+            return Math.pow(n, 3);
         },
-        ">": function (time, beg, diff, dur) {
-            return -diff * (time /= dur) * (time - 2) + beg;
+        ">": function(n) {
+            return Math.pow(n - 1, 3) + 1;
         },
-        "<>": function (time, beg, diff, dur) {
-            if ((time /= dur/2) < 1) {
-                return diff / 2 * time * time + beg;
+        "<>": function(n) {
+            n = n * 2;
+            if (n < 1) {
+                return Math.pow(n, 3) / 2;
             }
-            return -diff / 2 * ((--time) * (time - 2) - 1) + beg;
+            n -= 2;
+            return (Math.pow(n, 3) + 2) / 2;
+
         },
-        bounce: function (time, beg, diff, dur) {
-            if ((time /= dur) < (1 / 2.75)) {
-                return diff * (7.5625 * time * time) + beg;
-            } else if (time < (2 / 2.75)) {
-                return diff * (7.5625 * (time -= (1.5 / 2.75)) * time + .75) + beg;
-            } else if (time < (2.5 / 2.75)) {
-                return diff * (7.5625 * (time -= (2.25 / 2.75)) * time + .9375) + beg;
-            } else {
-                return diff * (7.5625 * (time -= (2.625 / 2.75)) * time + .984375) + beg;
-            }
+        backIn: function(n) {
+            var s = 1.70158;
+            return Math.pow(n, 2) * ((s + 1) * n - s);
         },
-        elastic: function (time, beg, diff, dur) {
-            var s = 1.70158,
-                p = 0,
-                s,
-                a = diff;
-            if (time == 0) {
-                return beg;
+        backOut: function(n) {
+            n = n - 1;
+            var s = 1.70158;
+            return Math.pow(n, 2) * ((s + 1) * n + s) + 1;
+        },
+        elastic: function(n) {
+            if (n == 0 || n == 1) {
+                return n;
             }
-            if ((time /= dur) == 1) {
-                return beg + diff;
-            }
-            if (!p) {
-                p = dur * .3;
-            }
-            if (a < Math.abs(diff)) {
-                a = diff;
+            var p = .3,
                 s = p / 4;
+            return Math.pow(2, -10 * n) * Math.sin((n - s) * (2 * Math.PI) / p) + 1;
+        },
+        bounce: function(n) {
+            var s = 7.5625,
+                p = 2.75,
+                l;
+            if (n < (1 / p)) {
+                l = s * Math.pow(n, 2);
             } else {
-                s = p / (2 * Math.PI) * Math.asin(diff / a);
+                if (n < (2 / p)) {
+                    n -= (1.5 / p);
+                    l = s * Math.pow(n, 2) + .75;
+                } else {
+                    if (n < (2.5 / p)) {
+                        n -= (2.25 / p);
+                        l = s * Math.pow(n, 2) + .9375;
+                    } else {
+                        n -= (2.625 / p);
+                        l = s * Math.pow(n, 2) + .984375;
+                    }
+                }
             }
-            return a * Math.pow(2, -10 * time) * Math.sin((time * dur - s) * (2 * Math.PI) / p) + diff + beg;
+            return l;
         }
     };
 
     // animation easing formulas
-    R.easing = function(easing, time, beg, diff, dur) {
-        return (R.easing_formulas[easing] || R.easing_formulas.linear)(time, beg, diff, dur);
+    R.easing = function(easing, n) {
+        return R.easing_formulas[easing] ? R.easing_formulas[easing](n) : n;
     };
 
     Element.prototype.animate = function (params, ms, easing, callback) {
@@ -2613,7 +2637,7 @@ window.Raphael = (function () {
                 set = {},
                 now;
             if (time < ms) {
-                pos = R.easing(easing, time, 0, 1, ms);
+                pos = R.easing(easing, time / ms);
                 for (var attr in from) {
                     switch (availableAnimAttrs[attr]) {
                         case "number":
@@ -2747,7 +2771,7 @@ window.Raphael = (function () {
         })(method);
     }
     Set.prototype.attr = function (name, value) {
-        if (name && name instanceof Array && typeof name[0] == "object") {
+        if (name && R.isArray(name) && typeof name[0] == "object") {
             for (var j = 0, jj = name.length; j < jj; j++) {
                 this.items[j].attr(name[j]);
             }
