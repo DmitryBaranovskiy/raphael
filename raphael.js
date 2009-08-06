@@ -875,6 +875,8 @@ window.Raphael = (function () {
         };
         var setFillAndStroke = function (o, params) {
             var dasharray = {
+                    "": [0],
+                    "none": [0],
                     "-": [3, 1],
                     ".": [1, 1],
                     "-.": [3, 1, 1, 1],
@@ -2503,35 +2505,33 @@ window.Raphael = (function () {
     };
 
     R.easing_formulas = {
-        linear: function(n) {
+        linear: function (n) {
             return n;
-
         },
-        "<": function(n) {
+        "<": function (n) {
             return Math.pow(n, 3);
         },
-        ">": function(n) {
+        ">": function (n) {
             return Math.pow(n - 1, 3) + 1;
         },
-        "<>": function(n) {
+        "<>": function (n) {
             n = n * 2;
             if (n < 1) {
                 return Math.pow(n, 3) / 2;
             }
             n -= 2;
             return (Math.pow(n, 3) + 2) / 2;
-
         },
-        backIn: function(n) {
+        backIn: function (n) {
             var s = 1.70158;
             return Math.pow(n, 2) * ((s + 1) * n - s);
         },
-        backOut: function(n) {
+        backOut: function (n) {
             n = n - 1;
             var s = 1.70158;
             return Math.pow(n, 2) * ((s + 1) * n + s) + 1;
         },
-        elastic: function(n) {
+        elastic: function (n) {
             if (n == 0 || n == 1) {
                 return n;
             }
@@ -2539,7 +2539,7 @@ window.Raphael = (function () {
                 s = p / 4;
             return Math.pow(2, -10 * n) * Math.sin((n - s) * (2 * Math.PI) / p) + 1;
         },
-        bounce: function(n) {
+        bounce: function (n) {
             var s = 7.5625,
                 p = 2.75,
                 l;
