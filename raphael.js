@@ -1,5 +1,5 @@
 /*
- * Raphael 0.8.5 - JavaScript Vector Library
+ * Raphael 0.8.6 - JavaScript Vector Library
  *
  * Copyright (c) 2008 - 2009 Dmitry Baranovskiy (http://raphaeljs.com)
  * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
@@ -21,7 +21,7 @@ window.Raphael = (function () {
         availableAttrs = {cx: 0, cy: 0, fill: "#fff", "fill-opacity": 1, font: '10px "Arial"', "font-family": '"Arial"', "font-size": "10", "font-style": "normal", "font-weight": 400, gradient: 0, height: 0, href: "http://raphaeljs.com/", opacity: 1, path: "M0,0", r: 0, rotation: 0, rx: 0, ry: 0, scale: "1 1", src: "", stroke: "#000", "stroke-dasharray": "", "stroke-linecap": "butt", "stroke-linejoin": "butt", "stroke-miterlimit": 0, "stroke-opacity": 1, "stroke-width": 1, target: "_blank", "text-anchor": "middle", title: "Raphael", translation: "0 0", width: 0, x: 0, y: 0},
         availableAnimAttrs = {cx: "number", cy: "number", fill: "colour", "fill-opacity": "number", "font-size": "number", height: "number", opacity: "number", path: "path", r: "number", rotation: "csv", rx: "number", ry: "number", scale: "csv", stroke: "colour", "stroke-opacity": "number", "stroke-width": "number", translation: "csv", width: "number", x: "number", y: "number"},
         events = ["click", "dblclick", "mousedown", "mousemove", "mouseout", "mouseover", "mouseup"];
-    R.version = "0.8.5";
+    R.version = "0.8.6";
     R.type = (window.SVGAngle || document.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#BasicStructure", "1.1") ? "SVG" : "VML");
     R.svg = !(R.vml = R.type == "VML");
     R.idGenerator = 0;
@@ -384,14 +384,14 @@ window.Raphael = (function () {
                         case "a":
                             r[1] = pa[1];
                             r[2] = pa[2];
-                            r[3] = 0;
+                            r[3] = pa[3];
                             r[4] = pa[4];
                             r[5] = pa[5];
                             r[6] = +(pa[6] - x).toFixed(3);
                             r[7] = +(pa[7] - y).toFixed(3);
                             break;
                         case "v":
-                            r[1] = (pa[1] - y).toFixed(3);
+                            r[1] = +(pa[1] - y).toFixed(3);
                             break;
                         default:
                             for (var j = 1, jj = pa.length; j < jj; j++) {
@@ -404,18 +404,19 @@ window.Raphael = (function () {
                         res[i][k] = pa[k];
                     }
                 }
+                var len = res[i].length;
                 switch (res[i][0]) {
                     case "z":
                         break;
                     case "h":
-                        x += res[i][res[i].length - 1];
+                        x += +res[i][len - 1];
                         break;
                     case "v":
-                        y += res[i][res[i].length - 1];
+                        y += +res[i][len - 1];
                         break;
                     default:
-                        x += res[i][res[i].length - 2];
-                        y += res[i][res[i].length - 1];
+                        x += +res[i][len - 2];
+                        y += +res[i][len - 1];
                 }
             }
             res.toString = pathArray.toString;
@@ -810,6 +811,7 @@ window.Raphael = (function () {
             }
         };
         var thePath = function (params, pathString, SVG) {
+            params = params || {};
             var el = doc.createElementNS(SVG.svgns, "path");
             if (SVG.canvas) {
                 SVG.canvas.appendChild(el);
@@ -1172,7 +1174,13 @@ window.Raphael = (function () {
                 this.show();
                 var hide = true;
             }
-            var bbox = this.node.getBBox() || {};
+            var bbox = {};
+            try {
+                bbox = this.node.getBBox();
+            } catch(e) {
+                // Firefox 3.0.x plays badly here
+                bbox = {};
+            }
             if (this.type == "text") {
                 bbox = {x: bbox.x, y: Infinity, width: bbox.width, height: 0};
                 for (var i = 0, ii = this.node.getNumberOfChars(); i < ii; i++) {
@@ -1442,23 +1450,23 @@ window.Raphael = (function () {
             arcTo: function (rx, ry, large_arc_flag, sweep_flag, x2, y2) {
                 // for more information of where this math came from visit:
                 // http://www.w3.org/TR/SVG11/implnote.html#ArcImplementationNotes
-                x2 = (this.isAbsolute ? 0 : this.last.x) + x2 - 1;
-                y2 = (this.isAbsolute ? 0 : this.last.y) + y2 - 1;
-                var x1 = this.last.x - 1,
+                var x22 = (this.isAbsolute ? 0 : this.last.x) + parseFloat(x2) - 1,
+                    y22 = (this.isAbsolute ? 0 : this.last.y) + parseFloat(y2) - 1,
+                    x1 = this.last.x - 1,
                     y1 = this.last.y - 1,
-                    x = (x1 - x2) / 2,
-                    y = (y1 - y2) / 2,
+                    x = (x1 - x22) / 2,
+                    y = (y1 - y22) / 2,
                     k = (large_arc_flag == sweep_flag ? -1 : 1) *
                         Math.sqrt(Math.abs(rx * rx * ry * ry - rx * rx * y * y - ry * ry * x * x) / (rx * rx * y * y + ry * ry * x * x)),
-                    cx = k * rx * y / ry + (x1 + x2) / 2,
-                    cy = k * -ry * x / rx + (y1 + y2) / 2,
+                    cx = k * rx * y / ry + (x1 + x22) / 2,
+                    cy = k * -ry * x / rx + (y1 + y22) / 2,
                     d = sweep_flag ? (this.isAbsolute ? "wa" : "wr") : (this.isAbsolute ? "at" : "ar"),
                     left = Math.round(cx - rx),
                     top = Math.round(cy - ry);
-                d += [left, top, Math.round(left + rx * 2), Math.round(top + ry * 2), Math.round(x1), Math.round(y1), Math.round(parseFloat(x2)), Math.round(parseFloat(y2))].join(", ");
+                d += [left, top, Math.round(left + rx * 2), Math.round(top + ry * 2), Math.round(x1), Math.round(y1), Math.round(x22), Math.round(y22)].join(", ");
                 this.node.path = this.Path += d;
-                this.last.x = (this.isAbsolute ? 0 : this.last.x) + parseFloat(x2);
-                this.last.y = (this.isAbsolute ? 0 : this.last.y) + parseFloat(y2);
+                this.last.x = (this.isAbsolute ? 0 : this.last.x) + x2;
+                this.last.y = (this.isAbsolute ? 0 : this.last.y) + y2;
                 this.last.isAbsolute = this.isAbsolute;
                 this.attrs.path += (this.isAbsolute ? "A" : "a") + [rx, ry, 0, large_arc_flag, sweep_flag, x2, y2];
                 return this;
@@ -1556,6 +1564,7 @@ window.Raphael = (function () {
             }
         };
         var thePath = function (params, pathString, VML) {
+            params = params || {};
             var g = createNode("group"), gl = g.style;
             gl.position = "absolute";
             gl.left = 0;
@@ -1618,6 +1627,7 @@ window.Raphael = (function () {
             if (params.path && o.type == "path") {
                 o.Path = "";
                 o.path = [];
+                o.attrs.path = "";
                 paper.pathfinder(o, params.path);
             }
             if (params.rotation != null) {
@@ -1748,9 +1758,9 @@ window.Raphael = (function () {
             gradient = toGradient(gradient);
             o.attrs = o.attrs || {};
             var attrs = o.attrs,
-                fill = o.getElementsByTagName("fill");
+                fill = o.node.getElementsByTagName("fill");
             o.attrs.gradient = gradient;
-            o = o.shape || o[0];
+            o = o.shape || o.node;
             if (fill.length) {
                 fill = fill[0];
             } else {
@@ -2407,19 +2417,21 @@ window.Raphael = (function () {
         if (x != 0) {
             var bb = this.type == "path" ? pathDimensions(a.path) : this.getBBox(),
                 rcx = bb.x + bb.width / 2,
-                rcy = bb.y + bb.height / 2;
+                rcy = bb.y + bb.height / 2,
+                kx = x / this._.sx,
+                ky = y / this._.sy;
             cx = (+cx || cx == 0) ? cx : rcx;
             cy = (+cy || cy == 0) ? cy : rcy;
             var dirx = Math.round(x / Math.abs(x)),
                 diry = Math.round(y / Math.abs(y)),
                 s = this.node.style,
-                ncx = cx + (rcx - cx) * x * dirx / this._.sx,
-                ncy = cy + (rcy - cy) * y * diry / this._.sy;
+                ncx = cx + (rcx - cx) * dirx * kx,
+                ncy = cy + (rcy - cy) * diry * ky;
             switch (this.type) {
                 case "rect":
                 case "image":
-                    var neww = a.width * x * dirx / this._.sx,
-                        newh = a.height * y * diry / this._.sy,
+                    var neww = a.width * dirx * kx,
+                        newh = a.height * diry * ky,
                         newx = ncx - neww / 2,
                         newy = ncy - newh / 2;
                     this.attr({
@@ -2432,9 +2444,9 @@ window.Raphael = (function () {
                 case "circle":
                 case "ellipse":
                     this.attr({
-                        rx: a.rx * x / this._.sx,
-                        ry: a.ry * y / this._.sy,
-                        r: a.r * x / this._.sx,
+                        rx: a.rx * kx,
+                        ry: a.ry * ky,
+                        r: a.r * kx,
                         cx: ncx,
                         cy: ncy
                     });
@@ -2450,14 +2462,14 @@ window.Raphael = (function () {
                             skip = false;
                         }
                         if (R.svg && p[0].toUpperCase() == "A") {
-                            p[path[i].length - 2] *= x / this._.sx;
-                            p[path[i].length - 1] *= y / this._.sy;
-                            p[1] *= x / this._.sx;
-                            p[2] *= y / this._.sy;
+                            p[path[i].length - 2] *= kx;
+                            p[path[i].length - 1] *= ky;
+                            p[1] *= kx;
+                            p[2] *= ky;
                             p[5] = +(dirx + diry ? !!+p[5] : !+p[5]);
                         } else {
                             for (var j = 1, jj = p.length; j < jj; j++) {
-                                p[j] *= (j % 2) ? x / this._.sx : y / this._.sy;
+                                p[j] *= (j % 2) ? kx : ky;
                             }
                         }
                     }
@@ -2687,7 +2699,7 @@ window.Raphael = (function () {
                 }
                 that.attr(set);
                 that.animation_in_progress = setTimeout(tick);
-                paper.safari();
+                R.svg && paper.safari();
             } else {
                 (t.x || t.y) && that.translate(-t.x, -t.y);
                 that.attr(params);
@@ -2708,12 +2720,12 @@ window.Raphael = (function () {
         switch (this.type) {
             case "circle":
             case "ellipse":
-                this.attr({cx: this.attrs.cx + x, cy: this.attrs.cy + y});
+                this.attr({cx: +x + this.attrs.cx, cy: +y + this.attrs.cy});
                 break;
             case "rect":
             case "image":
             case "text":
-                this.attr({x: this.attrs.x + (+x), y: this.attrs.y + (+y)});
+                this.attr({x: +x + this.attrs.x, y: +y + this.attrs.y});
                 break;
             case "path":
                 var path = pathToRelative(this.attrs.path);
