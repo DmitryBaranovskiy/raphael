@@ -1179,7 +1179,8 @@ window.Raphael = (function () {
                 bbox = this.node.getBBox();
             } catch(e) {
                 // Firefox 3.0.x plays badly here
-                bbox = {};
+            } finally {
+                bbox = bbox || {};
             }
             if (this.type == "text") {
                 bbox = {x: bbox.x, y: Infinity, width: bbox.width, height: 0};
