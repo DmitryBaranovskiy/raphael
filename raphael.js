@@ -873,7 +873,7 @@ window.Raphael = (function () {
                 },
                 node = o.node,
                 attrs = o.attrs,
-                rot = attrs.rotation,
+                rot = o.attr("rotation"),
                 addDashes = function (o, value) {
                     value = dasharray[(value + "").toLowerCase()];
                     if (value) {
@@ -971,6 +971,7 @@ window.Raphael = (function () {
                         addDashes(o, value);
                         break;
                     case "rotation":
+                        rot = value;
                         o.rotate(value, true);
                         break;
                     case "translation":
@@ -1058,7 +1059,7 @@ window.Raphael = (function () {
             }
             
             tuneText(o, params);
-            o.rotate(attrs.rotation, true);
+            o.rotate(rot, true);
         };
         var leading = 1.2;
         var tuneText = function (el, params) {
