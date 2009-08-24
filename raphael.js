@@ -802,6 +802,23 @@ window.Raphael = (function () {
 
     // SVG
     if (R.svg) {
+        var round = function (num) {
+            return isNaN(num) ? num : +num + ((+num).toFixed() == +num) * .5;
+        };
+        var roundPath = function (path) {
+            for (var i = 0, ii = path.length; i < ii; i++) {
+                if (path[i][0].toLowerCase() != "a") {
+                    for (var j = 0, jj = path[i].length; j < jj; j++) {
+                        var x = path[i][j];
+                        path[i][j] = round(x);
+                    }
+                } else {
+                    path[i][6] = round(path[i][6]);
+                    path[i][7] = round(path[i][7]);
+                }
+            }
+            return path;
+        };
         R.toString = function () {
             return  "Your browser supports SVG.\nYou are running Rapha\u00ebl " + this.version;
         };
@@ -812,7 +829,7 @@ window.Raphael = (function () {
             }
             var p = new Element(el, SVG);
             p.type = "path";
-            p.attrs.path = R.parsePathString(pathString);
+            p.attrs.path = roundPath(pathToAbsolute(pathString));
             pathString && p.node.setAttribute("d", p.attrs.path);
             setFillAndStroke(p, {fill: "none", stroke: "#000"});
             return p;
@@ -909,7 +926,7 @@ window.Raphael = (function () {
                       break;
                     case "path":
                         if (o.type == "path") {
-                            attrs.path = R.parsePathString(value);
+                            attrs.path = roundPath(pathToAbsolute(value));
                             node.setAttribute("d", attrs.path);
                         }
                     case "width":
@@ -1047,6 +1064,8 @@ window.Raphael = (function () {
                             }
                             break;
                         }
+                    case "font-size":
+                        value = parseInt(value, 10) + "px";
                     default :
                         var cssrule = att.replace(/(\-.)/g, function (w) {
                             return w.substring(1).toUpperCase();
@@ -1230,6 +1249,8 @@ window.Raphael = (function () {
             return this;
         };
         var theCircle = function (svg, x, y, r) {
+            x = round(x);
+            y = round(y);
             var el = doc.createElementNS(svg.svgns, "circle");
             el.setAttribute("cx", x);
             el.setAttribute("cy", y);
@@ -1249,6 +1270,8 @@ window.Raphael = (function () {
             return res;
         };
         var theRect = function (svg, x, y, w, h, r) {
+            x = round(x);
+            y = round(y);
             var el = doc.createElementNS(svg.svgns, "rect");
             el.setAttribute("x", x);
             el.setAttribute("y", y);
@@ -1277,6 +1300,8 @@ window.Raphael = (function () {
             return res;
         };
         var theEllipse = function (svg, x, y, rx, ry) {
+            x = round(x);
+            y = round(y);
             var el = doc.createElementNS(svg.svgns, "ellipse");
             el.setAttribute("cx", x);
             el.setAttribute("cy", y);
@@ -1460,7 +1485,8 @@ window.Raphael = (function () {
             params.title && (node.title = params.title);
             params.target && (node.target = params.target);
             if (params.path && o.type == "path") {
-                o.node.path = path2vml(params.path);
+                o.attrs.path = R.parsePathString(params.path);
+                o.node.path = path2vml(o.attrs.path);
             }
             if (params.rotation != null) {
                 o.rotate(params.rotation, true);
@@ -2184,19 +2210,6 @@ window.Raphael = (function () {
     paper.text = function (x, y, text) {
         return theText(this, x, y, text);
     };
-    paper.drawGrid = function (x, y, w, h, wv, hv, color) {
-        color = color || "#000";
-        var path = ["M", x, y, "L", x + w, y, x + w, y + h, x, y + h, x, y],
-            rowHeight = h / hv,
-            columnWidth = w / wv;
-        for (var i = 1; i < hv; i++) {
-            path = path.concat(["M", x, y + i * rowHeight, "L", x + w, y + i * rowHeight]);
-        }
-        for (var i = 1; i < wv; i++) {
-            path = path.concat(["M", x + i * columnWidth, y, "L", x + i * columnWidth, y + h]);
-        }
-        return this.path({stroke: color, "stroke-width": 1}, path.join(","));
-    };
     paper.set = function (itemsArray) {
         return new Set(itemsArray);
     };
@@ -2386,7 +2399,6 @@ window.Raphael = (function () {
         clearTimeout(this.animation_in_progress);
         if (typeof easing == "function" || !easing) {
             callback = easing || null;
-            easing = "linear";
         }
         var from = {},
             to = {},
@@ -2445,13 +2457,16 @@ window.Raphael = (function () {
         }
         var start = +new Date,
             prev = 0,
+            upto255 = function (color) {
+                return +color > 255 ? 255 : +color;
+            },
             that = this;
         (function tick() {
             var time = new Date - start,
                 set = {},
                 now;
             if (time < ms) {
-                pos = R.easing(easing, time / ms);
+                var pos = R.easing(easing, time / ms);
                 for (var attr in from) {
                     switch (availableAnimAttrs[attr]) {
                         case "number":
@@ -2459,9 +2474,9 @@ window.Raphael = (function () {
                             break;
                         case "colour":
                             now = "rgb(" + [
-                                Math.round(from[attr].r + pos * ms * diff[attr].r),
-                                Math.round(from[attr].g + pos * ms * diff[attr].g),
-                                Math.round(from[attr].b + pos * ms * diff[attr].b)
+                                upto255(Math.round(from[attr].r + pos * ms * diff[attr].r)),
+                                upto255(Math.round(from[attr].g + pos * ms * diff[attr].g)),
+                                upto255(Math.round(from[attr].b + pos * ms * diff[attr].b))
                             ].join(",") + ")";
                             break;
                         case "path":
@@ -2493,11 +2508,7 @@ window.Raphael = (function () {
                             }
                             break;
                     }
-                    if (attr == "font-size") {
-                        set[attr] = now + "px";
-                    } else {
-                        set[attr] = now;
-                    }
+                    set[attr] = now;
                 }
                 that.attr(set);
                 that.animation_in_progress = setTimeout(tick);
@@ -2543,6 +2554,7 @@ window.Raphael = (function () {
     var Set = function (items) {
         this.items = [];
         this.length = 0;
+        arguments.length > 1 && (items = Array.prototype.splice.call(arguments, 0, arguments.length));
         if (items) {
             for (var i = 0, ii = items.length; i < ii; i++) {
                 if (items[i] && (items[i].constructor == Element || items[i].constructor == Set)) {
