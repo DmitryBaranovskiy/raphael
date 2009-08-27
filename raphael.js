@@ -122,6 +122,18 @@ window.Raphael = (function () {
         }
         return {h: hue, s: saturation, b: brightness};
     };
+    R._path2string = function () {
+        var res = "",
+            item;
+        for (var i = 0, ii = this.length; i < ii; i++) {
+            for (var j = 0, jj = this[i].length; j < jj; j++) {
+                res += this[i][j];
+                j && j != jj - 1 && (res += ",");
+            }
+            i != ii - 1 && (res += "\n");
+        }
+        return res.replace(/,(?=-)/g, "");
+    };
     var getRGBcache = {},
         getRGBcount = [];
     R.getRGB = function (colour) {
@@ -216,20 +228,7 @@ window.Raphael = (function () {
         delete this.start;
     };
     // path utilities
-    var pathcache = {"": []},
-        path2string = function () {
-            var res = "",
-                item;
-            for (var i = 0, ii = this.length; i < ii; i++) {
-                for (var j = 0, jj = this[i].length; j < jj; j++) {
-                    item = this[i][j];
-                    res += isNaN(item) ? item : +item.toFixed(3);
-                    j && j != jj - 1 && (res += ",");
-                }
-                i != ii - 1 && (res += "\n");
-            }
-            return res.replace(/,(?=-)/g, "");
-        },
+    var pathcache = {"": null},
         pathcount = [];
     R.parsePathString = function (pathString) {
         if (pathString in pathcache) {
@@ -237,7 +236,7 @@ window.Raphael = (function () {
         }
         var paramCounts = {a: 7, c: 6, h: 1, l: 2, m: 2, q: 4, s: 4, t: 2, v: 1, z: 0},
             data = [];
-        if (pathString.toString == path2string) {
+        if (R.isArray(pathString) && R.isArray(pathString[0])) { // rough assumption
             data = pathString;
         }
         if (!data.length) {
@@ -254,14 +253,13 @@ window.Raphael = (function () {
                     };
                 }
             });
-            data.toString = path2string;
         }
+        data.toString = R._path2string;
         if (pathcount.length > 200) {
             delete pathcache[pathcount.unshift()];
         }
         pathcount.push(pathString);
-        pathcache[pathString] = data;
-        return data;
+        return (pathcache[pathString] = data);
     };
     var pathDimensions = function (path) {
         pathDimensions.cache = pathDimensions.cache || {};
@@ -298,7 +296,7 @@ window.Raphael = (function () {
         });
     },
         pathToRelative = function (pathArray) {
-            if (typeof pathArray == "string") {
+            if (!R.isArray(pathArray) || !R.isArray(pathArray && pathArray[0])) { // rough assumption
                 pathArray = R.parsePathString(pathArray);
             }
             pathToRelative.cache = pathToRelative.cache || {};
@@ -373,7 +371,7 @@ window.Raphael = (function () {
                         y += +res[i][len - 1];
                 }
             }
-            res.toString = path2string;
+            res.toString = R._path2string;
             if (pathToRelative.count.length > 100) {
                 delete pathToRelative.cache[pathToRelative.count.unshift()];
             }
@@ -382,7 +380,7 @@ window.Raphael = (function () {
         },
         pathClone = function (pathArray) {
             var res = [];
-            if (typeof pathArray == "string") {
+            if (!R.isArray(pathArray) || !R.isArray(pathArray && pathArray[0])) { // rough assumption
                 pathArray = R.parsePathString(pathArray);
             }
             for (var i = 0, ii = pathArray.length; i < ii; i++) {
@@ -391,11 +389,11 @@ window.Raphael = (function () {
                     res[i][j] = pathArray[i][j];
                 }
             }
-            res.toString = path2string;
+            res.toString = R._path2string;
             return res;
         },
         pathToAbsolute = function (pathArray) {
-            if (typeof pathArray == "string") {
+            if (!R.isArray(pathArray) || !R.isArray(pathArray && pathArray[0])) { // rough assumption
                 pathArray = R.parsePathString(pathArray);
             }
             pathToAbsolute.cache = pathToAbsolute.cache || {};
@@ -447,7 +445,6 @@ window.Raphael = (function () {
                             }
                     }
                 } else {
-                    r = res[i] = [];
                     for (var k = 0, kk = pa.length; k < kk; k++) {
                         res[i][k] = pa[k];
                     }
@@ -468,7 +465,7 @@ window.Raphael = (function () {
                         y = res[i][res[i].length - 1];
                 }
             }
-            res.toString = path2string;
+            res.toString = R._path2string;
             if (pathToAbsolute.count.length > 100) {
                 delete pathToAbsolute.cache[pathToAbsolute.count.unshift()];
             }
@@ -803,14 +800,13 @@ window.Raphael = (function () {
     // SVG
     if (R.svg) {
         var round = function (num) {
-            return isNaN(num) ? num : +num + ((+num).toFixed() == +num) * .5;
+            return +num + (Math.floor(num) == num) * .5;
         };
         var roundPath = function (path) {
             for (var i = 0, ii = path.length; i < ii; i++) {
                 if (path[i][0].toLowerCase() != "a") {
-                    for (var j = 0, jj = path[i].length; j < jj; j++) {
-                        var x = path[i][j];
-                        path[i][j] = round(x);
+                    for (var j = 1, jj = path[i].length; j < jj; j++) {
+                        path[i][j] = round(path[i][j]);
                     }
                 } else {
                     path[i][6] = round(path[i][6]);
@@ -829,8 +825,7 @@ window.Raphael = (function () {
             }
             var p = new Element(el, SVG);
             p.type = "path";
-            p.attrs.path = roundPath(pathToAbsolute(pathString));
-            pathString && p.node.setAttribute("d", p.attrs.path);
+            pathString && (p.attrs.path = roundPath(pathToAbsolute(pathString))) && p.node.setAttribute("d", p.attrs.path);
             setFillAndStroke(p, {fill: "none", stroke: "#000"});
             return p;
         };
@@ -867,10 +862,8 @@ window.Raphael = (function () {
             o.setAttribute("fill-opacity", 1);
         };
         var updatePosition = function (o) {
-            if (o.pattern) {
-                var bbox = o.getBBox();
-                o.pattern.setAttribute("patternTransform", "translate(".concat(bbox.x, ",", bbox.y, ")"));
-            }
+            var bbox = o.getBBox();
+            o.pattern.setAttribute("patternTransform", "translate(".concat(bbox.x, ",", bbox.y, ")"));
         };
         var setFillAndStroke = function (o, params) {
             var dasharray = {
@@ -903,7 +896,7 @@ window.Raphael = (function () {
                         node.setAttribute("stroke-dasharray", value);
                     }
                 };
-            o.rotate(0, true);
+            parseInt(rot, 10) && o.rotate(0, true);
             for (var att in params) {
                 if (!(att in availableAttrs)) {
                     continue;
@@ -944,7 +937,7 @@ window.Raphael = (function () {
                     case "rx":
                     case "cx":
                         node.setAttribute(att, value);
-                        updatePosition(o);
+                        o.pattern && updatePosition(o);
                         break;
                     case "height":
                         node.setAttribute(att, value);
@@ -961,7 +954,7 @@ window.Raphael = (function () {
                     case "ry":
                     case "cy":
                         node.setAttribute(att, value);
-                        updatePosition(o);
+                        o.pattern && updatePosition(o);
                         break;
                     case "r":
                         if (o.type == "rect") {
@@ -1031,7 +1024,7 @@ window.Raphael = (function () {
                             node.style.fill = "url(#" + el.id + ")";
                             node.setAttribute("fill", "url(#" + el.id + ")");
                             o.pattern = el;
-                            updatePosition(o);
+                            o.pattern && updatePosition(o);
                             break;
                         }
                         delete params.gradient;
@@ -1064,9 +1057,8 @@ window.Raphael = (function () {
                             }
                             break;
                         }
-                    case "font-size":
-                        value = parseInt(value, 10) + "px";
-                    default :
+                    default:
+                        att == "font-size" && (value = parseInt(value, 10) + "px");
                         var cssrule = att.replace(/(\-.)/g, function (w) {
                             return w.substring(1).toUpperCase();
                         });
@@ -1078,7 +1070,7 @@ window.Raphael = (function () {
             }
             
             tuneText(o, params);
-            o.rotate(rot, true);
+            parseInt(rot, 10) && o.rotate(rot, true);
         };
         var leading = 1.2;
         var tuneText = function (el, params) {
@@ -1473,20 +1465,21 @@ window.Raphael = (function () {
             return p;
         };
         var setFillAndStroke = function (o, params) {
+            o.attrs = o.attrs || {};
             var node = o.node,
+                a = o.attrs,
                 s = node.style,
                 xy,
                 res = o;
-            o.attrs = o.attrs || {};
             for (var par in params) {
-                o.attrs[par] = params[par];
+                a[par] = params[par];
             }
             params.href && (node.href = params.href);
             params.title && (node.title = params.title);
             params.target && (node.target = params.target);
             if (params.path && o.type == "path") {
-                o.attrs.path = R.parsePathString(params.path);
-                o.node.path = path2vml(o.attrs.path);
+                a.path = R.parsePathString(params.path);
+                node.path = path2vml(a.path);
             }
             if (params.rotation != null) {
                 o.rotate(params.rotation, true);
@@ -1504,24 +1497,36 @@ window.Raphael = (function () {
             }
             if (o.type == "image" && params.opacity) {
                 node.filterOpacity = " progid:DXImageTransform.Microsoft.Alpha(opacity=" + (params.opacity * 100) + ")";
-                node.style.filter = (node.filterMatrix || "") + (node.filterOpacity || "");
+                s.filter = (node.filterMatrix || "") + (node.filterOpacity || "");
             }
             params.font && (s.font = params.font);
             params["font-family"] && (s.fontFamily = '"' + params["font-family"].split(",")[0].replace(/^['"]+|['"]+$/g, "") + '"');
             params["font-size"] && (s.fontSize = params["font-size"]);
             params["font-weight"] && (s.fontWeight = params["font-weight"]);
             params["font-style"] && (s.fontStyle = params["font-style"]);
-            if (typeof params.opacity != "undefined" || typeof params["stroke-width"] != "undefined" || typeof params.fill != "undefined" || typeof params.stroke != "undefined" || params["stroke-width"] || params["stroke-opacity"] || params["fill-opacity"] || params["stroke-dasharray"] || params["stroke-miterlimit"] || params["stroke-linejoin"] || params["stroke-linecap"]) {
-                o = o.shape || node;
-                var fill = (o.getElementsByTagName("fill") && o.getElementsByTagName("fill")[0]) || createNode("fill");
+            if (params.opacity != null || 
+                params["stroke-width"] != null ||
+                params.fill != null ||
+                params.stroke != null ||
+                params["stroke-width"] != null ||
+                params["stroke-opacity"] != null ||
+                params["fill-opacity"] != null ||
+                params["stroke-dasharray"] != null ||
+                params["stroke-miterlimit"] != null ||
+                params["stroke-linejoin"] != null ||
+                params["stroke-linecap"] != null) {
+                node = o.shape || node;
+                var fill = (node.getElementsByTagName("fill") && node.getElementsByTagName("fill")[0]),
+                    newfill = false;
+                !fill && (newfill = fill = createNode("fill"));
                 if ("fill-opacity" in params || "opacity" in params) {
-                    var opacity = ((+params["fill-opacity"] + 1 || 2) - 1) * ((+params.opacity + 1 || 2) - 1);
+                    var opacity = ((+a["fill-opacity"] + 1 || 2) - 1) * ((+a.opacity + 1 || 2) - 1);
                     opacity < 0 && (opacity = 0);
                     opacity > 1 && (opacity = 1);
                     fill.opacity = opacity;
                 }
                 params.fill && (fill.on = true);
-                if (typeof fill.on == "undefined" || params.fill == "none") {
+                if (fill.on == null || params.fill == "none") {
                     fill.on = false;
                 }
                 if (fill.on && params.fill) {
@@ -1535,18 +1540,22 @@ window.Raphael = (function () {
                         fill.type = "solid";
                     }
                 }
-                o.appendChild(fill);
-                var stroke = (o.getElementsByTagName("stroke") && o.getElementsByTagName("stroke")[0]) || createNode("stroke");
-                if ((params.stroke && params.stroke != "none") || params["stroke-width"] || typeof params["stroke-opacity"] != "undefined" || params["stroke-dasharray"] || params["stroke-miterlimit"] || params["stroke-linejoin"] || params["stroke-linecap"]) {
+                newfill && node.appendChild(fill);
+                var stroke = (node.getElementsByTagName("stroke") && node.getElementsByTagName("stroke")[0]),
+                newstroke = false;
+                !stroke && (newstroke = stroke = createNode("stroke"));
+                if ((params.stroke && params.stroke != "none") ||
+                    params["stroke-width"] ||
+                    params["stroke-opacity"] != null ||
+                    params["stroke-dasharray"] ||
+                    params["stroke-miterlimit"] ||
+                    params["stroke-linejoin"] ||
+                    params["stroke-linecap"]) {
                     stroke.on = true;
                 }
-                if (params.stroke == "none" || typeof stroke.on == "undefined" || params.stroke == 0) {
-                    stroke.on = false;
-                }
-                if (stroke.on && params.stroke) {
-                    stroke.color = R.getRGB(params.stroke).hex;
-                }
-                var opacity = ((+params["stroke-opacity"] + 1 || 2) - 1) * ((+params.opacity + 1 || 2) - 1);
+                (params.stroke == "none" || stroke.on == null || params.stroke == 0) && (stroke.on = false);
+                stroke.on && params.stroke && (stroke.color = R.getRGB(params.stroke).hex);
+                var opacity = ((+a["stroke-opacity"] + 1 || 2) - 1) * ((+a.opacity + 1 || 2) - 1);
                 opacity < 0 && (opacity = 0);
                 opacity > 1 && (opacity = 1);
                 stroke.opacity = opacity;
@@ -1569,11 +1578,10 @@ window.Raphael = (function () {
                     };
                     stroke.dashstyle = dasharray[params["stroke-dasharray"]] || "";
                 }
-                o.appendChild(stroke);
+                newstroke && node.appendChild(stroke);
             }
             if (res.type == "text") {
-                var s = paper.span.style,
-                    a = res.attrs;
+                var s = paper.span.style;
                 a.font && (s.font = a.font);
                 a["font-family"] && (s.fontFamily = a["font-family"]);
                 a["font-size"] && (s.fontSize = a["font-size"]);
@@ -2211,6 +2219,7 @@ window.Raphael = (function () {
         return theText(this, x, y, text);
     };
     paper.set = function (itemsArray) {
+        arguments.length > 1 && (itemsArray = Array.prototype.splice.call(arguments, 0, arguments.length));
         return new Set(itemsArray);
     };
     paper.setSize = setSize;
@@ -2554,7 +2563,6 @@ window.Raphael = (function () {
     var Set = function (items) {
         this.items = [];
         this.length = 0;
-        arguments.length > 1 && (items = Array.prototype.splice.call(arguments, 0, arguments.length));
         if (items) {
             for (var i = 0, ii = items.length; i < ii; i++) {
                 if (items[i] && (items[i].constructor == Element || items[i].constructor == Set)) {
