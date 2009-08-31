@@ -34,7 +34,7 @@ window.Raphael = (function () {
         doc = win.document;
     };
     // colour utilities
-    R.hsb2rgb = function (hue, saturation, brightness) {
+    R.hsb2rgb = cacher(function (hue, saturation, brightness) {
         if (typeof hue == "object" && "h" in hue && "s" in hue && "b" in hue) {
             brightness = hue.b;
             saturation = hue.s;
@@ -77,8 +77,8 @@ window.Raphael = (function () {
         }
         rgb.hex = "#" + r + g + b;
         return rgb;
-    };
-    R.rgb2hsb = function (red, green, blue) {
+    }, R);
+    R.rgb2hsb = cacher(function (red, green, blue) {
         if (typeof red == "object" && "r" in red && "g" in red && "b" in red) {
             blue = red.b;
             green = red.g;
@@ -121,7 +121,7 @@ window.Raphael = (function () {
             }
         }
         return {h: hue, s: saturation, b: brightness};
-    };
+    }, R);
     R._path2string = function () {
         var res = "",
             item;
@@ -134,12 +134,26 @@ window.Raphael = (function () {
         }
         return res.replace(/,(?=-)/g, "");
     };
-    var getRGBcache = {},
-        getRGBcount = [];
-    R.getRGB = function (colour) {
-        if (colour in getRGBcache) {
-            return getRGBcache[colour];
+    function cacher(f, scope, postprocessor) {
+        function newf() {
+            var arg = Array.prototype.splice.call(arguments, 0, arguments.length),
+                args = arg.join("\u25ba");
+            newf.cache = newf.cache || {};
+            newf.count = newf.count || [];
+            if (args in newf.cache) {
+                return postprocessor ? postprocessor(newf.cache[args]) : newf.cache[args];
+            }
+            if (newf.count.length > 1000) {
+                delete newf.cache[newf.count.unshift()];
+            }
+            newf.count.push(args);
+            newf.cache[args] = f.apply(scope, arg);
+            return postprocessor ? postprocessor(newf.cache[args]) : newf.cache[args];
         }
+        return newf;
+    }
+
+    R.getRGB = cacher(function (colour) {
         var htmlcolors = {aliceblue: "#f0f8ff", amethyst: "#96c", antiquewhite: "#faebd7", aqua: "#0ff", aquamarine: "#7fffd4", azure: "#f0ffff", beige: "#f5f5dc", bisque: "#ffe4c4", black: "#000", blanchedalmond: "#ffebcd", blue: "#00f", blueviolet: "#8a2be2", brown: "#a52a2a", burlywood: "#deb887", cadetblue: "#5f9ea0", chartreuse: "#7fff00", chocolate: "#d2691e", coral: "#ff7f50", cornflowerblue: "#6495ed", cornsilk: "#fff8dc", crimson: "#dc143c", cyan: "#0ff", darkblue: "#00008b", darkcyan: "#008b8b", darkgoldenrod: "#b8860b", darkgray: "#a9a9a9", darkgreen: "#006400", darkkhaki: "#bdb76b", darkmagenta: "#8b008b", darkolivegreen: "#556b2f", darkorange: "#ff8c00", darkorchid: "#9932cc", darkred: "#8b0000", darksalmon: "#e9967a", darkseagreen: "#8fbc8f", darkslateblue: "#483d8b", darkslategray: "#2f4f4f", darkturquoise: "#00ced1", darkviolet: "#9400d3", deeppink: "#ff1493", deepskyblue: "#00bfff", dimgray: "#696969", dodgerblue: "#1e90ff", firebrick: "#b22222", floralwhite: "#fffaf0", forestgreen: "#228b22", fuchsia: "#f0f", gainsboro: "#dcdcdc", ghostwhite: "#f8f8ff", gold: "#ffd700", goldenrod: "#daa520", gray: "#808080", green: "#008000", greenyellow: "#adff2f", honeydew: "#f0fff0", hotpink: "#ff69b4", indianred: "#cd5c5c", indigo: "#4b0082", ivory: "#fffff0", khaki: "#f0e68c", lavender: "#e6e6fa", lavenderblush: "#fff0f5", lawngreen: "#7cfc00", lemonchiffon: "#fffacd", lightblue: "#add8e6", lightcoral: "#f08080", lightcyan: "#e0ffff", lightgoldenrodyellow: "#fafad2", lightgreen: "#90ee90", lightgrey: "#d3d3d3", lightpink: "#ffb6c1", lightsalmon: "#ffa07a", lightsalmon: "#ffa07a", lightseagreen: "#20b2aa", lightskyblue: "#87cefa", lightslategray: "#789", lightsteelblue: "#b0c4de", lightyellow: "#ffffe0", lime: "#0f0", limegreen: "#32cd32", linen: "#faf0e6", magenta: "#f0f", maroon: "#800000", mediumaquamarine: "#66cdaa", mediumblue: "#0000cd", mediumorchid: "#ba55d3", mediumpurple: "#9370db", mediumseagreen: "#3cb371", mediumslateblue: "#7b68ee", mediumslateblue: "#7b68ee", mediumspringgreen: "#00fa9a", mediumturquoise: "#48d1cc", mediumvioletred: "#c71585", midnightblue: "#191970", mintcream: "#f5fffa", mistyrose: "#ffe4e1", moccasin: "#ffe4b5", navajowhite: "#ffdead", navy: "#000080", oldlace: "#fdf5e6", olive: "#808000", olivedrab: "#6b8e23", orange: "#ffa500", orangered: "#ff4500", orchid: "#da70d6", palegoldenrod: "#eee8aa", palegreen: "#98fb98", paleturquoise: "#afeeee", palevioletred: "#db7093", papayawhip: "#ffefd5", peachpuff: "#ffdab9", peru: "#cd853f", pink: "#ffc0cb", plum: "#dda0dd", powderblue: "#b0e0e6", purple: "#800080", red: "#f00", rosybrown: "#bc8f8f", royalblue: "#4169e1", saddlebrown: "#8b4513", salmon: "#fa8072", sandybrown: "#f4a460", seagreen: "#2e8b57", seashell: "#fff5ee", sienna: "#a0522d", silver: "#c0c0c0", skyblue: "#87ceeb", slateblue: "#6a5acd", slategray: "#708090", snow: "#fffafa", springgreen: "#00ff7f", steelblue: "#4682b4", tan: "#d2b48c", teal: "#008080", thistle: "#d8bfd8", tomato: "#ff6347", turquoise: "#40e0d0", violet: "#ee82ee", wheat: "#f5deb3", white: "#fff", whitesmoke: "#f5f5f5", yellow: "#ff0", yellowgreen: "#9acd32"},
         res;
         if ((colour + "").toLowerCase() in htmlcolors) {
@@ -204,13 +218,8 @@ window.Raphael = (function () {
         } else {
             res = {r: -1, g: -1, b: -1, hex: "none"};
         }
-        if (getRGBcount.length > 20) {
-            delete getRGBcache[getRGBcount.unshift()];
-        }
-        getRGBcount.push(colour);
-        getRGBcache[colour] = res;
         return res;
-    };
+    }, R);
     R.getColor = function (value) {
         var start = this.getColor.start = this.getColor.start || {h: 0, s: 1, b: value || .75},
             rgb = this.hsb2rgb(start.h, start.s, start.b);
@@ -228,11 +237,9 @@ window.Raphael = (function () {
         delete this.start;
     };
     // path utilities
-    var pathcache = {"": null},
-        pathcount = [];
-    R.parsePathString = function (pathString) {
-        if (pathString in pathcache) {
-            return pathcache[pathString];
+    R.parsePathString = cacher(function (pathString) {
+        if (!pathString) {
+            return null;
         }
         var paramCounts = {a: 7, c: 6, h: 1, l: 2, m: 2, q: 4, s: 4, t: 2, v: 1, z: 0},
             data = [];
@@ -255,18 +262,9 @@ window.Raphael = (function () {
             });
         }
         data.toString = R._path2string;
-        if (pathcount.length > 200) {
-            delete pathcache[pathcount.unshift()];
-        }
-        pathcount.push(pathString);
-        return (pathcache[pathString] = data);
-    };
-    var pathDimensions = function (path) {
-        pathDimensions.cache = pathDimensions.cache || {};
-        pathDimensions.count = pathDimensions.count || [];
-        if (path in pathDimensions.cache) {
-            return pathDimensions.cache[path];
-        }
+        return data;
+    }, R);
+    var pathDimensions = cacher(function (path) {
         path = path2curve(path);
         var x = 0, 
             y = 0,
@@ -284,25 +282,16 @@ window.Raphael = (function () {
         }
         var xmin = Math.min.apply(0, X),
             ymin = Math.min.apply(0, Y);
-        if (pathDimensions.count.length > 100) {
-            delete pathDimensions.cache[pathDimensions.count.unshift()];
-        }
-        pathDimensions.count.push(path);
-        return (pathDimensions.cache[path] = {
+        return {
             x: xmin,
             y: ymin,
             width: Math.max.apply(0, X) - xmin,
             height: Math.max.apply(0, Y) - ymin
-        });
-    },
-        pathToRelative = function (pathArray) {
+        };
+    }),
+        pathToRelative = cacher(function (pathArray) {
             if (!R.isArray(pathArray) || !R.isArray(pathArray && pathArray[0])) { // rough assumption
                 pathArray = R.parsePathString(pathArray);
-            }
-            pathToRelative.cache = pathToRelative.cache || {};
-            pathToRelative.count = pathToRelative.count || [];
-            if (pathArray in pathToRelative.cache) {
-                return pathClone(pathToRelative.cache[pathArray]);
             }
             var res = [],
                 x = 0,
@@ -372,12 +361,8 @@ window.Raphael = (function () {
                 }
             }
             res.toString = R._path2string;
-            if (pathToRelative.count.length > 100) {
-                delete pathToRelative.cache[pathToRelative.count.unshift()];
-            }
-            pathToRelative.count.push(pathArray);
-            return pathClone(pathToRelative.cache[pathArray] = res);
-        },
+            return res;
+        }, null, pathClone),
         pathClone = function (pathArray) {
             var res = [];
             if (!R.isArray(pathArray) || !R.isArray(pathArray && pathArray[0])) { // rough assumption
@@ -392,14 +377,9 @@ window.Raphael = (function () {
             res.toString = R._path2string;
             return res;
         },
-        pathToAbsolute = function (pathArray) {
+        pathToAbsolute = cacher(function (pathArray) {
             if (!R.isArray(pathArray) || !R.isArray(pathArray && pathArray[0])) { // rough assumption
                 pathArray = R.parsePathString(pathArray);
-            }
-            pathToAbsolute.cache = pathToAbsolute.cache || {};
-            pathToAbsolute.count = pathToAbsolute.count || [];
-            if (pathArray in pathToAbsolute.cache) {
-                return pathClone(pathToAbsolute.cache[pathArray]);
             }
             var res = [],
                 x = 0,
@@ -466,12 +446,8 @@ window.Raphael = (function () {
                 }
             }
             res.toString = R._path2string;
-            if (pathToAbsolute.count.length > 100) {
-                delete pathToAbsolute.cache[pathToAbsolute.count.unshift()];
-            }
-            pathToAbsolute.count.push(pathArray);
-            return pathClone(pathToAbsolute.cache[pathArray] = res);
-        },
+            return res;
+        }, null, pathClone),
         l2c = function (x1, y1, x2, y2) {
             return [x1, y1, x2, y2, x2, y2];
         },
@@ -552,7 +528,7 @@ window.Raphael = (function () {
                 return res;
             }
         },
-        findDotAtSegment = function (p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y, t) {
+        findDotAtSegment = cacher(function (p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y, t) {
             var x = Math.pow(1 - t, 3) * p1x + Math.pow(1 - t, 2) * 3 * t * c1x + (1 - t) * 3 * t * t * c2x + Math.pow(t, 3) * p2x,
                 y = Math.pow(1 - t, 3) * p1y + Math.pow(1 - t, 2) * 3 * t * c1y + (1 - t) * 3 * t * t * c2y + Math.pow(t, 3) * p2y,
                 mx = p1x + 2 * t * (c1x - p1x) + t * t * (c2x - 2 * c1x + p1x),
@@ -564,8 +540,8 @@ window.Raphael = (function () {
                 cx = (1 - t) * c2x + t * p2x,
                 cy = (1 - t) * c2y + t * p2y;
             return {x: x, y: y, m: {x: mx, y: my}, n: {x: nx, y: ny}, start: {x: ax, y: ay}, end: {x: cx, y: cy}};
-        },
-        curveDim = function (p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y) {
+        }),
+        curveDim = cacher(function (p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y) {
             var a = (c2x - 2 * c1x + p1x) - (p2x - 2 * c2x + c1x),
                 b = 2 * (c1x - p1x) - 2 * (c2x - c1x),
                 c = p1x - c1x,
@@ -590,13 +566,8 @@ window.Raphael = (function () {
                 min: {x: Math.min.apply(Math, x), y: Math.min.apply(Math, y)},
                 max: {x: Math.max.apply(Math, x), y: Math.max.apply(Math, y)}
             };
-        },
-        path2curve = function (path, path2) {
-            path2curve.cache = path2curve.cache || {};
-            path2curve.count = path2curve.count || [];
-            if ((path + "&" + path2) in path2curve.cache) {
-                return path2curve.cache[path + "&" + path2];
-            }
+        }),
+        path2curve = cacher(function (path, path2) {
             var p = pathToAbsolute(path),
                 p2 = path2 && pathToAbsolute(path2),
                 attrs = {x: 0, y: 0, bx: 0, by: 0, X: 0, Y: 0},
@@ -682,13 +653,9 @@ window.Raphael = (function () {
                 attrs2.x = p2 && seg2[seg2len - 2];
                 attrs2.y = p2 && seg2[seg2len - 1];
             }
-            if (path2curve.count.length > 100) {
-                delete path2curve.cache[path2curve.count.unshift()];
-            }
-            path2curve.count.push(path + "&" + path2);
-            return (path2curve.cache[path + "&" + path2] = p2 ? [p, p2] : p);
-        },
-        toGradient = function (gradient) {
+            return p2 ? [p, p2] : p;
+        }),
+        toGradient = cacher(function (gradient) {
             if (typeof gradient == "string") {
                 gradient = gradient.split(/\s*\-\s*/);
                 var angle = gradient.shift();
@@ -749,7 +716,7 @@ window.Raphael = (function () {
             } else {
                 return gradient;
             }
-        },
+        }),
         getContainer = function () {
             var container,
                 x,
@@ -832,7 +799,7 @@ window.Raphael = (function () {
         var addGradientFill = function (o, gradient, SVG) {
             gradient = toGradient(gradient);
             var el = doc.createElementNS(SVG.svgns, (gradient.type || "linear") + "Gradient");
-            el.id = "raphael-gradient-" + R.idGenerator++;
+            el.id = "r" + (R.idGenerator++).toString(36);
             if (gradient.vector && gradient.vector.length) {
                 el.setAttribute("x1", gradient.vector[0]);
                 el.setAttribute("y1", gradient.vector[1]);
@@ -993,11 +960,11 @@ window.Raphael = (function () {
                         o.scale(+xy[0] || 1, +xy[1] || +xy[0] || 1, +xy[2] || null, +xy[3] || null);
                         break;
                     case "fill":
-                        var isURL = (value + "").match(/^url\(([^\)]+)\)$/i);
+                        var isURL = (value + "").match(/^url\(['"]?([^\)]+)['"]?\)$/i);
                         if (isURL) {
                             var el = doc.createElementNS(o.paper.svgns, "pattern"),
                                 ig = doc.createElementNS(o.paper.svgns, "image");
-                            el.id = "raphael-pattern-" + R.idGenerator++;
+                            el.id = "r" + (R.idGenerator++).toString(36);
                             el.setAttribute("x", 0);
                             el.setAttribute("y", 0);
                             el.setAttribute("patternUnits", "userSpaceOnUse");
@@ -1035,7 +1002,7 @@ window.Raphael = (function () {
                             node.setAttribute("opacity", attrs.opacity);
                         }
                         if (typeof attrs["fill-opacity"] != "undefined" && typeof params["fill-opacity"] == "undefined" ) {
-                            node.style.fillOpacity = o.attrs["fill-opacity"];
+                            node.style.fillOpacity = attrs["fill-opacity"];
                             // Need following line for Firefox
                             node.setAttribute("fill-opacity", attrs["fill-opacity"]);
                         }
@@ -1424,11 +1391,13 @@ window.Raphael = (function () {
         var path2vml = function (path) {
             var pa = path2curve(path);
             for (var i = 0, ii = pa.length; i < ii; i++) {
-                for (var j = 0, jj = pa[i].length; j < jj; j++) {
-                    pa[i][j] = isNaN(pa[i][j]) ? pa[i][j] : Math.round(pa[i][j]);
+                pa[i][0] = (pa[i][0] + "").toLowerCase();
+                pa[i][0] == "z" && (pa[i][0] = "x");
+                for (var j = 1, jj = pa[i].length; j < jj; j++) {
+                    pa[i][j] = Math.round(pa[i][j]);
                 }
             }
-            return (pa + "").toLowerCase().replace(/z/g, "x");
+            return (pa + "");
         };
         R.toString = function () {
             return  "Your browser doesn\u2019t support SVG. Assuming it is Internet Explorer and falling down to VML.\nYou are running Rapha\u00ebl " + this.version;
@@ -1553,7 +1522,7 @@ window.Raphael = (function () {
                     params["stroke-linecap"]) {
                     stroke.on = true;
                 }
-                (params.stroke == "none" || stroke.on == null || params.stroke == 0) && (stroke.on = false);
+                (params.stroke == "none" || stroke.on == null || params.stroke == 0 || params["stroke-width"] == 0) && (stroke.on = false);
                 stroke.on && params.stroke && (stroke.color = R.getRGB(params.stroke).hex);
                 var opacity = ((+a["stroke-opacity"] + 1 || 2) - 1) * ((+a.opacity + 1 || 2) - 1);
                 opacity < 0 && (opacity = 0);
