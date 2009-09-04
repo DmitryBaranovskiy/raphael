@@ -2196,8 +2196,8 @@ window.Raphael = (function () {
         return theEllipse(this, x, y, rx, ry);
     };
     paper.path = function (pathString) {
-        var args = arguments;
-        pathString && args.length - 1 && (pathString = pathString.replace(/\{(\d+)\}/g, function (str, i) {
+        var args = R.isArray(arguments[1]) ? [0].concat(arguments[1]) : arguments;
+        pathString && typeof pathString == "string" && args.length - 1 && (pathString = pathString.replace(/\{(\d+)\}/g, function (str, i) {
             return args[++i] || 0;
         }));
         return thePath(pathString, this);
@@ -2686,13 +2686,14 @@ window.Raphael = (function () {
             shift = 0,
             path = "",
             scale;
+        typeof font == "string" && (font = this.getFont(font));
         if (font) {
             scale = (size || 16) / font.face["units-per-em"];
             for (var i = 0, ii = letters.length; i < ii; i++) {
                 var prev = i && font.glyphs[letters[i - 1]] || {},
                     curr = font.glyphs[letters[i]];
                 shift += i ? (prev.w || font.w) + (prev.k && prev.k[letters[i]] || 0) : 0;
-                curr && curr.d && out.push(this.path({fill: "#000", stroke: "none"}, curr.d).translate(shift, 0));
+                curr && curr.d && out.push(this.path(curr.d).attr({fill: "#000", stroke: "none", translation: [shift, 0]}));
             }
             out.scale(scale, scale, 0, y).translate(x, (size || 16) / 2);
         }
