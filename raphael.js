@@ -2571,6 +2571,10 @@ window.Raphael = (function () {
         }
         return this;
     };
+    Set.prototype.pop = function () {
+        delete this[this.length--];
+        return this.items.pop();
+    };
     for (var method in Element.prototype) {
         Set.prototype[method] = (function (methodname) {
             return function () {
