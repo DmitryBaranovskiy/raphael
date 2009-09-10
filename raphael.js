@@ -1,5 +1,5 @@
 /*
- * Raphael 1.0 RC1 - JavaScript Vector Library
+ * Raphael 1.0 RC1.1 - JavaScript Vector Library
  *
  * Copyright (c) 2008 - 2009 Dmitry Baranovskiy (http://raphaeljs.com)
  * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
@@ -21,7 +21,7 @@ window.Raphael = (function () {
         availableAttrs = {cx: 0, cy: 0, fill: "#fff", "fill-opacity": 1, font: '10px "Arial"', "font-family": '"Arial"', "font-size": "10", "font-style": "normal", "font-weight": 400, gradient: 0, height: 0, href: "http://raphaeljs.com/", opacity: 1, path: "M0,0", r: 0, rotation: 0, rx: 0, ry: 0, scale: "1 1", src: "", stroke: "#000", "stroke-dasharray": "", "stroke-linecap": "butt", "stroke-linejoin": "butt", "stroke-miterlimit": 0, "stroke-opacity": 1, "stroke-width": 1, target: "_blank", "text-anchor": "middle", title: "Raphael", translation: "0 0", width: 0, x: 0, y: 0},
         availableAnimAttrs = {cx: "number", cy: "number", fill: "colour", "fill-opacity": "number", "font-size": "number", height: "number", opacity: "number", path: "path", r: "number", rotation: "csv", rx: "number", ry: "number", scale: "csv", stroke: "colour", "stroke-opacity": "number", "stroke-width": "number", translation: "csv", width: "number", x: "number", y: "number"},
         events = ["click", "dblclick", "mousedown", "mousemove", "mouseout", "mouseover", "mouseup"];
-    R.version = "1.0 RC1";
+    R.version = "1.0 RC1.1";
     R.type = (window.SVGAngle || document.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#BasicStructure", "1.1") ? "SVG" : "VML");
     R.svg = !(R.vml = R.type == "VML");
     R.idGenerator = 0;
@@ -265,6 +265,9 @@ window.Raphael = (function () {
         return data;
     });
     var pathDimensions = cacher(function (path) {
+        if (!path) {
+            return {x: 0, y: 0, width: 0, height: 0};
+        }
         path = path2curve(path);
         var x = 0, 
             y = 0,
@@ -491,7 +494,7 @@ window.Raphael = (function () {
                 var rx2 = rx * rx,
                     ry2 = ry * ry,
                     k = (large_arc_flag == sweep_flag ? -1 : 1) *
-                        Math.sqrt((rx2 * ry2 - rx2 * y * y - ry2 * x * x) / (rx2 * y * y + ry2 * x * x)),
+                        Math.sqrt(Math.abs((rx2 * ry2 - rx2 * y * y - ry2 * x * x) / (rx2 * y * y + ry2 * x * x))),
                     cx = k * rx * y / ry + (x1 + x2) / 2,
                     cy = k * -ry * x / rx + (y1 + y2) / 2,
                     f1 = Math.asin((y1 - cy) / ry),
@@ -2196,11 +2199,7 @@ window.Raphael = (function () {
         return theEllipse(this, x, y, rx, ry);
     };
     paper.path = function (pathString) {
-        var args = R.isArray(arguments[1]) ? [0].concat(arguments[1]) : arguments;
-        pathString && typeof pathString == "string" && args.length - 1 && (pathString = pathString.replace(/\{(\d+)\}/g, function (str, i) {
-            return args[++i] || 0;
-        }));
-        return thePath(pathString, this);
+        return thePath(R.format.apply(R, arguments), this);
     };
     paper.image = function (src, x, y, w, h) {
         return theImage(this, src, x, y, w, h);
@@ -2229,7 +2228,7 @@ window.Raphael = (function () {
             dcy,
             a = this.attrs;
         if (x != 0) {
-            var bb = this.type == "path" ? pathDimensions(a.path) : this.getBBox(),
+            var bb = this.getBBox(),
                 rcx = bb.x + bb.width / 2,
                 rcy = bb.y + bb.height / 2,
                 kx = x / this._.sx,
@@ -2704,6 +2703,13 @@ window.Raphael = (function () {
         return out;
     };
 
+    R.format = function (token) {
+        var args = R.isArray(arguments[1]) ? [0].concat(arguments[1]) : arguments;
+        token && typeof token == "string" && args.length - 1 && (token = token.replace(/\{(\d+)\}/g, function (str, i) {
+            return args[++i] || "";
+        }));
+        return token;
+    };
     R.ninja = function () {
         var r = window.Raphael;
         if (oldRaphael.was) {
