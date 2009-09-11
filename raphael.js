@@ -1,5 +1,5 @@
 /*
- * Raphael 1.0 RC1.1 - JavaScript Vector Library
+ * Raphael 1.0 RC1.2 - JavaScript Vector Library
  *
  * Copyright (c) 2008 - 2009 Dmitry Baranovskiy (http://raphaeljs.com)
  * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
@@ -18,10 +18,10 @@ window.Raphael = (function () {
             return create.apply(R, arguments);
         },
         paper = {},
-        availableAttrs = {cx: 0, cy: 0, fill: "#fff", "fill-opacity": 1, font: '10px "Arial"', "font-family": '"Arial"', "font-size": "10", "font-style": "normal", "font-weight": 400, gradient: 0, height: 0, href: "http://raphaeljs.com/", opacity: 1, path: "M0,0", r: 0, rotation: 0, rx: 0, ry: 0, scale: "1 1", src: "", stroke: "#000", "stroke-dasharray": "", "stroke-linecap": "butt", "stroke-linejoin": "butt", "stroke-miterlimit": 0, "stroke-opacity": 1, "stroke-width": 1, target: "_blank", "text-anchor": "middle", title: "Raphael", translation: "0 0", width: 0, x: 0, y: 0},
+        availableAttrs = {"clip-rect": "0 0 0 0", cx: 0, cy: 0, fill: "#fff", "fill-opacity": 1, font: '10px "Arial"', "font-family": '"Arial"', "font-size": "10", "font-style": "normal", "font-weight": 400, gradient: 0, height: 0, href: "http://raphaeljs.com/", opacity: 1, path: "M0,0", r: 0, rotation: 0, rx: 0, ry: 0, scale: "1 1", src: "", stroke: "#000", "stroke-dasharray": "", "stroke-linecap": "butt", "stroke-linejoin": "butt", "stroke-miterlimit": 0, "stroke-opacity": 1, "stroke-width": 1, target: "_blank", "text-anchor": "middle", title: "Raphael", translation: "0 0", width: 0, x: 0, y: 0},
         availableAnimAttrs = {cx: "number", cy: "number", fill: "colour", "fill-opacity": "number", "font-size": "number", height: "number", opacity: "number", path: "path", r: "number", rotation: "csv", rx: "number", ry: "number", scale: "csv", stroke: "colour", "stroke-opacity": "number", "stroke-width": "number", translation: "csv", width: "number", x: "number", y: "number"},
         events = ["click", "dblclick", "mousedown", "mousemove", "mouseout", "mouseover", "mouseup"];
-    R.version = "1.0 RC1.1";
+    R.version = "1.0 RC1.2";
     R.type = (window.SVGAngle || document.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#BasicStructure", "1.1") ? "SVG" : "VML");
     R.svg = !(R.vml = R.type == "VML");
     R.idGenerator = 0;
@@ -805,6 +805,11 @@ window.Raphael = (function () {
             }
             return path;
         };
+        var $ = function (el, attr) {
+            for (var key in attr) if (attr.hasOwnProperty(key)) {
+                el.setAttribute(key, attr[key]);
+            }
+        };
         R.toString = function () {
             return  "Your browser supports SVG.\nYou are running Rapha\u00ebl " + this.version;
         };
@@ -821,10 +826,12 @@ window.Raphael = (function () {
             var el = doc.createElementNS(SVG.svgns, (gradient.type || "linear") + "Gradient");
             el.id = "r" + (R.idGenerator++).toString(36);
             if (gradient.vector && gradient.vector.length) {
-                el.setAttribute("x1", gradient.vector[0]);
-                el.setAttribute("y1", gradient.vector[1]);
-                el.setAttribute("x2", gradient.vector[2]);
-                el.setAttribute("y2", gradient.vector[3]);
+                $(el, {
+                    x1: gradient.vector[0],
+                    y1: gradient.vector[1],
+                    x2: gradient.vector[2],
+                    y2: gradient.vector[3]
+                });
             }
             SVG.defs.appendChild(el);
             var isopacity = true;
@@ -833,24 +840,28 @@ window.Raphael = (function () {
                 if (gradient.dots[i].offset) {
                     isopacity = false;
                 }
-                stop.setAttribute("offset", gradient.dots[i].offset ? gradient.dots[i].offset : (i == 0) ? "0%" : "100%");
-                stop.setAttribute("stop-color", R.getRGB(gradient.dots[i].color).hex || "#fff");
+                $(stop, {
+                    offset: gradient.dots[i].offset ? gradient.dots[i].offset : (i == 0) ? "0%" : "100%",
+                    "stop-color": R.getRGB(gradient.dots[i].color).hex || "#fff"
+                });
                 // ignoring opacity for internal points, because VML doesn't support it
                 el.appendChild(stop);
             };
             if (isopacity && typeof gradient.dots[ii - 1].opacity != "undefined") {
-                stop.setAttribute("stop-opacity", gradient.dots[ii - 1].opacity);
+                $(stop, {"stop-opacity": gradient.dots[ii - 1].opacity});
             }
-            o.setAttribute("fill", "url(#" + el.id + ")");
+            $(o, {
+                fill: "url(#" + el.id + ")",
+                opacity: 1,
+                "fill-opacity": 1
+            });
             o.style.fill = "";
             o.style.opacity = 1;
             o.style.fillOpacity = 1;
-            o.setAttribute("opacity", 1);
-            o.setAttribute("fill-opacity", 1);
         };
         var updatePosition = function (o) {
             var bbox = o.getBBox();
-            o.pattern.setAttribute("patternTransform", "translate(".concat(bbox.x, ",", bbox.y, ")"));
+            $(o.pattern, {patternTransform: R.format("translate({0},{1})", bbox.x, bbox.y)});
         };
         var setFillAndStroke = function (o, params) {
             var dasharray = {
@@ -904,10 +915,35 @@ window.Raphael = (function () {
                         }
                         pn.setAttributeNS(o.paper.xlink, att, value);
                       break;
+                    case "clip-rect":
+                        var rect = value.split(separator);
+                        if (rect.length == 4) {
+                            o.clip && o.clip.parentNode.parentNode.removeChild(clip.parentNode);
+                            var el = doc.createElementNS(o.paper.svgns, "clipPath"),
+                                rc = doc.createElementNS(o.paper.svgns, "rect");
+                            el.id = "r" + (R.idGenerator++).toString(36);
+                            $(rc, {
+                                x: rect[0],
+                                y: rect[1],
+                                width: rect[2],
+                                height: rect[3]
+                            });
+                            el.appendChild(rc);
+                            o.paper.defs.appendChild(el);
+                            $(node, {"clip-path": "url(#" + el.id + ")"});
+                            o.clip = rc;
+                        }
+                        if (!value) {
+                            var clip = doc.getElementById(node.getAttribute("clip-path").replace(/(^url\(#|\)$)/g, ""));
+                            clip && clip.parentNode.removeChild(clip);
+                            $(node, {"clip-path": ""});
+                            delete o.clip;
+                        }
+                    break;
                     case "path":
                         if (value && o.type == "path") {
                             attrs.path = roundPath(pathToAbsolute(value));
-                            node.setAttribute("d", attrs.path);
+                            $(node, {d: attrs.path});
                         }
                     case "width":
                         node.setAttribute(att, value);
@@ -945,8 +981,7 @@ window.Raphael = (function () {
                         break;
                     case "r":
                         if (o.type == "rect") {
-                            node.setAttribute("rx", value);
-                            node.setAttribute("ry", value);
+                            $(node, {rx: value, ry: value});
                         } else {
                             node.setAttribute(att, value);
                         }
@@ -985,11 +1020,8 @@ window.Raphael = (function () {
                             var el = doc.createElementNS(o.paper.svgns, "pattern"),
                                 ig = doc.createElementNS(o.paper.svgns, "image");
                             el.id = "r" + (R.idGenerator++).toString(36);
-                            el.setAttribute("x", 0);
-                            el.setAttribute("y", 0);
-                            el.setAttribute("patternUnits", "userSpaceOnUse");
-                            ig.setAttribute("x", 0);
-                            ig.setAttribute("y", 0);
+                            $(el, {x: 0, y: 0, patternUnits: "userSpaceOnUse"});
+                            $(ig, {x: 0, y:0});
                             ig.setAttributeNS(o.paper.xlink, "href", isURL[1]);
                             el.appendChild(ig);
 
@@ -998,10 +1030,8 @@ window.Raphael = (function () {
                             img.style.top = "-9999em";
                             img.style.left = "-9999em";
                             img.onload = function () {
-                                el.setAttribute("width", this.offsetWidth);
-                                el.setAttribute("height", this.offsetHeight);
-                                ig.setAttribute("width", this.offsetWidth);
-                                ig.setAttribute("height", this.offsetHeight);
+                                $(el, {width: this.offsetWidth, height: this.offsetHeight});
+                                $(ig, {width: this.offsetWidth, height: this.offsetHeight});
                                 doc.body.removeChild(this);
                                 paper.safari();
                             };
@@ -1009,7 +1039,7 @@ window.Raphael = (function () {
                             img.src = isURL[1];
                             o.paper.defs.appendChild(el);
                             node.style.fill = "url(#" + el.id + ")";
-                            node.setAttribute("fill", "url(#" + el.id + ")");
+                            $(node, {fill: "url(#" + el.id + ")"});
                             o.pattern = el;
                             o.pattern && updatePosition(o);
                             break;
@@ -1019,12 +1049,12 @@ window.Raphael = (function () {
                         if (typeof attrs.opacity != "undefined" && typeof params.opacity == "undefined" ) {
                             node.style.opacity = attrs.opacity;
                             // Need following line for Firefox
-                            node.setAttribute("opacity", attrs.opacity);
+                            $(node, {opacity: attrs.opacity});
                         }
                         if (typeof attrs["fill-opacity"] != "undefined" && typeof params["fill-opacity"] == "undefined" ) {
                             node.style.fillOpacity = attrs["fill-opacity"];
                             // Need following line for Firefox
-                            node.setAttribute("fill-opacity", attrs["fill-opacity"]);
+                            $(node, {"fill-opacity": attrs["fill-opacity"]});
                         }
                     case "stroke":
                         node.style[att] = R.getRGB(value).hex;
@@ -1075,22 +1105,20 @@ window.Raphael = (function () {
                 var texts = (params.text + "").split("\n");
                 for (var i = 0, ii = texts.length; i < ii; i++) {
                     var tspan = doc.createElementNS(el.paper.svgns, "tspan");
-                    i && tspan.setAttribute("dy", fontSize * leading);
-                    i && tspan.setAttribute("x", a.x);
+                    i && $(tspan, {dy: fontSize * leading, x: a.x});
                     tspan.appendChild(doc.createTextNode(texts[i]));
                     node.appendChild(tspan);
                 }
             } else {
                 var texts = node.getElementsByTagName("tspan");
                 for (var i = 0, ii = texts.length; i < ii; i++) {
-                    i && texts[i].setAttribute("dy", fontSize * leading);
-                    i && texts[i].setAttribute("x", a.x);
+                    i && $(texts[i], {dy: fontSize * leading, x: a.x});
                 }
             }
-            node.setAttribute("y", a.y);
+            $(node, {y: a.y});
             var bb = el.getBBox(),
                 dif = a.y - (bb.y + bb.height / 2);
-            dif && node.setAttribute("y", a.y + dif);
+            dif && $(node, {y: a.y + dif});
         };
         var Element = function (node, svg) {
             var X = 0,
@@ -1133,11 +1161,13 @@ window.Raphael = (function () {
             cx = cx == null ? bbox.x + bbox.width / 2 : cx;
             cy = cy == null ? bbox.y + bbox.height / 2 : cy;
             if (this._.rt.deg) {
-                this.transformations[0] = "rotate(".concat(this._.rt.deg, " ", cx, " ", cy, ")");
+                this.transformations[0] = R.format("rotate({0} {1} {2})", this._.rt.deg, cx, cy);
+                this.clip && $(this.clip, {transform: R.format("rotate({0} {1} {2})", -this._.rt.deg, cx, cy)});
             } else {
                 this.transformations[0] = "";
+                this.clip && $(this.clip, {transform: ""});
             }
-            this.node.setAttribute("transform", this.transformations.join(" "));
+            $(this.node, {transform: this.transformations.join(" ")});
             return this;
         };
         Element.prototype.hide = function () {
@@ -1234,112 +1264,53 @@ window.Raphael = (function () {
             x = round(x);
             y = round(y);
             var el = doc.createElementNS(svg.svgns, "circle");
-            el.setAttribute("cx", x);
-            el.setAttribute("cy", y);
-            el.setAttribute("r", r);
-            el.setAttribute("fill", "none");
-            el.setAttribute("stroke", "#000");
-            if (svg.canvas) {
-                svg.canvas.appendChild(el);
-            }
+            svg.canvas && svg.canvas.appendChild(el);
             var res = new Element(el, svg);
-            res.attrs = res.attrs || {};
-            res.attrs.cx = x;
-            res.attrs.cy = y;
-            res.attrs.r = r;
-            res.attrs.stroke = "#000";
+            res.attrs = {cx: x, cy: y, r: r, fill: "none", stroke: "#000"};
             res.type = "circle";
+            $(el, res.attrs);
             return res;
         };
         var theRect = function (svg, x, y, w, h, r) {
             x = round(x);
             y = round(y);
             var el = doc.createElementNS(svg.svgns, "rect");
-            el.setAttribute("x", x);
-            el.setAttribute("y", y);
-            el.setAttribute("width", w);
-            el.setAttribute("height", h);
-            if (r) {
-                el.setAttribute("rx", r);
-                el.setAttribute("ry", r);
-            }
-            el.setAttribute("fill", "none");
-            el.setAttribute("stroke", "#000");
-            if (svg.canvas) {
-                svg.canvas.appendChild(el);
-            }
+            svg.canvas && svg.canvas.appendChild(el);
             var res = new Element(el, svg);
-            res.attrs = res.attrs || {};
-            res.attrs.x = x;
-            res.attrs.y = y;
-            res.attrs.width = w;
-            res.attrs.height = h;
-            res.attrs.stroke = "#000";
-            if (r) {
-                res.attrs.rx = res.attrs.ry = r;
-            }
+            res.attrs = {x: x, y: y, width: w, height: h, r: r || 0, rx: r || 0, ry: r || 0, fill: "none", stroke: "#000"};
             res.type = "rect";
+            $(el, res.attrs);
             return res;
         };
         var theEllipse = function (svg, x, y, rx, ry) {
             x = round(x);
             y = round(y);
             var el = doc.createElementNS(svg.svgns, "ellipse");
-            el.setAttribute("cx", x);
-            el.setAttribute("cy", y);
-            el.setAttribute("rx", rx);
-            el.setAttribute("ry", ry);
-            el.setAttribute("fill", "none");
-            el.setAttribute("stroke", "#000");
-            if (svg.canvas) {
-                svg.canvas.appendChild(el);
-            }
+            svg.canvas && svg.canvas.appendChild(el);
             var res = new Element(el, svg);
-            res.attrs = res.attrs || {};
-            res.attrs.cx = x;
-            res.attrs.cy = y;
-            res.attrs.rx = rx;
-            res.attrs.ry = ry;
-            res.attrs.stroke = "#000";
+            res.attrs = {cx: x, cy: y, rx: rx, ry: ry, fill: "none", stroke: "#000"};
             res.type = "ellipse";
+            $(el, res.attrs);
             return res;
         };
         var theImage = function (svg, src, x, y, w, h) {
             var el = doc.createElementNS(svg.svgns, "image");
-            el.setAttribute("x", x);
-            el.setAttribute("y", y);
-            el.setAttribute("width", w);
-            el.setAttribute("height", h);
-            el.setAttribute("preserveAspectRatio", "none");
+            $(el, {x: x, y: y, width: w, height: h, preserveAspectRatio: "none"});
             el.setAttributeNS(svg.xlink, "href", src);
-            if (svg.canvas) {
-                svg.canvas.appendChild(el);
-            }
+            svg.canvas && svg.canvas.appendChild(el);
             var res = new Element(el, svg);
-            res.attrs = res.attrs || {};
-            res.attrs.src = src;
-            res.attrs.x = x;
-            res.attrs.y = y;
-            res.attrs.width = w;
-            res.attrs.height = h;
+            res.attrs = {x: x, y: y, width: w, height: h, src: src};
             res.type = "image";
             return res;
         };
         var theText = function (svg, x, y, text) {
             var el = doc.createElementNS(svg.svgns, "text");
-            el.setAttribute("x", x);
-            el.setAttribute("y", y);
-            el.setAttribute("text-anchor", "middle");
-            if (svg.canvas) {
-                svg.canvas.appendChild(el);
-            }
+            $(el, {x: x, y: y, "text-anchor": "middle"});
+            svg.canvas && svg.canvas.appendChild(el);
             var res = new Element(el, svg);
-            res.attrs = res.attrs || {};
-            res.attrs.text = text;
-            res.attrs.x = x;
-            res.attrs.y = y;
+            res.attrs = {x: x, y: y, "text-anchor": "middle", text: text, font: availableAttrs.font, stroke: "none", fill: "#000"};
             res.type = "text";
-            setFillAndStroke(res, {font: availableAttrs.font, stroke: "none", fill: "#000", text: text});
+            setFillAndStroke(res, res.attrs);
             return res;
         };
         var setSize = function (width, height) {
@@ -1483,6 +1454,30 @@ window.Raphael = (function () {
             if (params.scale) {
                 xy = (params.scale + "").split(separator);
                 o.scale(+xy[0] || 1, +xy[1] || +xy[0] || 1, +xy[2] || null, +xy[3] || null);
+            }
+            if ("clip-rect" in params) {
+                var rect = (params["clip-rect"] + "").split(separator);
+                if (rect.length == 4) {
+                    rect[2] += rect[0];
+                    rect[3] += rect[1];
+                    var div = node.clipRect || doc.createElement("div"),
+                        dstyle = div.style,
+                        group = node.parentNode;
+                    dstyle.clip = R.format("rect({0}px {2}px {3}px {1}px)", rect);
+                    if (!node.clipRect) {
+                        dstyle.position = "absolute";
+                        dstyle.top = 0;
+                        dstyle.left = 0;
+                        dstyle.width = o.paper.width + "px";
+                        dstyle.height = o.paper.height + "px";
+                        group.parentNode.insertBefore(div, group);
+                        div.appendChild(group);
+                        node.clipRect = div;
+                    }
+                }
+                if (!params["clip-rect"]) {
+                    node.clipRect && (node.clipRect.style.clip = "");
+                }
             }
             if (o.type == "image" && params.src) {
                 node.src = params.src;
