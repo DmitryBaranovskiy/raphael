@@ -2726,7 +2726,7 @@ window.Raphael = (function () {
     R.format = function (token) {
         var args = R.isArray(arguments[1]) ? [0].concat(arguments[1]) : arguments;
         token && typeof token == "string" && args.length - 1 && (token = token.replace(/\{(\d+)\}/g, function (str, i) {
-            return args[++i] || "";
+            return args[++i] == null ? "" : args[i];
         }));
         return token;
     };
