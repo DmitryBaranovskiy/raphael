@@ -1,5 +1,5 @@
 /*
- * Raphael 1.0 RC1.2 - JavaScript Vector Library
+ * Raphael 1.0 RC1.3 - JavaScript Vector Library
  *
  * Copyright (c) 2008 - 2009 Dmitry Baranovskiy (http://raphaeljs.com)
  * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
@@ -18,10 +18,10 @@ window.Raphael = (function () {
             return create.apply(R, arguments);
         },
         paper = {},
-        availableAttrs = {"clip-rect": "0 0 0 0", cx: 0, cy: 0, fill: "#fff", "fill-opacity": 1, font: '10px "Arial"', "font-family": '"Arial"', "font-size": "10", "font-style": "normal", "font-weight": 400, gradient: 0, height: 0, href: "http://raphaeljs.com/", opacity: 1, path: "M0,0", r: 0, rotation: 0, rx: 0, ry: 0, scale: "1 1", src: "", stroke: "#000", "stroke-dasharray": "", "stroke-linecap": "butt", "stroke-linejoin": "butt", "stroke-miterlimit": 0, "stroke-opacity": 1, "stroke-width": 1, target: "_blank", "text-anchor": "middle", title: "Raphael", translation: "0 0", width: 0, x: 0, y: 0},
-        availableAnimAttrs = {cx: "number", cy: "number", fill: "colour", "fill-opacity": "number", "font-size": "number", height: "number", opacity: "number", path: "path", r: "number", rotation: "csv", rx: "number", ry: "number", scale: "csv", stroke: "colour", "stroke-opacity": "number", "stroke-width": "number", translation: "csv", width: "number", x: "number", y: "number"},
+        availableAttrs = {"clip-rect": "0 0 10e9 10e9", cx: 0, cy: 0, fill: "#fff", "fill-opacity": 1, font: '10px "Arial"', "font-family": '"Arial"', "font-size": "10", "font-style": "normal", "font-weight": 400, gradient: 0, height: 0, href: "http://raphaeljs.com/", opacity: 1, path: "M0,0", r: 0, rotation: 0, rx: 0, ry: 0, scale: "1 1", src: "", stroke: "#000", "stroke-dasharray": "", "stroke-linecap": "butt", "stroke-linejoin": "butt", "stroke-miterlimit": 0, "stroke-opacity": 1, "stroke-width": 1, target: "_blank", "text-anchor": "middle", title: "Raphael", translation: "0 0", width: 0, x: 0, y: 0},
+        availableAnimAttrs = {"clip-rect": "csv", cx: "number", cy: "number", fill: "colour", "fill-opacity": "number", "font-size": "number", height: "number", opacity: "number", path: "path", r: "number", rotation: "csv", rx: "number", ry: "number", scale: "csv", stroke: "colour", "stroke-opacity": "number", "stroke-width": "number", translation: "csv", width: "number", x: "number", y: "number"},
         events = ["click", "dblclick", "mousedown", "mousemove", "mouseout", "mouseover", "mouseup"];
-    R.version = "1.0 RC1.2";
+    R.version = "1.0 RC1.3";
     R.type = (window.SVGAngle || document.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#BasicStructure", "1.1") ? "SVG" : "VML");
     R.svg = !(R.vml = R.type == "VML");
     R.idGenerator = 0;
@@ -847,7 +847,7 @@ window.Raphael = (function () {
                 // ignoring opacity for internal points, because VML doesn't support it
                 el.appendChild(stop);
             };
-            if (isopacity && typeof gradient.dots[ii - 1].opacity != "undefined") {
+            if (isopacity && gradient.dots[ii - 1].opacity != null) {
                 $(stop, {"stop-opacity": gradient.dots[ii - 1].opacity});
             }
             $(o, {
@@ -887,14 +887,14 @@ window.Raphael = (function () {
                         var width = o.attrs["stroke-width"] || "1",
                             butt = {round: width, square: width, butt: 0}[o.attrs["stroke-linecap"] || params["stroke-linecap"]] || 0,
                             dashes = [];
-                        for (var i = 0, ii = value.length; i < ii; i++) {
-                            dashes.push(value[i] * width + ((i % 2) ? 1 : -1) * butt);
+                        var i = value.length;
+                        while (i--) {
+                            dashes[i] = value[i] * width + ((i % 2) ? 1 : -1) * butt;
                         }
-                        value = dashes.join(",");
-                        node.setAttribute("stroke-dasharray", value);
+                        $(node, {"stroke-dasharray": dashes.join(",")});
                     }
                 };
-            parseInt(rot, 10) && o.rotate(0, true);
+            parseFloat(rot) && o.rotate(0, true);
             for (var att in params) {
                 if (!(att in availableAttrs)) {
                     continue;
@@ -916,9 +916,9 @@ window.Raphael = (function () {
                         pn.setAttributeNS(o.paper.xlink, att, value);
                       break;
                     case "clip-rect":
-                        var rect = value.split(separator);
+                        var rect = (value + "").split(separator);
                         if (rect.length == 4) {
-                            o.clip && o.clip.parentNode.parentNode.removeChild(clip.parentNode);
+                            o.clip && o.clip.parentNode.parentNode.removeChild(o.clip.parentNode);
                             var el = doc.createElementNS(o.paper.svgns, "clipPath"),
                                 rc = doc.createElementNS(o.paper.svgns, "rect");
                             el.id = "r" + (R.idGenerator++).toString(36);
@@ -1331,29 +1331,34 @@ window.Raphael = (function () {
                 throw new Error("SVG container not found.");
             }
             paper.canvas = doc.createElementNS(paper.svgns, "svg");
-            paper.canvas.setAttribute("width", width || 512);
+            var cnvs = paper.canvas,
+                stl = cnvs.style;
+            cnvs.setAttribute("width", width || 512);
             paper.width = width || 512;
-            paper.canvas.setAttribute("height", height || 342);
+            cnvs.setAttribute("height", height || 342);
             paper.height = height || 342;
             if (container == 1) {
-                doc.body.appendChild(paper.canvas);
-                paper.canvas.style.position = "absolute";
-                paper.canvas.style.left = x + "px";
-                paper.canvas.style.top = y + "px";
+                doc.body.appendChild(cnvs);
+                stl.position = "absolute";
+                stl.left = x + "px";
+                stl.top = y + "px";
             } else {
                 if (container.firstChild) {
-                    container.insertBefore(paper.canvas, container.firstChild);
+                    container.insertBefore(cnvs, container.firstChild);
                 } else {
-                    container.appendChild(paper.canvas);
+                    container.appendChild(cnvs);
                 }
             }
             container = {
-                canvas: paper.canvas,
+                canvas: cnvs,
                 clear: function () {
                     while (this.canvas.firstChild) {
                         this.canvas.removeChild(this.canvas.firstChild);
                     }
+                    this.desc = doc.createElementNS(paper.svgns, "desc");
                     this.defs = doc.createElementNS(paper.svgns, "defs");
+                    this.desc.appendChild(doc.createTextNode("Created with Rapha\u00ebl"));
+                    this.canvas.appendChild(this.desc);
                     this.canvas.appendChild(this.defs);
                 }
             };
@@ -1374,7 +1379,7 @@ window.Raphael = (function () {
         paper.xlink = "http://www.w3.org/1999/xlink";
         paper.safari = function () {
             if ({"Apple Computer, Inc.": 1, "Google Inc.": 1}[navigator.vendor]) {
-                var rect = this.rect(-this.width, -this.height, this.width * 3, this.height * 3).attr({stroke: "none"});
+                var rect = this.rect(-99, -99, this.width + 99, this.height + 99);
                 setTimeout(function () {rect.remove();});
             }
         };
@@ -1458,8 +1463,8 @@ window.Raphael = (function () {
             if ("clip-rect" in params) {
                 var rect = (params["clip-rect"] + "").split(separator);
                 if (rect.length == 4) {
-                    rect[2] += rect[0];
-                    rect[3] += rect[1];
+                    rect[2] = +rect[2] + (+rect[0]);
+                    rect[3] = +rect[3] + (+rect[1]);
                     var div = node.clipRect || doc.createElement("div"),
                         dstyle = div.style,
                         group = node.parentNode;
@@ -2194,6 +2199,9 @@ window.Raphael = (function () {
         return theEllipse(this, x, y, rx, ry);
     };
     paper.path = function (pathString) {
+        if (pathString && typeof pathString != "string" && !R.isArray(pathString[0])) {
+            throw new Error("First argument for path method should be a string.");
+        }
         return thePath(R.format.apply(R, arguments), this);
     };
     paper.image = function (src, x, y, w, h) {
@@ -2213,7 +2221,7 @@ window.Raphael = (function () {
     };
     Element.prototype.scale = function (x, y, cx, cy) {
         if (x == null && y == null) {
-            return {x: this._.sx, y: this._.sy, toString: function () { return +this.x.toFixed(3) + " " + (+this.y.toFixed(3)); }};
+            return {x: this._.sx, y: this._.sy, toString: function () { return this.x + " " + this.y; }};
         }
         y = y || x;
         !+y && (y = x);
@@ -2287,7 +2295,7 @@ window.Raphael = (function () {
                     path = pathToRelative(path);
                     path[0][1] += dx;
                     path[0][2] += dy;
-                    
+
                     this.attr({path: path.join(" ")});
                 break;
             }
@@ -2396,7 +2404,7 @@ window.Raphael = (function () {
         for (var attr in params) {
             if (attr in availableAnimAttrs) {
                 from[attr] = this.attr(attr);
-                (typeof from[attr] == "undefined") && (from[attr] = availableAttrs[attr]);
+                (from[attr] == null) && (from[attr] = availableAttrs[attr]);
                 to[attr] = params[attr];
                 switch (availableAnimAttrs[attr]) {
                     case "number":
@@ -2439,6 +2447,15 @@ window.Raphael = (function () {
                                 params[attr] = values;
                                 from[attr] = (from[attr] + "").split(separator);
                                 diff[attr] = [(values[0] - from[attr][0]) / ms, (values[1] - from[attr][1]) / ms, 0, 0];
+                            break;
+                            case "clip-rect":
+                                from[attr] = (from[attr] + "").split(separator);
+                                diff[attr] = [];
+                                var i = 4;
+                                while (i--) {
+                                    diff[attr][i] = (values[i] - from[attr][i]) / ms;
+                                }
+                            break;
                         }
                         to[attr] = values;
                 }
@@ -2494,6 +2511,14 @@ window.Raphael = (function () {
                                 break;
                                 case "scale":
                                     now = [+from[attr][0] + pos * ms * diff[attr][0], +from[attr][1] + pos * ms * diff[attr][1], (2 in params[attr] ? params[attr][2] : ""), (3 in params[attr] ? params[attr][3] : "")].join(" ");
+                                break;
+                                case "clip-rect":
+                                    now = [];
+                                    var i = 4;
+                                    while (i--) {
+                                        now[i] = +from[attr][i] + pos * ms * diff[attr][i];
+                                    }
+                                break;
                             }
                             break;
                     }
