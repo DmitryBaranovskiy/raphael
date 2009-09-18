@@ -2721,7 +2721,7 @@ window.Raphael = (function () {
                         }) + "z"
                 };
                 if (path.k) {
-                    for (var k in path.k) if (path.khasOwnProperty(k)) {
+                    for (var k in path.k) if (path.hasOwnProperty(k)) {
                         fontcopy.glyphs[glyph].k[k] = path.k[k];
                     }
                 }
