@@ -972,7 +972,7 @@ window.Raphael = (function () {
                             value = -attrs.x - (attrs.width || 0);
                         }
                     case "rx":
-                        if (o.type == "rect") {
+                        if (att == "rx" && o.type == "rect") {
                             break;
                         }
                     case "cx":
@@ -992,7 +992,7 @@ window.Raphael = (function () {
                             value = -attrs.y - (attrs.height || 0);
                         }
                     case "ry":
-                        if (o.type == "rect") {
+                        if (att == "ry" && o.type == "rect") {
                             break;
                         }
                     case "cy":
