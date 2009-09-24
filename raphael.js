@@ -1,5 +1,5 @@
 /*
- * Raphael 1.0 RC1.5 - JavaScript Vector Library
+ * Raphael 1.0 RC1.6 - JavaScript Vector Library
  *
  * Copyright (c) 2008 - 2009 Dmitry Baranovskiy (http://raphaeljs.com)
  * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
@@ -21,7 +21,7 @@ window.Raphael = (function () {
         availableAttrs = {"clip-rect": "0 0 10e9 10e9", cx: 0, cy: 0, fill: "#fff", "fill-opacity": 1, font: '10px "Arial"', "font-family": '"Arial"', "font-size": "10", "font-style": "normal", "font-weight": 400, gradient: 0, height: 0, href: "http://raphaeljs.com/", opacity: 1, path: "M0,0", r: 0, rotation: 0, rx: 0, ry: 0, scale: "1 1", src: "", stroke: "#000", "stroke-dasharray": "", "stroke-linecap": "butt", "stroke-linejoin": "butt", "stroke-miterlimit": 0, "stroke-opacity": 1, "stroke-width": 1, target: "_blank", "text-anchor": "middle", title: "Raphael", translation: "0 0", width: 0, x: 0, y: 0},
         availableAnimAttrs = {"clip-rect": "csv", cx: "number", cy: "number", fill: "colour", "fill-opacity": "number", "font-size": "number", height: "number", opacity: "number", path: "path", r: "number", rotation: "csv", rx: "number", ry: "number", scale: "csv", stroke: "colour", "stroke-opacity": "number", "stroke-width": "number", translation: "csv", width: "number", x: "number", y: "number"},
         events = ["click", "dblclick", "mousedown", "mousemove", "mouseout", "mouseover", "mouseup"];
-    R.version = "1.0 RC1.5";
+    R.version = "1.0 RC1.6";
     R.type = (window.SVGAngle || document.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#BasicStructure", "1.1") ? "SVG" : "VML");
     R.svg = !(R.vml = R.type == "VML");
     R.idGenerator = 0;
@@ -2094,17 +2094,18 @@ window.Raphael = (function () {
             if (!container) {
                 throw new Error("VML container not found.");
             }
-            var c = paper.canvas = doc.createElement("div"),
+            var res = {},
+                c = res.canvas = doc.createElement("div"),
                 cs = c.style;
             width = parseFloat(width) || 512;
             height = parseFloat(height) || 342;
-            paper.width = width;
-            paper.height = height;
-            paper.coordsize = width + " " + height;
-            paper.coordorigin = "0 0";
-            paper.span = doc.createElement("span");
-            s = paper.span.style;
-            c.appendChild(paper.span);
+            res.width = width;
+            res.height = height;
+            res.coordsize = width + " " + height;
+            res.coordorigin = "0 0";
+            res.span = doc.createElement("span");
+            s = res.span.style;
+            c.appendChild(res.span);
             s.position = "absolute";
             s.left = "-99999px";
             s.top = "-99999px";
@@ -2136,16 +2137,16 @@ window.Raphael = (function () {
                 }
             }
             for (var prop in paper) if (paper.hasOwnProperty(prop)) {
-                container[prop] = paper[prop];
+                res[prop] = paper[prop];
             }
-            plugins.call(container, container, R.fn);
-            container.clear = function () {
+            plugins.call(res, res, R.fn);
+            res.clear = function () {
                 while (c.firstChild) {
                     c.removeChild(c.firstChild);
                 }
             };
-            container.raphael = R;
-            return container;
+            res.raphael = R;
+            return res;
         };
         paper.remove = function () {
             this.canvas.parentNode.removeChild(this.canvas);
