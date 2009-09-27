@@ -1,5 +1,5 @@
 /*
- * Raphael 1.0 RC1.6 - JavaScript Vector Library
+ * Raphael 1.0 RC2 - JavaScript Vector Library
  *
  * Copyright (c) 2008 - 2009 Dmitry Baranovskiy (http://raphaeljs.com)
  * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
@@ -15,13 +15,23 @@ window.Raphael = (function () {
             is: window.Raphael
         },
         R = function () {
+            if (R.is(arguments[0], "array")) {
+                var res = [],
+                    a = arguments[0],
+                    cnv = create.apply(R, a.splice(0, 3 + R.is(a[0], "number")));
+                for (var i = 0, ii = a.length; i < ii; i++) {
+                    var j = a[i] || {};
+                    j.type in {circle:1, rect:1, path:1, ellipse:1, text:1, image:1} && res.push(cnv[j.type]().attr(j));
+                }
+                return res;
+            }
             return create.apply(R, arguments);
         },
         paper = {},
         availableAttrs = {"clip-rect": "0 0 10e9 10e9", cx: 0, cy: 0, fill: "#fff", "fill-opacity": 1, font: '10px "Arial"', "font-family": '"Arial"', "font-size": "10", "font-style": "normal", "font-weight": 400, gradient: 0, height: 0, href: "http://raphaeljs.com/", opacity: 1, path: "M0,0", r: 0, rotation: 0, rx: 0, ry: 0, scale: "1 1", src: "", stroke: "#000", "stroke-dasharray": "", "stroke-linecap": "butt", "stroke-linejoin": "butt", "stroke-miterlimit": 0, "stroke-opacity": 1, "stroke-width": 1, target: "_blank", "text-anchor": "middle", title: "Raphael", translation: "0 0", width: 0, x: 0, y: 0},
         availableAnimAttrs = {"clip-rect": "csv", cx: "number", cy: "number", fill: "colour", "fill-opacity": "number", "font-size": "number", height: "number", opacity: "number", path: "path", r: "number", rotation: "csv", rx: "number", ry: "number", scale: "csv", stroke: "colour", "stroke-opacity": "number", "stroke-width": "number", translation: "csv", width: "number", x: "number", y: "number"},
         events = ["click", "dblclick", "mousedown", "mousemove", "mouseout", "mouseover", "mouseup"];
-    R.version = "1.0 RC1.6";
+    R.version = "1.0 RC2";
     R.type = (window.SVGAngle || document.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#BasicStructure", "1.1") ? "SVG" : "VML");
     R.svg = !(R.vml = R.type == "VML");
     R.idGenerator = 0;
@@ -1050,9 +1060,7 @@ window.Raphael = (function () {
                             el.appendChild(ig);
 
                             var img = doc.createElement("img");
-                            img.style.position = "absolute";
-                            img.style.top = "-9999em";
-                            img.style.left = "-9999em";
+                            img.style.cssText = "position:absolute;left:-9999em;top-9999em";
                             img.onload = function () {
                                 $(el, {width: this.offsetWidth, height: this.offsetHeight});
                                 $(ig, {width: this.offsetWidth, height: this.offsetHeight});
@@ -1600,15 +1608,15 @@ window.Raphael = (function () {
                 newstroke && node.appendChild(stroke);
             }
             if (res.type == "text") {
-                var s = paper.span.style;
+                var s = res.paper.span.style;
                 a.font && (s.font = a.font);
                 a["font-family"] && (s.fontFamily = a["font-family"]);
                 a["font-size"] && (s.fontSize = a["font-size"]);
                 a["font-weight"] && (s.fontWeight = a["font-weight"]);
                 a["font-style"] && (s.fontStyle = a["font-style"]);
-                res.node.string && (paper.span.innerHTML = res.node.string.replace(/</g, "&#60;").replace(/&/g, "&#38;").replace(/\n/g, "<br>"));
-                res.W = a.w = paper.span.offsetWidth;
-                res.H = a.h = paper.span.offsetHeight;
+                res.node.string && (res.paper.span.innerHTML = res.node.string.replace(/</g, "&#60;").replace(/&/g, "&#38;").replace(/\n/g, "<br>"));
+                res.W = a.w = res.paper.span.offsetWidth;
+                res.H = a.h = res.paper.span.offsetHeight;
                 res.X = a.x;
                 res.Y = a.y + Math.round(res.H / 2);
 
@@ -1924,17 +1932,12 @@ window.Raphael = (function () {
             element.Group.parentNode.insertBefore(this.Group, element.Group);
             return this;
         };
-        
+
         var theCircle = function (vml, x, y, r) {
             var g = createNode("group"),
-                gl = g.style,
                 o = createNode("oval"),
                 ol = o.style;
-            gl.position = "absolute";
-            gl.left = 0;
-            gl.top = 0;
-            gl.width = vml.width + "px";
-            gl.height = vml.height + "px";
+            g.style.cssText = "position:absolute;left:0;top:0;width:" + vml.width + "px;height:" + vml.height + "px";
             g.coordsize = vml.coordsize;
             g.coordorigin = vml.coordorigin;
             g.appendChild(o);
@@ -1950,15 +1953,10 @@ window.Raphael = (function () {
         };
         var theRect = function (vml, x, y, w, h, r) {
             var g = createNode("group"),
-                gl = g.style,
                 o = createNode(r ? "roundrect" : "rect"),
                 arcsize = (+r || 0) / (Math.min(w, h));
             o.arcsize = arcsize;
-            gl.position = "absolute";
-            gl.left = 0;
-            gl.top = 0;
-            gl.width = vml.width + "px";
-            gl.height = vml.height + "px";
+            g.style.cssText = "position:absolute;left:0;top:0;width:" + vml.width + "px;height:" + vml.height + "px";
             g.coordsize = vml.coordsize;
             g.coordorigin = vml.coordorigin;
             g.appendChild(o);
@@ -1972,14 +1970,9 @@ window.Raphael = (function () {
         };
         var theEllipse = function (vml, x, y, rx, ry) {
             var g = createNode("group"),
-                gl = g.style,
                 o = createNode("oval"),
                 ol = o.style;
-            gl.position = "absolute";
-            gl.left = 0;
-            gl.top = 0;
-            gl.width = vml.width + "px";
-            gl.height = vml.height + "px";
+            g.style.cssText = "position:absolute;left:0;top:0;width:" + vml.width + "px;height:" + vml.height + "px";
             g.coordsize = vml.coordsize;
             g.coordorigin = vml.coordorigin;
             g.appendChild(o);
@@ -1996,14 +1989,9 @@ window.Raphael = (function () {
         };
         var theImage = function (vml, src, x, y, w, h) {
             var g = createNode("group"),
-                gl = g.style,
                 o = createNode("image"),
                 ol = o.style;
-            gl.position = "absolute";
-            gl.left = 0;
-            gl.top = 0;
-            gl.width = vml.width + "px";
-            gl.height = vml.height + "px";
+            g.style.cssText = "position:absolute;left:0;top:0;width:" + vml.width + "px;height:" + vml.height + "px";
             g.coordsize = vml.coordsize;
             g.coordorigin = vml.coordorigin;
             o.src = src;
@@ -2021,28 +2009,18 @@ window.Raphael = (function () {
         };
         var theText = function (vml, x, y, text) {
             var g = createNode("group"),
-                gs = g.style,
                 el = createNode("shape"),
                 ol = el.style,
                 path = createNode("path"),
                 ps = path.style,
                 o = createNode("textpath");
-            gs.position = "absolute";
-            gs.left = 0;
-            gs.top = 0;
-            gs.width = vml.width + "px";
-            gs.height = vml.height + "px";
+            g.style.cssText = "position:absolute;left:0;top:0;width:" + vml.width + "px;height:" + vml.height + "px";
             g.coordsize = vml.coordsize;
             g.coordorigin = vml.coordorigin;
-            path.v = ["m", Math.round(x), ", ", Math.round(y), "l", Math.round(x) + 1, ", ", Math.round(y)].join("");
+            path.v = R.format("m{0},{1}l{2},{1}", Math.round(x), Math.round(y), Math.round(x) + 1);
             path.textpathok = true;
             ol.width = vml.width;
             ol.height = vml.height;
-            gs.position = "absolute";
-            gs.left = 0;
-            gs.top = 0;
-            gs.width = vml.width;
-            gs.height = vml.height;
             o.string = text;
             o.on = true;
             el.appendChild(o);
@@ -2104,19 +2082,9 @@ window.Raphael = (function () {
             res.coordsize = width + " " + height;
             res.coordorigin = "0 0";
             res.span = doc.createElement("span");
-            s = res.span.style;
+            res.span.style.cssText = "position:absolute;left:-9999px;top:-9999px;padding:0;margin:0;line-height:1;display:inline;";
             c.appendChild(res.span);
-            s.position = "absolute";
-            s.left = "-99999px";
-            s.top = "-99999px";
-            s.padding = 0;
-            s.margin = 0;
-            s.lineHeight = 1;
-            s.display = "inline";
-            cs.width  = width + "px";
-            cs.height = height + "px";
-            cs.position = "absolute";
-            cs.clip = "rect(0 " + width + "px " + height + "px 0)";
+            cs.cssText = R.format("width:{0}px;height:{1}px;position:absolute;clip:rect(0 {0}px {1}px 0)", width, height);
             if (container == 1) {
                 doc.body.appendChild(c);
                 cs.left = x + "px";
@@ -2154,7 +2122,7 @@ window.Raphael = (function () {
     }
 
     // rest
-    // Safari or Chrome (WebKit)
+    // Safari or Chrome (WebKit) rendering bug workaround method
     if ({"Apple Computer, Inc.": 1, "Google Inc.": 1}[navigator.vendor]) {
         paper.safari = function () {
             var rect = this.rect(-99, -99, this.width + 99, this.height + 99);
@@ -2228,23 +2196,23 @@ window.Raphael = (function () {
         })(events[i]);
     }
     paper.circle = function (x, y, r) {
-        return theCircle(this, x, y, r);
+        return theCircle(this, x || 0, y || 0, r || 0);
     };
     paper.rect = function (x, y, w, h, r) {
-        return theRect(this, x, y, w, h, r);
+        return theRect(this, x || 0, y || 0, w || 0, h || 0, r || 0);
     };
     paper.ellipse = function (x, y, rx, ry) {
-        return theEllipse(this, x, y, rx, ry);
+        return theEllipse(this, x || 0, y || 0, rx || 0, ry || 0);
     };
     paper.path = function (pathString) {
         pathString && !R.is(pathString, "string") && !R.is(pathString[0], "array") && (pathString += "");
         return thePath(R.format.apply(R, arguments), this);
     };
     paper.image = function (src, x, y, w, h) {
-        return theImage(this, src, x, y, w, h);
+        return theImage(this, src || "about:blank", x || 0, y || 0, w || 0, h || 0);
     };
     paper.text = function (x, y, text) {
-        return theText(this, x, y, text);
+        return theText(this, x || 0, y || 0, text || "");
     };
     paper.set = function (itemsArray) {
         arguments.length > 1 && (itemsArray = Array.prototype.splice.call(arguments, 0, arguments.length));
@@ -2657,7 +2625,28 @@ window.Raphael = (function () {
         }
         return this;
     };
-
+    Set.prototype.animate = function (params, ms, easing, callback) {
+        if (R.is(easing, "function") || !easing) {
+            callback = easing || null;
+        }
+        var len = this.items.length,
+            i = len,
+            set = this;
+        if (callback) {
+            var collector = function () {
+                !--len && callback.call(set);
+            };
+            while (i--) {
+                this.items[i].animate(params, ms, easing || collector, collector);
+            }
+        } else {
+            while (i--) {
+                this.items[i].animate(params, ms, easing);
+            }
+        }
+        return this;
+    };
+    
     Set.prototype.getBBox = function () {
         var x = [],
             y = [],
@@ -2769,7 +2758,7 @@ window.Raphael = (function () {
         token && R.is(token, "string") && args.length - 1 && (token = token.replace(/\{(\d+)\}/g, function (str, i) {
             return args[++i] == null ? "" : args[i];
         }));
-        return token;
+        return token || "";
     };
     R.ninja = function () {
         var r = window.Raphael, u;
