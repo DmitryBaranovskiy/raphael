@@ -230,7 +230,7 @@ window.Raphael = (function () {
             var r = (~~red).toString(16),
                 g = (~~green).toString(16),
                 b = (~~blue).toString(16),
-                rg = /^(?=\d$)/,
+                rg = /^(?=[\da-f]$)/,
                 rp = "replace";
             r = r[rp](rg, "0");
             g = g[rp](rg, "0");
