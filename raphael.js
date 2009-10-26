@@ -1,5 +1,5 @@
 /*!
- * Raphael 1.2 - JavaScript Vector Library
+ * Raphael 1.2.1 - JavaScript Vector Library
  *
  * Copyright (c) 2008 - 2009 Dmitry Baranovskiy (http://raphaeljs.com)
  * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
@@ -53,7 +53,7 @@ window.Raphael = (function () {
         availableAttrs = {"clip-rect": "0 0 10e9 10e9", cx: 0, cy: 0, fill: "#fff", "fill-opacity": 1, font: '10px "Arial"', "font-family": '"Arial"', "font-size": "10", "font-style": "normal", "font-weight": 400, gradient: 0, height: 0, href: "http://raphaeljs.com/", opacity: 1, path: "M0,0", r: 0, rotation: 0, rx: 0, ry: 0, scale: "1 1", src: "", stroke: "#000", "stroke-dasharray": "", "stroke-linecap": "butt", "stroke-linejoin": "butt", "stroke-miterlimit": 0, "stroke-opacity": 1, "stroke-width": 1, target: "_blank", "text-anchor": "middle", title: "Raphael", translation: "0 0", width: 0, x: 0, y: 0},
         availableAnimAttrs = {"clip-rect": "csv", cx: nu, cy: nu, fill: "colour", "fill-opacity": nu, "font-size": nu, height: nu, opacity: nu, path: "path", r: nu, rotation: "csv", rx: nu, ry: nu, scale: "csv", stroke: "colour", "stroke-opacity": nu, "stroke-width": nu, translation: "csv", width: nu, x: nu, y: nu},
         rp = "replace";
-    R.version = "1.2";
+    R.version = "1.2.1";
     R.type = (win.SVGAngle || doc.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#BasicStructure", "1.1") ? "SVG" : "VML");
     R.svg = !(R.vml = R.type == "VML");
     R._id = 0;
@@ -2571,7 +2571,7 @@ window.Raphael = (function () {
         };
 
     Element[proto].animateWith = function (element, params, ms, easing, callback) {
-        animationElements[element.in_animation] && (params.start = animationElements[element.in_animation].start);
+        animationElements[element.id] && (params.start = animationElements[element.id].start);
         return this.animate(params, ms, easing, callback);
     };
     Element[proto].onAnimation = function (f) {
@@ -2663,7 +2663,7 @@ window.Raphael = (function () {
     };
     Element[proto].stop = function () {
         delete animationElements[this.id];
-        this.in_animation = 0;
+        delete this.in_animation;
         return this;
     };
     Element[proto].translate = function (x, y) {
@@ -2752,24 +2752,23 @@ window.Raphael = (function () {
         (R.is(easing, "function") || !easing) && (callback = easing || null);
         var len = this.items[length],
             i = len,
-            set = this;
-        if (callback) {
-            var collector = function () {
-                !--len && callback.call(set);
-            };
-            this.items[--i].animate(params, ms, easing || collector, collector);
-            while (i--) {
-                this.items[i].animateWith(this.items[len - 1], params, ms, easing || collector, collector);
-            }
-        } else {
-            this.items[--i].animate(params, ms, easing);
-            while (i--) {
-                this.items[i].animateWith(this.items[len - 1], params, ms, easing);
-            }
+            set = this,
+            collector;
+        callback && (collector = function () {
+            !--len && callback.call(set);
+        });
+        this.items[--i].animate(params, ms, easing || collector, collector);
+        while (i--) {
+            this.items[i].animateWith(this.items[len - 1], params, ms, easing || collector, collector);
         }
         return this;
     };
-    
+    Set[proto].insertAfter = function (el) {
+        var i = this.items[length];
+        while (i--) {
+            this.items[i].insertAfter(el);
+        }
+    };
     Set[proto].getBBox = function () {
         var x = [],
             y = [],
