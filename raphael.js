@@ -1,5 +1,5 @@
 /*!
- * Raphael 1.2.2 - JavaScript Vector Library
+ * Raphael 1.2.3 - JavaScript Vector Library
  *
  * Copyright (c) 2008 - 2009 Dmitry Baranovskiy (http://raphaeljs.com)
  * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
@@ -58,7 +58,7 @@ window.Raphael = (function () {
         availableAttrs = {"clip-rect": "0 0 10e9 10e9", cursor: "default", cx: 0, cy: 0, fill: "#fff", "fill-opacity": 1, font: '10px "Arial"', "font-family": '"Arial"', "font-size": "10", "font-style": "normal", "font-weight": 400, gradient: 0, height: 0, href: "http://raphaeljs.com/", opacity: 1, path: "M0,0", r: 0, rotation: 0, rx: 0, ry: 0, scale: "1 1", src: "", stroke: "#000", "stroke-dasharray": "", "stroke-linecap": "butt", "stroke-linejoin": "butt", "stroke-miterlimit": 0, "stroke-opacity": 1, "stroke-width": 1, target: "_blank", "text-anchor": "middle", title: "Raphael", translation: "0 0", width: 0, x: 0, y: 0},
         availableAnimAttrs = {"clip-rect": "csv", cx: nu, cy: nu, fill: "colour", "fill-opacity": nu, "font-size": nu, height: nu, opacity: nu, path: "path", r: nu, rotation: "csv", rx: nu, ry: nu, scale: "csv", stroke: "colour", "stroke-opacity": nu, "stroke-width": nu, translation: "csv", width: nu, x: nu, y: nu},
         rp = "replace";
-    R.version = "1.2.2";
+    R.version = "1.2.3";
     R.type = (win.SVGAngle || doc.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#BasicStructure", "1.1") ? "SVG" : "VML");
     R.svg = !(R.vml = R.type == "VML");
     R._id = 0;
@@ -825,6 +825,9 @@ window.Raphael = (function () {
             el.prev && (el.prev.next = el.next);
         },
         tofront = function (el, paper) {
+            if (paper.top === el) {
+                return;
+            }
             tear(el, paper);
             el.next = null;
             el.prev = paper.top;
@@ -832,6 +835,9 @@ window.Raphael = (function () {
             paper.top = el;
         },
         toback = function (el, paper) {
+            if (paper.bottom === el) {
+                return;
+            }
             tear(el, paper);
             el.next = paper.bottom;
             el.prev = null;
@@ -2310,7 +2316,7 @@ window.Raphael = (function () {
 
     // rest
     // Safari or Chrome (WebKit) rendering bug workaround method
-    if ({"Apple Computer, Inc.": 1, "Google Inc.": 1}[navigator.vendor]) {
+    if ({"Apple Computer, Inc.": 1, "Google Inc.": 1}[navigator.vendor] && !(navigator.userAgent.indexOf("Version/4.0") + 1)) {
         paper.safari = function () {
             var rect = this.rect(-99, -99, this.width + 99, this.height + 99);
             setTimeout(function () {rect.remove();});
@@ -2433,8 +2439,8 @@ window.Raphael = (function () {
             var dirx = ~~(x / Math.abs(x)),
                 diry = ~~(y / Math.abs(y)),
                 s = this.node.style,
-                ncx = cx + (rcx - cx) * dirx * kx,
-                ncy = cy + (rcy - cy) * diry * ky;
+                ncx = cx + (rcx - cx) * kx,
+                ncy = cy + (rcy - cy) * ky;
             switch (this.type) {
                 case "rect":
                 case "image":
@@ -2454,9 +2460,9 @@ window.Raphael = (function () {
                 case "circle":
                 case "ellipse":
                     this.attr({
-                        rx: a.rx * kx,
-                        ry: a.ry * ky,
-                        r: a.r * mmin(kx, ky),
+                        rx: a.rx * dirx * kx,
+                        ry: a.ry * diry * ky,
+                        r: a.r * mmin(dirx * kx, diry * ky),
                         cx: ncx,
                         cy: ncy
                     });
@@ -2466,6 +2472,7 @@ window.Raphael = (function () {
                         skip = true;
                     for (var i = 0, ii = path[length]; i < ii; i++) {
                         var p = path[i],
+                            j,
                             P0 = upperCase.call(p[0]);
                         if (P0 == "M" && skip) {
                             continue;
@@ -2475,12 +2482,20 @@ window.Raphael = (function () {
                         if (R.svg && P0 == "A") {
                             p[path[i][length] - 2] *= kx;
                             p[path[i][length] - 1] *= ky;
-                            p[1] *= kx;
-                            p[2] *= ky;
+                            p[1] *= dirx * kx;
+                            p[2] *= diry * ky;
                             p[5] = +(dirx + diry ? !!+p[5] : !+p[5]);
-                        } else {
-                            for (var j = 1, jj = p[length]; j < jj; j++) {
-                                p[j] *= (j % 2 && P0 != "V") ? kx : ky;
+                        } else if (P0 == "H") {
+                            for (j = 1, jj = p[length]; j < jj; j++) {
+                                p[j] *= kx;
+                            }
+                        } else if (P0 == "V") {
+                            for (j = 1, jj = p[length]; j < jj; j++) {
+                                p[j] *= ky;
+                            }
+                         } else {
+                            for (j = 1, jj = p[length]; j < jj; j++) {
+                                p[j] *= (j % 2) ? kx : ky;
                             }
                         }
                     }
@@ -2977,13 +2992,16 @@ window.Raphael = (function () {
         R.is(font, "string") && (font = this.getFont(font));
         if (font) {
             scale = (size || 16) / font.face["units-per-em"];
+            var bb = font.face.bbox.split(separator),
+                top = +bb[0],
+                height = +bb[1] + (bb[3] - bb[1]) / 2;
             for (var i = 0, ii = letters[length]; i < ii; i++) {
                 var prev = i && font.glyphs[letters[i - 1]] || {},
                     curr = font.glyphs[letters[i]];
                 shift += i ? (prev.w || font.w) + (prev.k && prev.k[letters[i]] || 0) : 0;
                 curr && curr.d && out[push](this.path(curr.d).attr({fill: "#000", stroke: "none", translation: [shift, 0]}));
             }
-            out.scale(scale, scale, 0, y).translate(x, (size || 16) / 2);
+            out.scale(scale, scale, top, height).translate(x - top, y - height);
         }
         return out;
     };
