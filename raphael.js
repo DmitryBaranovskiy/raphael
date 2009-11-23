@@ -1363,6 +1363,13 @@ window.Raphael = (function () {
             if (this.removed) {
                 return this;
             }
+            if (arguments[length] == 0) {
+                var res = {};
+                for (var i in this.attrs) if (this.attrs[has](i)) {
+                    res[i] = this.attrs[i];
+                }
+                return res;
+            }
             if (arguments[length] == 1 && R.is(arguments[0], "string")) {
                 if (arguments[0] == "translation") {
                     return translate.call(this);
@@ -2043,6 +2050,13 @@ window.Raphael = (function () {
         Element[proto].attr = function () {
             if (this.removed) {
                 return this;
+            }
+            if (arguments[length] == 0) {
+                var res = {};
+                for (var i in this.attrs) if (this.attrs[has](i)) {
+                    res[i] = this.attrs[i];
+                }
+                return res;
             }
             if (arguments[length] == 1 && R.is(arguments[0], "string")) {
                 if (arguments[0] == "translation") {
