@@ -1,5 +1,5 @@
 /*!
- * Raphael 1.2.3 - JavaScript Vector Library
+ * Raphael 1.2.4 - JavaScript Vector Library
  *
  * Copyright (c) 2008 - 2009 Dmitry Baranovskiy (http://raphaeljs.com)
  * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
@@ -58,7 +58,7 @@ window.Raphael = (function () {
         availableAttrs = {"clip-rect": "0 0 10e9 10e9", cursor: "default", cx: 0, cy: 0, fill: "#fff", "fill-opacity": 1, font: '10px "Arial"', "font-family": '"Arial"', "font-size": "10", "font-style": "normal", "font-weight": 400, gradient: 0, height: 0, href: "http://raphaeljs.com/", opacity: 1, path: "M0,0", r: 0, rotation: 0, rx: 0, ry: 0, scale: "1 1", src: "", stroke: "#000", "stroke-dasharray": "", "stroke-linecap": "butt", "stroke-linejoin": "butt", "stroke-miterlimit": 0, "stroke-opacity": 1, "stroke-width": 1, target: "_blank", "text-anchor": "middle", title: "Raphael", translation: "0 0", width: 0, x: 0, y: 0},
         availableAnimAttrs = {"clip-rect": "csv", cx: nu, cy: nu, fill: "colour", "fill-opacity": nu, "font-size": nu, height: nu, opacity: nu, path: "path", r: nu, rotation: "csv", rx: nu, ry: nu, scale: "csv", stroke: "colour", "stroke-opacity": nu, "stroke-width": nu, translation: "csv", width: nu, x: nu, y: nu},
         rp = "replace";
-    R.version = "1.2.3";
+    R.version = "1.2.4";
     R.type = (win.SVGAngle || doc.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#BasicStructure", "1.1") ? "SVG" : "VML");
     R.svg = !(R.vml = R.type == "VML");
     R._id = 0;
@@ -2240,18 +2240,11 @@ window.Raphael = (function () {
         };
         var setSize = function (width, height) {
             var cs = this.canvas.style;
-            this.width = toFloat(width || this.width);
-            this.height = toFloat(height || this.height);
-            cs.width = this.width + "px";
-            cs.height = this.height + "px";
-            cs.clip = "rect(0 " + this.width + "px " + this.height + "px 0)";
-            this.coordsize = this.width + S + this.height;
-            var bot = this.bottom;
-            while (bot) {
-                bot.Group.coordsize = this.coordsize;
-                bot.attr(bot.attrs);
-                bot = bot.next;
-            }
+            width == +width && (width += "px");
+            height == +height && (height += "px");
+            cs.width = width;
+            cs.height = height;
+            cs.clip = "rect(0 " + width + " " + height + " 0)";
             return this;
         };
         doc.createStyleSheet().addRule(".rvml", "behavior:url(#default#VML)");
@@ -2279,16 +2272,18 @@ window.Raphael = (function () {
             var res = {},
                 c = res.canvas = doc.createElement("div"),
                 cs = c.style;
-            width = toFloat(width) || 512;
-            height = toFloat(height) || 342;
-            res.width = width;
-            res.height = height;
-            res.coordsize = width + S + height;
+            width = width || 512;
+            height = height || 342;
+            width == +width && (width += "px");
+            height == +height && (height += "px");
+            res.width = 1e3;
+            res.height = 1e3;
+            res.coordsize = "1000 1000";
             res.coordorigin = "0 0";
             res.span = doc.createElement("span");
             res.span.style.cssText = "position:absolute;left:-9999px;top:-9999px;padding:0;margin:0;line-height:1;display:inline;";
             c[appendChild](res.span);
-            cs.cssText = R.format("width:{0}px;height:{1}px;position:absolute;clip:rect(0 {0}px {1}px 0)", width, height);
+            cs.cssText = R.format("width:{0};height:{1};position:absolute;clip:rect(0 {0} {1} 0);overflow:hidden", width, height);
             if (container == 1) {
                 doc.body[appendChild](c);
                 cs.left = x + "px";
@@ -2997,7 +2992,8 @@ window.Raphael = (function () {
         }
         return thefont;
     };
-    paper.print = function (x, y, string, font, size) {
+    paper.print = function (x, y, string, font, size, origin) {
+        origin = origin || "middle"; // baseline|middle
         var out = this.set(),
             letters = (string + E)[split](E),
             shift = 0,
@@ -3008,7 +3004,7 @@ window.Raphael = (function () {
             scale = (size || 16) / font.face["units-per-em"];
             var bb = font.face.bbox.split(separator),
                 top = +bb[0],
-                height = +bb[1] + (bb[3] - bb[1]) / 2;
+                height = +bb[1] + (origin == "baseline" ? bb[3] - bb[1] + (+font.face.descent) : (bb[3] - bb[1]) / 2);
             for (var i = 0, ii = letters[length]; i < ii; i++) {
                 var prev = i && font.glyphs[letters[i - 1]] || {},
                     curr = font.glyphs[letters[i]];
