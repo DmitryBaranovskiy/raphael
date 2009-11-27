@@ -1130,11 +1130,13 @@ window.Raphael = (function () {
                         break;
                     case "translation":
                         var xy = (value + E)[split](separator);
+                        xy[0] = +xy[0] || 0;
+                        xy[1] = +xy[1] || 0;
                         if (rotxy) {
-                            rotxy[1] +=+ xy[0];
-                            rotxy[2] +=+ xy[1];
+                            rotxy[1] += xy[0];
+                            rotxy[2] += xy[1];
                         }
-                        translate.call(o, (+xy[0] + 1 || 2) - 1, (+xy[1] + 1 || 2) - 1);
+                        translate.call(o, xy[0], xy[1]);
                         break;
                     case "scale":
                         var xy = (value + E)[split](separator);
