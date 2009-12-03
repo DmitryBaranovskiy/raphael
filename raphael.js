@@ -1,5 +1,5 @@
 /*!
- * Raphael 1.2.4 - JavaScript Vector Library
+ * Raphael 1.2.5 - JavaScript Vector Library
  *
  * Copyright (c) 2008 - 2009 Dmitry Baranovskiy (http://raphaeljs.com)
  * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
@@ -58,7 +58,7 @@ window.Raphael = (function () {
         availableAttrs = {"clip-rect": "0 0 10e9 10e9", cursor: "default", cx: 0, cy: 0, fill: "#fff", "fill-opacity": 1, font: '10px "Arial"', "font-family": '"Arial"', "font-size": "10", "font-style": "normal", "font-weight": 400, gradient: 0, height: 0, href: "http://raphaeljs.com/", opacity: 1, path: "M0,0", r: 0, rotation: 0, rx: 0, ry: 0, scale: "1 1", src: "", stroke: "#000", "stroke-dasharray": "", "stroke-linecap": "butt", "stroke-linejoin": "butt", "stroke-miterlimit": 0, "stroke-opacity": 1, "stroke-width": 1, target: "_blank", "text-anchor": "middle", title: "Raphael", translation: "0 0", width: 0, x: 0, y: 0},
         availableAnimAttrs = {"clip-rect": "csv", cx: nu, cy: nu, fill: "colour", "fill-opacity": nu, "font-size": nu, height: nu, opacity: nu, path: "path", r: nu, rotation: "csv", rx: nu, ry: nu, scale: "csv", stroke: "colour", "stroke-opacity": nu, "stroke-width": nu, translation: "csv", width: nu, x: nu, y: nu},
         rp = "replace";
-    R.version = "1.2.4";
+    R.version = "1.2.5";
     R.type = (win.SVGAngle || doc.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#BasicStructure", "1.1") ? "SVG" : "VML");
     R.svg = !(R.vml = R.type == "VML");
     R._id = 0;
@@ -322,17 +322,21 @@ window.Raphael = (function () {
         var x = 0, 
             y = 0,
             X = [],
-            Y = [];
+            Y = [],
+            p;
         for (var i = 0, ii = path[length]; i < ii; i++) {
-            if (path[i][0] == "M") {
-                x = path[i][1];
-                y = path[i][2];
+            p = path[i];
+            if (p[0] == "M") {
+                x = p[1];
+                y = p[2];
                 X[push](x);
                 Y[push](y);
             } else {
-                var dim = curveDim(x, y, path[i][1], path[i][2], path[i][3], path[i][4], path[i][5], path[i][6]);
+                var dim = curveDim(x, y, p[1], p[2], p[3], p[4], p[5], p[6]);
                 X = X[concat](dim.min.x, dim.max.x);
                 Y = Y[concat](dim.min.y, dim.max.y);
+                x = p[5];
+                y = p[6];
             }
         }
         var xmin = mmin[apply](0, X),
@@ -605,8 +609,16 @@ window.Raphael = (function () {
             }
         },
         findDotAtSegment = cacher(function (p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y, t) {
-            var x = pow(1 - t, 3) * p1x + pow(1 - t, 2) * 3 * t * c1x + (1 - t) * 3 * t * t * c2x + pow(t, 3) * p2x,
-                y = pow(1 - t, 3) * p1y + pow(1 - t, 2) * 3 * t * c1y + (1 - t) * 3 * t * t * c2y + pow(t, 3) * p2y,
+            var t1 = 1 - t;
+            return {
+                x: pow(t1, 3) * p1x + pow(t1, 2) * 3 * t * c1x + t1 * 3 * t * t * c2x + pow(t, 3) * p2x,
+                y: pow(t1, 3) * p1y + pow(t1, 2) * 3 * t * c1y + t1 * 3 * t * t * c2y + pow(t, 3) * p2y
+            };
+        }),
+        findDotsAtSegment = cacher(function (p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y, t) {
+            var t1 = 1 - t,
+                x = pow(t1, 3) * p1x + pow(t1, 2) * 3 * t * c1x + t1 * 3 * t * t * c2x + pow(t, 3) * p2x,
+                y = pow(t1, 3) * p1y + pow(t1, 2) * 3 * t * c1y + t1 * 3 * t * t * c2y + pow(t, 3) * p2y,
                 mx = p1x + 2 * t * (c1x - p1x) + t * t * (c2x - 2 * c1x + p1x),
                 my = p1y + 2 * t * (c1y - p1y) + t * t * (c2y - 2 * c1y + p1y),
                 nx = c1x + 2 * t * (c2x - c1x) + t * t * (p2x - 2 * c2x + c1x),
@@ -625,19 +637,36 @@ window.Raphael = (function () {
                 t2 = (-b - Math.sqrt(b * b - 4 * a * c)) / 2 / a,
                 y = [p1y, p2y],
                 x = [p1x, p2x],
-                dot1 = findDotAtSegment(p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y, t1 > 0 && t1 < 1 ? t1 : 0),
-                dot2 = findDotAtSegment(p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y, t2 > 0 && t2 < 1 ? t2 : 0);
-            x = x[concat](dot1.x, dot2.x);
-            y = y[concat](dot1.y, dot2.y);
+                dot;
+            !isFinite(t1) && (t1 = .5);
+            !isFinite(t2) && (t2 = .5);
+            if (t1 > 0 && t1 < 1) {
+                dot = findDotAtSegment(p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y, t1);
+                x[push](dot.x);
+                y[push](dot.y);
+            }
+            if (t2 > 0 && t2 < 1) {
+                dot = findDotAtSegment(p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y, t2);
+                x[push](dot.x);
+                y[push](dot.y);
+            }
             a = (c2y - 2 * c1y + p1y) - (p2y - 2 * c2y + c1y);
             b = 2 * (c1y - p1y) - 2 * (c2y - c1y);
             c = p1y - c1y;
             t1 = (-b + Math.sqrt(b * b - 4 * a * c)) / 2 / a;
             t2 = (-b - Math.sqrt(b * b - 4 * a * c)) / 2 / a;
-            dot1 = findDotAtSegment(p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y, t1 > 0 && t1 < 1 ? t1 : 0);
-            dot2 = findDotAtSegment(p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y, t2 > 0 && t2 < 1 ? t2 : 0);
-            x = x[concat](dot1.x, dot2.x);
-            y = y[concat](dot1.y, dot2.y);
+            !isFinite(t1) && (t1 = .5);
+            !isFinite(t2) && (t2 = .5);
+            if (t1 > 0 && t1 < 1) {
+                dot = findDotAtSegment(p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y, t1);
+                x[push](dot.x);
+                y[push](dot.y);
+            }
+            if (t2 > 0 && t2 < 1) {
+                dot = findDotAtSegment(p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y, t2);
+                x[push](dot.x);
+                y[push](dot.y);
+            }
             return {
                 min: {x: mmin[apply](0, x), y: mmin[apply](0, y)},
                 max: {x: mmax[apply](0, x), y: mmax[apply](0, y)}
@@ -869,27 +898,27 @@ window.Raphael = (function () {
             return +num + (~~num === num) * .5;
         },
             roundPath = function (path) {
-            for (var i = 0, ii = path[length]; i < ii; i++) {
-                if (lowerCase.call(path[i][0]) != "a") {
-                    for (var j = 1, jj = path[i][length]; j < jj; j++) {
-                        path[i][j] = round(path[i][j]);
+                for (var i = 0, ii = path[length]; i < ii; i++) {
+                    if (lowerCase.call(path[i][0]) != "a") {
+                        for (var j = 1, jj = path[i][length]; j < jj; j++) {
+                            path[i][j] = round(path[i][j]);
+                        }
+                    } else {
+                        path[i][6] = round(path[i][6]);
+                        path[i][7] = round(path[i][7]);
+                    }
+                }
+                return path;
+            },
+            $ = function (el, attr) {
+                if (attr) {
+                    for (var key in attr) if (attr[has](key)) {
+                        el[setAttribute](key, attr[key]);
                     }
                 } else {
-                    path[i][6] = round(path[i][6]);
-                    path[i][7] = round(path[i][7]);
+                    return doc.createElementNS(paper.svgns, el);
                 }
-            }
-            return path;
-        },
-            $ = function (el, attr) {
-            if (attr) {
-                for (var key in attr) if (attr[has](key)) {
-                    el[setAttribute](key, attr[key]);
-                }
-            } else {
-                return doc.createElementNS(paper.svgns, el);
-            }
-        };
+            };
         R[toString] = function () {
             return  "Your browser supports SVG.\nYou are running Rapha\xebl " + this.version;
         };
@@ -1381,6 +1410,9 @@ window.Raphael = (function () {
                 }
                 if (arguments[0] == "scale") {
                     return this.scale();
+                }
+                if (arguments[0] == "fill" && this.attrs.fill == "none" && this.attrs.gradient) {
+                    return this.attrs.gradient;
                 }
                 return this.attrs[arguments[0]];
             }
@@ -2001,7 +2033,7 @@ window.Raphael = (function () {
                 (os.top != y - top + "px") && (os.top = y - top + "px");
                 (os.width != w + "px") && (os.width = w + "px");
                 (os.height != h + "px") && (os.height = h + "px");
-                var arcsize = (+params.r || 0) / (mmin(w, h));
+                var arcsize = (+params.r || 0) / mmin(w, h);
                 if (this.type == "rect" && this.arcsize != arcsize && (arcsize || this.arcsize)) {
                     // We should replace element with the new one
                     var o = createNode(arcsize ? "roundrect" : "rect");
@@ -2041,7 +2073,7 @@ window.Raphael = (function () {
                 return;
             }
             tear(this, this.paper);
-            this.node.parentNode.removeChild(this[0]);
+            this.node.parentNode.removeChild(this.node);
             this.Group.parentNode.removeChild(this.Group);
             this.shape && this.shape.parentNode.removeChild(this.shape);
             for (var i in this) {
@@ -2069,6 +2101,9 @@ window.Raphael = (function () {
                 }
                 if (arguments[0] == "scale") {
                     return this.scale();
+                }
+                if (arguments[0] == "fill" && this.attrs.fill == "none" && this.attrs.gradient) {
+                    return this.attrs.gradient;
                 }
                 return this.attrs[arguments[0]];
             }
@@ -2153,18 +2188,18 @@ window.Raphael = (function () {
         };
         var theRect = function (vml, x, y, w, h, r) {
             var g = createNode("group"),
-                o = createNode(r ? "roundrect" : "rect"),
+                o = createNode("roundrect"),
                 arcsize = (+r || 0) / (mmin(w, h));
-            o.arcsize = arcsize;
             g.style.cssText = "position:absolute;left:0;top:0;width:" + vml.width + "px;height:" + vml.height + "px";
             g.coordsize = vml.coordsize;
             g.coordorigin = vml.coordorigin;
             g[appendChild](o);
+            o.arcsize = arcsize;
             var res = new Element(o, g, vml);
             res.type = "rect";
             setFillAndStroke(res, {stroke: "#000"});
             res.arcsize = arcsize;
-            res.setBox({x: x, y: y, width: w, height: h, r: +r});
+            res.setBox({x: x, y: y, width: w, height: h, r: r});
             vml.canvas[appendChild](g);
             return res;
         };
@@ -2490,7 +2525,7 @@ window.Raphael = (function () {
                         } else {
                             skip = false;
                         }
-                        if (R.svg && P0 == "A") {
+                        if (P0 == "A") {
                             p[path[i][length] - 2] *= kx;
                             p[path[i][length] - 1] *= ky;
                             p[1] *= dirx * kx;
