@@ -1,5 +1,5 @@
 /*!
- * Raphael 1.2.5 - JavaScript Vector Library
+ * Raphael 1.2.6 - JavaScript Vector Library
  *
  * Copyright (c) 2008 - 2009 Dmitry Baranovskiy (http://raphaeljs.com)
  * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
@@ -31,25 +31,26 @@ window.Raphael = (function () {
         apply = "apply",
         concat = "concat",
         E = "",
-        events = ["click", "dblclick", "mousedown", "mousemove", "mouseout", "mouseover", "mouseup"],
+        S = " ",
+        events = "click dblclick mousedown mousemove mouseout mouseover mouseup".split(S),
         has = "hasOwnProperty",
         isit = /^\[object\s+|\]$/gi,
         join = "join",
         length = "length",
         proto = "prototype",
         lowerCase = String[proto].toLowerCase,
-        mmax = Math.max,
-        mmin = Math.min,
+        math = Math,
+        mmax = math.max,
+        mmin = math.min,
         nu = "number",
         toString = "toString",
         objectToString = Object[proto][toString],
         paper = {},
-        pow = Math.pow,
+        pow = math.pow,
         push = "push",
         rg = /^(?=[\da-f]$)/,
         ISURL = /^url\(['"]?([^\)]+)['"]?\)$/i,
-        round = Math.round,
-        S = " ",
+        round = math.round,
         setAttribute = "setAttribute",
         split = "split",
         toFloat = parseFloat,
@@ -58,7 +59,7 @@ window.Raphael = (function () {
         availableAttrs = {"clip-rect": "0 0 10e9 10e9", cursor: "default", cx: 0, cy: 0, fill: "#fff", "fill-opacity": 1, font: '10px "Arial"', "font-family": '"Arial"', "font-size": "10", "font-style": "normal", "font-weight": 400, gradient: 0, height: 0, href: "http://raphaeljs.com/", opacity: 1, path: "M0,0", r: 0, rotation: 0, rx: 0, ry: 0, scale: "1 1", src: "", stroke: "#000", "stroke-dasharray": "", "stroke-linecap": "butt", "stroke-linejoin": "butt", "stroke-miterlimit": 0, "stroke-opacity": 1, "stroke-width": 1, target: "_blank", "text-anchor": "middle", title: "Raphael", translation: "0 0", width: 0, x: 0, y: 0},
         availableAnimAttrs = {"clip-rect": "csv", cx: nu, cy: nu, fill: "colour", "fill-opacity": nu, "font-size": nu, height: nu, opacity: nu, path: "path", r: nu, rotation: "csv", rx: nu, ry: nu, scale: "csv", stroke: "colour", "stroke-opacity": nu, "stroke-width": nu, translation: "csv", width: nu, x: nu, y: nu},
         rp = "replace";
-    R.version = "1.2.5";
+    R.version = "1.2.6";
     R.type = (win.SVGAngle || doc.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#BasicStructure", "1.1") ? "SVG" : "VML");
     R.svg = !(R.vml = R.type == "VML");
     R._id = 0;
@@ -525,14 +526,14 @@ window.Raphael = (function () {
         a2c = function (x1, y1, rx, ry, angle, large_arc_flag, sweep_flag, x2, y2, recursive) {
             // for more information of where this math came from visit:
             // http://www.w3.org/TR/SVG11/implnote.html#ArcImplementationNotes
-            var PI = Math.PI,
+            var PI = math.PI,
                 _120 = PI * 120 / 180,
                 rad = PI / 180 * (+angle || 0),
                 res = [],
                 xy,
                 rotate = cacher(function (x, y, rad) {
-                    var X = x * Math.cos(rad) - y * Math.sin(rad),
-                        Y = x * Math.sin(rad) + y * Math.cos(rad);
+                    var X = x * math.cos(rad) - y * math.sin(rad),
+                        Y = x * math.sin(rad) + y * math.cos(rad);
                     return {x: X, y: Y};
                 });
             if (!recursive) {
@@ -542,20 +543,20 @@ window.Raphael = (function () {
                 xy = rotate(x2, y2, -rad);
                 x2 = xy.x;
                 y2 = xy.y;
-                var cos = Math.cos(PI / 180 * angle),
-                    sin = Math.sin(PI / 180 * angle),
+                var cos = math.cos(PI / 180 * angle),
+                    sin = math.sin(PI / 180 * angle),
                     x = (x1 - x2) / 2,
                     y = (y1 - y2) / 2;
-                rx = mmax(rx, Math.abs(x));
-                ry = mmax(ry, Math.abs(y));
+                rx = mmax(rx, math.abs(x));
+                ry = mmax(ry, math.abs(y));
                 var rx2 = rx * rx,
                     ry2 = ry * ry,
                     k = (large_arc_flag == sweep_flag ? -1 : 1) *
-                        Math.sqrt(Math.abs((rx2 * ry2 - rx2 * y * y - ry2 * x * x) / (rx2 * y * y + ry2 * x * x))),
+                        math.sqrt(math.abs((rx2 * ry2 - rx2 * y * y - ry2 * x * x) / (rx2 * y * y + ry2 * x * x))),
                     cx = k * rx * y / ry + (x1 + x2) / 2,
                     cy = k * -ry * x / rx + (y1 + y2) / 2,
-                    f1 = Math.asin((y1 - cy) / ry),
-                    f2 = Math.asin((y2 - cy) / ry);
+                    f1 = math.asin((y1 - cy) / ry),
+                    f2 = math.asin((y2 - cy) / ry);
 
                 f1 = x1 < cx ? PI - f1 : f1;
                 f2 = x2 < cx ? PI - f2 : f2;
@@ -574,21 +575,21 @@ window.Raphael = (function () {
                 cy = recursive[3];
             }
             var df = f2 - f1;
-            if (Math.abs(df) > _120) {
+            if (math.abs(df) > _120) {
                 var f2old = f2,
                     x2old = x2,
                     y2old = y2;
                 f2 = f1 + _120 * (sweep_flag && f2 > f1 ? 1 : -1);
-                x2 = cx + rx * Math.cos(f2);
-                y2 = cy + ry * Math.sin(f2);
+                x2 = cx + rx * math.cos(f2);
+                y2 = cy + ry * math.sin(f2);
                 res = a2c(x2, y2, rx, ry, angle, 0, sweep_flag, x2old, y2old, [f2, f2old, cx, cy]);
             }
             df = f2 - f1;
-            var c1 = Math.cos(f1),
-                s1 = Math.sin(f1),
-                c2 = Math.cos(f2),
-                s2 = Math.sin(f2),
-                t = Math.tan(df / 4),
+            var c1 = math.cos(f1),
+                s1 = math.sin(f1),
+                c2 = math.cos(f2),
+                s2 = math.sin(f2),
+                t = math.tan(df / 4),
                 hx = 4 / 3 * rx * t,
                 hy = 4 / 3 * ry * t,
                 m1 = [x1, y1],
@@ -633,13 +634,13 @@ window.Raphael = (function () {
             var a = (c2x - 2 * c1x + p1x) - (p2x - 2 * c2x + c1x),
                 b = 2 * (c1x - p1x) - 2 * (c2x - c1x),
                 c = p1x - c1x,
-                t1 = (-b + Math.sqrt(b * b - 4 * a * c)) / 2 / a,
-                t2 = (-b - Math.sqrt(b * b - 4 * a * c)) / 2 / a,
+                t1 = (-b + math.sqrt(b * b - 4 * a * c)) / 2 / a,
+                t2 = (-b - math.sqrt(b * b - 4 * a * c)) / 2 / a,
                 y = [p1y, p2y],
                 x = [p1x, p2x],
                 dot;
-            !isFinite(t1) && (t1 = .5);
-            !isFinite(t2) && (t2 = .5);
+            math.abs(t1) > 1e12 && (t1 = .5);
+            math.abs(t2) > 1e12 && (t2 = .5);
             if (t1 > 0 && t1 < 1) {
                 dot = findDotAtSegment(p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y, t1);
                 x[push](dot.x);
@@ -653,10 +654,10 @@ window.Raphael = (function () {
             a = (c2y - 2 * c1y + p1y) - (p2y - 2 * c2y + c1y);
             b = 2 * (c1y - p1y) - 2 * (c2y - c1y);
             c = p1y - c1y;
-            t1 = (-b + Math.sqrt(b * b - 4 * a * c)) / 2 / a;
-            t2 = (-b - Math.sqrt(b * b - 4 * a * c)) / 2 / a;
-            !isFinite(t1) && (t1 = .5);
-            !isFinite(t2) && (t2 = .5);
+            t1 = (-b + math.sqrt(b * b - 4 * a * c)) / 2 / a;
+            t2 = (-b - math.sqrt(b * b - 4 * a * c)) / 2 / a;
+            math.abs(t1) > 1e12 && (t1 = .5);
+            math.abs(t2) > 1e12 && (t2 = .5);
             if (t1 > 0 && t1 < 1) {
                 dot = findDotAtSegment(p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y, t1);
                 x[push](dot.x);
@@ -940,7 +941,7 @@ window.Raphael = (function () {
                     fx = toFloat(_fx);
                     fy = toFloat(_fy);
                     if (pow(fx - .5, 2) + pow(fy - .5, 2) > .25) {
-                        fy = Math.sqrt(.25 - pow(fx - .5, 2)) + .5;
+                        fy = math.sqrt(.25 - pow(fx - .5, 2)) + .5;
                     }
                 }
                 return E;
@@ -952,8 +953,8 @@ window.Raphael = (function () {
                 if (isNaN(angle)) {
                     return null;
                 }
-                var vector = [0, 0, Math.cos(angle * Math.PI / 180), Math.sin(angle * Math.PI / 180)],
-                    max = 1 / (mmax(Math.abs(vector[2]), Math.abs(vector[3])) || 1);
+                var vector = [0, 0, math.cos(angle * math.PI / 180), math.sin(angle * math.PI / 180)],
+                    max = 1 / (mmax(math.abs(vector[2]), math.abs(vector[3])) || 1);
                 vector[2] *= max;
                 vector[3] *= max;
                 if (vector[2] < 0) {
@@ -1550,8 +1551,12 @@ window.Raphael = (function () {
             var cnvs = paper.canvas;
             paper.width = width || 512;
             paper.height = height || 342;
-            cnvs[setAttribute]("width", paper.width);
-            cnvs[setAttribute]("height", paper.height);
+            $(cnvs, {
+                xmlns: "http://www.w3.org/2000/svg",
+                version: 1.1,
+                width: paper.width,
+                height: paper.height
+            });
             if (container == 1) {
                 cnvs.style.cssText = "position:absolute;left:" + x + "px;top:" + y + "px";
                 doc.body[appendChild](cnvs);
@@ -1842,7 +1847,7 @@ window.Raphael = (function () {
                     fx = toFloat(fx);
                     fy = toFloat(fy);
                     if (pow(fx - .5, 2) + pow(fy - .5, 2) > .25) {
-                        fy = Math.sqrt(.25 - pow(fx - .5, 2)) + .5;
+                        fy = math.sqrt(.25 - pow(fx - .5, 2)) + .5;
                     }
                     fxfy = fx + S + fy;
                 }
@@ -2034,15 +2039,26 @@ window.Raphael = (function () {
                 (os.width != w + "px") && (os.width = w + "px");
                 (os.height != h + "px") && (os.height = h + "px");
                 var arcsize = (+params.r || 0) / mmin(w, h);
-                if (this.type == "rect" && this.arcsize != arcsize && (arcsize || this.arcsize)) {
+                if (this.type == "rect" && this.arcsize.toFixed(4) != arcsize.toFixed(4) && (arcsize || this.arcsize)) {
                     // We should replace element with the new one
-                    var o = createNode(arcsize ? "roundrect" : "rect");
+                    var o = createNode("roundrect"),
+                        a = {},
+                        i = 0,
+                        ii = this.events[length];
                     o.arcsize = arcsize;
+                    o.raphael = this;
                     this.Group[appendChild](o);
-                    this.node.parentNode.removeChild(this.node);
-                    this.node = o;
+                    this.Group.removeChild(this.node);
+                    this[0] = this.node = o;
                     this.arcsize = arcsize;
-                    this.attr(this.attrs);
+                    for (var i in attr) {
+                        a[i] = attr[i];
+                    }
+                    delete a.scale;
+                    this.attr(a);
+                    if (this.events) for (; i < ii; i++) {
+                        this.events[i].unbind = addEvent(this.node, this.events[i].name, this.events[i].f, this);
+                    }
                 }
             }
         };
@@ -2362,7 +2378,7 @@ window.Raphael = (function () {
 
     // rest
     // Safari or Chrome (WebKit) rendering bug workaround method
-    if ({"Apple Computer, Inc.": 1, "Google Inc.": 1}[navigator.vendor] && !(navigator.userAgent.indexOf("Version/4.0") + 1)) {
+    if ((/^Apple|^Google/).test(navigator.vendor) && !(navigator.userAgent.indexOf("Version/4.0") + 1)) {
         paper.safari = function () {
             var rect = this.rect(-99, -99, this.width + 99, this.height + 99);
             setTimeout(function () {rect.remove();});
@@ -2394,19 +2410,6 @@ window.Raphael = (function () {
                     obj.detachEvent("on" + type, f);
                     return true;
                 };
-                if (type == "mouseover") {
-                    obj.attachEvent("onmouseenter", f);
-                    return function () {
-                        obj.detachEvent("onmouseenter", f);
-                        return detacher();
-                    };
-                } else if (type == "mouseout") {
-                    obj.attachEvent("onmouseleave", f);
-                    return function () {
-                        obj.detachEvent("onmouseleave", f);
-                        return detacher();
-                    };
-                }
                 return detacher;
             };
         }
@@ -2415,29 +2418,29 @@ window.Raphael = (function () {
         (function (eventName) {
             Element[proto][eventName] = function (fn) {
                 if (R.is(fn, "function")) {
-                    this.events = this.events || {};
-                    this.events[eventName] = this.events[eventName] || {};
-                    this.events[eventName][fn] = this.events[eventName][fn] || [];
-                    this.events[eventName][fn][push](addEvent(this.shape || this.node, eventName, fn, this));
+                    this.events = this.events || [];
+                    this.events.push({name: eventName, f: fn, unbind: addEvent(this.shape || this.node, eventName, fn, this)});
                 }
                 return this;
             };
             Element[proto]["un" + eventName] = function (fn) {
-                var e = this.events;
-                e &&
-                e[eventName] &&
-                e[eventName][fn] &&
-                e[eventName][fn][length] &&
-                e[eventName][fn].shift()() &&
-                !e[eventName][fn][length] &&
-                delete e[eventName][fn];
+                var events = this.events,
+                    l = events[length];
+                while (l--) if (events[l].name == eventName && events[l].f == fn) {
+                    events[l].unbind();
+                    events.splice(l, 1);
+                    !events.length && delete this.events;
+                    return this;
+                }
                 return this;
             };
-
         })(events[i]);
     }
     Element[proto].hover = function (f_in, f_out) {
         return this.mouseover(f_in).mouseout(f_out);
+    };
+    Element[proto].unhover = function (f_in, f_out) {
+        return this.unmouseover(f_in).unmouseout(f_out);
     };
     paper.circle = function (x, y, r) {
         return theCircle(this, x || 0, y || 0, r || 0);
@@ -2463,9 +2466,16 @@ window.Raphael = (function () {
         return new Set(itemsArray);
     };
     paper.setSize = setSize;
+    function scaleToString() {
+        return this.x + S + this.y;
+    };
     Element[proto].scale = function (x, y, cx, cy) {
         if (x == null && y == null) {
-            return {x: this._.sx, y: this._.sy, toString: function () { return this.x + S + this.y; }};
+            return {
+                x: this._.sx,
+                y: this._.sy,
+                toString: scaleToString
+            };
         }
         y = y || x;
         !+y && (y = x);
@@ -2482,8 +2492,8 @@ window.Raphael = (function () {
                 ky = y / this._.sy;
             cx = (+cx || cx == 0) ? cx : rcx;
             cy = (+cy || cy == 0) ? cy : rcy;
-            var dirx = ~~(x / Math.abs(x)),
-                diry = ~~(y / Math.abs(y)),
+            var dirx = ~~(x / math.abs(x)),
+                diry = ~~(y / math.abs(y)),
                 s = this.node.style,
                 ncx = cx + (rcx - cx) * kx,
                 ncy = cy + (rcy - cy) * ky;
@@ -2496,11 +2506,11 @@ window.Raphael = (function () {
                         newx = ncx - neww / 2,
                         newy = ncy - newh / 2;
                     this.attr({
-                        width: neww,
                         height: newh,
+                        r: newr,
+                        width: neww,
                         x: newx,
-                        y: newy,
-                        r: newr
+                        y: newy
                     });
                     break;
                 case "circle":
@@ -2621,7 +2631,7 @@ window.Raphael = (function () {
             }
             var p = .3,
                 s = p / 4;
-            return pow(2, -10 * n) * Math.sin((n - s) * (2 * Math.PI) / p) + 1;
+            return pow(2, -10 * n) * math.sin((n - s) * (2 * math.PI) / p) + 1;
         },
         bounce: function (n) {
             var s = 7.5625,
@@ -2942,6 +2952,7 @@ window.Raphael = (function () {
         while (i--) {
             this.items[i].insertAfter(el);
         }
+        return this;
     };
     Set[proto].getBBox = function () {
         var x = [],
