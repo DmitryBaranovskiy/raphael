@@ -1,5 +1,5 @@
 /*!
- * Raphael 1.2.6 - JavaScript Vector Library
+ * Raphael 1.2.7dev - JavaScript Vector Library
  *
  * Copyright (c) 2008 - 2009 Dmitry Baranovskiy (http://raphaeljs.com)
  * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
@@ -8,6 +8,7 @@
 
 window.Raphael = (function () {
     var separator = /[, ]+/,
+        elements = /^(circle|rect|path|ellipse|text|image)$/,
         doc = document,
         win = window,
         oldRaphael = {
@@ -21,7 +22,7 @@ window.Raphael = (function () {
                     res = cnv.set();
                 for (var i = 0, ii = a[length]; i < ii; i++) {
                     var j = a[i] || {};
-                    ({circle:1, rect:1, path:1, ellipse:1, text:1, image:1})[has](j.type) && res[push](cnv[j.type]().attr(j));
+                    elements.test(j.type) && res[push](cnv[j.type]().attr(j));
                 }
                 return res;
             }
@@ -59,7 +60,7 @@ window.Raphael = (function () {
         availableAttrs = {"clip-rect": "0 0 10e9 10e9", cursor: "default", cx: 0, cy: 0, fill: "#fff", "fill-opacity": 1, font: '10px "Arial"', "font-family": '"Arial"', "font-size": "10", "font-style": "normal", "font-weight": 400, gradient: 0, height: 0, href: "http://raphaeljs.com/", opacity: 1, path: "M0,0", r: 0, rotation: 0, rx: 0, ry: 0, scale: "1 1", src: "", stroke: "#000", "stroke-dasharray": "", "stroke-linecap": "butt", "stroke-linejoin": "butt", "stroke-miterlimit": 0, "stroke-opacity": 1, "stroke-width": 1, target: "_blank", "text-anchor": "middle", title: "Raphael", translation: "0 0", width: 0, x: 0, y: 0},
         availableAnimAttrs = {"clip-rect": "csv", cx: nu, cy: nu, fill: "colour", "fill-opacity": nu, "font-size": nu, height: nu, opacity: nu, path: "path", r: nu, rotation: "csv", rx: nu, ry: nu, scale: "csv", stroke: "colour", "stroke-opacity": nu, "stroke-width": nu, translation: "csv", width: nu, x: nu, y: nu},
         rp = "replace";
-    R.version = "1.2.6";
+    R.version = "1.2.7dev";
     R.type = (win.SVGAngle || doc.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#BasicStructure", "1.1") ? "SVG" : "VML");
     R.svg = !(R.vml = R.type == "VML");
     R._id = 0;
@@ -889,7 +890,8 @@ window.Raphael = (function () {
             el.prev = el2.prev;
             el2.prev = el;
             el.next = el2;
-        };
+        },
+        radial_gradient = /^r(?:\(([^,]+?)\s*,\s*([^\)]+?)\))?/;
 
     // SVG
     if (R.svg) {
@@ -935,14 +937,16 @@ window.Raphael = (function () {
             var type = "linear",
                 fx = .5, fy = .5,
                 s = o.style;
-            gradient = (gradient + E)[rp](/^r(?:\(([^,]+?)\s*,\s*([^\)]+?)\))?/, function (all, _fx, _fy) {
+            gradient = (gradient + E)[rp](radial_gradient, function (all, _fx, _fy) {
                 type = "radial";
                 if (_fx && _fy) {
                     fx = toFloat(_fx);
                     fy = toFloat(_fy);
-                    if (pow(fx - .5, 2) + pow(fy - .5, 2) > .25) {
-                        fy = math.sqrt(.25 - pow(fx - .5, 2)) + .5;
-                    }
+                    var dir = ((fy > .5) * 2 - 1);
+                    pow(fx - .5, 2) + pow(fy - .5, 2) > .25 &&
+                        (fy = math.sqrt(.25 - pow(fx - .5, 2)) * dir + .5) &&
+                        fy != .5 &&
+                        (fy = fy.toFixed(5) - 1e-5 * dir);
                 }
                 return E;
             });
@@ -972,7 +976,7 @@ window.Raphael = (function () {
             }
             var el = $(type + "Gradient");
             el.id = "r" + (R._id++)[toString](36);
-            type == "radial" ? $(el, {fx: fx, fy: fy}) : $(el, {x1: vector[0], y1: vector[1], x2: vector[2], y2: vector[3]});
+            $(el, type == "radial" ? {fx: fx, fy: fy} : {x1: vector[0], y1: vector[1], x2: vector[2], y2: vector[3]});
             SVG.defs[appendChild](el);
             for (var i = 0, ii = dots[length]; i < ii; i++) {
                 var stop = $("stop");
@@ -1841,14 +1845,12 @@ window.Raphael = (function () {
                 type = "linear",
                 fxfy = ".5 .5";
             o.attrs.gradient = gradient;
-            gradient = (gradient + E)[rp](/^r(?:\(([^,]+?)\s*,\s*([^\)]+?)\))?/, function (all, fx, fy) {
+            gradient = (gradient + E)[rp](radial_gradient, function (all, fx, fy) {
                 type = "radial";
                 if (fx && fy) {
                     fx = toFloat(fx);
                     fy = toFloat(fy);
-                    if (pow(fx - .5, 2) + pow(fy - .5, 2) > .25) {
-                        fy = math.sqrt(.25 - pow(fx - .5, 2)) + .5;
-                    }
+                    pow(fx - .5, 2) + pow(fy - .5, 2) > .25 && (fy = math.sqrt(.25 - pow(fx - .5, 2)) * ((fy > .5) * 2 - 1) + .5);
                     fxfy = fx + S + fy;
                 }
                 return E;
@@ -2044,7 +2046,7 @@ window.Raphael = (function () {
                     var o = createNode("roundrect"),
                         a = {},
                         i = 0,
-                        ii = this.events[length];
+                        ii = this.events && this.events[length];
                     o.arcsize = arcsize;
                     o.raphael = this;
                     this.Group[appendChild](o);
