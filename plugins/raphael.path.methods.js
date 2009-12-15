@@ -1,3 +1,10 @@
+/*!
+ * Raphael Path Methods Plugin 0.2
+ *
+ * Copyright (c) 2009 Dmitry Baranovskiy (http://raphaeljs.com)
+ * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
+ */
+
 Raphael.el.isAbsolute = true;
 Raphael.el.absolutely = function () {
     this.isAbsolute = 1;
