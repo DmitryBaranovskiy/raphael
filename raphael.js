@@ -1879,7 +1879,7 @@ window.Raphael = (function () {
                 for (var i = 0, ii = dots[length]; i < ii; i++) {
                     dots[i].offset && clrs[push](dots[i].offset + S + dots[i].color);
                 }
-                fill.colors.value = clrs[length] ? clrs[join](",") : "0% " + fill.color;
+                fill.colors && (fill.colors.value = clrs[length] ? clrs[join](",") : "0% " + fill.color);
                 if (type == "radial") {
                     fill.focus = "100%";
                     fill.focussize = fxfy;
