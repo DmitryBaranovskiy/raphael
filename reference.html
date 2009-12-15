@@ -52,6 +52,10 @@
                             <li>width <em>number</em></li>
                             <li>height <em>number</em></li>
                         </ol>
+                        <p>or</p>
+                        <ol>
+                            <li>all <em>array</em> (first 3 or 4 elements in the array are equal to [containerID, width, height] or [x, y, width, height]. The rest are element descriptions in format {type: type, &lt;attributes>})</li>
+                        </ol>
                         <h4>Usage</h4>
                         <pre class="javascript code"><code>// Each of the following examples create a canvas that is 320px wide by 200px high
 // Canvas is created at the viewport's 10,50 coordinate
@@ -59,7 +63,9 @@ var paper = Raphael(10, 50, 320, 200);
 // Canvas is created at the top left corner of the #notepad element (or its top right corner in dir="rtl" elements)
 var paper = Raphael(document.getElementById("notepad"), 320, 200);
 // Same as above
-var paper = Raphael("notepad", 320, 200);</code></pre>
+var paper = Raphael("notepad", 320, 200);
+// Image dump
+var set = Raphael(["notepad", 320, 200, {type: "rect", x: 10, y: 10, width: 25, height: 25, stroke: "#f00"}, {type: "text", x: 30, y: 40, text: "Dump"}]);</code></pre>
                         <h2 id="Element">
                             Element’s generic methods
                         </h2>
@@ -188,45 +194,54 @@ c.scale(.5, .75);  // makes the circle half as wide, and 75% as high</code></pre
                         <ol>
                             <li>attributeNames <em>array</em> in this case method returns array of current values for given attribute names</li>
                         </ol>
+                        <p>or</p>
+                        <p>no parameters, in this case object containing all attributes will be returned</p>
                         <h4>Possible parameters</h4>
                         <p>Please refer to the <a href="http://www.w3.org/TR/SVG/" title="The W3C Recommendation for the SVG language describes these properties in detail.">SVG specification</a> for an explanation of these parameters.</p>
                         <ul>
-                            <li>clip-rect <em>string</em> comma or space separated values: x, y, width and height</li>
-                            <li>cx <em>number</em></li>
-                            <li>cy <em>number</em></li>
-                            <li>fill <em>colour</em></li>
-                            <li>fill-opacity <em>number</em></li>
-                            <li>font <em>string</em></li>
-                            <li>font-family <em>string</em></li>
-                            <li>font-size <em>number</em></li>
-                            <li>font-weight <em>string</em></li>
-                            <li>gradient <em>string</em> “‹angle›-‹colour›[-‹colour›[:‹offset›]]*-‹colour›”, example: <samp>"90-#fff-#000"</samp> or <samp>"0-#fff-#f00:20-#000"</samp></li>
-                            <li>height <em>number</em></li>
-                            <li>opacity <em>number</em></li>
-                            <li>path <em>pathString</em> <a href="http://www.w3.org/TR/SVG/paths.html#PathData" title="Details of a path’s data attribute’s format are described in the SVG specification.">SVG path string format</a></li>
-                            <li>r <em>number</em></li>
-                            <li>rotation <em>number</em></li>
-                            <li>rx <em>number</em></li>
-                            <li>ry <em>number</em></li>
-                            <li>scale <em>string</em> comma or space separated values: xtimes, ytimes, cx, cy. See: <a href="#scale">scale</a></li>
-                            <li>src <em>string</em> (URL)</li>
-                            <li>stroke <em>colour</em></li>
-                            <li>stroke-dasharray <em>string</em> [“”, “-”, “.”, “-.”, “-..”, “. ”, “- ”, “--”, “- .”, “--.”, “--..”]</li>
-                            <li>stroke-linecap <em>string</em> [“butt”, “square”, “round”, “miter”]</li>
-                            <li>stroke-linejoin <em>string</em> [“butt”, “square”, “round”, “miter”]</li>
-                            <li>stroke-miterlimit <em>number</em></li>
-                            <li>stroke-opacity <em>number</em></li>
-                            <li>stroke-width <em>number</em></li>
-                            <li>translation <em>string</em> comma or space separated values: x and y</li>
-                            <li>width <em>number</em></li>
-                            <li>x <em>number</em></li>
-                            <li>y <em>number</em></li>
+                            <li id="attr-clip-rect">clip-rect <em>string</em> comma or space separated values: x, y, width and height</li>
+                            <li id="attr-cx">cx <em>number</em></li>
+                            <li id="attr-cy">cy <em>number</em></li>
+                            <li id="attr-fill">
+                                fill <em>colour</em> or <em>gradient</em>
+                                <ul>
+                                    <li>linear gradient: “‹angle›-‹colour›[-‹colour›[:‹offset›]]*-‹colour›”, example: <samp>"90-#fff-#000"</samp> – 90° gradient from white to black or <samp>"0-#fff-#f00:20-#000"</samp> – 0° gradient from white via red (at 20%) to black</li>
+                                    <li>radial gradient: “r[(‹fx›, ‹fy›)]‹colour›[-‹colour›[:‹offset›]]*-‹colour›”, example: <samp>“r#fff-#000”</samp> – gradient from white to black or <samp>“r(0.25, 0.75)#fff-#000”</samp> – gradient from white to black with focus point at 0.25, 0.75</li>
+                                    <li>Focus point coordinates are in 0..1 range</li>
+                                    <li>Radial gradients can only be applied to circles and ellipses</li>
+                                </ul>
+                            </li>
+                            <li id="attr-fill-opacity">fill-opacity <em>number</em></li>
+                            <li id="attr-font">font <em>string</em></li>
+                            <li id="attr-font-family">font-family <em>string</em></li>
+                            <li id="attr-font-size">font-size <em>number</em></li>
+                            <li id="attr-font-weight">font-weight <em>string</em></li>
+                            <li id="attr-height">height <em>number</em></li>
+                            <li id="attr-opacity">opacity <em>number</em></li>
+                            <li id="attr-path">path <em>pathString</em> <a href="http://www.w3.org/TR/SVG/paths.html#PathData" title="Details of a path’s data attribute’s format are described in the SVG specification.">SVG path string format</a></li>
+                            <li id="attr-r">r <em>number</em></li>
+                            <li id="attr-rotation">rotation <em>number</em></li>
+                            <li id="attr-rx">rx <em>number</em></li>
+                            <li id="attr-ry">ry <em>number</em></li>
+                            <li id="attr-scale">scale <em>string</em> comma or space separated values: xtimes, ytimes, cx, cy. See: <a href="#scale">scale</a></li>
+                            <li id="attr-src">src <em>string</em> (URL)</li>
+                            <li id="attr-stroke">stroke <em>colour</em></li>
+                            <li id="attr-stroke-dasharray">stroke-dasharray <em>string</em> [“”, “-”, “.”, “-.”, “-..”, “. ”, “- ”, “--”, “- .”, “--.”, “--..”]</li>
+                            <li id="attr-stroke-linecap">stroke-linecap <em>string</em> [“butt”, “square”, “round”]</li>
+                            <li id="attr-stroke-linejoin">stroke-linejoin <em>string</em> [“butt”, “square”, “round”, “miter”]</li>
+                            <li id="attr-stroke-miterlimit">stroke-miterlimit <em>number</em></li>
+                            <li id="attr-stroke-opacity">stroke-opacity <em>number</em></li>
+                            <li id="attr-stroke-width">stroke-width <em>number</em></li>
+                            <li id="attr-translation">translation <em>string</em> comma or space separated values: x and y</li>
+                            <li id="attr-width">width <em>number</em></li>
+                            <li id="attr-x">x <em>number</em></li>
+                            <li id="attr-y">y <em>number</em></li>
                         </ul>
                         <h4>Usage</h4>
                         <pre class="javascript code"><code>var c = paper.circle(10, 10, 10);
 c.attr("fill", "black");                              // using strings
 c.attr({fill: "#000", stroke: "#f00", opacity: 0.5}); // using params object
-c.attr({gradient: "90-#fff-#000", "stroke-dasharray": "-..", "clip-rect": "10, 10, 100, 100"});</code></pre>
+c.attr({fill: "90-#fff-#000", "stroke-dasharray": "-..", "clip-rect": "10, 10, 100, 100"});</code></pre>
                         <h3 id="animate">
                             animate
                         </h3>
@@ -243,7 +258,7 @@ c.attr({gradient: "90-#fff-#000", "stroke-dasharray": "-..", "clip-rect": "10, 1
                         <ol>
                             <li>newAttrs <em>object</em> A parameters object of the animation results. (Not all attributes can be animated.)</li>
                             <li>ms <em>number</em> The duration of the animation, given in milliseconds.</li>
-                            <li>easing <em>string</em> [“>”, “&lt;”, “&lt;&gt;”, “backIn”, “backOut”, “bounce”, “elastic”] [optional]</li>
+                            <li>easing <em>string</em> [“>”, “&lt;”, “&lt;&gt;”, “backIn”, “backOut”, “bounce”, “elastic”] or <em>function</em> [optional]</li>
                             <li>callback <em>function</em> [optional]</li>
                         </ol>
                         <h4>Attributes that can be animated</h4>
@@ -613,7 +628,7 @@ paper.circle(100, 100, 20).red();
                             “Ninja Mode”
                         </h3>
                         <p>
-                            If you want to leave no trace of Raphaël (Well, Raphaël creates only one global variable <code>Raphael</code>, but anyway.) You can use <code>ninja</code> method.
+                            If you want to leave no trace of Raphaël (Well, Raphaël creates only one global variable <code>Raphael</code>, but anyway.) You can use <code>ninja</code> method. Beware, that in this case plugins could stop working, because they are depending on global variable existance.
                         </p>
                         <h4>Usage</h4>
                         <pre class="javascript code"><code>(function (local_raphael) {
@@ -748,7 +763,7 @@ paper.circle(100, 100, 20).red();
                             <a href="http://www.opensource.org/licenses/mit-license.php" title="MIT License" rel="license">Some Rights Reserved</a> by <a href="http://dmitry.baranovskiy.com/">Dmitry Baranovskiy</a>
                         </h3>
                         <h3 id="font">
-                            Font by <a href="http://www.exljbris.nl">Jos Buivenga</a> · Logo by <a href="http://wasabicube.com/">Wasabicube</a> ·
+                            Logo by <a href="http://wasabicube.com/">Wasabicube</a> ·
                             Work at this project started as 20% time at <a href="http://www.atlassian.com/" title="Atlassian — Software to Track, Test &#38; Collaborate, from Enterprises to Open Source Projects.">Atlassian</a>
                         </h3>
                     </div>
@@ -763,6 +778,5 @@ paper.circle(100, 100, 20).red();
         var pageTracker = _gat._getTracker("UA-616618-3");
         pageTracker._trackPageview();
         </script>
-        <script src="http://static.woopra.com/js/woopra.js" type="text/javascript" charset="utf-8"></script>
     </body>
 </html>
