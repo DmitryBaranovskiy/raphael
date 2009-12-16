@@ -1182,7 +1182,7 @@ window.Raphael = (function () {
                             var el = $("pattern"),
                                 ig = $("image");
                             el.id = "r" + (R._id++)[toString](36);
-                            $(el, {x: 0, y: 0, patternUnits: "userSpaceOnUse"});
+                            $(el, {x: 0, y: 0, patternUnits: "userSpaceOnUse", height: 1, width: 1});
                             $(ig, {x: 0, y: 0});
                             ig.setAttributeNS(o.paper.xlink, "href", isURL[1]);
                             el[appendChild](ig);
