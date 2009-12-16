@@ -14,8 +14,6 @@
         <link rel="stylesheet" type="text/css" media="print" href="print.css">
         <link rel="shortcut icon" href="/favicon16.png" type="image/x-icon">
         <link media="only screen and (max-device-width: 480px)" href="iphone.css" type="text/css" rel="stylesheet">
-        <script src="jquery.js" type="text/javascript" charset="utf-8"></script>
-        <script src="dmitry.js" type="text/javascript" charset="utf-8"></script>
         <script src="raphael.js" type="text/javascript" charset="utf-8"></script>
         <script src="museo.js" type="text/javascript" charset="utf-8"></script>
 
@@ -338,9 +336,18 @@ c.attr({fill: "90-#fff-#000", "stroke-dasharray": "-..", "clip-rect": "10, 10, 1
                             Inserts current object after the given one.
                         </p>
                         <h4>Usage</h4>
-                        <pre class="javascript code"><code>var r = paper.rect(10, 10, 10, 10);</code>
-<code>var c = paper.circle(10, 10, 10);</code>
-<code>r.insertAfter(c);</code></pre>
+                        <pre class="javascript code"><code>var r = paper.rect(10, 10, 10, 10);
+var c = paper.circle(10, 10, 10);
+r.insertAfter(c);</code></pre>
+                        <h3 id="clone">
+                            clone
+                        </h3>
+                        <p>
+                            Returns a clone of the current element.
+                        </p>
+                        <h4>Usage</h4>
+                        <pre class="javascript code"><code>var r = paper.rect(10, 10, 10, 10);
+var c = r.clone();</code></pre>
                         <h2>Graphic Primitives</h2>
                         <p>
                             Methods of “paper” object, created with <code>Raphael</code> function call.
@@ -694,6 +701,9 @@ paper.circle(100, 100, 20).red();
                                 <a href="#insertAfter"><code>insertAfter</code></a>
                             </li>
                             <li>
+                                <a href="#clone"><code>clone</code></a>
+                            </li>
+                            <li>
                                 <a href="#raphael"><code>raphael</code></a>
                             </li>
                             <li>
@@ -770,6 +780,7 @@ paper.circle(100, 100, 20).red();
                 </div>
             </div>
         </div>
+        <script src="syntax.js" type="text/javascript" charset="utf-8"></script>
         <script type="text/javascript">
         var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
         document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
