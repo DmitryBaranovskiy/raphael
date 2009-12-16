@@ -1404,6 +1404,10 @@ window.Raphael = (function () {
                 for (var i in this.attrs) if (this.attrs[has](i)) {
                     res[i] = this.attrs[i];
                 }
+                this._.rt.deg && (res.rotation = this.rotate());
+                (this._.sx != 1 || this._.sy != 1) && (res.scale = this.scale());
+                delete res.translation;
+                res.gradient && res.fill == "none" && (res.fill = res.gradient) && delete res.gradient;
                 return res;
             }
             if (arguments[length] == 1 && R.is(arguments[0], "string")) {
@@ -2108,6 +2112,10 @@ window.Raphael = (function () {
                 for (var i in this.attrs) if (this.attrs[has](i)) {
                     res[i] = this.attrs[i];
                 }
+                this._.rt.deg && (res.rotation = this.rotate());
+                (this._.sx != 1 || this._.sy != 1) && (res.scale = this.scale());
+                delete res.translation;
+                res.gradient && res.fill == "none" && (res.fill = res.gradient) && delete res.gradient;
                 return res;
             }
             if (arguments[length] == 1 && R.is(arguments[0], "string")) {
@@ -2468,7 +2476,7 @@ window.Raphael = (function () {
         return new Set(itemsArray);
     };
     paper.setSize = setSize;
-    function scaleToString() {
+    function x_y() {
         return this.x + S + this.y;
     };
     Element[proto].scale = function (x, y, cx, cy) {
@@ -2476,7 +2484,7 @@ window.Raphael = (function () {
             return {
                 x: this._.sx,
                 y: this._.sy,
-                toString: scaleToString
+                toString: x_y
             };
         }
         y = y || x;
@@ -2597,6 +2605,9 @@ window.Raphael = (function () {
             this._.sy = y;
         }
         return this;
+    };
+    Element[proto].clone = function () {
+        return this.paper[this.type]().attr(this.attr());
     };
 
     // animation easing formulas
@@ -2755,7 +2766,7 @@ window.Raphael = (function () {
         },
         translate = function (x, y) {
             if (x == null) {
-                return {x: this._.tx, y: this._.ty};
+                return {x: this._.tx, y: this._.ty, toString: x_y};
             }
             this._.tx += +x;
             this._.ty += +y;
