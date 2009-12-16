@@ -1,5 +1,5 @@
 /*!
- * Raphael 1.2.7dev - JavaScript Vector Library
+ * Raphael 1.2.7 - JavaScript Vector Library
  *
  * Copyright (c) 2008 - 2009 Dmitry Baranovskiy (http://raphaeljs.com)
  * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
@@ -60,7 +60,7 @@ window.Raphael = (function () {
         availableAttrs = {"clip-rect": "0 0 10e9 10e9", cursor: "default", cx: 0, cy: 0, fill: "#fff", "fill-opacity": 1, font: '10px "Arial"', "font-family": '"Arial"', "font-size": "10", "font-style": "normal", "font-weight": 400, gradient: 0, height: 0, href: "http://raphaeljs.com/", opacity: 1, path: "M0,0", r: 0, rotation: 0, rx: 0, ry: 0, scale: "1 1", src: "", stroke: "#000", "stroke-dasharray": "", "stroke-linecap": "butt", "stroke-linejoin": "butt", "stroke-miterlimit": 0, "stroke-opacity": 1, "stroke-width": 1, target: "_blank", "text-anchor": "middle", title: "Raphael", translation: "0 0", width: 0, x: 0, y: 0},
         availableAnimAttrs = {"clip-rect": "csv", cx: nu, cy: nu, fill: "colour", "fill-opacity": nu, "font-size": nu, height: nu, opacity: nu, path: "path", r: nu, rotation: "csv", rx: nu, ry: nu, scale: "csv", stroke: "colour", "stroke-opacity": nu, "stroke-width": nu, translation: "csv", width: nu, x: nu, y: nu},
         rp = "replace";
-    R.version = "1.2.7dev";
+    R.version = "1.2.7";
     R.type = (win.SVGAngle || doc.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#BasicStructure", "1.1") ? "SVG" : "VML");
     R.svg = !(R.vml = R.type == "VML");
     R._id = 0;
@@ -556,8 +556,8 @@ window.Raphael = (function () {
                         math.sqrt(math.abs((rx2 * ry2 - rx2 * y * y - ry2 * x * x) / (rx2 * y * y + ry2 * x * x))),
                     cx = k * rx * y / ry + (x1 + x2) / 2,
                     cy = k * -ry * x / rx + (y1 + y2) / 2,
-                    f1 = math.asin((y1 - cy) / ry),
-                    f2 = math.asin((y2 - cy) / ry);
+                    f1 = math.asin(((y1 - cy) / ry).toFixed(7)),
+                    f2 = math.asin(((y2 - cy) / ry).toFixed(7));
 
                 f1 = x1 < cx ? PI - f1 : f1;
                 f2 = x2 < cx ? PI - f2 : f2;
@@ -602,7 +602,7 @@ window.Raphael = (function () {
             if (recursive) {
                 return [m2, m3, m4][concat](res);
             } else {
-                res = [m2, m3, m4][concat](res)[join](",")[split](",");
+                res = [m2, m3, m4][concat](res)[join]()[split](",");
                 var newres = [];
                 for (var i = 0, ii = res[length]; i < ii; i++) {
                     newres[i] = i % 2 ? rotate(res[i - 1], res[i], rad).y : rotate(res[i], res[i + 1], rad).x;
