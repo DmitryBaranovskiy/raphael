@@ -1,5 +1,5 @@
 /*!
- * Raphael 1.2.7 - JavaScript Vector Library
+ * Raphael 1.2.8 - JavaScript Vector Library
  *
  * Copyright (c) 2008 - 2009 Dmitry Baranovskiy (http://raphaeljs.com)
  * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
@@ -51,6 +51,7 @@ window.Raphael = (function () {
         push = "push",
         rg = /^(?=[\da-f]$)/,
         ISURL = /^url\(['"]?([^\)]+)['"]?\)$/i,
+        colourRegExp = /^\s*((#[a-f\d]{6})|(#[a-f\d]{3})|rgb\(\s*([\d\.]+\s*,\s*[\d\.]+\s*,\s*[\d\.]+)\s*\)|rgb\(\s*([\d\.]+%\s*,\s*[\d\.]+%\s*,\s*[\d\.]+%)\s*\)|hs[bl]\(\s*([\d\.]+\s*,\s*[\d\.]+\s*,\s*[\d\.]+)\s*\)|hs[bl]\(\s*([\d\.]+%\s*,\s*[\d\.]+%\s*,\s*[\d\.]+%)\s*\))\s*$/i,
         round = math.round,
         setAttribute = "setAttribute",
         split = "split",
@@ -60,7 +61,7 @@ window.Raphael = (function () {
         availableAttrs = {"clip-rect": "0 0 10e9 10e9", cursor: "default", cx: 0, cy: 0, fill: "#fff", "fill-opacity": 1, font: '10px "Arial"', "font-family": '"Arial"', "font-size": "10", "font-style": "normal", "font-weight": 400, gradient: 0, height: 0, href: "http://raphaeljs.com/", opacity: 1, path: "M0,0", r: 0, rotation: 0, rx: 0, ry: 0, scale: "1 1", src: "", stroke: "#000", "stroke-dasharray": "", "stroke-linecap": "butt", "stroke-linejoin": "butt", "stroke-miterlimit": 0, "stroke-opacity": 1, "stroke-width": 1, target: "_blank", "text-anchor": "middle", title: "Raphael", translation: "0 0", width: 0, x: 0, y: 0},
         availableAnimAttrs = {"clip-rect": "csv", cx: nu, cy: nu, fill: "colour", "fill-opacity": nu, "font-size": nu, height: nu, opacity: nu, path: "path", r: nu, rotation: "csv", rx: nu, ry: nu, scale: "csv", stroke: "colour", "stroke-opacity": nu, "stroke-width": nu, translation: "csv", width: nu, x: nu, y: nu},
         rp = "replace";
-    R.version = "1.2.7";
+    R.version = "1.2.8";
     R.type = (win.SVGAngle || doc.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#BasicStructure", "1.1") ? "SVG" : "VML");
     R.svg = !(R.vml = R.type == "VML");
     R._id = 0;
@@ -81,12 +82,12 @@ window.Raphael = (function () {
             var trim = /^\s+|\s+$/g;
             toHex = cacher(function (color) {
                 var bod;
-                color = (color + E).replace(trim, E);
+                color = (color + E)[rp](trim, E);
                 try {
-                    var document = new ActiveXObject("htmlfile");
-                    document.write("<body>");
-                    document.close();
-                    bod = document.body;
+                    var docum = new ActiveXObject("htmlfile");
+                    docum.write("<body>");
+                    docum.close();
+                    bod = docum.body;
                 } catch(e) {
                     bod = createPopup().document.body;
                 }
@@ -102,8 +103,8 @@ window.Raphael = (function () {
             });
         } else {
             var i = doc.createElement("i");
-            i.className = "Rapha\xebl Colour Picker";
-            i.style.cssText = "display:none";
+            i.title = "Rapha\xebl Colour Picker";
+            i.style.display = "none";
             doc.body[appendChild](i);
             toHex = cacher(function (color) {
                 i.style.color = color;
@@ -212,19 +213,19 @@ window.Raphael = (function () {
     }
 
     R.getRGB = cacher(function (colour) {
-        if (!colour || !!((colour + E).indexOf("-") + 1)) {
+        if (!colour || !!((colour = colour + E).indexOf("-") + 1)) {
             return {r: -1, g: -1, b: -1, hex: "none", error: 1};
         }
-        colour = colour + E;
         if (colour == "none") {
             return {r: -1, g: -1, b: -1, hex: "none"};
         }
-        !({hs: 1, rg: 1})[has](colour.substring(0, 2)) && (colour = toHex(colour));
+        !(({hs: 1, rg: 1})[has](colour.substring(0, 2)) || colour.charAt() == "#") && (colour = toHex(colour));
         var res,
             red,
             green,
             blue,
-            rgb = colour.match(/^\s*((#[a-f\d]{6})|(#[a-f\d]{3})|rgb\(\s*([\d\.]+\s*,\s*[\d\.]+\s*,\s*[\d\.]+)\s*\)|rgb\(\s*([\d\.]+%\s*,\s*[\d\.]+%\s*,\s*[\d\.]+%)\s*\)|hs[bl]\(\s*([\d\.]+\s*,\s*[\d\.]+\s*,\s*[\d\.]+)\s*\)|hs[bl]\(\s*([\d\.]+%\s*,\s*[\d\.]+%\s*,\s*[\d\.]+%)\s*\))\s*$/i);
+            t,
+            rgb = colour.match(colourRegExp);
         if (rgb) {
             if (rgb[2]) {
                 blue = toInt(rgb[2].substring(5), 16);
@@ -232,9 +233,9 @@ window.Raphael = (function () {
                 red = toInt(rgb[2].substring(1, 3), 16);
             }
             if (rgb[3]) {
-                blue = toInt(rgb[3].substring(3) + rgb[3].substring(3), 16);
-                green = toInt(rgb[3].substring(2, 3) + rgb[3].substring(2, 3), 16);
-                red = toInt(rgb[3].substring(1, 2) + rgb[3].substring(1, 2), 16);
+                blue = toInt((t = rgb[3].charAt(3)) + t, 16);
+                green = toInt((t = rgb[3].charAt(2)) + t, 16);
+                red = toInt((t = rgb[3].charAt(1)) + t, 16);
             }
             if (rgb[4]) {
                 rgb = rgb[4][split](/\s*,\s*/);
