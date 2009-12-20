@@ -1,5 +1,5 @@
 /*!
- * Raphael 1.2.8 - JavaScript Vector Library
+ * Raphael 1.2.9dev - JavaScript Vector Library
  *
  * Copyright (c) 2008 - 2009 Dmitry Baranovskiy (http://raphaeljs.com)
  * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
@@ -61,7 +61,7 @@ window.Raphael = (function () {
         availableAttrs = {"clip-rect": "0 0 10e9 10e9", cursor: "default", cx: 0, cy: 0, fill: "#fff", "fill-opacity": 1, font: '10px "Arial"', "font-family": '"Arial"', "font-size": "10", "font-style": "normal", "font-weight": 400, gradient: 0, height: 0, href: "http://raphaeljs.com/", opacity: 1, path: "M0,0", r: 0, rotation: 0, rx: 0, ry: 0, scale: "1 1", src: "", stroke: "#000", "stroke-dasharray": "", "stroke-linecap": "butt", "stroke-linejoin": "butt", "stroke-miterlimit": 0, "stroke-opacity": 1, "stroke-width": 1, target: "_blank", "text-anchor": "middle", title: "Raphael", translation: "0 0", width: 0, x: 0, y: 0},
         availableAnimAttrs = {"clip-rect": "csv", cx: nu, cy: nu, fill: "colour", "fill-opacity": nu, "font-size": nu, height: nu, opacity: nu, path: "path", r: nu, rotation: "csv", rx: nu, ry: nu, scale: "csv", stroke: "colour", "stroke-opacity": nu, "stroke-width": nu, translation: "csv", width: nu, x: nu, y: nu},
         rp = "replace";
-    R.version = "1.2.8";
+    R.version = "1.2.9dev";
     R.type = (win.SVGAngle || doc.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#BasicStructure", "1.1") ? "SVG" : "VML");
     R.svg = !(R.vml = R.type == "VML");
     R._id = 0;
@@ -1407,7 +1407,6 @@ window.Raphael = (function () {
                 }
                 this._.rt.deg && (res.rotation = this.rotate());
                 (this._.sx != 1 || this._.sy != 1) && (res.scale = this.scale());
-                delete res.translation;
                 res.gradient && res.fill == "none" && (res.fill = res.gradient) && delete res.gradient;
                 return res;
             }
@@ -2115,7 +2114,6 @@ window.Raphael = (function () {
                 }
                 this._.rt.deg && (res.rotation = this.rotate());
                 (this._.sx != 1 || this._.sy != 1) && (res.scale = this.scale());
-                delete res.translation;
                 res.gradient && res.fill == "none" && (res.fill = res.gradient) && delete res.gradient;
                 return res;
             }
@@ -2512,16 +2510,13 @@ window.Raphael = (function () {
                 case "rect":
                 case "image":
                     var neww = a.width * dirx * kx,
-                        newh = a.height * diry * ky,
-                        newr = a.r * mmin(kx, ky),
-                        newx = ncx - neww / 2,
-                        newy = ncy - newh / 2;
+                        hewh = a.height * diry * ky;
                     this.attr({
                         height: newh,
-                        r: newr,
+                        r: a.r * mmin(dirx * kx, diry * ky),
                         width: neww,
-                        x: newx,
-                        y: newy
+                        x: ncx - neww / 2,
+                        y: ncy - newh / 2
                     });
                     break;
                 case "circle":
@@ -2571,7 +2566,6 @@ window.Raphael = (function () {
                         dy = ncy - dim2.y - dim2.height / 2;
                     path[0][1] += dx;
                     path[0][2] += dy;
-
                     this.attr({path: path});
                 break;
             }
@@ -2608,7 +2602,10 @@ window.Raphael = (function () {
         return this;
     };
     Element[proto].clone = function () {
-        return this.paper[this.type]().attr(this.attr());
+        var attr = this.attr();
+        delete attr.scale;
+        delete attr.translation;
+        return this.paper[this.type]().attr(attr);
     };
 
     // animation easing formulas
@@ -2826,12 +2823,12 @@ window.Raphael = (function () {
                     case "path":
                         var pathes = path2curve(from[attr], to[attr]);
                         from[attr] = pathes[0];
-                        to[attr] = pathes[1];
+                        var toPath = pathes[1];
                         diff[attr] = [];
                         for (var i = 0, ii = from[attr][length]; i < ii; i++) {
                             diff[attr][i] = [0];
                             for (var j = 1, jj = from[attr][i][length]; j < jj; j++) {
-                                diff[attr][i][j] = (to[attr][i][j] - from[attr][i][j]) / ms;
+                                diff[attr][i][j] = (toPath[i][j] - from[attr][i][j]) / ms;
                             }
                         }
                         break;
