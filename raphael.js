@@ -28,6 +28,7 @@ window.Raphael = (function () {
             }
             return create[apply](R, arguments);
         },
+        Paper = function () {},
         appendChild = "appendChild",
         apply = "apply",
         concat = "concat",
@@ -62,7 +63,14 @@ window.Raphael = (function () {
         availableAnimAttrs = {"clip-rect": "csv", cx: nu, cy: nu, fill: "colour", "fill-opacity": nu, "font-size": nu, height: nu, opacity: nu, path: "path", r: nu, rotation: "csv", rx: nu, ry: nu, scale: "csv", stroke: "colour", "stroke-opacity": nu, "stroke-width": nu, translation: "csv", width: nu, x: nu, y: nu},
         rp = "replace";
     R.version = "1.2.9dev";
-    R.type = (win.SVGAngle || doc.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#BasicStructure", "1.1") ? "SVG" : "VML");
+    R.type = (win.SVGAngle || doc.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#BasicStructure", 1.1) ? "SVG" : "VML");
+    if (R.type == "VML") {
+        var d = document.createElement("div");
+        d.innerHTML = '<!--[if vml]><br><br><![endif]-->';
+        if (d.childNodes[length] != 2) {
+            return null;
+        }
+    }
     R.svg = !(R.vml = R.type == "VML");
     R._id = 0;
     R._oid = 0;
@@ -892,12 +900,17 @@ window.Raphael = (function () {
             el2.prev = el;
             el.next = el2;
         },
+        removed = function (methodname) {
+            return function () {
+                throw new Error("Rapha\xebl: you are calling to method \u201c" + methodname + "\u201d of removed object");
+            };
+        },
         radial_gradient = /^r(?:\(([^,]+?)\s*,\s*([^\)]+?)\))?/;
 
     // SVG
     if (R.svg) {
-        paper.svgns = "http://www.w3.org/2000/svg";
-        paper.xlink = "http://www.w3.org/1999/xlink";
+        Paper[proto].svgns = "http://www.w3.org/2000/svg";
+        Paper[proto].xlink = "http://www.w3.org/1999/xlink";
         var round = function (num) {
             return +num + (~~num === num) * .5;
         },
@@ -920,7 +933,7 @@ window.Raphael = (function () {
                         el[setAttribute](key, attr[key]);
                     }
                 } else {
-                    return doc.createElementNS(paper.svgns, el);
+                    return doc.createElementNS(Paper[proto].svgns, el);
                 }
             };
         R[toString] = function () {
@@ -1062,7 +1075,7 @@ window.Raphael = (function () {
                             hl[appendChild](node);
                             pn = hl;
                         }
-                        pn.setAttributeNS(o.paper.xlink, att, value);
+                        pn.setAttributeNS(o.Paper[proto].xlink, att, value);
                         break;
                     case "cursor":
                         node.style.cursor = value;
@@ -1194,7 +1207,7 @@ window.Raphael = (function () {
                                 $(el, {width: this.offsetWidth, height: this.offsetHeight});
                                 $(ig, {width: this.offsetWidth, height: this.offsetHeight});
                                 doc.body.removeChild(this);
-                                paper.safari();
+                                o.paper.safari();
                             };
                             doc.body[appendChild](img);
                             img.src = isURL[1];
@@ -1555,15 +1568,14 @@ window.Raphael = (function () {
             if (!container) {
                 throw new Error("SVG container not found.");
             }
-            paper.canvas = $("svg");
-            var cnvs = paper.canvas;
-            paper.width = width || 512;
-            paper.height = height || 342;
+            var cnvs = $("svg");
+            width = width || 512;
+            height = height || 342;
             $(cnvs, {
                 xmlns: "http://www.w3.org/2000/svg",
                 version: 1.1,
-                width: paper.width,
-                height: paper.height
+                width: width,
+                height: height
             });
             if (container == 1) {
                 cnvs.style.cssText = "position:absolute;left:" + x + "px;top:" + y + "px";
@@ -1575,17 +1587,15 @@ window.Raphael = (function () {
                     container[appendChild](cnvs);
                 }
             }
-            container = { canvas: cnvs };
-            for (var prop in paper) if (paper[has](prop)) {
-                container[prop] = paper[prop];
-            }
-            container.bottom = container.top = null;
+            container = new Paper;
+            container.width = width;
+            container.height = height;
+            container.canvas = cnvs;
             plugins.call(container, container, R.fn);
             container.clear();
-            container.raphael = R;
             return container;
         };
-        paper.clear = function () {
+        Paper[proto].clear = function () {
             var c = this.canvas;
             while (c.firstChild) {
                 c.removeChild(c.firstChild);
@@ -1595,10 +1605,10 @@ window.Raphael = (function () {
             c[appendChild](this.desc);
             c[appendChild](this.defs = $("defs"));
         };
-        paper.remove = function () {
+        Paper[proto].remove = function () {
             this.canvas.parentNode && this.canvas.parentNode.removeChild(this.canvas);
             for (var i in this) {
-                delete this[i];
+                this[i] = removed(i);
             }
         };
     }
@@ -2210,8 +2220,8 @@ window.Raphael = (function () {
             res.setBox({x: x - r, y: y - r, width: r * 2, height: r * 2});
             vml.canvas[appendChild](g);
             return res;
-        };
-        var theRect = function (vml, x, y, w, h, r) {
+        },
+        theRect = function (vml, x, y, w, h, r) {
             var g = createNode("group"),
                 o = createNode("roundrect"),
                 arcsize = (+r || 0) / (mmin(w, h));
@@ -2227,8 +2237,8 @@ window.Raphael = (function () {
             res.setBox({x: x, y: y, width: w, height: h, r: r});
             vml.canvas[appendChild](g);
             return res;
-        };
-        var theEllipse = function (vml, x, y, rx, ry) {
+        },
+        theEllipse = function (vml, x, y, rx, ry) {
             var g = createNode("group"),
                 o = createNode("oval"),
                 ol = o.style;
@@ -2246,8 +2256,8 @@ window.Raphael = (function () {
             res.setBox({x: x - rx, y: y - ry, width: rx * 2, height: ry * 2});
             vml.canvas[appendChild](g);
             return res;
-        };
-        var theImage = function (vml, src, x, y, w, h) {
+        },
+        theImage = function (vml, src, x, y, w, h) {
             var g = createNode("group"),
                 o = createNode("image"),
                 ol = o.style;
@@ -2266,8 +2276,8 @@ window.Raphael = (function () {
             res.setBox({x: x, y: y, width: w, height: h});
             vml.canvas[appendChild](g);
             return res;
-        };
-        var theText = function (vml, x, y, text) {
+        },
+        theText = function (vml, x, y, text) {
             var g = createNode("group"),
                 el = createNode("shape"),
                 ol = el.style,
@@ -2299,8 +2309,8 @@ window.Raphael = (function () {
             res.setBox();
             vml.canvas[appendChild](g);
             return res;
-        };
-        var setSize = function (width, height) {
+        },
+        setSize = function (width, height) {
             var cs = this.canvas.style;
             width == +width && (width += "px");
             height == +height && (height += "px");
@@ -2308,15 +2318,16 @@ window.Raphael = (function () {
             cs.height = height;
             cs.clip = "rect(0 " + width + " " + height + " 0)";
             return this;
-        };
+        },
+        createNode;
         doc.createStyleSheet().addRule(".rvml", "behavior:url(#default#VML)");
         try {
             !doc.namespaces.rvml && doc.namespaces.add("rvml", "urn:schemas-microsoft-com:vml");
-            var createNode = function (tagName) {
+            createNode = function (tagName) {
                 return doc.createElement('<rvml:' + tagName + ' class="rvml">');
             };
         } catch (e) {
-            var createNode = function (tagName) {
+            createNode = function (tagName) {
                 return doc.createElement('<' + tagName + ' xmlns="urn:schemas-microsoft.com:vml" class="rvml">');
             };
         }
@@ -2331,7 +2342,7 @@ window.Raphael = (function () {
             if (!container) {
                 throw new Error("VML container not found.");
             }
-            var res = {},
+            var res = new Paper,
                 c = res.canvas = doc.createElement("div"),
                 cs = c.style;
             width = width || 512;
@@ -2350,12 +2361,6 @@ window.Raphael = (function () {
                 doc.body[appendChild](c);
                 cs.left = x + "px";
                 cs.top = y + "px";
-                container = {
-                    style: {
-                        width: width,
-                        height: height
-                    }
-                };
             } else {
                 container.style.width = width;
                 container.style.height = height;
@@ -2365,22 +2370,17 @@ window.Raphael = (function () {
                     container[appendChild](c);
                 }
             }
-            for (var prop in paper) if (paper[has](prop)) {
-                res[prop] = paper[prop];
-            }
             plugins.call(res, res, R.fn);
-            res.top = res.bottom = null;
-            res.raphael = R;
             return res;
         };
-        paper.clear = function () {
+        Paper[proto].clear = function () {
             this.canvas.innerHTML = E;
             this.bottom = this.top = null;
         };
-        paper.remove = function () {
+        Paper[proto].remove = function () {
             this.canvas.parentNode.removeChild(this.canvas);
             for (var i in this) {
-                delete this[i];
+                this[i] = removed(i);
             }
         };
     }
@@ -2388,12 +2388,12 @@ window.Raphael = (function () {
     // rest
     // Safari or Chrome (WebKit) rendering bug workaround method
     if ((/^Apple|^Google/).test(navigator.vendor) && !(navigator.userAgent.indexOf("Version/4.0") + 1)) {
-        paper.safari = function () {
+        Paper[proto].safari = function () {
             var rect = this.rect(-99, -99, this.width + 99, this.height + 99);
             setTimeout(function () {rect.remove();});
         };
     } else {
-        paper.safari = function () {};
+        Paper[proto].safari = function () {};
     }
 
     // Events
@@ -2451,30 +2451,32 @@ window.Raphael = (function () {
     Element[proto].unhover = function (f_in, f_out) {
         return this.unmouseover(f_in).unmouseout(f_out);
     };
-    paper.circle = function (x, y, r) {
+    Paper[proto].circle = function (x, y, r) {
         return theCircle(this, x || 0, y || 0, r || 0);
     };
-    paper.rect = function (x, y, w, h, r) {
+    Paper[proto].rect = function (x, y, w, h, r) {
         return theRect(this, x || 0, y || 0, w || 0, h || 0, r || 0);
     };
-    paper.ellipse = function (x, y, rx, ry) {
+    Paper[proto].ellipse = function (x, y, rx, ry) {
         return theEllipse(this, x || 0, y || 0, rx || 0, ry || 0);
     };
-    paper.path = function (pathString) {
+    Paper[proto].path = function (pathString) {
         pathString && !R.is(pathString, "string") && !R.is(pathString[0], "array") && (pathString += E);
         return thePath(R.format[apply](R, arguments), this);
     };
-    paper.image = function (src, x, y, w, h) {
+    Paper[proto].image = function (src, x, y, w, h) {
         return theImage(this, src || "about:blank", x || 0, y || 0, w || 0, h || 0);
     };
-    paper.text = function (x, y, text) {
+    Paper[proto].text = function (x, y, text) {
         return theText(this, x || 0, y || 0, text || E);
     };
-    paper.set = function (itemsArray) {
+    Paper[proto].set = function (itemsArray) {
         arguments[length] > 1 && (itemsArray = Array[proto].splice.call(arguments, 0, arguments[length]));
         return new Set(itemsArray);
     };
-    paper.setSize = setSize;
+    Paper[proto].setSize = setSize;
+    Paper[proto].top = Paper[proto].bottom = null;
+    Paper[proto].raphael = R;
     function x_y() {
         return this.x + S + this.y;
     };
@@ -2756,7 +2758,7 @@ window.Raphael = (function () {
                 }
                 e.prev = time;
             }
-            R.svg && paper.safari();
+            R.svg && that.paper.safari();
             animationElements[length] && setTimeout(animation);
         },
         upto255 = function (color) {
@@ -3026,7 +3028,7 @@ window.Raphael = (function () {
         }
         return font;
     };
-    paper.getFont = function (family, weight, style, stretch) {
+    Paper[proto].getFont = function (family, weight, style, stretch) {
         stretch = stretch || "normal";
         style = style || "normal";
         weight = +weight || {normal: 400, bold: 700, lighter: 300, bolder: 800}[weight] || 400;
@@ -3051,7 +3053,7 @@ window.Raphael = (function () {
         }
         return thefont;
     };
-    paper.print = function (x, y, string, font, size, origin) {
+    Paper[proto].print = function (x, y, string, font, size, origin) {
         origin = origin || "middle"; // baseline|middle
         var out = this.set(),
             letters = (string + E)[split](E),
