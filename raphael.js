@@ -1,5 +1,5 @@
 /*!
- * Raphael 1.2.9dev - JavaScript Vector Library
+ * Raphael 1.3.0dev - JavaScript Vector Library
  *
  * Copyright (c) 2008 - 2009 Dmitry Baranovskiy (http://raphaeljs.com)
  * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
@@ -34,9 +34,9 @@ window.Raphael = (function () {
         concat = "concat",
         E = "",
         S = " ",
-        events = "click dblclick mousedown mousemove mouseout mouseover mouseup".split(S),
+        split = "split",
+        events = "click dblclick mousedown mousemove mouseout mouseover mouseup"[split](S),
         has = "hasOwnProperty",
-        isit = /^\[object\s+|\]$/gi,
         join = "join",
         length = "length",
         proto = "prototype",
@@ -55,15 +55,14 @@ window.Raphael = (function () {
         colourRegExp = /^\s*((#[a-f\d]{6})|(#[a-f\d]{3})|rgb\(\s*([\d\.]+\s*,\s*[\d\.]+\s*,\s*[\d\.]+)\s*\)|rgb\(\s*([\d\.]+%\s*,\s*[\d\.]+%\s*,\s*[\d\.]+%)\s*\)|hs[bl]\(\s*([\d\.]+\s*,\s*[\d\.]+\s*,\s*[\d\.]+)\s*\)|hs[bl]\(\s*([\d\.]+%\s*,\s*[\d\.]+%\s*,\s*[\d\.]+%)\s*\))\s*$/i,
         round = math.round,
         setAttribute = "setAttribute",
-        split = "split",
         toFloat = parseFloat,
         toInt = parseInt,
         upperCase = String[proto].toUpperCase,
         availableAttrs = {"clip-rect": "0 0 10e9 10e9", cursor: "default", cx: 0, cy: 0, fill: "#fff", "fill-opacity": 1, font: '10px "Arial"', "font-family": '"Arial"', "font-size": "10", "font-style": "normal", "font-weight": 400, gradient: 0, height: 0, href: "http://raphaeljs.com/", opacity: 1, path: "M0,0", r: 0, rotation: 0, rx: 0, ry: 0, scale: "1 1", src: "", stroke: "#000", "stroke-dasharray": "", "stroke-linecap": "butt", "stroke-linejoin": "butt", "stroke-miterlimit": 0, "stroke-opacity": 1, "stroke-width": 1, target: "_blank", "text-anchor": "middle", title: "Raphael", translation: "0 0", width: 0, x: 0, y: 0},
         availableAnimAttrs = {"clip-rect": "csv", cx: nu, cy: nu, fill: "colour", "fill-opacity": nu, "font-size": nu, height: nu, opacity: nu, path: "path", r: nu, rotation: "csv", rx: nu, ry: nu, scale: "csv", stroke: "colour", "stroke-opacity": nu, "stroke-width": nu, translation: "csv", width: nu, x: nu, y: nu},
         rp = "replace";
-    R.version = "1.2.9dev";
-    R.type = (win.SVGAngle || doc.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#BasicStructure", 1.1) ? "SVG" : "VML");
+    R.version = "1.3.0dev";
+    R.type = (win.SVGAngle || doc.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#BasicStructure", "1.1") ? "SVG" : "VML");
     if (R.type == "VML") {
         var d = document.createElement("div");
         d.innerHTML = '<!--[if vml]><br><br><![endif]-->';
@@ -72,12 +71,13 @@ window.Raphael = (function () {
         }
     }
     R.svg = !(R.vml = R.type == "VML");
+    Paper[proto] = R[proto];
     R._id = 0;
     R._oid = 0;
     R.fn = {};
     R.is = function (o, type) {
         type = lowerCase.call(type);
-        return ((type == "object" || type == "undefined") && typeof o == type) || (o == null && type == "null") || lowerCase.call(objectToString.call(o)[rp](isit, E)) == type;
+        return ((type == "object" || type == "undefined") && typeof o == type) || (o == null && type == "null") || lowerCase.call(objectToString.call(o).slice(8, -1)) == type;
     };
     R.setWindow = function (newwin) {
         win = newwin;
@@ -324,6 +324,20 @@ window.Raphael = (function () {
         }
         data[toString] = R._path2string;
         return data;
+    });
+    R.findDotsAtSegment = cacher(function (p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y, t) {
+        var t1 = 1 - t,
+            x = pow(t1, 3) * p1x + pow(t1, 2) * 3 * t * c1x + t1 * 3 * t * t * c2x + pow(t, 3) * p2x,
+            y = pow(t1, 3) * p1y + pow(t1, 2) * 3 * t * c1y + t1 * 3 * t * t * c2y + pow(t, 3) * p2y,
+            mx = p1x + 2 * t * (c1x - p1x) + t * t * (c2x - 2 * c1x + p1x),
+            my = p1y + 2 * t * (c1y - p1y) + t * t * (c2y - 2 * c1y + p1y),
+            nx = c1x + 2 * t * (c2x - c1x) + t * t * (p2x - 2 * c2x + c1x),
+            ny = c1y + 2 * t * (c2y - c1y) + t * t * (p2y - 2 * c2y + c1y),
+            ax = (1 - t) * p1x + t * c1x,
+            ay = (1 - t) * p1y + t * c1y,
+            cx = (1 - t) * c2x + t * p2x,
+            cy = (1 - t) * c2y + t * p2y;
+        return {x: x, y: y, m: {x: mx, y: my}, n: {x: nx, y: ny}, start: {x: ax, y: ay}, end: {x: cx, y: cy}};
     });
     var pathDimensions = cacher(function (path) {
         if (!path) {
@@ -619,27 +633,13 @@ window.Raphael = (function () {
                 return newres;
             }
         },
-        findDotAtSegment = cacher(function (p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y, t) {
+        findDotAtSegment = function (p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y, t) {
             var t1 = 1 - t;
             return {
                 x: pow(t1, 3) * p1x + pow(t1, 2) * 3 * t * c1x + t1 * 3 * t * t * c2x + pow(t, 3) * p2x,
                 y: pow(t1, 3) * p1y + pow(t1, 2) * 3 * t * c1y + t1 * 3 * t * t * c2y + pow(t, 3) * p2y
             };
-        }),
-        findDotsAtSegment = cacher(function (p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y, t) {
-            var t1 = 1 - t,
-                x = pow(t1, 3) * p1x + pow(t1, 2) * 3 * t * c1x + t1 * 3 * t * t * c2x + pow(t, 3) * p2x,
-                y = pow(t1, 3) * p1y + pow(t1, 2) * 3 * t * c1y + t1 * 3 * t * t * c2y + pow(t, 3) * p2y,
-                mx = p1x + 2 * t * (c1x - p1x) + t * t * (c2x - 2 * c1x + p1x),
-                my = p1y + 2 * t * (c1y - p1y) + t * t * (c2y - 2 * c1y + p1y),
-                nx = c1x + 2 * t * (c2x - c1x) + t * t * (p2x - 2 * c2x + c1x),
-                ny = c1y + 2 * t * (c2y - c1y) + t * t * (p2y - 2 * c2y + c1y),
-                ax = (1 - t) * p1x + t * c1x,
-                ay = (1 - t) * p1y + t * c1y,
-                cx = (1 - t) * c2x + t * p2x,
-                cy = (1 - t) * c2y + t * p2y;
-            return {x: x, y: y, m: {x: mx, y: my}, n: {x: nx, y: ny}, start: {x: ax, y: ay}, end: {x: cx, y: cy}};
-        }),
+        },
         curveDim = cacher(function (p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y) {
             var a = (c2x - 2 * c1x + p1x) - (p2x - 2 * c2x + c1x),
                 b = 2 * (c1x - p1x) - 2 * (c2x - c1x),
@@ -1497,7 +1497,19 @@ window.Raphael = (function () {
             insertbefore(this, element, this.paper);
             return this;
         };
-        
+        Element[proto].getTotalLength = function () {
+            if (this.type != "path") {
+                return -1;
+            }
+            return this.node.getTotalLength();
+        };
+        Element[proto].getPointAtLength = function (length) {
+            if (this.type != "path") {
+                return -1;
+            }
+            var point = this.node.getPointAtLength(length);
+            return {x: point.x, y: point.y};
+        };
         var theCircle = function (svg, x, y, r) {
             x = round(x);
             y = round(y);
@@ -1644,6 +1656,16 @@ window.Raphael = (function () {
                 res[push](r);
             }
             return res[join](S);
+        },
+        segmentLength = function (p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y) {
+            var old = {x: 0, y: 0},
+                len = 0;
+            for (var i = 0; i < 1.01; i+=.01) {
+                var dot = findDotAtSegment(p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y, i);
+                i && (len += math.sqrt(pow(old.x - dot.x, 2) + pow(old.y - dot.y, 2)));
+                old = dot;
+            }
+            return len;
         };
         
         R[toString] = function () {
@@ -2201,6 +2223,48 @@ window.Raphael = (function () {
             element.Group.parentNode.insertBefore(this.Group, element.Group);
             insertbefore(this, element, this.paper);
             return this;
+        };
+        Element[proto].getTotalLength = function () {
+            if (this.type != "path") {
+                return -1;
+            }
+            var path = path2curve(this.attrs.path), x, y, p,
+                len = 0;
+            for (var i = 0, ii = path.length; i < ii; i++) {
+                p = path[i];
+                if (p[0] == "M") {
+                    x = +p[1];
+                    y = +p[2];
+                } else {
+                    len += segmentLength(x, y, p[1], p[2], p[3], p[4], p[5], p[6]);
+                    x = +p[5];
+                    y = +p[6];
+                }
+            }
+            return len;
+        };
+        Element[proto].getPointAtLength = function (length) {
+            if (this.type != "path") {
+                return -1;
+            }
+            var path = path2curve(this.attrs.path), x, y, p, l,
+                len = 0;
+            for (var i = 0, ii = path.length; i < ii; i++) {
+                p = path[i];
+                if (p[0] == "M") {
+                    x = +p[1];
+                    y = +p[2];
+                } else {
+                    l = segmentLength(x, y, p[1], p[2], p[3], p[4], p[5], p[6]);
+                    if (len + l > length) {
+                        return findDotAtSegment(x, y, p[1], p[2], p[3], p[4], p[5], p[6], (length - len) / l);
+                    }
+                    len += l;
+                    x = +p[5];
+                    y = +p[6];
+                }
+            }
+            return {x: x, y: y};
         };
 
         var theCircle = function (vml, x, y, r) {
