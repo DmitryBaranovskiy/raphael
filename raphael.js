@@ -4,8 +4,8 @@
  * Copyright (c) 2008 - 2009 Dmitry Baranovskiy (http://raphaeljs.com)
  * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
  */
-
-
+ 
+ 
 window.Raphael = (function () {
     var separator = /[, ]+/,
         elements = /^(circle|rect|path|ellipse|text|image)$/,
@@ -44,7 +44,6 @@ window.Raphael = (function () {
         math = Math,
         mmax = math.max,
         mmin = math.min,
-        abs = math.abs,
         nu = "number",
         toString = "toString",
         objectToString = Object[proto][toString],
@@ -220,7 +219,7 @@ window.Raphael = (function () {
         }
         return newf;
     }
-
+ 
     R.getRGB = cacher(function (colour) {
         if (!colour || !!((colour = colour + E).indexOf("-") + 1)) {
             return {r: -1, g: -1, b: -1, hex: "none", error: 1};
@@ -326,7 +325,7 @@ window.Raphael = (function () {
         data[toString] = R._path2string;
         return data;
     });
-    R.findDotsAtSegment = cacher(function (p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y, t) {
+    R.findDotsAtSegment = function (p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y, t) {
         var t1 = 1 - t,
             x = pow(t1, 3) * p1x + pow(t1, 2) * 3 * t * c1x + t1 * 3 * t * t * c2x + pow(t, 3) * p2x,
             y = pow(t1, 3) * p1y + pow(t1, 2) * 3 * t * c1y + t1 * 3 * t * t * c2y + pow(t, 3) * p2y,
@@ -337,9 +336,10 @@ window.Raphael = (function () {
             ax = (1 - t) * p1x + t * c1x,
             ay = (1 - t) * p1y + t * c1y,
             cx = (1 - t) * c2x + t * p2x,
-            cy = (1 - t) * c2y + t * p2y;
-        return {x: x, y: y, m: {x: mx, y: my}, n: {x: nx, y: ny}, start: {x: ax, y: ay}, end: {x: cx, y: cy}};
-    });
+            cy = (1 - t) * c2y + t * p2y,
+            alpha = (90 - math.atan((mx - nx) / (my - ny)) * 180 / math.PI) % 360;
+        return {x: x, y: y, m: {x: mx, y: my}, n: {x: nx, y: ny}, start: {x: ax, y: ay}, end: {x: cx, y: cy}, alpha: alpha};
+    };
     var pathDimensions = cacher(function (path) {
         if (!path) {
             return {x: 0, y: 0, width: 0, height: 0};
@@ -572,17 +572,17 @@ window.Raphael = (function () {
                     sin = math.sin(PI / 180 * angle),
                     x = (x1 - x2) / 2,
                     y = (y1 - y2) / 2;
-                rx = mmax(rx, abs(x));
-                ry = mmax(ry, abs(y));
+                rx = mmax(rx, math.abs(x));
+                ry = mmax(ry, math.abs(y));
                 var rx2 = rx * rx,
                     ry2 = ry * ry,
                     k = (large_arc_flag == sweep_flag ? -1 : 1) *
-                        math.sqrt(abs((rx2 * ry2 - rx2 * y * y - ry2 * x * x) / (rx2 * y * y + ry2 * x * x))),
+                        math.sqrt(math.abs((rx2 * ry2 - rx2 * y * y - ry2 * x * x) / (rx2 * y * y + ry2 * x * x))),
                     cx = k * rx * y / ry + (x1 + x2) / 2,
                     cy = k * -ry * x / rx + (y1 + y2) / 2,
                     f1 = math.asin(((y1 - cy) / ry).toFixed(7)),
                     f2 = math.asin(((y2 - cy) / ry).toFixed(7));
-
+ 
                 f1 = x1 < cx ? PI - f1 : f1;
                 f2 = x2 < cx ? PI - f2 : f2;
                 f1 < 0 && (f1 = PI * 2 + f1);
@@ -600,7 +600,7 @@ window.Raphael = (function () {
                 cy = recursive[3];
             }
             var df = f2 - f1;
-            if (abs(df) > _120) {
+            if (math.abs(df) > _120) {
                 var f2old = f2,
                     x2old = x2,
                     y2old = y2;
@@ -650,8 +650,8 @@ window.Raphael = (function () {
                 y = [p1y, p2y],
                 x = [p1x, p2x],
                 dot;
-            abs(t1) > 1e12 && (t1 = .5);
-            abs(t2) > 1e12 && (t2 = .5);
+            math.abs(t1) > 1e12 && (t1 = .5);
+            math.abs(t2) > 1e12 && (t2 = .5);
             if (t1 > 0 && t1 < 1) {
                 dot = findDotAtSegment(p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y, t1);
                 x[push](dot.x);
@@ -667,8 +667,8 @@ window.Raphael = (function () {
             c = p1y - c1y;
             t1 = (-b + math.sqrt(b * b - 4 * a * c)) / 2 / a;
             t2 = (-b - math.sqrt(b * b - 4 * a * c)) / 2 / a;
-            abs(t1) > 1e12 && (t1 = .5);
-            abs(t2) > 1e12 && (t2 = .5);
+            math.abs(t1) > 1e12 && (t1 = .5);
+            math.abs(t2) > 1e12 && (t2 = .5);
             if (t1 > 0 && t1 < 1) {
                 dot = findDotAtSegment(p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y, t1);
                 x[push](dot.x);
@@ -907,7 +907,7 @@ window.Raphael = (function () {
             };
         },
         radial_gradient = /^r(?:\(([^,]+?)\s*,\s*([^\)]+?)\))?/;
-
+ 
     // SVG
     if (R.svg) {
         Paper[proto].svgns = "http://www.w3.org/2000/svg";
@@ -973,7 +973,7 @@ window.Raphael = (function () {
                     return null;
                 }
                 var vector = [0, 0, math.cos(angle * math.PI / 180), math.sin(angle * math.PI / 180)],
-                    max = 1 / (mmax(abs(vector[2]), abs(vector[3])) || 1);
+                    max = 1 / (mmax(math.abs(vector[2]), math.abs(vector[3])) || 1);
                 vector[2] *= max;
                 vector[3] *= max;
                 if (vector[2] < 0) {
@@ -1201,7 +1201,7 @@ window.Raphael = (function () {
                             $(ig, {x: 0, y: 0});
                             ig.setAttributeNS(o.paper.xlink, "href", isURL[1]);
                             el[appendChild](ig);
-
+ 
                             var img = doc.createElement("img");
                             img.style.cssText = "position:absolute;left:-9999em;top-9999em";
                             img.onload = function () {
@@ -1276,7 +1276,7 @@ window.Raphael = (function () {
             var a = el.attrs,
                 node = el.node,
                 fontSize = node.firstChild ? toInt(doc.defaultView.getComputedStyle(node.firstChild, E).getPropertyValue("font-size"), 10) : 10;
-
+ 
             if (params[has]("text")) {
                 a.text = params.text;
                 while (node.firstChild) {
@@ -1498,19 +1498,19 @@ window.Raphael = (function () {
             insertbefore(this, element, this.paper);
             return this;
         };
-        Element[proto].getTotalLength = function () {
-            if (this.type != "path") {
-                return -1;
-            }
-            return this.node.getTotalLength();
-        };
-        Element[proto].getPointAtLength = function (length) {
-            if (this.type != "path") {
-                return -1;
-            }
-            var point = this.node.getPointAtLength(length);
-            return {x: point.x, y: point.y};
-        };
+        // Element[proto].getTotalLength = function () {
+        //     if (this.type != "path") {
+        //         return -1;
+        //     }
+        //     return this.node.getTotalLength();
+        // };
+        // Element[proto].getPointAtLength = function (length) {
+        //     if (this.type != "path") {
+        //         return -1;
+        //     }
+        //     var point = this.node.getPointAtLength(length);
+        //     return {x: point.x, y: point.y};
+        // };
         var theCircle = function (svg, x, y, r) {
             x = round(x);
             y = round(y);
@@ -1625,7 +1625,7 @@ window.Raphael = (function () {
             }
         };
     }
-
+ 
     // VML
     if (R.vml) {
         var path2vml = function (path) {
@@ -1657,16 +1657,6 @@ window.Raphael = (function () {
                 res[push](r);
             }
             return res[join](S);
-        },
-        segmentLength = function (p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y) {
-            var old = {x: 0, y: 0},
-                len = 0;
-            for (var i = 0; i < 1.01; i+=.01) {
-                var dot = findDotAtSegment(p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y, i);
-                i && (len += math.sqrt(pow(old.x - dot.x, 2) + pow(old.y - dot.y, 2)));
-                old = dot;
-            }
-            return len;
         };
         
         R[toString] = function () {
@@ -1858,7 +1848,7 @@ window.Raphael = (function () {
                 res.H = a.h = res.paper.span.offsetHeight;
                 res.X = a.x;
                 res.Y = a.y + round(res.H / 2);
-
+ 
                 // text-anchor emulationm
                 switch (a["text-anchor"]) {
                     case "start":
@@ -2225,34 +2215,7 @@ window.Raphael = (function () {
             insertbefore(this, element, this.paper);
             return this;
         };
-        var getLengthFactory = function (istotal) {
-            return function (length) {
-                if (this.type != "path") {
-                    return -1;
-                }
-                var path = path2curve(this.attrs.path), x, y, p, l,
-                    len = 0;
-                for (var i = 0, ii = path.length; i < ii; i++) {
-                    p = path[i];
-                    if (p[0] == "M") {
-                        x = +p[1];
-                        y = +p[2];
-                    } else {
-                        l = segmentLength(x, y, p[1], p[2], p[3], p[4], p[5], p[6]);
-                        if (!istotal && len + l > length) {
-                            return findDotAtSegment(x, y, p[1], p[2], p[3], p[4], p[5], p[6], (length - len) / l);
-                        }
-                        len += l;
-                        x = +p[5];
-                        y = +p[6];
-                    }
-                }
-                return istotal ? len : {x: x, y: y};
-            };
-        };
-        Element[proto].getTotalLength = getLengthFactory(1);
-        Element[proto].getPointAtLength = getLengthFactory();
-
+ 
         var theCircle = function (vml, x, y, r) {
             var g = createNode("group"),
                 o = createNode("oval"),
@@ -2437,7 +2400,7 @@ window.Raphael = (function () {
             }
         };
     }
-
+ 
     // rest
     // Safari or Chrome (WebKit) rendering bug workaround method
     if ((/^Apple|^Google/).test(navigator.vendor) && !(navigator.userAgent.indexOf("Version/4.0") + 1)) {
@@ -2448,7 +2411,7 @@ window.Raphael = (function () {
     } else {
         Paper[proto].safari = function () {};
     }
-
+ 
     // Events
     var addEvent = (function () {
         if (doc.addEventListener) {
@@ -2552,25 +2515,23 @@ window.Raphael = (function () {
             var bb = this.getBBox(),
                 rcx = bb.x + bb.width / 2,
                 rcy = bb.y + bb.height / 2,
-                kx = abs(x / this._.sx),
-                ky = abs(y / this._.sy);
+                kx = x / this._.sx,
+                ky = y / this._.sy;
             cx = (+cx || cx == 0) ? cx : rcx;
             cy = (+cy || cy == 0) ? cy : rcy;
-            var dirx = ~~(x / abs(x)),
-                diry = ~~(y / abs(y)),
-                dkx = kx * dirx,
-                dky = ky * diry,
+            var dirx = ~~(x / math.abs(x)),
+                diry = ~~(y / math.abs(y)),
                 s = this.node.style,
-                ncx = cx - abs(rcx - cx) * dkx,
-                ncy = cy - abs(rcy - cy) * dky;
+                ncx = cx + (rcx - cx) * kx,
+                ncy = cy + (rcy - cy) * ky;
             switch (this.type) {
                 case "rect":
                 case "image":
-                    var neww = a.width * kx,
-                        newh = a.height * ky;
+                    var neww = a.width * dirx * kx,
+                        hewh = a.height * diry * ky;
                     this.attr({
                         height: newh,
-                        r: a.r * mmin(kx, ky),
+                        r: a.r * mmin(dirx * kx, diry * ky),
                         width: neww,
                         x: ncx - neww / 2,
                         y: ncy - newh / 2
@@ -2579,9 +2540,9 @@ window.Raphael = (function () {
                 case "circle":
                 case "ellipse":
                     this.attr({
-                        rx: a.rx * kx,
-                        ry: a.ry * ky,
-                        r: a.r * mmin(kx, ky),
+                        rx: a.rx * dirx * kx,
+                        ry: a.ry * diry * ky,
+                        r: a.r * mmin(dirx * kx, diry * ky),
                         cx: ncx,
                         cy: ncy
                     });
@@ -2599,22 +2560,22 @@ window.Raphael = (function () {
                             skip = false;
                         }
                         if (P0 == "A") {
-                            p[path[i][length] - 2] = abs(p[path[i][length] - 2]) * dkx;
-                            p[path[i][length] - 1] = abs(p[path[i][length] - 1]) * dky;
-                            p[1] *= kx;
-                            p[2] *= ky;
-                            p[5] = +(dirx + diry ? !+p[4] : !!+p[4]);
+                            p[path[i][length] - 2] *= kx;
+                            p[path[i][length] - 1] *= ky;
+                            p[1] *= dirx * kx;
+                            p[2] *= diry * ky;
+                            p[5] = +(dirx + diry ? !!+p[5] : !+p[5]);
                         } else if (P0 == "H") {
                             for (j = 1, jj = p[length]; j < jj; j++) {
-                                p[j] = abs(p[j]) * dkx;
+                                p[j] *= kx;
                             }
                         } else if (P0 == "V") {
                             for (j = 1, jj = p[length]; j < jj; j++) {
-                                p[j] = abs(p[j]) * dky;
+                                p[j] *= ky;
                             }
                          } else {
                             for (j = 1, jj = p[length]; j < jj; j++) {
-                                p[j] = abs(p[j]) * ( (j % 2) ? dkx : dky );
+                                p[j] *= (j % 2) ? kx : ky;
                             }
                         }
                     }
@@ -2664,6 +2625,43 @@ window.Raphael = (function () {
         delete attr.translation;
         return this.paper[this.type]().attr(attr);
     };
+    var getLengthFactory = function (istotal) {
+        return function (length) {
+            if (this.type != "path") {
+                return -1;
+            }
+            var path = path2curve(this.attrs.path), x, y, p, l,
+                len = 0;
+            for (var i = 0, ii = path.length; i < ii; i++) {
+                p = path[i];
+                if (p[0] == "M") {
+                    x = +p[1];
+                    y = +p[2];
+                } else {
+                    l = segmentLength(x, y, p[1], p[2], p[3], p[4], p[5], p[6]);
+                    if (!istotal && len + l > length) {
+                        return R.findDotsAtSegment(x, y, p[1], p[2], p[3], p[4], p[5], p[6], (length - len) / l);
+                    }
+                    len += l;
+                    x = +p[5];
+                    y = +p[6];
+                }
+            }
+            return istotal ? len : R.findDotsAtSegment(x, y, p[1], p[2], p[3], p[4], p[5], p[6], 1);
+        };
+    },
+    segmentLength = function (p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y) {
+        var old = {x: 0, y: 0},
+            len = 0;
+        for (var i = 0; i < 1.01; i+=.01) {
+            var dot = findDotAtSegment(p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y, i);
+            i && (len += math.sqrt(pow(old.x - dot.x, 2) + pow(old.y - dot.y, 2)));
+            old = dot;
+        }
+        return len;
+    };
+    Element[proto].getTotalLength = getLengthFactory(1);
+    Element[proto].getPointAtLength = getLengthFactory();
 
     // animation easing formulas
     R.easing_formulas = {
@@ -2724,7 +2722,7 @@ window.Raphael = (function () {
             return l;
         }
     };
-
+ 
     var animationElements = {length : 0},
         animation = function () {
             var Now = +new Date;
@@ -2947,7 +2945,7 @@ window.Raphael = (function () {
         return "Rapha\xebl\u2019s object";
     };
     R.ae = animationElements;
-
+ 
     // Set
     var Set = function (items) {
         this.items = [];
@@ -3043,7 +3041,7 @@ window.Raphael = (function () {
             height: mmax[apply](0, h) - y
         };
     };
-
+ 
     R.registerFont = function (font) {
         if (!font.face) {
             return font;
@@ -3131,7 +3129,7 @@ window.Raphael = (function () {
         }
         return out;
     };
-
+ 
     R.format = function (token) {
         var args = R.is(arguments[1], "array") ? [0][concat](arguments[1]) : arguments,
             rg = /\{(\d+)\}/g;
