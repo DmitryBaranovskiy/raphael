@@ -2224,48 +2224,33 @@ window.Raphael = (function () {
             insertbefore(this, element, this.paper);
             return this;
         };
-        Element[proto].getTotalLength = function () {
-            if (this.type != "path") {
-                return -1;
-            }
-            var path = path2curve(this.attrs.path), x, y, p,
-                len = 0;
-            for (var i = 0, ii = path.length; i < ii; i++) {
-                p = path[i];
-                if (p[0] == "M") {
-                    x = +p[1];
-                    y = +p[2];
-                } else {
-                    len += segmentLength(x, y, p[1], p[2], p[3], p[4], p[5], p[6]);
-                    x = +p[5];
-                    y = +p[6];
+        var getLengthFactory = function (istotal) {
+            return function (length) {
+                if (this.type != "path") {
+                    return -1;
                 }
-            }
-            return len;
-        };
-        Element[proto].getPointAtLength = function (length) {
-            if (this.type != "path") {
-                return -1;
-            }
-            var path = path2curve(this.attrs.path), x, y, p, l,
-                len = 0;
-            for (var i = 0, ii = path.length; i < ii; i++) {
-                p = path[i];
-                if (p[0] == "M") {
-                    x = +p[1];
-                    y = +p[2];
-                } else {
-                    l = segmentLength(x, y, p[1], p[2], p[3], p[4], p[5], p[6]);
-                    if (len + l > length) {
-                        return findDotAtSegment(x, y, p[1], p[2], p[3], p[4], p[5], p[6], (length - len) / l);
+                var path = path2curve(this.attrs.path), x, y, p, l,
+                    len = 0;
+                for (var i = 0, ii = path.length; i < ii; i++) {
+                    p = path[i];
+                    if (p[0] == "M") {
+                        x = +p[1];
+                        y = +p[2];
+                    } else {
+                        l = segmentLength(x, y, p[1], p[2], p[3], p[4], p[5], p[6]);
+                        if (!istotal && len + l > length) {
+                            return findDotAtSegment(x, y, p[1], p[2], p[3], p[4], p[5], p[6], (length - len) / l);
+                        }
+                        len += l;
+                        x = +p[5];
+                        y = +p[6];
                     }
-                    len += l;
-                    x = +p[5];
-                    y = +p[6];
                 }
-            }
-            return {x: x, y: y};
+                return istotal ? len : {x: x, y: y};
+            };
         };
+        Element[proto].getTotalLength = getLengthFactory(1);
+        Element[proto].getPointAtLength = getLengthFactory();
 
         var theCircle = function (vml, x, y, r) {
             var g = createNode("group"),
@@ -2439,6 +2424,9 @@ window.Raphael = (function () {
         };
         Paper[proto].clear = function () {
             this.canvas.innerHTML = E;
+            this.span = doc.createElement("span");
+            this.span.style.cssText = "position:absolute;left:-9999px;top:-9999px;padding:0;margin:0;line-height:1;display:inline;";
+            this.canvas[appendChild](this.span);
             this.bottom = this.top = null;
         };
         Paper[proto].remove = function () {
