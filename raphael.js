@@ -44,6 +44,7 @@ window.Raphael = (function () {
         math = Math,
         mmax = math.max,
         mmin = math.min,
+        abs = math.abs,
         nu = "number",
         toString = "toString",
         objectToString = Object[proto][toString],
@@ -571,12 +572,12 @@ window.Raphael = (function () {
                     sin = math.sin(PI / 180 * angle),
                     x = (x1 - x2) / 2,
                     y = (y1 - y2) / 2;
-                rx = mmax(rx, math.abs(x));
-                ry = mmax(ry, math.abs(y));
+                rx = mmax(rx, abs(x));
+                ry = mmax(ry, abs(y));
                 var rx2 = rx * rx,
                     ry2 = ry * ry,
                     k = (large_arc_flag == sweep_flag ? -1 : 1) *
-                        math.sqrt(math.abs((rx2 * ry2 - rx2 * y * y - ry2 * x * x) / (rx2 * y * y + ry2 * x * x))),
+                        math.sqrt(abs((rx2 * ry2 - rx2 * y * y - ry2 * x * x) / (rx2 * y * y + ry2 * x * x))),
                     cx = k * rx * y / ry + (x1 + x2) / 2,
                     cy = k * -ry * x / rx + (y1 + y2) / 2,
                     f1 = math.asin(((y1 - cy) / ry).toFixed(7)),
@@ -599,7 +600,7 @@ window.Raphael = (function () {
                 cy = recursive[3];
             }
             var df = f2 - f1;
-            if (math.abs(df) > _120) {
+            if (abs(df) > _120) {
                 var f2old = f2,
                     x2old = x2,
                     y2old = y2;
@@ -649,8 +650,8 @@ window.Raphael = (function () {
                 y = [p1y, p2y],
                 x = [p1x, p2x],
                 dot;
-            math.abs(t1) > 1e12 && (t1 = .5);
-            math.abs(t2) > 1e12 && (t2 = .5);
+            abs(t1) > 1e12 && (t1 = .5);
+            abs(t2) > 1e12 && (t2 = .5);
             if (t1 > 0 && t1 < 1) {
                 dot = findDotAtSegment(p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y, t1);
                 x[push](dot.x);
@@ -666,8 +667,8 @@ window.Raphael = (function () {
             c = p1y - c1y;
             t1 = (-b + math.sqrt(b * b - 4 * a * c)) / 2 / a;
             t2 = (-b - math.sqrt(b * b - 4 * a * c)) / 2 / a;
-            math.abs(t1) > 1e12 && (t1 = .5);
-            math.abs(t2) > 1e12 && (t2 = .5);
+            abs(t1) > 1e12 && (t1 = .5);
+            abs(t2) > 1e12 && (t2 = .5);
             if (t1 > 0 && t1 < 1) {
                 dot = findDotAtSegment(p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y, t1);
                 x[push](dot.x);
@@ -972,7 +973,7 @@ window.Raphael = (function () {
                     return null;
                 }
                 var vector = [0, 0, math.cos(angle * math.PI / 180), math.sin(angle * math.PI / 180)],
-                    max = 1 / (mmax(math.abs(vector[2]), math.abs(vector[3])) || 1);
+                    max = 1 / (mmax(abs(vector[2]), abs(vector[3])) || 1);
                 vector[2] *= max;
                 vector[3] *= max;
                 if (vector[2] < 0) {
@@ -2551,23 +2552,25 @@ window.Raphael = (function () {
             var bb = this.getBBox(),
                 rcx = bb.x + bb.width / 2,
                 rcy = bb.y + bb.height / 2,
-                kx = x / this._.sx,
-                ky = y / this._.sy;
+                kx = abs(x / this._.sx),
+                ky = abs(y / this._.sy);
             cx = (+cx || cx == 0) ? cx : rcx;
             cy = (+cy || cy == 0) ? cy : rcy;
-            var dirx = ~~(x / math.abs(x)),
-                diry = ~~(y / math.abs(y)),
+            var dirx = ~~(x / abs(x)),
+                diry = ~~(y / abs(y)),
+                dkx = kx * dirx,
+                dky = ky * diry,
                 s = this.node.style,
-                ncx = cx + (rcx - cx) * kx,
-                ncy = cy + (rcy - cy) * ky;
+                ncx = cx - abs(rcx - cx) * dkx,
+                ncy = cy - abs(rcy - cy) * dky;
             switch (this.type) {
                 case "rect":
                 case "image":
-                    var neww = a.width * dirx * kx,
-                        hewh = a.height * diry * ky;
+                    var neww = a.width * kx,
+                        newh = a.height * ky;
                     this.attr({
                         height: newh,
-                        r: a.r * mmin(dirx * kx, diry * ky),
+                        r: a.r * mmin(kx, ky),
                         width: neww,
                         x: ncx - neww / 2,
                         y: ncy - newh / 2
@@ -2576,9 +2579,9 @@ window.Raphael = (function () {
                 case "circle":
                 case "ellipse":
                     this.attr({
-                        rx: a.rx * dirx * kx,
-                        ry: a.ry * diry * ky,
-                        r: a.r * mmin(dirx * kx, diry * ky),
+                        rx: a.rx * kx,
+                        ry: a.ry * ky,
+                        r: a.r * mmin(kx, ky),
                         cx: ncx,
                         cy: ncy
                     });
@@ -2596,22 +2599,22 @@ window.Raphael = (function () {
                             skip = false;
                         }
                         if (P0 == "A") {
-                            p[path[i][length] - 2] *= kx;
-                            p[path[i][length] - 1] *= ky;
-                            p[1] *= dirx * kx;
-                            p[2] *= diry * ky;
-                            p[5] = +(dirx + diry ? !!+p[5] : !+p[5]);
+                            p[path[i][length] - 2] = abs(p[path[i][length] - 2]) * dkx;
+                            p[path[i][length] - 1] = abs(p[path[i][length] - 1]) * dky;
+                            p[1] *= kx;
+                            p[2] *= ky;
+                            p[5] = +(dirx + diry ? !+p[4] : !!+p[4]);
                         } else if (P0 == "H") {
                             for (j = 1, jj = p[length]; j < jj; j++) {
-                                p[j] *= kx;
+                                p[j] = abs(p[j]) * dkx;
                             }
                         } else if (P0 == "V") {
                             for (j = 1, jj = p[length]; j < jj; j++) {
-                                p[j] *= ky;
+                                p[j] = abs(p[j]) * dky;
                             }
                          } else {
                             for (j = 1, jj = p[length]; j < jj; j++) {
-                                p[j] *= (j % 2) ? kx : ky;
+                                p[j] = abs(p[j]) * ( (j % 2) ? dkx : dky );
                             }
                         }
                     }
