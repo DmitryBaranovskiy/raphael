@@ -59,7 +59,7 @@ window.Raphael = (function () {
         toInt = parseInt,
         upperCase = String[proto].toUpperCase,
         availableAttrs = {"clip-rect": "0 0 10e9 10e9", cursor: "default", cx: 0, cy: 0, fill: "#fff", "fill-opacity": 1, font: '10px "Arial"', "font-family": '"Arial"', "font-size": "10", "font-style": "normal", "font-weight": 400, gradient: 0, height: 0, href: "http://raphaeljs.com/", opacity: 1, path: "M0,0", r: 0, rotation: 0, rx: 0, ry: 0, scale: "1 1", src: "", stroke: "#000", "stroke-dasharray": "", "stroke-linecap": "butt", "stroke-linejoin": "butt", "stroke-miterlimit": 0, "stroke-opacity": 1, "stroke-width": 1, target: "_blank", "text-anchor": "middle", title: "Raphael", translation: "0 0", width: 0, x: 0, y: 0},
-        availableAnimAttrs = {"clip-rect": "csv", cx: nu, cy: nu, fill: "colour", "fill-opacity": nu, "font-size": nu, height: nu, opacity: nu, path: "path", r: nu, rotation: "csv", rx: nu, ry: nu, scale: "csv", stroke: "colour", "stroke-opacity": nu, "stroke-width": nu, translation: "csv", width: nu, x: nu, y: nu},
+        availableAnimAttrs = {along: "along", "clip-rect": "csv", cx: nu, cy: nu, fill: "colour", "fill-opacity": nu, "font-size": nu, height: nu, opacity: nu, path: "path", r: nu, rotation: "csv", rx: nu, ry: nu, scale: "csv", stroke: "colour", "stroke-opacity": nu, "stroke-width": nu, translation: "csv", width: nu, x: nu, y: nu},
         rp = "replace";
     R.version = "1.3.0dev";
     R.type = (win.SVGAngle || doc.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#BasicStructure", "1.1") ? "SVG" : "VML");
@@ -337,7 +337,8 @@ window.Raphael = (function () {
             ay = (1 - t) * p1y + t * c1y,
             cx = (1 - t) * c2x + t * p2x,
             cy = (1 - t) * c2y + t * p2y,
-            alpha = (90 - math.atan((mx - nx) / (my - ny)) * 180 / math.PI) % 360;
+            alpha = (90 - math.atan((mx - nx) / (my - ny)) * 180 / math.PI);
+        (mx > nx || my < ny) && (alpha += 180);
         return {x: x, y: y, m: {x: mx, y: my}, n: {x: nx, y: ny}, start: {x: ax, y: ay}, end: {x: cx, y: cy}, alpha: alpha};
     };
     var pathDimensions = cacher(function (path) {
@@ -1479,8 +1480,7 @@ window.Raphael = (function () {
             if (this.removed) {
                 return this;
             }
-            var svg = this.paper,
-                node = element.node;
+            var node = element.node;
             if (node.nextSibling) {
                 node.parentNode.insertBefore(this.node, node.nextSibling);
             } else {
@@ -1498,19 +1498,6 @@ window.Raphael = (function () {
             insertbefore(this, element, this.paper);
             return this;
         };
-        // Element[proto].getTotalLength = function () {
-        //     if (this.type != "path") {
-        //         return -1;
-        //     }
-        //     return this.node.getTotalLength();
-        // };
-        // Element[proto].getPointAtLength = function (length) {
-        //     if (this.type != "path") {
-        //         return -1;
-        //     }
-        //     var point = this.node.getPointAtLength(length);
-        //     return {x: point.x, y: point.y};
-        // };
         var theCircle = function (svg, x, y, r) {
             x = round(x);
             y = round(y);
@@ -2528,7 +2515,7 @@ window.Raphael = (function () {
                 case "rect":
                 case "image":
                     var neww = a.width * dirx * kx,
-                        hewh = a.height * diry * ky;
+                        newh = a.height * diry * ky;
                     this.attr({
                         height: newh,
                         r: a.r * mmin(dirx * kx, diry * ky),
@@ -2625,12 +2612,12 @@ window.Raphael = (function () {
         delete attr.translation;
         return this.paper[this.type]().attr(attr);
     };
-    var getLengthFactory = function (istotal) {
+    var getLengthFactory = function (istotal, subpath) {
         return function (length) {
             if (this.type != "path") {
                 return -1;
             }
-            var path = path2curve(this.attrs.path), x, y, p, l,
+            var path = path2curve(this.attrs.path), x, y, p, l, sp = "", subpaths = {},
                 len = 0;
             for (var i = 0, ii = path.length; i < ii; i++) {
                 p = path[i];
@@ -2639,18 +2626,32 @@ window.Raphael = (function () {
                     y = +p[2];
                 } else {
                     l = segmentLength(x, y, p[1], p[2], p[3], p[4], p[5], p[6]);
-                    if (!istotal && len + l > length) {
-                        return R.findDotsAtSegment(x, y, p[1], p[2], p[3], p[4], p[5], p[6], (length - len) / l);
+                    if (len + l > length) {
+                        if (subpath && !subpaths.start) {
+                            var point = R.findDotsAtSegment(x, y, p[1], p[2], p[3], p[4], p[5], p[6], (length - len) / l);
+                            sp += ["C", point.start.x, point.start.y, point.m.x, point.m.y, point.x, point.y];
+                            subpaths.start = sp;
+                            sp = ["M", point.x, point.y, "C", point.n.x, point.n.y, point.end.x, point.end.y, p[5], p[6]][join]();
+                            len += l;
+                            x = +p[5];
+                            y = +p[6];
+                            continue;
+                        }
+                        if (!istotal && !subpath) {
+                            return R.findDotsAtSegment(x, y, p[1], p[2], p[3], p[4], p[5], p[6], (length - len) / l);
+                        }
                     }
                     len += l;
                     x = +p[5];
                     y = +p[6];
                 }
+                sp += p;
             }
-            return istotal ? len : R.findDotsAtSegment(x, y, p[1], p[2], p[3], p[4], p[5], p[6], 1);
+            subpaths.end = sp;
+            return istotal ? len : subpath ? subpaths : R.findDotsAtSegment(x, y, p[1], p[2], p[3], p[4], p[5], p[6], 1);
         };
     },
-    segmentLength = function (p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y) {
+    segmentLength = cacher(function (p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y) {
         var old = {x: 0, y: 0},
             len = 0;
         for (var i = 0; i < 1.01; i+=.01) {
@@ -2659,9 +2660,10 @@ window.Raphael = (function () {
             old = dot;
         }
         return len;
-    };
+    });
     Element[proto].getTotalLength = getLengthFactory(1);
     Element[proto].getPointAtLength = getLengthFactory();
+    Element[proto].getSubpathToLength = getLengthFactory(0, 1);
 
     // animation easing formulas
     R.easing_formulas = {
@@ -2749,6 +2751,15 @@ window.Raphael = (function () {
                     var pos = R.easing_formulas[easing] ? R.easing_formulas[easing](time / ms) : time / ms;
                     for (var attr in from) if (from[has](attr)) {
                         switch (availableAnimAttrs[attr]) {
+                            case "along":
+                                now = pos * ms * diff[attr];
+                                var point = to[attr].getPointAtLength(now);
+                                that.translate(diff.sx - diff.x || 0, diff.sy - diff.y || 0);
+                                diff.x = point.x;
+                                diff.y = point.y;
+                                that.translate(point.x - diff.sx, point.y - diff.sy);
+                                to.rot && that.rotate(diff.r + point.alpha, point.x, point.y);
+                                break;
                             case "number":
                                 now = +from[attr] + pos * ms * diff[attr];
                                 break;
@@ -2801,6 +2812,11 @@ window.Raphael = (function () {
                     that.attr(set);
                     that._run && that._run.call(that);
                 } else {
+                    if (to.along) {
+                        var point = to.along.getPointAtLength(to.along.getTotalLength());
+                        that.translate(diff.sx - (diff.x || 0) + point.x - diff.sx, diff.sy - (diff.y || 0) + point.y - diff.sy);
+                        to.rot && that.rotate(diff.r + point.alpha, point.x, point.y);
+                    }
                     (t.x || t.y) && that.translate(-t.x, -t.y);
                     to.scale && (to.scale = to.scale + E);
                     that.attr(to);
@@ -2811,7 +2827,7 @@ window.Raphael = (function () {
                 }
                 e.prev = time;
             }
-            R.svg && that.paper.safari();
+            R.svg && that && that.paper.safari();
             animationElements[length] && setTimeout(animation);
         },
         upto255 = function (color) {
@@ -2846,8 +2862,21 @@ window.Raphael = (function () {
         animationElements[element.id] && (params.start = animationElements[element.id].start);
         return this.animate(params, ms, easing, callback);
     };
+    Element[proto].animateAlong = function (path, ms, rotate, callback) {
+        var params = {};
+        R.is(rotate, "function") ? (callback = rotate) : (params.rot = rotate);
+        if (R.is(path, "string") && path.constructor != Element) {
+            path = r.path(path).attr({stroke: "none"});
+            var f = function () {
+                path.remove();
+            };
+            callback = R.is(callback, "function") ? function () { f(); callback.call(this); } : f;
+        }
+        path.constructor == Element && (params.along = path);
+        return this.animate(params, ms, callback);
+    };
     Element[proto].onAnimation = function (f) {
-        this._run = f || null;
+        this._run = f || 0;
         return this;
     };
     Element[proto].animate = function (params, ms, easing, callback) {
@@ -2863,6 +2892,17 @@ window.Raphael = (function () {
                 (from[attr] == null) && (from[attr] = availableAttrs[attr]);
                 to[attr] = params[attr];
                 switch (availableAnimAttrs[attr]) {
+                    case "along":
+                        var point = params[attr].getPointAtLength(0),
+                            bb = this.getBBox();
+                        diff[attr] = params[attr].getTotalLength() / ms;
+                        diff.tx = bb.x;
+                        diff.ty = bb.y;
+                        diff.sx = point.x;
+                        diff.sy = point.y;
+                        to.rot = params.rot;
+                        params.rot && (diff.r = toFloat(this.rotate()));
+                        break;
                     case "number":
                         diff[attr] = (to[attr] - from[attr]) / ms;
                         break;
