@@ -2617,7 +2617,7 @@ window.Raphael = (function () {
             if (this.type != "path") {
                 return -1;
             }
-            var path = path2curve(this.attrs.path), x, y, p, l, sp = "", subpaths = {},
+            var path = path2curve(this.attrs.path), x, y, p, l, sp = "", subpaths = {}, point,
                 len = 0;
             for (var i = 0, ii = path.length; i < ii; i++) {
                 p = path[i];
@@ -2628,7 +2628,7 @@ window.Raphael = (function () {
                     l = segmentLength(x, y, p[1], p[2], p[3], p[4], p[5], p[6]);
                     if (len + l > length) {
                         if (subpath && !subpaths.start) {
-                            var point = R.findDotsAtSegment(x, y, p[1], p[2], p[3], p[4], p[5], p[6], (length - len) / l);
+                            point = R.findDotsAtSegment(x, y, p[1], p[2], p[3], p[4], p[5], p[6], (length - len) / l);
                             sp += ["C", point.start.x, point.start.y, point.m.x, point.m.y, point.x, point.y];
                             subpaths.start = sp;
                             sp = ["M", point.x, point.y, "C", point.n.x, point.n.y, point.end.x, point.end.y, p[5], p[6]][join]();
@@ -2638,7 +2638,8 @@ window.Raphael = (function () {
                             continue;
                         }
                         if (!istotal && !subpath) {
-                            return R.findDotsAtSegment(x, y, p[1], p[2], p[3], p[4], p[5], p[6], (length - len) / l);
+                            point = R.findDotsAtSegment(x, y, p[1], p[2], p[3], p[4], p[5], p[6], (length - len) / l);
+                            return {x: point.x, y: point.y, alpha: point.alpha};
                         }
                     }
                     len += l;
@@ -2648,7 +2649,9 @@ window.Raphael = (function () {
                 sp += p;
             }
             subpaths.end = sp;
-            return istotal ? len : subpath ? subpaths : R.findDotsAtSegment(x, y, p[1], p[2], p[3], p[4], p[5], p[6], 1);
+            point = istotal ? len : subpath ? subpaths : R.findDotsAtSegment(x, y, p[1], p[2], p[3], p[4], p[5], p[6], 1);
+            point.alpha && (point = {x: point.x, y: point.y, alpha: point.alpha});
+            return point;
         };
     },
     segmentLength = cacher(function (p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y) {
@@ -2663,7 +2666,7 @@ window.Raphael = (function () {
     });
     Element[proto].getTotalLength = getLengthFactory(1);
     Element[proto].getPointAtLength = getLengthFactory();
-    Element[proto].getSubpathToLength = getLengthFactory(0, 1);
+    Element[proto].getSubpathsAtLength = getLengthFactory(0, 1);
 
     // animation easing formulas
     R.easing_formulas = {
@@ -2753,6 +2756,7 @@ window.Raphael = (function () {
                         switch (availableAnimAttrs[attr]) {
                             case "along":
                                 now = pos * ms * diff[attr];
+                                to.back && (now = to.len - now);
                                 var point = to[attr].getPointAtLength(now);
                                 that.translate(diff.sx - diff.x || 0, diff.sy - diff.y || 0);
                                 diff.x = point.x;
@@ -2813,7 +2817,7 @@ window.Raphael = (function () {
                     that._run && that._run.call(that);
                 } else {
                     if (to.along) {
-                        var point = to.along.getPointAtLength(to.along.getTotalLength());
+                        var point = to.along.getPointAtLength(to.len * !to.back);
                         that.translate(diff.sx - (diff.x || 0) + point.x - diff.sx, diff.sy - (diff.y || 0) + point.y - diff.sy);
                         to.rot && that.rotate(diff.r + point.alpha, point.x, point.y);
                     }
@@ -2862,19 +2866,23 @@ window.Raphael = (function () {
         animationElements[element.id] && (params.start = animationElements[element.id].start);
         return this.animate(params, ms, easing, callback);
     };
-    Element[proto].animateAlong = function (path, ms, rotate, callback) {
-        var params = {};
-        R.is(rotate, "function") ? (callback = rotate) : (params.rot = rotate);
-        if (R.is(path, "string") && path.constructor != Element) {
-            path = r.path(path).attr({stroke: "none"});
-            var f = function () {
-                path.remove();
-            };
-            callback = R.is(callback, "function") ? function () { f(); callback.call(this); } : f;
-        }
-        path.constructor == Element && (params.along = path);
-        return this.animate(params, ms, callback);
-    };
+    Element[proto].animateAlong = along();
+    Element[proto].animateAlongBack = along(1);
+    function along(isBack) {
+        return function (path, ms, rotate, callback) {
+            var params = {back: isBack};
+            R.is(rotate, "function") ? (callback = rotate) : (params.rot = rotate);
+            if (R.is(path, "string") && path.constructor != Element) {
+                path = r.path(path).attr({stroke: "none"});
+                var f = function () {
+                    path.remove();
+                };
+                callback = R.is(callback, "function") ? function () { f(); callback.call(this); } : f;
+            }
+            path.constructor == Element && (params.along = path);
+            return this.animate(params, ms, callback);
+        };
+    }
     Element[proto].onAnimation = function (f) {
         this._run = f || 0;
         return this;
@@ -2893,15 +2901,18 @@ window.Raphael = (function () {
                 to[attr] = params[attr];
                 switch (availableAnimAttrs[attr]) {
                     case "along":
-                        var point = params[attr].getPointAtLength(0),
+                        var len = params[attr].getTotalLength(),
+                            point = params[attr].getPointAtLength(len * !!params.back),
                             bb = this.getBBox();
-                        diff[attr] = params[attr].getTotalLength() / ms;
+                        diff[attr] = len / ms;
                         diff.tx = bb.x;
                         diff.ty = bb.y;
                         diff.sx = point.x;
                         diff.sy = point.y;
                         to.rot = params.rot;
-                        params.rot && (diff.r = toFloat(this.rotate()));
+                        to.back = params.back;
+                        to.len = len;
+                        params.rot && (diff.r = toFloat(this.rotate()) || 0);
                         break;
                     case "number":
                         diff[attr] = (to[attr] - from[attr]) / ms;

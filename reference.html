@@ -292,6 +292,49 @@ c.attr({fill: "90-#fff-#000", "stroke-dasharray": "-..", "clip-rect": "10, 10, 1
                         <pre class="javascript code"><code>var c = paper.circle(10, 10, 10);</code>
 <code>c.animate({cx: 20, r: 20}, 2000);</code>
 <code>c.animate({cx: 20, r: 20}, 2000, "bounce");</code></pre>
+                        <h3 id="animateWith">
+                            animateWith
+                        </h3>
+                        <p>
+                            The same as <a href="#animate"><code>animate</code></a> method, but synchronise animation with another element.
+                        </p>
+                        <h4>Parameters</h4>
+                        <p>The same as for <a href="#animate"><code>animate</code></a> method, but first argument is an element.</p>
+                        <h4>Usage</h4>
+                        <pre class="javascript code"><code>var c = paper.circle(10, 10, 10),
+    r = paper.rect(10, 10, 10, 10);
+c.animate({cx: 20, r: 20}, 2000);
+r.animateWith(c, {x: 20}, 2000);</code></pre>
+                        <h3 id="animateAlong">
+                            animateAlong
+                        </h3>
+                        <p>
+                            Animates element along the given path. As an option it could rotate element along the path.
+                        </p>
+                        <h4>Parameters</h4>
+                        <ol>
+                            <li>path <em>object</em> or <em>string</em> path element or path string along which the element will be animated</li>
+                            <li>ms <em>number</em> The duration of the animation, given in milliseconds.</li>
+                            <li>rotate <em>boolean</em> [optional] if true, element will be rotated along the path</li>
+                            <li>callback <em>function</em> [optional]</li>
+                        </ol>
+                        <h4>Usage</h4>
+                        <pre class="javascript code"><code>var p = r.path("M100,100c0,50 100-50 100,0c0,50 -100-50 -100,0z").attr({stroke: "#ddd"}),
+    e = r.ellipse(104, 100, 4, 4).attr({stroke: "none", fill: "#f00"}),
+    b = r.rect(0, 0, 620, 400).attr({stroke: "none", fill: "#000", opacity: 0}).click(function () {
+        e.attr({rx: 5, ry: 3}).animateAlong(p, 4000, true, function () {
+            e.attr({rx: 4, ry: 4});
+        });
+    });</code></pre>
+                        <h3 id="toFront">
+                            toFront
+                        </h3>
+                        <p>
+                            Moves the element so it is the closest to the viewer’s eyes, on top of other elements.
+                        </p>
+                        <h4>Usage</h4>
+                        <pre class="javascript code"><code>var c = paper.circle(10, 10, 10);</code>
+<code>c.toFront();</code></pre>
                         <h3 id="getBBox">
                             getBBox
                         </h3>
@@ -364,6 +407,35 @@ var c = r.clone();</code></pre>
     hsb.h = 1;
     this.attr({fill: this.paper.raphael.hsb2rgb(hsb).hex});
 }</code></pre>
+                        <h3 id="getTotalLength">
+                            getTotalLength
+                        </h3>
+                        <p>
+                            Path specific method. Returns length of the path in pixels.
+                        </p>
+                        <h4>Usage</h4>
+                        <pre class="javascript code"><code>var p = r.path("M100,100c0,50 100-50 100,0c0,50 -100-50 -100,0z");
+    alert(p.getTotalLength());</code></pre>
+                        <h3 id="getPointAtLength">
+                            getPointAtLength
+                        </h3>
+                        <p>
+                            Path specific method. Returns point description at given length.
+                        </p>
+                        <h4>Parameters</h4>
+                        <ol>
+                            <li>length <em>number</em> length in pixels from the beginining of the path to the point</li>
+                        </ol>
+                        <h4>Usage</h4>
+                        <pre class="javascript code"><code>var p = r.path("M100,100c0,50 100-50 100,0c0,50 -100-50 -100,0z");
+    var point = p.getPointAtLength(30);
+    r.circle(point.x, point.y, 3);</code></pre>
+                        <p>Returned object format:</p>
+                        <ul>
+                            <li>x – x coordinate of the point</li>
+                            <li>y – y coordinate of the point</li>
+                            <li>alpha – angle of the path at the point</li>
+                        </ul>
                         <h3 id="setSize">
                             setSize
                         </h3>
@@ -686,6 +758,12 @@ paper.circle(100, 100, 20).red();
                                 <a href="#animate"><code>animate</code></a>
                             </li>
                             <li>
+                                <a href="#animateWith"><code>animateWith</code></a>
+                            </li>
+                            <li>
+                                <a href="#animateAlong"><code>animateAlong</code></a>
+                            </li>
+                            <li>
                                 <a href="#getBBox"><code>getBBox</code></a>
                             </li>
                             <li>
@@ -705,6 +783,15 @@ paper.circle(100, 100, 20).red();
                             </li>
                             <li>
                                 <a href="#raphael"><code>raphael</code></a>
+                            </li>
+                            <li>
+                                <a href="#getTotalLength"><code>getTotalLength</code></a>
+                            </li>
+                            <li>
+                                <a href="#getPointAtLength"><code>getPointAtLength</code></a>
+                            </li>
+                            <li>
+                                <a href="#getSubpathsAtLength"><code>getSubpathsAtLength</code></a>
                             </li>
                             <li>
                                 <a href="#setSize"><code>setSize</code></a>
