@@ -58,7 +58,7 @@ window.Raphael = (function () {
         toFloat = parseFloat,
         toInt = parseInt,
         upperCase = String[proto].toUpperCase,
-        availableAttrs = {"clip-rect": "0 0 10e9 10e9", cursor: "default", cx: 0, cy: 0, fill: "#fff", "fill-opacity": 1, font: '10px "Arial"', "font-family": '"Arial"', "font-size": "10", "font-style": "normal", "font-weight": 400, gradient: 0, height: 0, href: "http://raphaeljs.com/", opacity: 1, path: "M0,0", r: 0, rotation: 0, rx: 0, ry: 0, scale: "1 1", src: "", stroke: "#000", "stroke-dasharray": "", "stroke-linecap": "butt", "stroke-linejoin": "butt", "stroke-miterlimit": 0, "stroke-opacity": 1, "stroke-width": 1, target: "_blank", "text-anchor": "middle", title: "Raphael", translation: "0 0", width: 0, x: 0, y: 0},
+        availableAttrs = {"clip-rect": "0 0 1e9 1e9", cursor: "default", cx: 0, cy: 0, fill: "#fff", "fill-opacity": 1, font: '10px "Arial"', "font-family": '"Arial"', "font-size": "10", "font-style": "normal", "font-weight": 400, gradient: 0, height: 0, href: "http://raphaeljs.com/", opacity: 1, path: "M0,0", r: 0, rotation: 0, rx: 0, ry: 0, scale: "1 1", src: "", stroke: "#000", "stroke-dasharray": "", "stroke-linecap": "butt", "stroke-linejoin": "butt", "stroke-miterlimit": 0, "stroke-opacity": 1, "stroke-width": 1, target: "_blank", "text-anchor": "middle", title: "Raphael", translation: "0 0", width: 0, x: 0, y: 0},
         availableAnimAttrs = {along: "along", "clip-rect": "csv", cx: nu, cy: nu, fill: "colour", "fill-opacity": nu, "font-size": nu, height: nu, opacity: nu, path: "path", r: nu, rotation: "csv", rx: nu, ry: nu, scale: "csv", stroke: "colour", "stroke-opacity": nu, "stroke-width": nu, translation: "csv", width: nu, x: nu, y: nu},
         rp = "replace";
     R.version = "1.3.0dev";
@@ -2354,7 +2354,7 @@ window.Raphael = (function () {
             res.coordsize = "1000 1000";
             res.coordorigin = "0 0";
             res.span = doc.createElement("span");
-            res.span.style.cssText = "position:absolute;left:-9999px;top:-9999px;padding:0;margin:0;line-height:1;display:inline;";
+            res.span.style.cssText = "position:absolute;left:-9999em;top:-9999em;padding:0;margin:0;line-height:1;display:inline;";
             c[appendChild](res.span);
             cs.cssText = R.format("width:{0};height:{1};position:absolute;clip:rect(0 {0} {1} 0);overflow:hidden", width, height);
             if (container == 1) {
@@ -2376,7 +2376,7 @@ window.Raphael = (function () {
         Paper[proto].clear = function () {
             this.canvas.innerHTML = E;
             this.span = doc.createElement("span");
-            this.span.style.cssText = "position:absolute;left:-9999px;top:-9999px;padding:0;margin:0;line-height:1;display:inline;";
+            this.span.style.cssText = "position:absolute;left:-9999em;top:-9999em;padding:0;margin:0;line-height:1;display:inline;";
             this.canvas[appendChild](this.span);
             this.bottom = this.top = null;
         };
@@ -2613,11 +2613,9 @@ window.Raphael = (function () {
         return this.paper[this.type]().attr(attr);
     };
     var getLengthFactory = function (istotal, subpath) {
-        return function (length) {
-            if (this.type != "path") {
-                return -1;
-            }
-            var path = path2curve(this.attrs.path), x, y, p, l, sp = "", subpaths = {}, point,
+        return function (path, length, onlystart) {
+            path = path2curve(path);
+            var x, y, p, l, sp = "", subpaths = {}, point,
                 len = 0;
             for (var i = 0, ii = path.length; i < ii; i++) {
                 p = path[i];
@@ -2630,6 +2628,9 @@ window.Raphael = (function () {
                         if (subpath && !subpaths.start) {
                             point = R.findDotsAtSegment(x, y, p[1], p[2], p[3], p[4], p[5], p[6], (length - len) / l);
                             sp += ["C", point.start.x, point.start.y, point.m.x, point.m.y, point.x, point.y];
+                            if (onlystart) {
+                                return sp;
+                            }
                             subpaths.start = sp;
                             sp = ["M", point.x, point.y, "C", point.n.x, point.n.y, point.end.x, point.end.y, p[5], p[6]][join]();
                             len += l;
@@ -2664,9 +2665,22 @@ window.Raphael = (function () {
         }
         return len;
     });
-    Element[proto].getTotalLength = getLengthFactory(1);
-    Element[proto].getPointAtLength = getLengthFactory();
-    Element[proto].getSubpathsAtLength = getLengthFactory(0, 1);
+    var getTotalLength = getLengthFactory(1),
+        getPointAtLength = getLengthFactory(),
+        getSubpathsAtLength = getLengthFactory(0, 1);
+    Element[proto].getTotalLength = function () {
+        if (this.type != "path") return;
+        return getTotalLength(this.attrs.path);
+    };
+    Element[proto].getPointAtLength = function (length) {
+        if (this.type != "path") return;
+        return getPointAtLength(this.attrs.path, length);
+    };
+    Element[proto].getSubpath = function (from, to) {
+        if (this.type != "path") return;
+        var a = getSubpathsAtLength(this.attrs.path, to, 1);
+        return from ? getSubpathsAtLength(a, from).end : a;
+    };
 
     // animation easing formulas
     R.easing_formulas = {
@@ -2757,7 +2771,7 @@ window.Raphael = (function () {
                             case "along":
                                 now = pos * ms * diff[attr];
                                 to.back && (now = to.len - now);
-                                var point = to[attr].getPointAtLength(now);
+                                var point = getPointAtLength(to[attr], now);
                                 that.translate(diff.sx - diff.x || 0, diff.sy - diff.y || 0);
                                 diff.x = point.x;
                                 diff.y = point.y;
@@ -2817,7 +2831,7 @@ window.Raphael = (function () {
                     that._run && that._run.call(that);
                 } else {
                     if (to.along) {
-                        var point = to.along.getPointAtLength(to.len * !to.back);
+                        var point = getPointAtLength(to.along, to.len * !to.back);
                         that.translate(diff.sx - (diff.x || 0) + point.x - diff.sx, diff.sy - (diff.y || 0) + point.y - diff.sy);
                         to.rot && that.rotate(diff.r + point.alpha, point.x, point.y);
                     }
@@ -2872,14 +2886,8 @@ window.Raphael = (function () {
         return function (path, ms, rotate, callback) {
             var params = {back: isBack};
             R.is(rotate, "function") ? (callback = rotate) : (params.rot = rotate);
-            if (R.is(path, "string") && path.constructor != Element) {
-                path = r.path(path).attr({stroke: "none"});
-                var f = function () {
-                    path.remove();
-                };
-                callback = R.is(callback, "function") ? function () { f(); callback.call(this); } : f;
-            }
-            path.constructor == Element && (params.along = path);
+            path && path.constructor == Element && (path = path.attrs.path);
+            path && (params.along = path);
             return this.animate(params, ms, callback);
         };
     }
