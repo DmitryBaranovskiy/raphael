@@ -1,5 +1,5 @@
 /*!
- * Raphael 1.3.0dev - JavaScript Vector Library
+ * Raphael 1.3.0 - JavaScript Vector Library
  *
  * Copyright (c) 2008 - 2009 Dmitry Baranovskiy (http://raphaeljs.com)
  * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
@@ -61,7 +61,7 @@ window.Raphael = (function () {
         availableAttrs = {"clip-rect": "0 0 1e9 1e9", cursor: "default", cx: 0, cy: 0, fill: "#fff", "fill-opacity": 1, font: '10px "Arial"', "font-family": '"Arial"', "font-size": "10", "font-style": "normal", "font-weight": 400, gradient: 0, height: 0, href: "http://raphaeljs.com/", opacity: 1, path: "M0,0", r: 0, rotation: 0, rx: 0, ry: 0, scale: "1 1", src: "", stroke: "#000", "stroke-dasharray": "", "stroke-linecap": "butt", "stroke-linejoin": "butt", "stroke-miterlimit": 0, "stroke-opacity": 1, "stroke-width": 1, target: "_blank", "text-anchor": "middle", title: "Raphael", translation: "0 0", width: 0, x: 0, y: 0},
         availableAnimAttrs = {along: "along", "clip-rect": "csv", cx: nu, cy: nu, fill: "colour", "fill-opacity": nu, "font-size": nu, height: nu, opacity: nu, path: "path", r: nu, rotation: "csv", rx: nu, ry: nu, scale: "csv", stroke: "colour", "stroke-opacity": nu, "stroke-width": nu, translation: "csv", width: nu, x: nu, y: nu},
         rp = "replace";
-    R.version = "1.3.0dev";
+    R.version = "1.3.0";
     R.type = (win.SVGAngle || doc.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#BasicStructure", "1.1") ? "SVG" : "VML");
     if (R.type == "VML") {
         var d = document.createElement("div");
@@ -1616,10 +1616,10 @@ window.Raphael = (function () {
     // VML
     if (R.vml) {
         var path2vml = function (path) {
-            var total =  /[ahqtv]/ig,
+            var total =  /[ahqstv]/ig,
                 command = pathToAbsolute;
             (path + E).match(total) && (command = path2curve);
-            total =  /[clmz]/g;
+            total = /[clmz]/g;
             if (command == pathToAbsolute && !(path + E).match(total)) {
                 var map = {M: "m", L: "l", C: "c", Z: "x", m: "t", l: "r", c: "v", z: "x"},
                     bites = /([clmz]),?([^clmz]*)/gi,
@@ -2909,8 +2909,8 @@ window.Raphael = (function () {
                 to[attr] = params[attr];
                 switch (availableAnimAttrs[attr]) {
                     case "along":
-                        var len = params[attr].getTotalLength(),
-                            point = params[attr].getPointAtLength(len * !!params.back),
+                        var len = getTotalLength(params[attr]),
+                            point = getPointAtLength(params[attr], len * !!params.back),
                             bb = this.getBBox();
                         diff[attr] = len / ms;
                         diff.tx = bb.x;
