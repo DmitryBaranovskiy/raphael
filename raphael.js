@@ -1,12 +1,12 @@
 /*!
- * Raphael 1.3.0 - JavaScript Vector Library
+ * Raphael 1.3.1 - JavaScript Vector Library
  *
  * Copyright (c) 2008 - 2009 Dmitry Baranovskiy (http://raphaeljs.com)
  * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
  */
  
  
-window.Raphael = (function () {
+Raphael = (function () {
     var separator = /[, ]+/,
         elements = /^(circle|rect|path|ellipse|text|image)$/,
         doc = document,
@@ -61,7 +61,7 @@ window.Raphael = (function () {
         availableAttrs = {"clip-rect": "0 0 1e9 1e9", cursor: "default", cx: 0, cy: 0, fill: "#fff", "fill-opacity": 1, font: '10px "Arial"', "font-family": '"Arial"', "font-size": "10", "font-style": "normal", "font-weight": 400, gradient: 0, height: 0, href: "http://raphaeljs.com/", opacity: 1, path: "M0,0", r: 0, rotation: 0, rx: 0, ry: 0, scale: "1 1", src: "", stroke: "#000", "stroke-dasharray": "", "stroke-linecap": "butt", "stroke-linejoin": "butt", "stroke-miterlimit": 0, "stroke-opacity": 1, "stroke-width": 1, target: "_blank", "text-anchor": "middle", title: "Raphael", translation: "0 0", width: 0, x: 0, y: 0},
         availableAnimAttrs = {along: "along", "clip-rect": "csv", cx: nu, cy: nu, fill: "colour", "fill-opacity": nu, "font-size": nu, height: nu, opacity: nu, path: "path", r: nu, rotation: "csv", rx: nu, ry: nu, scale: "csv", stroke: "colour", "stroke-opacity": nu, "stroke-width": nu, translation: "csv", width: nu, x: nu, y: nu},
         rp = "replace";
-    R.version = "1.3.0";
+    R.version = "1.3.1";
     R.type = (win.SVGAngle || doc.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#BasicStructure", "1.1") ? "SVG" : "VML");
     if (R.type == "VML") {
         var d = document.createElement("div");
@@ -575,6 +575,11 @@ window.Raphael = (function () {
                     y = (y1 - y2) / 2;
                 rx = mmax(rx, math.abs(x));
                 ry = mmax(ry, math.abs(y));
+                var h = (x * x) / (rx * rx) + (y * y) / (ry * ry);
+                if (h > 1){
+                   rx = math.sqrt(h) * rx;
+                   ry = math.sqrt(h) * ry;
+                }
                 var rx2 = rx * rx,
                     ry2 = ry * ry,
                     k = (large_arc_flag == sweep_flag ? -1 : 1) *
@@ -1077,7 +1082,7 @@ window.Raphael = (function () {
                             hl[appendChild](node);
                             pn = hl;
                         }
-                        pn.setAttributeNS(o.Paper[proto].xlink, att, value);
+                        pn.setAttributeNS(o.paper.xlink, att, value);
                         break;
                     case "cursor":
                         node.style.cursor = value;
@@ -2628,11 +2633,9 @@ window.Raphael = (function () {
                         if (subpath && !subpaths.start) {
                             point = R.findDotsAtSegment(x, y, p[1], p[2], p[3], p[4], p[5], p[6], (length - len) / l);
                             sp += ["C", point.start.x, point.start.y, point.m.x, point.m.y, point.x, point.y];
-                            if (onlystart) {
-                                return sp;
-                            }
+                            if (onlystart) return sp;
                             subpaths.start = sp;
-                            sp = ["M", point.x, point.y, "C", point.n.x, point.n.y, point.end.x, point.end.y, p[5], p[6]][join]();
+                            sp = ["M", point.x, point.y + "C", point.n.x, point.n.y, point.end.x, point.end.y, p[5], p[6]][join]();
                             len += l;
                             x = +p[5];
                             y = +p[6];
@@ -2678,6 +2681,9 @@ window.Raphael = (function () {
     };
     Element[proto].getSubpath = function (from, to) {
         if (this.type != "path") return;
+        if (math.abs(this.getTotalLength() - to) < 1e-6) {
+            return getSubpathsAtLength(this.attrs.path, from).end;
+        }
         var a = getSubpathsAtLength(this.attrs.path, to, 1);
         return from ? getSubpathsAtLength(a, from).end : a;
     };
@@ -3198,15 +3204,11 @@ window.Raphael = (function () {
         return token || E;
     };
     R.ninja = function () {
-        var r = win.Raphael, u;
+        var r = Raphael;
         if (oldRaphael.was) {
-            win.Raphael = oldRaphael.is;
+            Raphael = oldRaphael.is;
         } else {
-            try {
-                delete win.Raphael;
-            } catch (e) {
-                win.Raphael = u;
-            }
+            delete Raphael;
         }
         return r;
     };

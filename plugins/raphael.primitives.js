@@ -5,7 +5,7 @@
  * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
  */
 
-Raphael.fn.g.star = function (cx, cy, r, r2, rays) {
+Raphael.fn.star = function (cx, cy, r, r2, rays) {
     r2 = r2 || r * .382;
     rays = rays || 5;
     var points = ["M", cx, cy + r2, "L"],
@@ -39,6 +39,14 @@ Raphael.fn.spike = function (cx, cy, rout, rin, n) {
         points = points.concat([cx + R * Math.sin(i * Math.PI / n - Math.PI), cy + R * Math.cos(i * Math.PI / n - Math.PI)]);
     }
     points.push("z");
+    return this.path(points);
+};
+Raphael.fn.polyline = function () {
+    var points = "M".concat(arguments[0] || 0, ",", arguments[1] || 0, "L");
+    for (var i = 2, ii = arguments.length - 1; i < ii; i++) {
+        points += arguments[i] + "," + arguments[++i];
+    }
+    arguments[ii].toLowerCase() == "z" && (points += "z");
     return this.path(points);
 };
 Raphael.fn.polygon = function (cx, cy, r, n) {
@@ -86,6 +94,6 @@ Raphael.fn.plus = function (cx, cy, r) {
     r = r / 2;
     return this.path("M".concat(cx - r / 2, ",", cy - r / 2, "l", [0, -r, r, 0, 0, r, r, 0, 0, r, -r, 0, 0, r, -r, 0, 0, -r, -r, 0, 0, -r, "z"]));
 };
-Raphael.fn.g.arrow = function (cx, cy, r) {
+Raphael.fn.arrow = function (cx, cy, r) {
     return this.path("M".concat(cx - r * .7, ",", cy - r * .4, "l", [r * .6, 0, 0, -r * .4, r, r * .8, -r, r * .8, 0, -r * .4, -r * .6, 0], "z"));
 };
