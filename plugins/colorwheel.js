@@ -1,19 +1,13 @@
-/*!
- * Color Wheel 0.1.0 - Raphael plugin
- *
- * Copyright (c) 2010 John Weir (http://famedriver.com) & Dmitry Baranovskiy (http://raphaeljs.com)
- * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
- */
 (function (Raphael) {
-    Raphael.colorpicker = function (x, y, size, initcolor, element) {
-        return new ColorPicker(x, y, size, initcolor, element);
+    Raphael.colorwheel = function (x, y, size, initcolor, element) {
+        return new ColorWheel(x, y, size, initcolor, element);
     };
     var pi = Math.PI;
     function angle(x, y) {
         return (x < 0) * 180 + Math.atan(-y / -x) * 180 / pi;
     }
-    var doc = document, win = window,
-        addEvent = (function () {
+    var doc = document, win = window;
+    var addEvent = (function () {
         if (doc.addEventListener) {
             return function (obj, type, fn, element) {
                 var f = function (e) {
@@ -38,201 +32,177 @@
                 return detacher;
             };
         }
-    })(),
-        ColorPicker = function (x, y, size, initcolor, element) {
-            size = size || 200;
-            var w3 = 3 * size / 200,
-                w1 = size / 200,
-                fi = 1.6180339887,
-                segments = pi * size / 4,
-                size20 = size / 20,
-                size2 = size / 2,
-                padding = 2 * size / 200,
-                height = size + size20 * 2 + padding * 3,
-                t = this,
-                H = 1, S = 1, B = 1, s = size - (size20 * 4),
-                r = element ? Raphael(element, size, height) : Raphael(x, y, size, height),
-                xy = s / 6 + size20 * 2 + padding,
-                wh = s * 2 / 3 - padding * 2;
-            w1 < 1 && (w1 = 1);
-            w3 < 1 && (w3 = 1);
+    })();
+    var ColorWheel = function (x, y, size, initcolor, element) {
+        size = size || 200;
+        var w3 = 3 * size / 200,
+            w1 = size / 200,
+            fi = 1.6180339887,
+            segments = pi * size / 5,
+            size20 = size / 20,
+            size2 = size / 2,
+            padding = 2 * size / 200,
+            t = this;
+
+        var H = 1, S = 1, B = 1, s = size - (size20 * 4);
+        var r = element ? Raphael(element, size, size) : Raphael(x, y, size, size),
+            xy = s / 6 + size20 * 2 + padding,
+            wh = s * 2 / 3 - padding * 2;
+        w1 < 1 && (w1 = 1);
+        w3 < 1 && (w3 = 1);
 
 
-            // ring drawing
-            var a = pi / 2 - pi * 2 / segments * 1.3,
-                R = size2 - padding,
-                R2 = size2 - padding - size20 * 2,
-                path = ["M", size2, padding, "A", R, R, 0, 0, 1, R * Math.cos(a) + R + padding, R - R * Math.sin(a) + padding, "L", size2, size2, "z"].join();
-            for (var i = 0; i < segments; i++) {
-                r.path(path).attr({
-                    stroke: "none",
-                    fill: "hsb(" + (segments - i) * (255 / segments) + ", 255, 200)",
-                    rotation: [90 + (360 / segments) * i, size2, size2]
-                });
-            }
-            r.circle(size2, size2, R).attr({
-                fill: "r#fff-#fff",
-                "fill-opacity": 0,
-                "stroke-width": 3,
-                stroke: "#fff"
-            });
-
-            t.cursor = r.set();
-            t.cursor.push(r.circle(size2, size2, size20 / 2).attr({
-                stroke: "#000",
-                opacity: .5,
-                "stroke-width": w3
-            }));
-            t.cursor.push(t.cursor[0].clone().attr({
-                stroke: "#fff",
-                opacity: 1,
-                "stroke-width": w1
-            }));
-            t.disc = r.circle(size2, size2, R).attr({
-                fill: "#000",
-                "fill-opacity": 0,
+        // ring drawing
+        var a = pi / 2 - pi * 2 / segments * 1.3,
+            R = size2 - padding,
+            R2 = size2 - padding - size20 * 2,
+            path = ["M", size2, padding, "A", R, R, 0, 0, 1, R * Math.cos(a) + R + padding, R - R * Math.sin(a) + padding, "L", R2 * Math.cos(a) + R + padding, R - R2 * Math.sin(a) + padding, "A", R2, R2, 0, 0, 0, size2, padding + size20 * 2, "z"].join();
+        for (var i = 0; i < segments; i++) {
+            r.path(path).attr({
                 stroke: "none",
-                cursor: "crosshair"
+                fill: "hsb(" + i * (255 / segments) + ", 255, 200)",
+                rotation: [(360 / segments) * i, size2, size2]
             });
-            var style = t.disc.node.style;
-            style.unselectable = "on";
-            style.MozUserSelect =  "none";
-            style.WebkitUserSelect= "none";
+        }
+        r.path(["M", size2, padding, "A", R, R, 0, 1, 1, size2 - 1, padding, "l1,0", "M", size2, padding + size20 * 2, "A", R2, R2, 0, 1, 1, size2 - 1, padding + size20 * 2, "l1,0"]).attr({
+            "stroke-width": w3,
+            stroke: "#fff"
+        });
+        t.cursorhsb = r.set();
+        var h = size20 * 2 + 2;
+        t.cursorhsb.push(r.rect(size2 - h / fi / 2, padding - 1, h / fi, h, 3 * size / 200).attr({
+            stroke: "#000",
+            opacity: .5,
+            "stroke-width": w3
+        }));
+        t.cursorhsb.push(t.cursorhsb[0].clone().attr({
+            stroke: "#fff",
+            opacity: 1,
+            "stroke-width": w1
+        }));
+        t.ring = r.path(["M", size2, padding, "A", R, R, 0, 1, 1, size2 - 1, padding, "l1,0M", size2, padding + size20 * 2, "A", R2, R2, 0, 1, 1, size2 - 1, padding + size20 * 2, "l1,0"]).attr({
+            fill: "#000",
+            opacity: 0,
+            stroke: "none"
+        });
 
-            // brightness drawing
-            var h = size20 * 2 + 2;
-            t.brect = r.rect(padding + h / fi / 2, size + padding * 2, size - padding * 2 - h / fi, h - padding * 2).attr({
-                stroke: "#fff",
-                fill: "180-#fff-#000"
-            });
-            t.cursorb = r.set();
-            t.cursorb.push(r.rect(size - padding - h / fi, size + padding, ~~(h / fi), h, 3 * size / 200).attr({
-                stroke: "#000",
-                opacity: .5,
-                "stroke-width": w3
-            }));
-            t.cursorb.push(t.cursorb[0].clone().attr({
-                stroke: "#fff",
-                opacity: 1,
-                "stroke-width": w1
-            }));
-            t.btop = t.brect.clone().attr({
-                stroke: "#000",
-                fill: "#000",
-                opacity: 0
-            });
-            style = t.btop.node.style;
-            style.unselectable = "on";
-            style.MozUserSelect =  "none";
-            style.WebkitUserSelect= "none";
+        // rect drawing
+        t.main = r.rect(xy, xy, wh, wh).attr({
+            stroke: "none",
+            fill: "#f00",
+            opacity: 1
+        });
+        t.main.clone().attr({
+            stroke: "none",
+            fill: "0-#fff-#fff",
+            opacity: 0
+        });
+        t.square = r.rect(xy - 1, xy - 1, wh + 2, wh + 2).attr({
+            r: 2,
+            stroke: "#fff",
+            "stroke-width": w3,
+            fill: "90-#000-#000",
+            opacity: 0,
+            cursor: "crosshair"
+        });
+        t.cursor = r.set();
+        t.cursor.push(r.circle(size2, size2, size20 / 2).attr({
+            stroke: "#000",
+            opacity: .5,
+            "stroke-width": w3
+        }));
+        t.cursor.push(t.cursor[0].clone().attr({
+            stroke: "#fff",
+            opacity: 1,
+            "stroke-width": w1
+        }));
+        t.H = t.S = t.B = 1;
+        t.raphael = r;
+        t.size2 = size2;
+        t.wh = wh;
+        t.x = x;
+        t.xy = xy;
+        t.y = y;
+
+        // events
+        t.hsbon = addEvent(t.ring.node, "mousedown", function (e) {
+            this.hsbOnTheMove = true;
+            this.setH(e.clientX - this.x - this.size2, e.clientY - this.y - this.size2);
+            this.docmove = addEvent(doc, "mousemove", this.docOnMove, this);
+            this.docup = addEvent(doc, "mouseup", this.docOnUp, this);
+        }, t);
+        t.clron = addEvent(t.square.node, "mousedown", function (e) {
+            this.clrOnTheMove = true;
+            this.setSB(e.clientX - this.x, e.clientY - this.y);
+            this.docmove = addEvent(doc, "mousemove", this.docOnMove, this);
+            this.docup = addEvent(doc, "mouseup", this.docOnUp, this);
+        }, t);
+        t.winunload = addEvent(win, "unload", function () {
+            this.hsbon();
+            this.clron();
+            this.docmove && this.docmove();
+            this.docup && this.docup();
+            this.winunload();
+        }, t);
         
-            t.minx = padding;
-            t.maxx = size - h / fi - padding;
-
-            t.H = t.S = t.B = 1;
-            t.padding = padding;
-            t.raphael = r;
-            t.size2 = size2;
-            t.size20 = size20;
-            t.x = x;
-            t.y = y;
-
-            // events
-            t.hson = addEvent(t.disc.node, "mousedown", function (e) {
-                var scrollY = doc.documentElement.scrollTop || doc.body.scrollTop,
-                    scrollX = doc.documentElement.scrollLeft || doc.body.scrollLeft;
-                this.hsOnTheMove = true;
-                this.setHS(e.clientX + scrollX - this.x, e.clientY + scrollY - this.y);
-                this.docmove = addEvent(doc, "mousemove", this.docOnMove, this);
-                this.docup = addEvent(doc, "mouseup", this.docOnUp, this);
-            }, t);
-            t.bon = addEvent(t.btop.node, "mousedown", function (e) {
-                var scrollX = doc.documentElement.scrollLeft || doc.body.scrollLeft;
-                this.bOnTheMove = true;
-                this.setB(e.clientX + scrollX - this.x);
-                this.docmove = addEvent(doc, "mousemove", this.docOnMove, this);
-                this.docup = addEvent(doc, "mouseup", this.docOnUp, this);
-            }, t);
-            t.winunload = addEvent(win, "unload", function () {
-                this.hson();
-                this.bon();
-                this.docmove && this.docmove();
-                this.docup && this.docup();
-                this.winunload();
-            }, t);
-
-            t.color(initcolor || "#fff");
-            this.onchanged && this.onchanged(this.color());
-        };
-    ColorPicker.prototype.setB = function (x) {
-        x < this.minx && (x = this.minx);
-        x > this.maxx && (x = this.maxx);
-        this.cursorb.attr({x: x});
-        this.B = (x - this.minx) / (this.maxx - this.minx);
-        this.onchange && this.onchange(this.color());
+        t.color(initcolor || "#f00");
+        this.onchanged && this.onchanged(this.color());
     };
-    ColorPicker.prototype.setHS = function (x, y) {
-        var X = x - this.size2,
-            Y = y - this.size2,
-            R = this.size2 - this.size20 / 2 - this.padding,
-            d = angle(X, Y),
+    ColorWheel.prototype.setH = function (x, y) {
+        var d = angle(x, y),
             rd = d * pi / 180;
-        isNaN(d) && (d = 0);
-        if (X * X + Y * Y > R * R) {
-            x = R * Math.cos(rd) + this.size2;
-            y = R * Math.sin(rd) + this.size2;
-        }
-        this.cursor.attr({cx: x, cy: y});
-        this.H = (1 - d / 360) % 1;
-        this.S = Math.min((X * X + Y * Y) / R / R, 1);
-        this.brect.attr({fill: "180-hsb(" + [this.H, this.S] + ",1)-#000"});
+        this.cursorhsb.rotate(d + 90, this.size2, this.size2);
+        this.H = (d + 90) / 360;
+        this.main.attr({fill: "hsb(" + this.H + ",1,1)"});
         this.onchange && this.onchange(this.color());
     };
-    ColorPicker.prototype.docOnMove = function (e) {
-        var scrollY = doc.documentElement.scrollTop || doc.body.scrollTop,
-            scrollX = doc.documentElement.scrollLeft || doc.body.scrollLeft;
-        if (this.hsOnTheMove) {
-            this.setHS(e.clientX + scrollX - this.x, e.clientY + scrollY - this.y);
+    ColorWheel.prototype.setSB = function (x, y) {
+        x < this.size2 - this.wh / 2 && (x = this.size2 - this.wh / 2);
+        x > this.size2 + this.wh / 2 && (x = this.size2 + this.wh / 2);
+        y < this.size2 - this.wh / 2 && (y = this.size2 - this.wh / 2);
+        y > this.size2 + this.wh / 2 && (y = this.size2 + this.wh / 2);
+        this.cursor.attr({cx: x, cy: y});
+        this.B = 1 - (y - this.xy) / this.wh;
+        this.S = (x - this.xy) / this.wh;
+        this.onchange && this.onchange(this.color());
+    };
+    ColorWheel.prototype.docOnMove = function (e) {
+        if (this.hsbOnTheMove) {
+            this.setH(e.clientX - this.x - this.size2, e.clientY - this.y - this.size2);
         }
-        if (this.bOnTheMove) {
-            this.setB(e.clientX + scrollX - this.x);
+        if (this.clrOnTheMove) {
+            this.setSB(e.clientX - this.x, e.clientY - this.y);
         }
         e.preventDefault && e.preventDefault();
         e.returnValue = false;
         return false;
     };
-    ColorPicker.prototype.docOnUp = function (e) {
-        this.hsOnTheMove = this.bOnTheMove = false;
+    ColorWheel.prototype.docOnUp = function (e) {
+        this.hsbOnTheMove = this.clrOnTheMove = false;
         this.docmove();
         delete this.docmove;
         this.docup();
         delete this.docup;
         this.onchanged && this.onchanged(this.color());
     };
-    ColorPicker.prototype.remove = function () {
+    ColorWheel.prototype.remove = function () {
         this.raphael.remove();
         this.color = function () {
             return false;
         };
     };
-    ColorPicker.prototype.color = function (color) {
+    ColorWheel.prototype.color = function (color) {
         if (color) {
             color = Raphael.getRGB(color);
-            var hex = color.hex;
             color = Raphael.rgb2hsb(color.r, color.g, color.b);
-            d = color.h * 360;
+            var d = color.h * 360;
             this.H = color.h;
             this.S = color.s;
             this.B = color.b;
-
-            this.cursorb.attr({x: this.B * (this.maxx - this.minx) + this.minx});
-            this.brect.attr({fill: "180-hsb(" + [this.H, this.S] + ",1)-#000"});
-
-            var d = (1 - this.H) * 360,
-                rd = d * pi / 180,
-                R = (this.size2 - this.size20 / 2 - this.padding) * this.S,
-                x = Math.cos(rd) * R + this.size2,
-                y = Math.sin(rd) * R + this.size2;
+            this.cursorhsb.rotate(d, this.size2, this.size2);
+            this.main.attr({fill: "hsb(" + this.H + ",1,1)"});
+            var x = this.S * this.wh + this.xy,
+                y = (1 - this.B) * this.wh + this.xy;
             this.cursor.attr({cx: x, cy: y});
             return this;
         } else {
