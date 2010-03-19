@@ -947,7 +947,7 @@ Raphael = (function () {
             if (attr) {
                 for (var key in attr) {
                     if (attr[has](key)) {
-                        el[setAttribute](key, attr[key]);
+                        el[setAttribute](key, attr[key] + E);
                     }
                 }
             } else {
