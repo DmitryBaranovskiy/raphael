@@ -1,5 +1,5 @@
 /*!
- * Raphael 1.4.0 - JavaScript Vector Library
+ * Raphael 1.4.0-pre - JavaScript Vector Library
  *
  * Copyright (c) 2010 Dmitry Baranovskiy (http://raphaeljs.com)
  * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
@@ -2491,12 +2491,13 @@ Raphael = (function () {
         if (doc.addEventListener) {
             return function (obj, type, fn, element) {
                 var f = function (e) {
-                    if (e.touches) {
-                        for (var i = 0, ii = e.touches.length; i < ii; i++) {
-                            if (e.touches[i].target == obj) {
+                    if (e.targetTouches) {
+                        for (var i = 0, ii = e.targetTouches.length; i < ii; i++) {
+                            if (e.targetTouches[i].target == obj) {
                                 var olde = e;
-                                e = e.touches[i];
-                                e.originalEvent = e;
+                                e = e.targetTouches[i];
+                                e.originalEvent = olde;
+                                break;
                             }
                         }
                     }
@@ -2561,12 +2562,13 @@ Raphael = (function () {
             Raphael.mousemove(move).mouseup(up);
         }),
             move = function (e) {
-                if (e.changedTouches) {
-                    for (var i = 0, ii = e.changedTouches.length; i < ii; i++) {
-                        var touch = e.changedTouches[i];
+                if (e.touches) {
+                    for (var i = 0, ii = e.touches.length; i < ii; i++) {
+                        var touch = e.touches[i];
                         if (touch.identifier == el._drag.id) {
                             f.call(el, touch.clientX - el._drag.x, touch.clientY - el._drag.y);
                             e.preventDefault();
+                            break;
                         }
                     }
                 } else {
@@ -2575,18 +2577,11 @@ Raphael = (function () {
                 }
             },
             up = function (e) {
-                if (e.changedTouches) {
-                    for (var i = 0, ii = e.changedTouches.length; i < ii; i++) {
-                        if (e.changedTouches[i].identifier == el._drag.id) {
-                            Raphael.unmousemove(move).unmouseup(up);
-                            end && end.call(el);
-                        }
-                    }
-                } else {
-                    Raphael.unmousemove(move).unmouseup(up);
-                    end && end.call(el);
-                }
+                el._drag = {};
+                Raphael.unmousemove(move).unmouseup(up);
+                end && end.call(el);
             };
+        return this;
     };
     Paper[proto].circle = function (x, y, r) {
         return theCircle(this, x || 0, y || 0, r || 0);
