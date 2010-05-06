@@ -2476,7 +2476,13 @@ Raphael = (function () {
     }
  
     // Events
-    var addEvent = (function () {
+    var preventDefault = function () {
+        this.returnValue = false;
+    },
+    stopPropagation = function () {
+        this.cancelBubble = true;
+    },
+    addEvent = (function () {
         if (doc.addEventListener) {
             return function (obj, type, fn, element) {
                 var f = function (e) {
@@ -2501,7 +2507,10 @@ Raphael = (function () {
         } else if (doc.attachEvent) {
             return function (obj, type, fn, element) {
                 var f = function (e) {
-                    return fn.call(element, e || win.event);
+                    e = e || win.event;
+                    e.preventDefault = e.preventDefault || preventDefault;
+                    e.stopPropagation = e.stopPropagation || stopPropagation;
+                    return fn.call(element, e);
                 };
                 obj.attachEvent("on" + type, f);
                 var detacher = function () {
@@ -2544,6 +2553,7 @@ Raphael = (function () {
     Element[proto].drag = function (onmove, onstart, onend) {
         this._drag = {};
         var el = this.mousedown(function (e) {
+            e.preventDefault();
             this._drag.x = e.clientX;
             this._drag.y = e.clientY;
             this._drag.id = e.identifier;
@@ -2551,21 +2561,24 @@ Raphael = (function () {
             Raphael.mousemove(move).mouseup(up);
         }),
             move = function (e) {
+                var x = e.clientX,
+                    y = e.clientY;
                 if (supportsTouch) {
-                    for (var i = 0, ii = e.touches.length; i < ii; i++) {
-                        var touch = e.touches[i];
+                    var i = e.touches.length,
+                        touch;
+                    while (i--) {
+                        touch = e.touches[i];
                         if (touch.identifier == el._drag.id) {
-                            onmove && onmove.call(el, touch.clientX - el._drag.x, touch.clientY - el._drag.y, touch.clientX, touch.clientY);
+                            x = touch.clientX;
+                            y = touch.clientY;
                             e.preventDefault();
                             break;
                         }
                     }
                 } else {
-                    onmove && onmove.call(el, e.clientX - el._drag.x, e.clientY - el._drag.y, e.clientX, e.clientY);
-                    e.preventDefault && e.preventDefault();
-                    e.returnValue = false;
-                    return false;
+                    e.preventDefault();
                 }
+                onmove && onmove.call(el, x - el._drag.x, y - el._drag.y, x, y);
             },
             up = function () {
                 el._drag = {};
