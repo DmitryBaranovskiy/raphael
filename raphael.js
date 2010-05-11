@@ -1,5 +1,5 @@
 /*!
- * Raphael 1.4.1 - JavaScript Vector Library
+ * Raphael 1.4.2 - JavaScript Vector Library
  *
  * Copyright (c) 2010 Dmitry Baranovskiy (http://raphaeljs.com)
  * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
@@ -19,7 +19,7 @@ Raphael = (function () {
         }
         return create[apply](R, arguments);
     }
-    R.version = "1.4.1";
+    R.version = "1.4.2";
     var separator = /[, ]+/,
         elements = /^(circle|rect|path|ellipse|text|image)$/,
         proto = "prototype",
@@ -38,7 +38,7 @@ Raphael = (function () {
         E = "",
         S = " ",
         split = "split",
-        events = "click dblclick mousedown mousemove mouseout mouseover mouseup"[split](S),
+        events = "click dblclick mousedown mousemove mouseout mouseover mouseup touchstart touchmove touchend orientationchange touchcancel gesturestart gesturechange gestureend"[split](S),
         touchMap = {
             mousedown: "touchstart",
             mousemove: "touchmove",
@@ -2479,19 +2479,27 @@ Raphael = (function () {
     var preventDefault = function () {
         this.returnValue = false;
     },
+    preventTouch = function () {
+        return this.originalEvent.preventDefault();
+    },
     stopPropagation = function () {
         this.cancelBubble = true;
+    },
+    stopTouch = function () {
+        return this.originalEvent.stopPropagation();
     },
     addEvent = (function () {
         if (doc.addEventListener) {
             return function (obj, type, fn, element) {
                 var f = function (e) {
-                    if (supportsTouch) {
+                    if (supportsTouch && touchMap[has](type)) {
                         for (var i = 0, ii = e.targetTouches && e.targetTouches.length; i < ii; i++) {
                             if (e.targetTouches[i].target == obj) {
                                 var olde = e;
                                 e = e.targetTouches[i];
                                 e.originalEvent = olde;
+                                e.preventDefault = preventTouch;
+                                e.stopPropagation = stopTouch;
                                 break;
                             }
                         }
@@ -2756,6 +2764,9 @@ Raphael = (function () {
         return this;
     };
     Element[proto].clone = function () {
+        if (this.removed) {
+            return null;
+        }
         var attr = this.attr();
         delete attr.scale;
         delete attr.translation;
@@ -3001,7 +3012,7 @@ Raphael = (function () {
                         to.rot && that.rotate(diff.r + point.alpha, point.x, point.y);
                     }
                     (t.x || t.y) && that.translate(-t.x, -t.y);
-                    to.scale && (to.scale = to.scale + E);
+                    to.scale && (to.scale += E);
                     that.attr(to);
                     delete animationElements[l];
                     animationElements[length]--;
@@ -3227,14 +3238,16 @@ Raphael = (function () {
         (R.is(easing, "function") || !easing) && (callback = easing || null);
         var len = this.items[length],
             i = len,
+            item,
             set = this,
             collector;
         callback && (collector = function () {
             !--len && callback.call(set);
         });
-        this.items[--i].animate(params, ms, easing || collector, collector);
+        easing = R.is(easing, string) ? easing : collector;
+        item = this.items[--i].animate(params, ms, easing, collector);
         while (i--) {
-            this.items[i].animateWith(this.items[len - 1], params, ms, easing || collector, collector);
+            this.items[i].animateWith(item, params, ms, easing, collector);
         }
         return this;
     };
@@ -3366,8 +3379,8 @@ Raphael = (function () {
     };
 
     var formatrg = /\{(\d+)\}/g;
-    R.format = function (token, array) {
-        var args = R.is(array, array) ? [0][concat](array) : arguments;
+    R.format = function (token, params) {
+        var args = R.is(params, array) ? [0][concat](params) : arguments;
         token && R.is(token, string) && args[length] - 1 && (token = token[rp](formatrg, function (str, i) {
             return args[++i] == null ? E : args[i];
         }));
