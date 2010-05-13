@@ -1,5 +1,5 @@
 /*!
- * Raphael 1.4.2 - JavaScript Vector Library
+ * Raphael 1.4.3 - JavaScript Vector Library
  *
  * Copyright (c) 2010 Dmitry Baranovskiy (http://raphaeljs.com)
  * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
@@ -19,7 +19,7 @@ Raphael = (function () {
         }
         return create[apply](R, arguments);
     }
-    R.version = "1.4.2";
+    R.version = "1.4.3";
     var separator = /[, ]+/,
         elements = /^(circle|rect|path|ellipse|text|image)$/,
         proto = "prototype",
@@ -2491,6 +2491,7 @@ Raphael = (function () {
     addEvent = (function () {
         if (doc.addEventListener) {
             return function (obj, type, fn, element) {
+                var realName = supportsTouch && touchMap[type] ? touchMap[type] : type;
                 var f = function (e) {
                     if (supportsTouch && touchMap[has](type)) {
                         for (var i = 0, ii = e.targetTouches && e.targetTouches.length; i < ii; i++) {
@@ -2506,9 +2507,9 @@ Raphael = (function () {
                     }
                     return fn.call(element, e);
                 };
-                obj.addEventListener(type, f, false);
+                obj.addEventListener(realName, f, false);
                 return function () {
-                    obj.removeEventListener(type, f, false);
+                    obj.removeEventListener(realName, f, false);
                     return true;
                 };
             };
@@ -2533,9 +2534,8 @@ Raphael = (function () {
         (function (eventName) {
             R[eventName] = Element[proto][eventName] = function (fn) {
                 if (R.is(fn, "function")) {
-                    var realName = supportsTouch && touchMap[eventName] ? touchMap[eventName] : eventName;
                     this.events = this.events || [];
-                    this.events.push({name: eventName, f: fn, unbind: addEvent(this.shape || this.node || doc, realName, fn, this)});
+                    this.events.push({name: eventName, f: fn, unbind: addEvent(this.shape || this.node || doc, eventName, fn, this)});
                 }
                 return this;
             };
