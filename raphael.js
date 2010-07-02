@@ -37,6 +37,7 @@ Raphael = (function () {
         supportsTouch = "createTouch" in doc,
         E = "",
         S = " ",
+        Str = String,
         split = "split",
         events = "click dblclick mousedown mousemove mouseout mouseover mouseup touchstart touchmove touchend orientationchange touchcancel gesturestart gesturechange gestureend"[split](S),
         touchMap = {
@@ -104,7 +105,7 @@ Raphael = (function () {
             var trim = /^\s+|\s+$/g;
             toHex = cacher(function (color) {
                 var bod;
-                color = (color + E)[rp](trim, E);
+                color = Str(color)[rp](trim, E);
                 try {
                     var docum = new win.ActiveXObject("htmlfile");
                     docum.write("<body>");
@@ -243,7 +244,7 @@ Raphael = (function () {
     }
  
     R.getRGB = cacher(function (colour) {
-        if (!colour || !!((colour = colour + E).indexOf("-") + 1)) {
+        if (!colour || !!((colour = Str(colour)).indexOf("-") + 1)) {
             return {r: -1, g: -1, b: -1, hex: "none", error: 1};
         }
         if (colour == "none") {
@@ -336,7 +337,7 @@ Raphael = (function () {
             data = pathClone(pathString);
         }
         if (!data[length]) {
-            (pathString + E)[rp](pathCommand, function (a, b, c) {
+            Str(pathString)[rp](pathCommand, function (a, b, c) {
                 var params = [],
                     name = lowerCase.call(b);
                 c[rp](pathValues, function (a, b) {
@@ -942,7 +943,7 @@ Raphael = (function () {
             };
         },
         radial_gradient = /^r(?:\(([^,]+?)\s*,\s*([^\)]+?)\))?/;
- 
+    R.pathToRelative = pathToRelative;
     // SVG
     if (R.svg) {
         Paper[proto].svgns = "http://www.w3.org/2000/svg";
@@ -954,7 +955,7 @@ Raphael = (function () {
             if (attr) {
                 for (var key in attr) {
                     if (attr[has](key)) {
-                        el[setAttribute](key, attr[key] + E);
+                        el[setAttribute](key, Str(attr[key]));
                     }
                 }
             } else {
@@ -978,7 +979,7 @@ Raphael = (function () {
             var type = "linear",
                 fx = .5, fy = .5,
                 s = o.style;
-            gradient = (gradient + E)[rp](radial_gradient, function (all, _fx, _fy) {
+            gradient = Str(gradient)[rp](radial_gradient, function (all, _fx, _fy) {
                 type = "radial";
                 if (_fx && _fy) {
                     fx = toFloat(_fx);
@@ -1077,7 +1078,7 @@ Raphael = (function () {
                     }
                 };
             params[has]("rotation") && (rot = params.rotation);
-            var rotxy = (rot + E)[split](separator);
+            var rotxy = Str(rot)[split](separator);
             if (!(rotxy.length - 1)) {
                 rotxy = null;
             } else {
@@ -1115,7 +1116,7 @@ Raphael = (function () {
                             node.style.cursor = value;
                             break;
                         case "clip-rect":
-                            var rect = (value + E)[split](separator);
+                            var rect = Str(value)[split](separator);
                             if (rect[length] == 4) {
                                 o.clip && o.clip.parentNode.parentNode.removeChild(o.clip.parentNode);
                                 var el = $("clipPath"),
@@ -1210,7 +1211,7 @@ Raphael = (function () {
                             addDashes(o, value);
                             break;
                         case "translation":
-                            var xy = (value + E)[split](separator);
+                            var xy = Str(value)[split](separator);
                             xy[0] = +xy[0] || 0;
                             xy[1] = +xy[1] || 0;
                             if (rotxy) {
@@ -1220,11 +1221,11 @@ Raphael = (function () {
                             translate.call(o, xy[0], xy[1]);
                             break;
                         case "scale":
-                            xy = (value + E)[split](separator);
+                            xy = Str(value)[split](separator);
                             o.scale(+xy[0] || 1, +xy[1] || +xy[0] || 1, isNaN(toFloat(xy[2])) ? null : +xy[2], isNaN(toFloat(xy[3])) ? null : +xy[3]);
                             break;
                         case fillString:
-                            var isURL = (value + E).match(ISURL);
+                            var isURL = Str(value).match(ISURL);
                             if (isURL) {
                                 el = $("pattern");
                                 var ig = $("image");
@@ -1261,7 +1262,7 @@ Raphael = (function () {
                                 !R.is(attrs["fill-opacity"], "undefined") &&
                                     R.is(params["fill-opacity"], "undefined") &&
                                     $(node, {"fill-opacity": attrs["fill-opacity"]});
-                            } else if ((({circle: 1, ellipse: 1})[has](o.type) || (value + E).charAt() != "r") && addGradientFill(node, value, o.paper)) {
+                            } else if ((({circle: 1, ellipse: 1})[has](o.type) || Str(value).charAt() != "r") && addGradientFill(node, value, o.paper)) {
                                 attrs.gradient = value;
                                 attrs.fill = "none";
                                 break;
@@ -1273,7 +1274,7 @@ Raphael = (function () {
                             att == "stroke" && clr[has]("o") && $(node, {"stroke-opacity": clr.o / 100});
                             break;
                         case "gradient":
-                            (({circle: 1, ellipse: 1})[has](o.type) || (value + E).charAt() != "r") && addGradientFill(node, value, o.paper);
+                            (({circle: 1, ellipse: 1})[has](o.type) || Str(value).charAt() != "r") && addGradientFill(node, value, o.paper);
                             break;
                         case "opacity":
                         case "fill-opacity":
@@ -1319,7 +1320,7 @@ Raphael = (function () {
                 while (node.firstChild) {
                     node.removeChild(node.firstChild);
                 }
-                var texts = (params.text + E)[split]("\n");
+                var texts = Str(params.text)[split]("\n");
                 for (var i = 0, ii = texts[length]; i < ii; i++) if (texts[i]) {
                     var tspan = $("tspan");
                     i && $(tspan, {dy: fontSize * leading, x: a.x});
@@ -1371,7 +1372,7 @@ Raphael = (function () {
                 return this._.rt.deg;
             }
             var bbox = this.getBBox();
-            deg = (deg + E)[split](separator);
+            deg = Str(deg)[split](separator);
             if (deg[length] - 1) {
                 cx = toFloat(deg[1]);
                 cy = toFloat(deg[2]);
@@ -1684,10 +1685,10 @@ Raphael = (function () {
             path2vml = function (path) {
                 var total =  /[ahqstv]/ig,
                     command = pathToAbsolute;
-                (path + E).match(total) && (command = path2curve);
+                Str(path).match(total) && (command = path2curve);
                 total = /[clmz]/g;
-                if (command == pathToAbsolute && !(path + E).match(total)) {
-                    var res = (path + E)[rp](bites, function (all, command, args) {
+                if (command == pathToAbsolute && !Str(path).match(total)) {
+                    var res = Str(path)[rp](bites, function (all, command, args) {
                         var vals = [],
                             isMove = lowerCase.call(command) == "m",
                             res = map[command];
@@ -1772,7 +1773,7 @@ Raphael = (function () {
                 o.rotate(params.rotation, true);
             }
             if (params.translation) {
-                xy = (params.translation + E)[split](separator);
+                xy = Str(params.translation)[split](separator);
                 translate.call(o, xy[0], xy[1]);
                 if (o._.rt.cx != null) {
                     o._.rt.cx +=+ xy[0];
@@ -1781,11 +1782,11 @@ Raphael = (function () {
                 }
             }
             if (params.scale) {
-                xy = (params.scale + E)[split](separator);
+                xy = Str(params.scale)[split](separator);
                 o.scale(+xy[0] || 1, +xy[1] || +xy[0] || 1, +xy[2] || null, +xy[3] || null);
             }
             if ("clip-rect" in params) {
-                var rect = (params["clip-rect"] + E)[split](separator);
+                var rect = Str(params["clip-rect"])[split](separator);
                 if (rect[length] == 4) {
                     rect[2] = +rect[2] + (+rect[0]);
                     rect[3] = +rect[3] + (+rect[1]);
@@ -1854,7 +1855,7 @@ Raphael = (function () {
                         fill.color = R.getRGB(params.fill).hex;
                         fill.src = E;
                         fill.type = "solid";
-                        if (R.getRGB(params.fill).error && (res.type in {circle: 1, ellipse: 1} || (params.fill + E).charAt() != "r") && addGradientFill(res, params.fill)) {
+                        if (R.getRGB(params.fill).error && (res.type in {circle: 1, ellipse: 1} || Str(params.fill).charAt() != "r") && addGradientFill(res, params.fill)) {
                             a.fill = "none";
                             a.gradient = params.fill;
                         }
@@ -1912,7 +1913,7 @@ Raphael = (function () {
                 a["font-size"] && (s.fontSize = a["font-size"]);
                 a["font-weight"] && (s.fontWeight = a["font-weight"]);
                 a["font-style"] && (s.fontStyle = a["font-style"]);
-                res.node.string && (res.paper.span.innerHTML = (res.node.string + E)[rp](/</g, "&#60;")[rp](/&/g, "&#38;")[rp](/\n/g, "<br>"));
+                res.node.string && (res.paper.span.innerHTML = Str(res.node.string)[rp](/</g, "&#60;")[rp](/&/g, "&#38;")[rp](/\n/g, "<br>"));
                 res.W = a.w = res.paper.span.offsetWidth;
                 res.H = a.h = res.paper.span.offsetHeight;
                 res.X = a.x;
@@ -1941,7 +1942,7 @@ Raphael = (function () {
                 type = "linear",
                 fxfy = ".5 .5";
             o.attrs.gradient = gradient;
-            gradient = (gradient + E)[rp](radial_gradient, function (all, fx, fy) {
+            gradient = Str(gradient)[rp](radial_gradient, function (all, fx, fy) {
                 type = "radial";
                 if (fx && fy) {
                     fx = toFloat(fx);
@@ -2025,7 +2026,7 @@ Raphael = (function () {
                 }
                 return this._.rt.deg;
             }
-            deg = (deg + E)[split](separator);
+            deg = Str(deg)[split](separator);
             if (deg[length] - 1) {
                 cx = toFloat(deg[1]);
                 cy = toFloat(deg[2]);
@@ -2219,7 +2220,7 @@ Raphael = (function () {
                     this.node.string = params.text;
                 }
                 setFillAndStroke(this, params);
-                if (params.gradient && (({circle: 1, ellipse: 1})[has](this.type) || (params.gradient + E).charAt() != "r")) {
+                if (params.gradient && (({circle: 1, ellipse: 1})[has](this.type) || Str(params.gradient).charAt() != "r")) {
                     addGradientFill(this, params.gradient);
                 }
                 (!pathlike[has](this.type) || this._.rt.deg) && this.setBox(this.attrs);
@@ -2368,7 +2369,7 @@ Raphael = (function () {
             path.textpathok = true;
             ol.width = vml.width;
             ol.height = vml.height;
-            o.string = text + E;
+            o.string = Str(text);
             o.on = true;
             el[appendChild](o);
             el[appendChild](path);
@@ -3126,8 +3127,8 @@ Raphael = (function () {
                         }
                         break;
                     case "csv":
-                        var values = (params[attr] + E)[split](separator),
-                            from2 = (from[attr] + E)[split](separator);
+                        var values = Str(params[attr])[split](separator),
+                            from2 = Str(from[attr])[split](separator);
                         switch (attr) {
                             case "translation":
                                 from[attr] = [0, 0];
@@ -3139,11 +3140,11 @@ Raphael = (function () {
                             break;
                             case "scale":
                                 params[attr] = values;
-                                from[attr] = (from[attr] + E)[split](separator);
+                                from[attr] = Str(from[attr])[split](separator);
                                 diff[attr] = [(values[0] - from[attr][0]) / ms, (values[1] - from[attr][1]) / ms, 0, 0];
                             break;
                             case "clip-rect":
-                                from[attr] = (from[attr] + E)[split](separator);
+                                from[attr] = Str(from[attr])[split](separator);
                                 diff[attr] = [];
                                 i = 4;
                                 while (i--) {
@@ -3360,7 +3361,7 @@ Raphael = (function () {
     Paper[proto].print = function (x, y, string, font, size, origin) {
         origin = origin || "middle"; // baseline|middle
         var out = this.set(),
-            letters = (string + E)[split](E),
+            letters = Str(string)[split](E),
             shift = 0,
             path = E,
             scale;
