@@ -1,5 +1,5 @@
 /*!
- * Raphael 1.4.5 - JavaScript Vector Library
+ * Raphael 1.4.6 - JavaScript Vector Library
  *
  * Copyright (c) 2010 Dmitry Baranovskiy (http://raphaeljs.com)
  * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
@@ -19,7 +19,7 @@ Raphael = (function () {
         }
         return create[apply](R, arguments);
     }
-    R.version = "1.4.5";
+    R.version = "1.4.6";
     var separator = /[, ]+/,
         elements = /^(circle|rect|path|ellipse|text|image)$/,
         proto = "prototype",
@@ -2467,10 +2467,10 @@ Raphael = (function () {
     }
  
     // rest
-    // Safari or Chrome (WebKit) rendering bug workaround method
-    if ((/^Apple|^Google/).test(win.navigator.vendor) && (!(win.navigator.userAgent.indexOf("Version/4.0") + 1) || win.navigator.platform.slice(0, 2) == "iP")) {
+    // WebKit rendering bug workaround method
+    if ((navigator.vendor == "Apple Computer, Inc.") && (navigator.userAgent.match(/Version\/(.*?)\s/)[1] < 4 || win.navigator.platform.slice(0, 2) == "iP")) {
         Paper[proto].safari = function () {
-            var rect = this.rect(-99, -99, this.width + 99, this.height + 99);
+            var rect = this.rect(-99, -99, this.width + 99, this.height + 99).attr({stroke: "none"});
             win.setTimeout(function () {rect.remove();});
         };
     } else {
@@ -2848,16 +2848,14 @@ Raphael = (function () {
         };
     },
     segmentLength = cacher(function (p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y) {
-        var a = (p2y - p1y) / (p2x - p1x),
-            b = (c2y - p1y) / (c2x - p1x),
-            c = (c1y - p1y) / (c1x - p1x);
-        if ((Math.abs(b - a) + Math.abs(b - c)) / 2 < .1) {
-            return pow(pow(p1x - p2x, 2) + pow(p1y - p2y, 2), .5);
-        } else {
-            var dot = R.findDotsAtSegment(p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y, .5);
-            return  segmentLength(p1x, p1y, dot.start.x, dot.start.y, dot.m.x, dot.m.y, dot.x, dot.y) + 
-                    segmentLength(dot.x, dot.y, dot.n.x, dot.n.y, dot.end.x, dot.end.y, p2x, p2y);
+        var old = {x: 0, y: 0},
+            len = 0;
+        for (var i = 0; i < 1.01; i+=.01) {
+            var dot = findDotAtSegment(p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y, i);
+            i && (len += pow(pow(old.x - dot.x, 2) + pow(old.y - dot.y, 2), .5));
+            old = dot;
         }
+        return len;
     });
     var getTotalLength = getLengthFactory(1),
         getPointAtLength = getLengthFactory(),
@@ -3112,9 +3110,9 @@ Raphael = (function () {
                 to[attr] = params[attr];
                 switch (availableAnimAttrs[attr]) {
                     case "along":
-                        var len = getTotalLength(params[attr]),
-                            point = getPointAtLength(params[attr], len * !!params.back),
-                            bb = this.getBBox();
+                        var len = getTotalLength(params[attr]);
+                        var point = getPointAtLength(params[attr], len * !!params.back);
+                        var bb = this.getBBox();
                         diff[attr] = len / ms;
                         diff.tx = bb.x;
                         diff.ty = bb.y;
