@@ -1,5 +1,5 @@
 /*!
- * Raphael 1.4.4 - JavaScript Vector Library
+ * Raphael 1.4.5 - JavaScript Vector Library
  *
  * Copyright (c) 2010 Dmitry Baranovskiy (http://raphaeljs.com)
  * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
@@ -19,7 +19,7 @@ Raphael = (function () {
         }
         return create[apply](R, arguments);
     }
-    R.version = "1.4.4";
+    R.version = "1.4.5";
     var separator = /[, ]+/,
         elements = /^(circle|rect|path|ellipse|text|image)$/,
         proto = "prototype",
@@ -74,9 +74,12 @@ Raphael = (function () {
         rp = "replace";
     R.type = (win.SVGAngle || doc.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#BasicStructure", "1.1") ? "SVG" : "VML");
     if (R.type == "VML") {
-        var d = doc.createElement("div");
-        d.innerHTML = '<!--[if vml]><br><br><![endif]-->';
-        if (d.childNodes[length] != 2) {
+        var d = doc.createElement("div"),
+            b;
+        d.innerHTML = '<v:shape adj="1"/>';
+        b = d.firstChild;
+        b.style.behavior = "url(#default#VML)";
+        if (!(b && typeof b.adj == "object")) {
             return R.type = null;
         }
         d = null;
@@ -91,6 +94,7 @@ Raphael = (function () {
         return  (type == "object" && o === Object(o)) ||
                 (type == "undefined" && typeof o == type) ||
                 (type == "null" && o == null) ||
+                (type == "array" && Array.isArray && Array.isArray(o)) ||
                 lowerCase.call(objectToString.call(o).slice(8, -1)) == type;
     };
 
@@ -1163,7 +1167,7 @@ Raphael = (function () {
                             }
                         case "cx":
                             rotxy && (att == "x" || att == "cx") && (rotxy[1] += value - attrs[att]);
-                            node[setAttribute](att, round(value));
+                            node[setAttribute](att, value);
                             o.pattern && updatePosition(o);
                             break;
                         case "height":
@@ -1184,7 +1188,7 @@ Raphael = (function () {
                             }
                         case "cy":
                             rotxy && (att == "y" || att == "cy") && (rotxy[2] += value - attrs[att]);
-                            node[setAttribute](att, round(value));
+                            node[setAttribute](att, value);
                             o.pattern && updatePosition(o);
                             break;
                         case "r":
@@ -1517,7 +1521,7 @@ Raphael = (function () {
             if (this.removed) {
                 return this;
             }
-            var node = element.node;
+            var node = element.node || element[element.length].node;
             if (node.nextSibling) {
                 node.parentNode.insertBefore(this.node, node.nextSibling);
             } else {
@@ -1530,7 +1534,7 @@ Raphael = (function () {
             if (this.removed) {
                 return this;
             }
-            var node = element.node;
+            var node = element.node || element[0].node;
             node.parentNode.insertBefore(this.node, node);
             insertbefore(this, element, this.paper);
             return this;
@@ -1558,8 +1562,6 @@ Raphael = (function () {
             }
         };
         var theCircle = function (svg, x, y, r) {
-            x = round(x);
-            y = round(y);
             var el = $("circle");
             svg.canvas && svg.canvas[appendChild](el);
             var res = new Element(el, svg);
@@ -1569,8 +1571,6 @@ Raphael = (function () {
             return res;
         };
         var theRect = function (svg, x, y, w, h, r) {
-            x = round(x);
-            y = round(y);
             var el = $("rect");
             svg.canvas && svg.canvas[appendChild](el);
             var res = new Element(el, svg);
@@ -1580,8 +1580,6 @@ Raphael = (function () {
             return res;
         };
         var theEllipse = function (svg, x, y, rx, ry) {
-            x = round(x);
-            y = round(y);
             var el = $("ellipse");
             svg.canvas && svg.canvas[appendChild](el);
             var res = new Element(el, svg);
@@ -2270,7 +2268,7 @@ Raphael = (function () {
             if (+size !== 0) {
                 this.attrs.blur = size;
                 s.filter = f + S + ms + ".Blur(pixelradius=" + (+size || 1.5) + ")";
-                s.margin = Raphael.format("-{0}px 0 0 -{0}px", Math.round(+size || 1.5));
+                s.margin = R.format("-{0}px 0 0 -{0}px", round(+size || 1.5));
             } else {
                 s.filter = f;
                 s.margin = 0;
@@ -2533,7 +2531,44 @@ Raphael = (function () {
                 return detacher;
             };
         }
-    })();
+    })(),
+    drag = [],
+    dragMove = function (e) {
+        var x = e.clientX,
+            y = e.clientY,
+            dragi,
+            j = drag.length;
+        while (j--) {
+            dragi = drag[j];
+            if (supportsTouch) {
+                var i = e.touches.length,
+                    touch;
+                while (i--) {
+                    touch = e.touches[i];
+                    if (touch.identifier == dragi.el._drag.id) {
+                        x = touch.clientX;
+                        y = touch.clientY;
+                        (e.originalEvent ? e.originalEvent : e).preventDefault();
+                        break;
+                    }
+                }
+            } else {
+                e.preventDefault();
+            }
+            dragi.move && dragi.move.call(dragi.el, x - dragi.el._drag.x, y - dragi.el._drag.y, x, y);
+        }
+    },
+    dragUp = function () {
+        R.unmousemove(dragMove).unmouseup(dragUp);
+        var i = drag.length,
+            dragi;
+        while (i--) {
+            dragi = drag[i];
+            dragi.el._drag = {};
+            dragi.end && dragi.end.call(dragi.el);
+        }
+        drag = [];
+    };
     for (var i = events[length]; i--;) {
         (function (eventName) {
             R[eventName] = Element[proto][eventName] = function (fn) {
@@ -2564,40 +2599,23 @@ Raphael = (function () {
     };
     Element[proto].drag = function (onmove, onstart, onend) {
         this._drag = {};
-        var el = this.mousedown(function (e) {
-            (e.originalEvent ? e.originalEvent : e).preventDefault();
+        this.mousedown(function (e) {
+            (e.originalEvent || e).preventDefault();
             this._drag.x = e.clientX;
             this._drag.y = e.clientY;
             this._drag.id = e.identifier;
             onstart && onstart.call(this, e.clientX, e.clientY);
-            Raphael.mousemove(move).mouseup(up);
-        }),
-            move = function (e) {
-                var x = e.clientX,
-                    y = e.clientY;
-                if (supportsTouch) {
-                    var i = e.touches.length,
-                        touch;
-                    while (i--) {
-                        touch = e.touches[i];
-                        if (touch.identifier == el._drag.id) {
-                            x = touch.clientX;
-                            y = touch.clientY;
-                            (e.originalEvent ? e.originalEvent : e).preventDefault();
-                            break;
-                        }
-                    }
-                } else {
-                    e.preventDefault();
-                }
-                onmove && onmove.call(el, x - el._drag.x, y - el._drag.y, x, y);
-            },
-            up = function () {
-                el._drag = {};
-                Raphael.unmousemove(move).unmouseup(up);
-                onend && onend.call(el);
-            };
+            !drag.length && R.mousemove(dragMove).mouseup(dragUp);
+            drag.push({el: this, move: onmove, end: onend});
+        });
         return this;
+    };
+    Element[proto].undrag = function (onmove, onstart, onend) {
+        var i = drag.length;
+        while (i--) {
+            drag[i].el == this && (drag[i].move == onmove && drag[i].end == onend) && drag.splice(i, 1);
+            !drag.length && R.unmousemove(dragMove).unmouseup(dragUp);
+        }
     };
     Paper[proto].circle = function (x, y, r) {
         return theCircle(this, x || 0, y || 0, r || 0);
@@ -2779,8 +2797,8 @@ Raphael = (function () {
     var getPointAtSegmentLength = cacher(function (p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y, length) {
         var len = 0,
             old;
-        for (var i = 0; i < 1.001; i+=.001) {
-            var dot = R.findDotsAtSegment(p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y, i);
+        for (var i = 0; i < 1.01; i+=.01) {
+            var dot = findDotAtSegment(p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y, i);
             i && (len += pow(pow(old.x - dot.x, 2) + pow(old.y - dot.y, 2), .5));
             if (len >= length) {
                 return dot;
@@ -2830,14 +2848,16 @@ Raphael = (function () {
         };
     },
     segmentLength = cacher(function (p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y) {
-        var old = {x: 0, y: 0},
-            len = 0;
-        for (var i = 0; i < 1.01; i+=.01) {
-            var dot = findDotAtSegment(p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y, i);
-            i && (len += pow(pow(old.x - dot.x, 2) + pow(old.y - dot.y, 2), .5));
-            old = dot;
+        var a = (p2y - p1y) / (p2x - p1x),
+            b = (c2y - p1y) / (c2x - p1x),
+            c = (c1y - p1y) / (c1x - p1x);
+        if ((Math.abs(b - a) + Math.abs(b - c)) / 2 < .1) {
+            return pow(pow(p1x - p2x, 2) + pow(p1y - p2y, 2), .5);
+        } else {
+            var dot = R.findDotsAtSegment(p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y, .5);
+            return  segmentLength(p1x, p1y, dot.start.x, dot.start.y, dot.m.x, dot.m.y, dot.x, dot.y) + 
+                    segmentLength(dot.x, dot.y, dot.n.x, dot.n.y, dot.end.x, dot.end.y, p2x, p2y);
         }
-        return len;
     });
     var getTotalLength = getLengthFactory(1),
         getPointAtLength = getLengthFactory(),
@@ -2851,6 +2871,9 @@ Raphael = (function () {
     };
     Element[proto].getPointAtLength = function (length) {
         if (this.type != "path") {return;}
+        if (this.node.getPointAtLength) {
+            return this.node.getPointAtLength(length);
+        }
         return getPointAtLength(this.attrs.path, length);
     };
     Element[proto].getSubpath = function (from, to) {

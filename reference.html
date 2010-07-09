@@ -1,6 +1,4 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
-   "http://www.w3.org/TR/html4/strict.dtd">
-<html lang="en">
+<!DOCTYPE html><html lang="en">
     <head>
         <title>Raphaël Reference</title>
         <meta http-equiv="content-language" content="en">
@@ -9,26 +7,17 @@
         <meta name="description" content="Vector Graphics JavaScript Library">
         <meta name="keywords" content="JavaScript Library, Raphael, SVG, VML">
         <meta name="viewport" content="width=450; user-scalable=no">
+        <link rel="apple-touch-icon-precomposed" href="/Raphael.png"/>
         <link rel="shortcut icon" href="/favicon16.png" type="image/x-icon">
-        <link rel="stylesheet" href="raphael.css" type="text/css" charset="utf-8" media="screen,projection">
-        <link rel="stylesheet" type="text/css" media="print" href="print.css">
+        <link rel="stylesheet" href="site.css" type="text/css">
         <link rel="shortcut icon" href="/favicon16.png" type="image/x-icon">
-        <link media="only screen and (max-device-width: 480px)" href="iphone.css" type="text/css" rel="stylesheet">
-        <script src="raphael.js" type="text/javascript" charset="utf-8"></script>
-        <script src="museo.js" type="text/javascript" charset="utf-8"></script>
-
-
     </head>
     <body class="raphael" id="reference">
         <div id="header">
-            <a href="http://twitter.com/statuses/user_timeline/17180567.atom" id="rss" name="rss">rss</a>
-            <h1>
-                Raphaël—JavaScript Library
-            </h1>
+            <h1><span>&nbsp;</span>Raphaël—JavaScript Library</h1>
         </div>
         <div id="content">
-            <div>
-                <div>
+            <div id="top">&nbsp;</div>
                     <div id="column-1">
                         <h2>Main Function</h2>
                         <h3 id="Raphael">
@@ -189,6 +178,15 @@ var set = Raphael(["notepad", 320, 200, {
                         <pre class="javascript code"><code>var c = paper.path("M10 10L90 90");
 // draw a diagonal line:
 // move to 10,10, line to 90,90</code></pre>
+                        <h3 id="clear">
+                            clear
+                        </h3>
+                        <p>
+                            Clears the canvas, i.e. removes all the elements.
+                        </p>
+                        <h4>Usage</h4>
+                        <pre class="javascript code"><code>var c = paper.path("M10 10L90 90");
+paper.clear();</code></pre>
                         <h2 id="Element">
                             Element’s generic methods
                         </h2>
@@ -855,6 +853,9 @@ element.hover(function (event) {
                                 <a href="#path"><code>path</code></a>
                             </li>
                             <li>
+                                <a href="#clear"><code>clear</code></a>
+                            </li>
+                            <li>
                                 <a href="#node"><code>node</code></a>
                             </li>
                             <li>
@@ -972,14 +973,14 @@ element.hover(function (event) {
                             <a href="http://www.opensource.org/licenses/mit-license.php" title="MIT License" rel="license">Some Rights Reserved</a> by <a href="http://dmitry.baranovskiy.com/">Dmitry Baranovskiy</a>
                         </h3>
                         <h3 id="font">
-                            Logo by <a href="http://wasabicube.com/">Wasabicube</a> ·
-                            Work at this project started as 20% time at <a href="http://www.atlassian.com/" title="Atlassian — Software to Track, Test &#38; Collaborate, from Enterprises to Open Source Projects.">Atlassian</a>
+                            Logo by <a href="http://wasabicube.com/">Wasabicube</a>
                         </h3>
                     </div>
-                </div>
-            </div>
         </div>
+        <script src="raphael.js" type="text/javascript" charset="utf-8"></script>
         <script src="syntax.js" type="text/javascript" charset="utf-8"></script>
+        <script src="museo.js" type="text/javascript" charset="utf-8"></script>
+        <script src="site.js" type="text/javascript" charset="utf-8"></script>
         <script type="text/javascript">
         var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
         document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
