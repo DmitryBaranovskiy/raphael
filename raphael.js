@@ -1,5 +1,5 @@
 /*!
- * Raphael 1.4.6 - JavaScript Vector Library
+ * Raphael 1.4.7 - JavaScript Vector Library
  *
  * Copyright (c) 2010 Dmitry Baranovskiy (http://raphaeljs.com)
  * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
@@ -19,7 +19,7 @@ Raphael = (function () {
         }
         return create[apply](R, arguments);
     }
-    R.version = "1.4.6";
+    R.version = "1.4.7";
     var separator = /[, ]+/,
         elements = /^(circle|rect|path|ellipse|text|image)$/,
         proto = "prototype",
@@ -1748,7 +1748,7 @@ Raphael = (function () {
                 xy,
                 newpath = (params.x != a.x || params.y != a.y || params.width != a.width || params.height != a.height || params.r != a.r) && o.type == "rect",
                 res = o;
-            
+
             for (var par in params) if (params[has](par)) {
                 a[par] = params[par];
             }
@@ -2244,6 +2244,9 @@ Raphael = (function () {
             if (this.removed) {
                 return this;
             }
+            if (element.constructor == Set) {
+                element = element[element.length];
+            }
             if (element.Group.nextSibling) {
                 element.Group.parentNode.insertBefore(this.Group, element.Group.nextSibling);
             } else {
@@ -2255,6 +2258,9 @@ Raphael = (function () {
         Element[proto].insertBefore = function (element) {
             if (this.removed) {
                 return this;
+            }
+            if (element.constructor == Set) {
+                element = element[0];
             }
             element.Group.parentNode.insertBefore(this.Group, element.Group);
             insertbefore(this, element, this.paper);
