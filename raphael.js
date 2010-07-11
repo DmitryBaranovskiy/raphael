@@ -62,7 +62,7 @@ Raphael = (function () {
         push = "push",
         rg = /^(?=[\da-f]$)/,
         ISURL = /^url\(['"]?([^\)]+?)['"]?\)$/i,
-        colourRegExp = /^\s*((#[a-f\d]{6})|(#[a-f\d]{3})|rgba?\(\s*([\d\.]+\s*,\s*[\d\.]+\s*,\s*[\d\.]+(?:\s*,\s*[\d\.]+)?)\s*\)|rgba?\(\s*([\d\.]+%\s*,\s*[\d\.]+%\s*,\s*[\d\.]+%(?:\s*,\s*[\d\.]+%))\s*\)|hs[bl]\(\s*([\d\.]+\s*,\s*[\d\.]+\s*,\s*[\d\.]+)\s*\)|hs[bl]\(\s*([\d\.]+%\s*,\s*[\d\.]+%\s*,\s*[\d\.]+%)\s*\))\s*$/i,
+        colourRegExp = /^\s*((#[a-f\d]{6})|(#[a-f\d]{3})|rgba?\(\s*([\d\.]+\s*,\s*[\d\.]+\s*,\s*[\d\.]+(?:\s*,\s*[\d\.]+)?)\s*\)|rgba?\(\s*([\d\.]+%\s*,\s*[\d\.]+%\s*,\s*[\d\.]+%(?:\s*,\s*[\d\.]+%)?)\s*\)|hsb\(\s*([\d\.]+(?:deg|\xb0)?\s*,\s*[\d\.]+\s*,\s*[\d\.]+)\s*\)|hsb\(\s*([\d\.]+(?:deg|\xb0|%)\s*,\s*[\d\.]+%\s*,\s*[\d\.]+%)\s*\)|hsl\(\s*([\d\.]+(?:deg|\xb0)?\s*,\s*[\d\.]+\s*,\s*[\d\.]+)\s*\)|hsl\(\s*([\d\.]+(?:deg|\xb0|%)\s*,\s*[\d\.]+%\s*,\s*[\d\.]+%)\s*\))\s*$/i,
         round = math.round,
         setAttribute = "setAttribute",
         toFloat = parseFloat,
@@ -139,58 +139,81 @@ Raphael = (function () {
             });
         }
         return toHex(color);
-    };
-    var hsbtoString = function () {
+    },
+    hsbtoString = function () {
         return "hsb(" + [this.h, this.s, this.b] + ")";
+    },
+    hsltoString = function () {
+        return "hsl(" + [this.h, this.s, this.l] + ")";
     },
     rgbtoString = function () {
         return this.hex;
     };
-    R.hsb2rgb = cacher(function (hue, saturation, brightness) {
-        if (R.is(hue, "object") && "h" in hue && "s" in hue && "b" in hue) {
-            brightness = hue.b;
-            saturation = hue.s;
-            hue = hue.h;
+    R.hsb2rgb = function (h, s, b) {
+        if (R.is(h, "object") && "h" in h && "s" in h && "b" in h) {
+            b = h.b;
+            s = h.s;
+            h = h.h;
         }
-        var red,
-            green,
-            blue;
-        if (brightness == 0) {
-            return {r: 0, g: 0, b: 0, hex: "#000"};
+        return R.hsl2rgb(h, s, b / 2);
+    };
+    R.hsl2rgb = function (h, s, l) {
+        if (R.is(h, "object") && "h" in h && "s" in h && "l" in h) {
+            l = h.l;
+            s = h.s;
+            h = h.h;
         }
-        if (hue > 1 || saturation > 1 || brightness > 1) {
-            hue /= 255;
-            saturation /= 255;
-            brightness /= 255;
+        var rgb = {},
+            channels = ["r", "g", "b"],
+            t2, t1, t3, r, g, b;
+        if (!s) {
+            rgb = {
+                r: l,
+                g: l,
+                b: l
+            };
+        } else {
+            if (l < .5) {
+                t2 = l * (1 + s);
+            } else {
+                t2 = l + s - l * s;
+            }
+            t1 = 2 * l - t2;
+            for (var i = 0, ii = channels.length; i < ii; i++) {
+                t3 = h + 1 / 3 * -(i - 1);
+                t3 < 0 && t3++;
+                t3 > 1 && t3--;
+                if (t3 * 6 < 1) {
+                    rgb[channels[i]] = t1 + (t2 - t1) * 6 * t3;
+                } else if (t3 * 2 < 1) {
+                    rgb[channels[i]] = t2;
+                } else if (t3 * 3 < 2) {
+                    rgb[channels[i]] = t1 + (t2 - t1) * (2 / 3 - t3) * 6;
+                } else {
+                    rgb[channels[i]] = t1;
+                }
+            }
         }
-        var i = ~~(hue * 6),
-            f = (hue * 6) - i,
-            p = brightness * (1 - saturation),
-            q = brightness * (1 - (saturation * f)),
-            t = brightness * (1 - (saturation * (1 - f)));
-        red = [brightness, q, p, p, t, brightness, brightness][i];
-        green = [t, brightness, brightness, q, p, p, t][i];
-        blue = [p, p, t, brightness, brightness, q, p][i];
-        red *= 255;
-        green *= 255;
-        blue *= 255;
-        var rgb = {r: red, g: green, b: blue, toString: rgbtoString},
-            r = (~~red)[toString](16),
-            g = (~~green)[toString](16),
-            b = (~~blue)[toString](16);
+        rgb.r *= 255;
+        rgb.g *= 255;
+        rgb.b *= 255;
+        r = (~~rgb.r)[toString](16);
+        g = (~~rgb.g)[toString](16);
+        b = (~~rgb.b)[toString](16);
         r = r[rp](rg, "0");
         g = g[rp](rg, "0");
         b = b[rp](rg, "0");
         rgb.hex = "#" + r + g + b;
+        rgb.toString = rgbtoString;
         return rgb;
-    }, R);
-    R.rgb2hsb = cacher(function (red, green, blue) {
-        if (R.is(red, "object") && "r" in red && "g" in red && "b" in red) {
+    };
+    R.rgb2hsb = function (red, green, blue) {
+        if (green == null && R.is(red, "object") && "r" in red && "g" in red && "b" in red) {
             blue = red.b;
             green = red.g;
             red = red.r;
         }
-        if (R.is(red, string)) {
+        if (green == null && R.is(red, string)) {
             var clr = R.getRGB(red);
             red = clr.r;
             green = clr.g;
@@ -207,7 +230,7 @@ Raphael = (function () {
             saturation,
             brightness = max;
         if (min == max) {
-            return {h: 0, s: 0, b: max};
+            return {h: 0, s: 0, b: max, toString: hsbtoString};
         } else {
             var delta = (max - min);
             saturation = delta / max;
@@ -223,7 +246,50 @@ Raphael = (function () {
             hue > 1 && hue--;
         }
         return {h: hue, s: saturation, b: brightness, toString: hsbtoString};
-    }, R);
+    };
+    R.rgb2hsl = function (red, green, blue) {
+        if (green == null && R.is(red, "object") && "r" in red && "g" in red && "b" in red) {
+            blue = red.b;
+            green = red.g;
+            red = red.r;
+        }
+        if (green == null && R.is(red, string)) {
+            var clr = R.getRGB(red);
+            red = clr.r;
+            green = clr.g;
+            blue = clr.b;
+        }
+        if (red > 1 || green > 1 || blue > 1) {
+            red /= 255;
+            green /= 255;
+            blue /= 255;
+        }
+        var max = mmax(red, green, blue),
+            min = mmin(red, green, blue),
+            h,
+            s,
+            l = (max + min) / 2,
+            hsl;
+        if (min == max) {
+            hsl =  {h: 0, s: 0, l: l};
+        } else {
+            var delta = max - min;
+            s = l < .5 ? delta / (max + min) : delta / (2 - max - min);
+            if (red == max) {
+                h = (green - blue) / delta;
+            } else if (green == max) {
+                h = 2 + (blue - red) / delta;
+            } else {
+                h = 4 + (red - green) / delta;
+            }
+            h /= 6;
+            h < 0 && h++;
+            h > 1 && h--;
+            hsl = {h: h, s: s, l: l};
+        }
+        hsl.toString = hsltoString;
+        return hsl;
+    };
     var p2s = /,?([achlmqrstvxz]),?/gi,
         commaSpaces = /\s*,\s*/,
         hsrg = {hs: 1, rg: 1};
@@ -292,6 +358,7 @@ Raphael = (function () {
                 red = toFloat(rgb[0]);
                 green = toFloat(rgb[1]);
                 blue = toFloat(rgb[2]);
+                (rgb[0].slice(-3) == "deg" || rgb[0].slice(-1) == "\xb0") && (red /= 360);
                 return R.hsb2rgb(red, green, blue);
             }
             if (rgb[7]) {
@@ -299,7 +366,24 @@ Raphael = (function () {
                 red = toFloat(rgb[0]) * 2.55;
                 green = toFloat(rgb[1]) * 2.55;
                 blue = toFloat(rgb[2]) * 2.55;
+                (rgb[0].slice(-3) == "deg" || rgb[0].slice(-1) == "\xb0") && (red /= 360 * 2.55);
                 return R.hsb2rgb(red, green, blue);
+            }
+            if (rgb[8]) {
+                rgb = rgb[8][split](commaSpaces);
+                red = toFloat(rgb[0]);
+                green = toFloat(rgb[1]);
+                blue = toFloat(rgb[2]);
+                (rgb[0].slice(-3) == "deg" || rgb[0].slice(-1) == "\xb0") && (red /= 360);
+                return R.hsl2rgb(red, green, blue);
+            }
+            if (rgb[9]) {
+                rgb = rgb[9][split](commaSpaces);
+                red = toFloat(rgb[0]) * 2.55;
+                green = toFloat(rgb[1]) * 2.55;
+                blue = toFloat(rgb[2]) * 2.55;
+                (rgb[0].slice(-3) == "deg" || rgb[0].slice(-1) == "\xb0") && (red /= 360 * 2.55);
+                return R.hsl2rgb(red, green, blue);
             }
             rgb = {r: red, g: green, b: blue};
             var r = (~~red)[toString](16),
