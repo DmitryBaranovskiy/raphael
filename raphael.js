@@ -1360,11 +1360,11 @@ Raphael = (function () {
                                 attrs.fill = "none";
                                 break;
                             }
-                            clr[has]("o") && $(node, {"fill-opacity": clr.o / 100});
+                            clr[has]("o") && $(node, {"fill-opacity": clr.o > 1 ? clr.o / 100 : clr.o});
                         case "stroke":
                             clr = R.getRGB(value);
                             node[setAttribute](att, clr.hex);
-                            att == "stroke" && clr[has]("o") && $(node, {"stroke-opacity": clr.o / 100});
+                            att == "stroke" && clr[has]("o") && $(node, {"stroke-opacity": clr.o > 1 ? clr.o / 100 : clr.o});
                             break;
                         case "gradient":
                             (({circle: 1, ellipse: 1})[has](o.type) || Str(value).charAt() != "r") && addGradientFill(node, value, o.paper);
