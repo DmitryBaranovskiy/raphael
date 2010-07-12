@@ -163,6 +163,11 @@ Raphael = (function () {
             s = h.s;
             h = h.h;
         }
+        if (h > 1 || s > 1 || l > 1) {
+            h /= 255;
+            s /= 255;
+            l /= 255;
+        }
         var rgb = {},
             channels = ["r", "g", "b"],
             t2, t1, t3, r, g, b;
