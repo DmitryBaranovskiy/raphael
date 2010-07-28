@@ -103,10 +103,17 @@ Raphael = (function () {
                 (type == "array" && Array.isArray && Array.isArray(o)) ||
                 objectToString.call(o).slice(8, -1).toLowerCase() == type;
     };
-    R.angle = function (dx, dy, cx, cy) {
-        var x = dx - cx,
-            y = dy - cy;
-        return ((x < 0) * 180 + math.atan(-y / -x) * 180 / math.PI + 360) % 360;
+    R.angle = function (x1, y1, x2, y2, x3, y3) {
+        if (x3 == null) {
+            var x = x1 - x2,
+                y = y1 - y2;
+            if (!x && !y) {
+                return 0;
+            }
+            return ((x < 0) * 180 + math.atan(-y / -x) * 180 / math.PI + 360) % 360;
+        } else {
+            return R.angle(x1, y1, x3, y3) - R.angle(x2, y2, x3, y3);
+        }
     };
     R.snapTo = function (values, value, tolerance) {
         tolerance = tolerance || 10;
@@ -127,20 +134,19 @@ Raphael = (function () {
         if (R.vml) {
             // http://dean.edwards.name/weblog/2009/10/convert-any-colour-value-to-hex-in-msie/
             var trim = /^\s+|\s+$/g;
+            var bod;
+            try {
+                var docum = new win.ActiveXObject("htmlfile");
+                docum.write("<body>");
+                docum.close();
+                bod = docum.body;
+            } catch(e) {
+                bod = win.createPopup().document.body;
+            }
+            var range = bod.createTextRange();
             toHex = cacher(function (color) {
-                var bod;
-                color = Str(color)[rp](trim, E);
                 try {
-                    var docum = new win.ActiveXObject("htmlfile");
-                    docum.write("<body>");
-                    docum.close();
-                    bod = docum.body;
-                } catch(e) {
-                    bod = win.createPopup().document.body;
-                }
-                var range = bod.createTextRange();
-                try {
-                    bod.style.color = color;
+                    bod.style.color = Str(color)[rp](trim, E);
                     var value = range.queryCommandValue("ForeColor");
                     value = ((value & 255) << 16) | (value & 65280) | ((value & 16711680) >>> 16);
                     return "#" + ("000000" + value[toString](16)).slice(-6);
@@ -1637,7 +1643,7 @@ Raphael = (function () {
             if (this.removed) {
                 return this;
             }
-            var node = element.node || element[element.length].node;
+            var node = element.node || element[element.length - 1].node;
             if (node.nextSibling) {
                 node.parentNode.insertBefore(this.node, node.nextSibling);
             } else {
@@ -3094,7 +3100,6 @@ Raphael = (function () {
                     diff = e.diff,
                     to = e.to,
                     t = e.t,
-                    prev = e.prev || 0,
                     that = e.el,
                     callback = e.callback,
                     set = {},
@@ -3184,12 +3189,13 @@ Raphael = (function () {
                     delete animationElements[l];
                     animationElements[length]--;
                     that.in_animation = null;
-                    R.is(callback, "function") && callback.call(that);
+                    R.is(callback, "function") && setTimeout(function () {
+                        callback.call(that);
+                    });
                 }
-                e.prev = time;
             }
             R.svg && that && that.paper && that.paper.safari();
-            animationElements[length] && win.setTimeout(animation);
+            animationElements[length] && setTimeout(animation);
         },
         upto255 = function (color) {
             return mmax(mmin(color, 255), 0);
@@ -3241,6 +3247,10 @@ Raphael = (function () {
     Element[proto].animate = function (params, ms, easing, callback) {
         if (R.is(easing, "function") || !easing) {
             callback = easing || null;
+        }
+        if (this.removed) {
+            callback && callback.call(this);
+            return this;
         }
         var from = {},
             to = {},
@@ -3342,7 +3352,7 @@ Raphael = (function () {
             callback: callback,
             t: {x: 0, y: 0}
         };
-        ++animationElements[length] == 1 && animation();
+        ++animationElements[length] == 1 && setTimeout(animation);
         return this;
     };
     Element[proto].stop = function () {
@@ -3424,7 +3434,7 @@ Raphael = (function () {
         easing = R.is(easing, string) ? easing : collector;
         item = this.items[--i].animate(params, ms, easing, collector);
         while (i--) {
-            this.items[i].animateWith(item, params, ms, easing, collector);
+            this.items[i] && !this.items[i].removed && this.items[i].animateWith(item, params, ms, easing, collector);
         }
         return this;
     };
