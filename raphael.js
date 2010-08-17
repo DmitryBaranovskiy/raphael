@@ -4,8 +4,7 @@
  * Copyright (c) 2010 Dmitry Baranovskiy (http://raphaeljs.com)
  * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
  */
- 
-Raphael = (function () {
+(function () {
     function R() {
         if (R.is(arguments[0], array)) {
             var a = arguments[0],
@@ -68,6 +67,7 @@ Raphael = (function () {
         ISURL = /^url\(['"]?([^\)]+?)['"]?\)$/i,
         colourRegExp = /^\s*((#[a-f\d]{6})|(#[a-f\d]{3})|rgba?\(\s*([\d\.]+\s*,\s*[\d\.]+\s*,\s*[\d\.]+(?:\s*,\s*[\d\.]+)?)\s*\)|rgba?\(\s*([\d\.]+%\s*,\s*[\d\.]+%\s*,\s*[\d\.]+%(?:\s*,\s*[\d\.]+%)?)\s*\)|hsb\(\s*([\d\.]+(?:deg|\xb0)?\s*,\s*[\d\.]+\s*,\s*[\d\.]+)\s*\)|hsb\(\s*([\d\.]+(?:deg|\xb0|%)\s*,\s*[\d\.]+%\s*,\s*[\d\.]+%)\s*\)|hsl\(\s*([\d\.]+(?:deg|\xb0)?\s*,\s*[\d\.]+\s*,\s*[\d\.]+)\s*\)|hsl\(\s*([\d\.]+(?:deg|\xb0|%)\s*,\s*[\d\.]+%\s*,\s*[\d\.]+%)\s*\))\s*$/i,
         isnan = /^(NaN|-?Infinity)$/,
+        bezierrg = /^cubic-bezier\(([^,]+),([^,]+),([^,]+),([^\)]+)\)/,
         round = math.round,
         setAttribute = "setAttribute",
         toFloat = parseFloat,
@@ -149,12 +149,12 @@ Raphael = (function () {
             var trim = /^\s+|\s+$/g;
             var bod;
             try {
-                var docum = new win.ActiveXObject("htmlfile");
+                var docum = new ActiveXObject("htmlfile");
                 docum.write("<body>");
                 docum.close();
                 bod = docum.body;
             } catch(e) {
-                bod = win.createPopup().document.body;
+                bod = createPopup().document.body;
             }
             var range = bod.createTextRange();
             toHex = cacher(function (color) {
@@ -749,8 +749,8 @@ Raphael = (function () {
                         math.sqrt(math.abs((rx2 * ry2 - rx2 * y * y - ry2 * x * x) / (rx2 * y * y + ry2 * x * x))),
                     cx = k * rx * y / ry + (x1 + x2) / 2,
                     cy = k * -ry * x / rx + (y1 + y2) / 2,
-                    f1 = math.asin(((y1 - cy) / ry).toFixed(7)),
-                    f2 = math.asin(((y2 - cy) / ry).toFixed(7));
+                    f1 = math.asin(((y1 - cy) / ry).toFixed(9)),
+                    f2 = math.asin(((y2 - cy) / ry).toFixed(9));
 
                 f1 = x1 < cx ? PI - f1 : f1;
                 f2 = x2 < cx ? PI - f2 : f2;
@@ -1900,7 +1900,7 @@ Raphael = (function () {
             params.cursor && (s.cursor = params.cursor);
             "blur" in params && o.blur(params.blur);
             if (params.path && o.type == "path" || newpath) {
-                    node.path = path2vml(a.path);
+                node.path = path2vml(a.path);
             }
             if (params.rotation != null) {
                 o.rotate(params.rotation, true);
@@ -2946,18 +2946,32 @@ Raphael = (function () {
         delete attr.translation;
         return this.paper[this.type]().attr(attr);
     };
-    var getPointAtSegmentLength = cacher(function (p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y, length) {
+    var curveslengths = {},
+    getPointAtSegmentLength = function (p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y, length) {
         var len = 0,
-            old;
-        for (var i = 0; i < 1.01; i+=.01) {
-            var dot = R.findDotsAtSegment(p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y, i);
+            name = [p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y].join(),
+            cache = curveslengths[name],
+            old, dot;
+        !cache && (curveslengths[name] = cache = {data: []});
+        cache.timer && clearTimeout(cache.timer);
+        cache.timer = setTimeout(function () {delete curveslengths[name];}, 2000);
+        for (var i = 0; i < 101; i++) {
+            if (cache.data[length] > i) {
+                dot = cache.data[i * 100];
+            } else {
+                dot = R.findDotsAtSegment(p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y, i / 100);
+                cache.data[i] = dot;
+            }
             i && (len += pow(pow(old.x - dot.x, 2) + pow(old.y - dot.y, 2), .5));
-            if (len >= length) {
+            if (length != null && len >= length) {
                 return dot;
             }
             old = dot;
         }
-    }),
+        if (length == null) {
+            return len;
+        }
+    },
     getLengthFactory = function (istotal, subpath) {
         return function (path, length, onlystart) {
             path = path2curve(path);
@@ -2969,7 +2983,7 @@ Raphael = (function () {
                     x = +p[1];
                     y = +p[2];
                 } else {
-                    l = segmentLength(x, y, p[1], p[2], p[3], p[4], p[5], p[6]);
+                    l = getPointAtSegmentLength(x, y, p[1], p[2], p[3], p[4], p[5], p[6]);
                     if (len + l > length) {
                         if (subpath && !subpaths.start) {
                             point = getPointAtSegmentLength(x, y, p[1], p[2], p[3], p[4], p[5], p[6], length - len);
@@ -2998,17 +3012,7 @@ Raphael = (function () {
             point.alpha && (point = {x: point.x, y: point.y, alpha: point.alpha});
             return point;
         };
-    },
-    segmentLength = cacher(function (p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y) {
-        var old = {x: 0, y: 0},
-            len = 0;
-        for (var i = 0; i < 1.01; i+=.01) {
-            var dot = findDotAtSegment(p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y, i);
-            i && (len += pow(pow(old.x - dot.x, 2) + pow(old.y - dot.y, 2), .5));
-            old = dot;
-        }
-        return len;
-    });
+    };
     var getTotalLength = getLengthFactory(1),
         getPointAtLength = getLengthFactory(),
         getSubpathsAtLength = getLengthFactory(0, 1);
@@ -3028,7 +3032,7 @@ Raphael = (function () {
     };
     elproto.getSubpath = function (from, to) {
         if (this.type != "path") {return;}
-        if (math.abs(this.getTotalLength() - to) < 1e-6) {
+        if (math.abs(this.getTotalLength() - to) < "1e-6") {
             return getSubpathsAtLength(this.attrs.path, from).end;
         }
         var a = getSubpathsAtLength(this.attrs.path, to, 1);
@@ -3095,14 +3099,12 @@ Raphael = (function () {
         }
     };
 
-    var animationElements = {length : 0},
+    var animationElements = [],
         animation = function () {
             var Now = +new Date;
-            for (var l in animationElements) if (l != "length" && animationElements[has](l)) {
+            for (var l = 0; l < animationElements[length]; l++) {
                 var e = animationElements[l];
                 if (e.stop || e.el.removed) {
-                    delete animationElements[l];
-                    animationElements[length]--;
                     continue;
                 }
                 var time = Now - e.start,
@@ -3116,7 +3118,7 @@ Raphael = (function () {
                     set = {},
                     now;
                 if (time < ms) {
-                    var pos = R.easing_formulas[easing] ? R.easing_formulas[easing](time / ms) : time / ms;
+                    var pos = easing(time / ms);
                     for (var attr in from) if (from[has](attr)) {
                         switch (availableAnimAttrs[attr]) {
                             case "along":
@@ -3197,20 +3199,18 @@ Raphael = (function () {
                     (t.x || t.y) && that.translate(-t.x, -t.y);
                     to.scale && (to.scale += E);
                     that.attr(to);
-                    delete animationElements[l];
-                    animationElements[length]--;
-                    that.in_animation = null;
+                    animationElements.splice(l--, 1);
                 }
             }
             R.svg && that && that.paper && that.paper.safari();
             animationElements[length] && setTimeout(animation);
         },
-        keyframesRun = function (attr, element, time, next, prevcallback) {
-            next = next - time;
-            setTimeout(function () {
+        keyframesRun = function (attr, element, time, prev, prevcallback) {
+            var dif = time - prev;
+            element.timeouts.push(setTimeout(function () {
                 R.is(prevcallback, "function") && prevcallback.call(element);
-                element.animate(attr, next, attr.easing);
-            }, time);
+                element.animate(attr, dif, attr.easing);
+            }, prev));
         },
         upto255 = function (color) {
             return mmax(mmin(color, 255), 0);
@@ -3241,7 +3241,11 @@ Raphael = (function () {
             return this;
         };
     elproto.animateWith = function (element, params, ms, easing, callback) {
-        animationElements[element.id] && (params.start = animationElements[element.id].start);
+        for (var i = 0, ii = animationElements.length; i < ii; i++) {
+            if (animationElements[i].el.id == element.id) {
+                params.start = animationElements[i].start;
+            }
+        }
         return this.animate(params, ms, easing, callback);
     };
     elproto.animateAlong = along();
@@ -3255,12 +3259,65 @@ Raphael = (function () {
             return this.animate(params, ms, callback);
         };
     }
+    function CubicBezierAtTime(t, p1x, p1y, p2x, p2y, duration) {
+        var cx = 3 * p1x,
+            bx = 3 * (p2x - p1x) - cx,
+            ax = 1 - cx - bx,
+            cy = 3 * p1y,
+            by = 3 * (p2y - p1y) - cy,
+            ay = 1 - cy - by;
+        function sampleCurveX(t) {
+            return ((ax * t + bx) * t + cx) * t;
+        }
+        function solve(x, epsilon) {
+            var t = solveCurveX(x, epsilon);
+            return ((ay * t + by) * t + cy) * t;
+        }
+        function solveCurveX(x, epsilon) {
+            var t0, t1, t2, x2, d2, i;
+            for(t2 = x, i = 0; i < 8; i++) {
+                x2 = sampleCurveX(t2) - x;
+                if (math.abs(x2) < epsilon) {
+                    return t2;
+                }
+                d2 = (3 * ax * t2 + 2 * bx) * t2 + cx;
+                if (math.abs(d2) < 1e-6) {
+                    break;
+                }
+                t2 = t2 - x2 / d2;
+            }
+            t0 = 0;
+            t1 = 1;
+            t2 = x;
+            if (t2 < t0) {
+                return t0;
+            }
+            if (t2 > t1) {
+                return t1;
+            }
+            while (t0 < t1) {
+                x2 = sampleCurveX(t2);
+                if (math.abs(x2 - x) < epsilon) {
+                    return t2;
+                }
+                if (x > x2) {
+                    t0 = t2;
+                } else {
+                    t1 = t2;
+                }
+                t2 = (t1 - t0) / 2 + t0;
+            }
+            return t2;
+        }
+        return solve(t, 1 / (200 * duration));
+    }
     elproto.onAnimation = function (f) {
         this._run = f || 0;
         return this;
     };
     elproto.animate = function (params, ms, easing, callback) {
         var element = this;
+        element.timeouts = element.timeouts || [];
         if (R.is(easing, "function") || !easing) {
             callback = easing || null;
         }
@@ -3349,7 +3406,7 @@ Raphael = (function () {
                         values = [].concat(params[attr]);
                         from2 = [].concat(from[attr]);
                         diff[attr] = [];
-                        i = element.paper.customAttributes[attr].length;
+                        i = element.paper.customAttributes[attr][length];
                         while (i--) {
                             diff[attr][i] = ((values[i] || 0) - (from2[i] || 0)) / ms;
                         }
@@ -3358,7 +3415,8 @@ Raphael = (function () {
             }
         }
         if (!animateable) {
-            var attrs = [];
+            var attrs = [],
+                lastcall;
             for (var key in params) if (params[has](key) && animKeyFrames.test(key)) {
                 attr = {value: params[key]};
                 key == "from" && (key = 0);
@@ -3367,32 +3425,56 @@ Raphael = (function () {
                 attrs.push(attr);
             }
             attrs.sort(sortByKey);
-            for (i = 0, ii = attrs.length; i < ii; i++) {
-                keyframesRun(attrs[i].value, element, ms / 100 * attrs[i].key, ms / 100 * (attrs[i + 1] && attrs[i + 1].key || 100), attrs[i - 1] && attrs[i - 1].value.callback);
+            if (attrs[0].key) {
+                attrs.unshift({key: 0, value: element.attrs});
+            }
+            for (i = 0, ii = attrs[length]; i < ii; i++) {
+                keyframesRun(attrs[i].value, element, ms / 100 * attrs[i].key, ms / 100 * (attrs[i - 1] && attrs[i - 1].key || 0), attrs[i - 1] && attrs[i - 1].value.callback);
+            }
+            lastcall = attrs[attrs[length] - 1].value.callback;
+            if (lastcall) {
+                element.timeouts.push(setTimeout(function () {lastcall.call(element);}, ms));
             }
         } else {
-            element.stop();
-            element.in_animation = 1;
-            animationElements[element.id] = {
+            var easyeasy = R.easing_formulas[easing];
+            if (!easyeasy) {
+                easyeasy = Str(easing).match(bezierrg);
+                if (easyeasy && easyeasy[length] == 5) {
+                    var curve = easyeasy;
+                    easyeasy = function (t) {
+                        return CubicBezierAtTime(t, +curve[1], +curve[2], +curve[3], +curve[4], ms);
+                    };
+                } else {
+                    easyeasy = function (t) {
+                        return t;
+                    };
+                }
+            }
+            animationElements.push({
                 start: params.start || +new Date,
                 ms: ms,
-                easing: easing,
+                easing: easyeasy,
                 from: from,
                 diff: diff,
                 to: to,
                 el: element,
                 t: {x: 0, y: 0}
-            };
+            });
             R.is(callback, "function") && (element._ac = setTimeout(function () {
                 callback.call(element);
             }, ms));
-            ++animationElements[length] == 1 && setTimeout(animation);
+            animationElements[length] == 1 && setTimeout(animation);
         }
         return this;
     };
     elproto.stop = function () {
-        animationElements[this.id] && animationElements[length]--;
-        delete animationElements[this.id];
+        for (var i = 0; i < animationElements.length; i++) {
+            animationElements[i].el.id == this.id && animationElements.splice(i--, 1);
+        }
+        for (i = 0, ii = this.timeouts && this.timeouts.length; i < ii; i++) {
+            clearTimeout(this.timeouts[i]);
+        }
+        this.timeouts = [];
         clearTimeout(this._ac);
         delete this._ac;
         return this;
@@ -3611,10 +3693,11 @@ Raphael = (function () {
         return token || E;
     };
     R.ninja = function () {
-        oldRaphael.was ? (Raphael = oldRaphael.is) : delete Raphael;
+        oldRaphael.was ? (win.Raphael = oldRaphael.is) : delete Raphael;
         return R;
     };
     R.el = elproto;
     R.st = Set[proto];
-    return R;
+
+    oldRaphael.was ? (win.Raphael = R) : (Raphael = R);
 })();
