@@ -1,8 +1,9 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
     <head>
         <title>Raphaël Reference</title>
         <meta http-equiv="content-language" content="en">
-        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <meta charset="utf-8">
         <meta name="author" content="Dmitry Baranovskiy">
         <meta name="description" content="Vector Graphics JavaScript Library">
         <meta name="keywords" content="JavaScript Library, Raphael, SVG, VML">
@@ -20,7 +21,7 @@
             <div id="top">&nbsp;</div>
                     <div id="column-1">
                         <h2>Main Function</h2>
-                        <h3 id="Raphael">
+                        <h3 id="RAPHAEL">
                             Raphael
                         </h3>
                         <p>
@@ -392,9 +393,15 @@ c.attr({
                         <ol>
                             <li>newAttrs <em>object</em> A parameters object of the animation results. (Not all attributes can be animated.)</li>
                             <li>ms <em>number</em> The duration of the animation, given in milliseconds.</li>
-                            <li>easing <em>string</em> [“<samp>></samp>”, “<samp>&lt;</samp>”, “<samp>&lt;></samp>”, “<samp>backIn</samp>”, “<samp>backOut</samp>”, “<samp>bounce</samp>”, “<samp>elastic</samp>”] or <em>function</em> [optional]</li>
+                            <li>easing <em>string</em> [“<samp>></samp>”, “<samp>&lt;</samp>”, “<samp>&lt;></samp>”, “<samp>backIn</samp>”, “<samp>backOut</samp>”, “<samp>bounce</samp>”, “<samp>elastic</samp>”, “<samp>cubic-bezier(p1, p2, p3, p4)</samp>”] or <em>function</em> [optional], see <a href="http://www.w3.org/TR/css3-transitions/#transition-timing-function_tag" title="CSS Transitions Module Level 3">explanation re cubic-bezier syntax</a></li>
                             <li>callback <em>function</em> [optional]</li>
                         </ol>
+                        <p>or</p>
+                        <ol>
+                            <li>keyFrames <em>object</em> Key-value map, where key represents keyframe timing: [“from”, “20%”, “to”, “35%”, etc] and value is the same as <code>newAttrs</code> from above, except it could also have <samp>easing</samp> and <samp>callback</samp> properties</li>
+                            <li>ms <em>number</em> The duration of the animation, given in milliseconds.</li>
+                        </ol>
+                        <p>Look at the <a href="bounce.html">example of keyframes usage</a></p>
                         <h4>Attributes that can be animated</h4>
                         <p>The <code>newAttrs</code> parameter accepts an object whose properties are the attributes to animate. However, not all attributes listed in the <code>attr</code> method reference can be animated. The following is a list of those properties that can be animated:</p>
                         <ul>
@@ -425,9 +432,14 @@ c.attr({
                             For easing use built in functions or add your own by adding new functions to <code>Raphael.easing_formulas</code> object. Look at the <a href="easing.html">example of easing usage</a>.
                         </p>
                         <h4>Usage</h4>
-                        <pre class="javascript code"><code>var c = paper.circle(10, 10, 10);</code>
-<code>c.animate({cx: 20, r: 20}, 2000);</code>
-<code>c.animate({cx: 20, r: 20}, 2000, "bounce");</code></pre>
+                        <pre class="javascript code"><code>var c = paper.circle(10, 10, 10);
+c.animate({cx: 20, r: 20}, 2000);
+c.animate({cx: 20, r: 20}, 2000, "bounce");
+c.animate({
+    "20%": {cx: 20, r: 20, easing: ">"},
+    "50%": {cx: 70, r: 120, callback: function () {…}},
+    "100%": {cx: 10, r: 10}
+}, 2000);</code></pre>
                         <h3 id="animateWith">
                             animateWith
                         </h3>
@@ -753,10 +765,13 @@ paper.circle(100, 100, 20).red();
                             <li>#•••••• — full length HTML colour: (“<samp>#000000</samp>”, “<samp>#bd2300</samp>”)</li>
                             <li>rgb(•••, •••, •••) — red, green and blue channels’ values: (“<samp>rgb(200,&nbsp;100,&nbsp;0)</samp>”)</li>
                             <li>rgb(•••%, •••%, •••%) — same as above, but in %: (“<samp>rgb(100%,&nbsp;175%,&nbsp;0%)</samp>”)</li>
+                            <li>rgba(•••, •••, •••, •••) — red, green and blue channels’ values: (“<samp>rgb(200,&nbsp;100,&nbsp;0, .5)</samp>”)</li>
+                            <li>rgba(•••%, •••%, •••%, •••%) — same as above, but in %: (“<samp>rgb(100%,&nbsp;175%,&nbsp;0%, 50%)</samp>”)</li>
                             <li>hsb(•••, •••, •••) — hue, saturation and brightness values: (“<samp>hsb(0.5,&nbsp;0.25,&nbsp;1)</samp>”)</li>
                             <li>hsb(•••%, •••%, •••%) — same as above, but in %</li>
-                            <li>hsl(•••, •••, •••) — same as hsb</li>
-                            <li>hsl(•••%, •••%, •••%) — same as hsb</li>
+                            <li>hsl(•••, •••, •••) — almost the same as hsb, see <a href="http://en.wikipedia.org/wiki/HSL_and_HSV" title="HSL and HSV - Wikipedia, the free encyclopedia">Wikipedia page</a></li>
+                            <li>hsl(•••%, •••%, •••%) — almost the same as hsb</li>
+                            <li>Optionally for hsb and hsl you could specify hue as a degree: “<samp>hsl(240deg,&nbsp;1,&nbsp;.5)</samp>” or, if you want to go fancy, “<samp>hsl(240°,&nbsp;1,&nbsp;.5)</samp>”</li>
                         </ul>
                         <h4>Usage</h4>
                         <pre class="javascript code"><code>paper.circle(100, 100, 20).attr({
@@ -818,6 +833,42 @@ element.hover(function (event) {
 });</code></pre>
                         <p>
                             To unbind events use the same method names with “un” prefix, i.e. <samp>element.unclick(f);</samp>
+                        </p>
+                        <h3 id="drag-n-drop">
+                            Drag ’n’ Drop
+                        </h3>
+                        <p>
+                            To make element “draggable” you need to call method <code>drag</code> on element.
+                        </p>
+                        <h4>Parameters</h4>
+                        <ol>
+                            <li>onmove <em>function</em> event handler for moving</li>
+                            <li>onstart <em>function</em> event handler for start</li>
+                            <li>onend <em>function</em> event handler for end of the drag</li>
+                        </ol>
+                        <h4>Usage</h4>
+                        <pre class="javascript code"><code>var c = R.circle(100, 100, 50).attr({
+    fill: "hsb(.8, 1, 1)",
+    stroke: "none",
+    opacity: .5
+});
+var start = function () {
+    // storing original coordinates
+    this.ox = this.attr("cx");
+    this.oy = this.attr("cy");
+    this.attr({opacity: 1});
+},
+move = function (dx, dy) {
+    // move will be called with dx and dy
+    this.attr({cx: this.ox + dx, cy: this.oy + dy});
+},
+up = function () {
+    // restoring state
+    this.attr({opacity: .5});
+};
+c.drag(move, start, up);</code></pre>
+                        <p>
+                            To unbind drag use the <samp>undrag</samp> method.
                         </p>
                     </div>
                     <div id="column-2">
