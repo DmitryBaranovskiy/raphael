@@ -2829,23 +2829,28 @@
             var bb = this.getBBox(),
                 rcx = bb.x + bb.width / 2,
                 rcy = bb.y + bb.height / 2,
-                kx = x / this._.sx,
-                ky = y / this._.sy;
+                kx = abs(x / this._.sx),
+                ky = abs(y / this._.sy);
             cx = (+cx || cx == 0) ? cx : rcx;
             cy = (+cy || cy == 0) ? cy : rcy;
-            var dirx = ~~(x / abs(x)),
+            var posx = this._.sx > 0,
+                posy = this._.sy > 0,
+                dirx = ~~(x / abs(x)),
                 diry = ~~(y / abs(y)),
+                dkx = kx * dirx,
+                dky = ky * diry,
                 s = this.node.style,
-                ncx = cx + (rcx - cx) * kx,
-                ncy = cy + (rcy - cy) * ky;
+                ncx = cx + abs(rcx - cx) * dkx * (rcx > cx == posx ? 1 : -1),
+                ncy = cy + abs(rcy - cy) * dky * (rcy > cy == posy ? 1 : -1),
+                fr = (x * dirx > y * diry ? ky : kx);
             switch (this.type) {
                 case "rect":
                 case "image":
-                    var neww = a.width * dirx * kx,
-                        newh = a.height * diry * ky;
+                    var neww = a.width * kx,
+                        newh = a.height * ky;
                     this.attr({
                         height: newh,
-                        r: a.r * mmin(dirx * kx, diry * ky),
+                        r: a.r * fr,
                         width: neww,
                         x: ncx - neww / 2,
                         y: ncy - newh / 2
@@ -2854,9 +2859,9 @@
                 case "circle":
                 case "ellipse":
                     this.attr({
-                        rx: a.rx * dirx * kx,
-                        ry: a.ry * diry * ky,
-                        r: a.r * mmin(dirx * kx, diry * ky),
+                        rx: a.rx * kx,
+                        ry: a.ry * ky,
+                        r: a.r * fr,
                         cx: ncx,
                         cy: ncy
                     });
@@ -2869,7 +2874,9 @@
                     break;
                 case "path":
                     var path = pathToRelative(a.path),
-                        skip = true;
+                        skip = true,
+                        fx = posx ? dkx : kx,
+                        fy = posy ? dky : ky;
                     for (var i = 0, ii = path[length]; i < ii; i++) {
                         var p = path[i],
                             P0 = upperCase.call(p[0]);
@@ -2879,22 +2886,22 @@
                             skip = false;
                         }
                         if (P0 == "A") {
-                            p[path[i][length] - 2] *= kx;
-                            p[path[i][length] - 1] *= ky;
-                            p[1] *= dirx * kx;
-                            p[2] *= diry * ky;
-                            p[5] = +!(dirx + diry ? !+p[5] : +p[5]);
+                            p[path[i][length] - 2] *= fx;
+                            p[path[i][length] - 1] *= fy;
+                            p[1] *= kx;
+                            p[2] *= ky;
+                            p[5] = +(dirx + diry ? !+p[4] : !!+p[4]);
                         } else if (P0 == "H") {
                             for (var j = 1, jj = p[length]; j < jj; j++) {
-                                p[j] *= kx;
+                                p[j] *= fx;
                             }
                         } else if (P0 == "V") {
                             for (j = 1, jj = p[length]; j < jj; j++) {
-                                p[j] *= ky;
+                                p[j] *= fy;
                             }
                          } else {
                             for (j = 1, jj = p[length]; j < jj; j++) {
-                                p[j] *= (j % 2) ? kx : ky;
+                                p[j] *= (j % 2) ? fx : fy;
                             }
                         }
                     }
