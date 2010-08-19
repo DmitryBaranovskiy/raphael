@@ -138,6 +138,17 @@
         }
         return value;
     };
+    function createUUID() {
+        // http://www.ietf.org/rfc/rfc4122.txt
+        var s = [],
+            i = 0;
+        for (; i < 32; i++) {
+            s[i] = (~~(math.random() * 16))[toString](16);
+        }
+        s[12] = 4;  // bits 12-15 of the time_hi_and_version field to 0010
+        s[16] = ((s[16] & 3) | 8)[toString](16);  // bits 6-7 of the clock_seq_hi_and_reserved to 01
+        return "r-" + s[join]("");
+    }
 
     R.setWindow = function (newwin) {
         win = newwin;
@@ -1149,7 +1160,7 @@
             id && SVG.defs.removeChild(doc.getElementById(id[1]));
 
             var el = $(type + "Gradient");
-            el.id = "r" + (R._id++)[toString](36);
+            el.id = createUUID();
             $(el, type == "radial" ? {fx: fx, fy: fy} : {x1: vector[0], y1: vector[1], x2: vector[2], y2: vector[3]});
             SVG.defs[appendChild](el);
             for (var i = 0, ii = dots[length]; i < ii; i++) {
@@ -1253,7 +1264,7 @@
                                 o.clip && o.clip.parentNode.parentNode.removeChild(o.clip.parentNode);
                                 var el = $("clipPath"),
                                     rc = $("rect");
-                                el.id = "r" + (R._id++)[toString](36);
+                                el.id = createUUID();
                                 $(rc, {
                                     x: rect[0],
                                     y: rect[1],
@@ -1361,7 +1372,7 @@
                             if (isURL) {
                                 el = $("pattern");
                                 var ig = $("image");
-                                el.id = "r" + (R._id++)[toString](36);
+                                el.id = createUUID();
                                 $(el, {x: 0, y: 0, patternUnits: "userSpaceOnUse", height: 1, width: 1});
                                 $(ig, {x: 0, y: 0});
                                 ig.setAttributeNS(o.paper.xlink, "href", isURL[1]);
@@ -1682,7 +1693,7 @@
                 var fltr = $("filter"),
                     blur = $("feGaussianBlur");
                 t.attrs.blur = size;
-                fltr.id = "r" + (R._id++)[toString](36);
+                fltr.id = createUUID();
                 $(blur, {stdDeviation: +size || 1.5});
                 fltr.appendChild(blur);
                 t.paper.defs.appendChild(fltr);
