@@ -1,5 +1,5 @@
 /*!
- * Raphael 1.5.0 - JavaScript Vector Library
+ * Raphael 1.5.1 - JavaScript Vector Library
  *
  * Copyright (c) 2010 Dmitry Baranovskiy (http://raphaeljs.com)
  * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
@@ -18,7 +18,7 @@
         }
         return create[apply](R, arguments);
     }
-    R.version = "1.5.0";
+    R.version = "1.5.1";
     var separator = /[, ]+/,
         elements = {circle: 1, rect: 1, path: 1, ellipse: 1, text: 1, image: 1},
         formatrg = /\{(\d+)\}/g,
@@ -54,6 +54,7 @@
         math = Math,
         mmax = math.max,
         mmin = math.min,
+        abs = math.abs,
         pow = math.pow,
         nu = "number",
         string = "string",
@@ -132,7 +133,7 @@
         tolerance = tolerance || 10;
         values = [][concat](values);
         var i = values.length;
-        while (i--) if (math.abs(values[i] - value) <= tolerance) {
+        while (i--) if (abs(values[i] - value) <= tolerance) {
             return values[i];
         }
         return value;
@@ -746,7 +747,7 @@
                 var rx2 = rx * rx,
                     ry2 = ry * ry,
                     k = (large_arc_flag == sweep_flag ? -1 : 1) *
-                        math.sqrt(math.abs((rx2 * ry2 - rx2 * y * y - ry2 * x * x) / (rx2 * y * y + ry2 * x * x))),
+                        math.sqrt(abs((rx2 * ry2 - rx2 * y * y - ry2 * x * x) / (rx2 * y * y + ry2 * x * x))),
                     cx = k * rx * y / ry + (x1 + x2) / 2,
                     cy = k * -ry * x / rx + (y1 + y2) / 2,
                     f1 = math.asin(((y1 - cy) / ry).toFixed(9)),
@@ -769,7 +770,7 @@
                 cy = recursive[3];
             }
             var df = f2 - f1;
-            if (math.abs(df) > _120) {
+            if (abs(df) > _120) {
                 var f2old = f2,
                     x2old = x2,
                     y2old = y2;
@@ -819,8 +820,8 @@
                 y = [p1y, p2y],
                 x = [p1x, p2x],
                 dot;
-            math.abs(t1) > "1e12" && (t1 = .5);
-            math.abs(t2) > "1e12" && (t2 = .5);
+            abs(t1) > "1e12" && (t1 = .5);
+            abs(t2) > "1e12" && (t2 = .5);
             if (t1 > 0 && t1 < 1) {
                 dot = findDotAtSegment(p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y, t1);
                 x[push](dot.x);
@@ -836,8 +837,8 @@
             c = p1y - c1y;
             t1 = (-b + math.sqrt(b * b - 4 * a * c)) / 2 / a;
             t2 = (-b - math.sqrt(b * b - 4 * a * c)) / 2 / a;
-            math.abs(t1) > "1e12" && (t1 = .5);
-            math.abs(t2) > "1e12" && (t2 = .5);
+            abs(t1) > "1e12" && (t1 = .5);
+            abs(t2) > "1e12" && (t2 = .5);
             if (t1 > 0 && t1 < 1) {
                 dot = findDotAtSegment(p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y, t1);
                 x[push](dot.x);
@@ -1127,7 +1128,7 @@
                     return null;
                 }
                 var vector = [0, 0, math.cos(angle * math.PI / 180), math.sin(angle * math.PI / 180)],
-                    max = 1 / (mmax(math.abs(vector[2]), math.abs(vector[3])) || 1);
+                    max = 1 / (mmax(abs(vector[2]), abs(vector[3])) || 1);
                 vector[2] *= max;
                 vector[3] *= max;
                 if (vector[2] < 0) {
@@ -2765,9 +2766,9 @@
     elproto.undrag = function (onmove, onstart, onend) {
         var i = drag.length;
         while (i--) {
-            drag[i].el == this && (drag[i].move == onmove && drag[i].end == onend) && drag.splice(i, 1);
-            !drag.length && R.unmousemove(dragMove).unmouseup(dragUp);
+            drag[i].el == this && (drag[i].move == onmove && drag[i].end == onend) && drag.splice(i++, 1);
         }
+        !drag.length && R.unmousemove(dragMove).unmouseup(dragUp);
     };
     paperproto.circle = function (x, y, r) {
         return theCircle(this, x || 0, y || 0, r || 0);
@@ -2832,8 +2833,8 @@
                 ky = y / this._.sy;
             cx = (+cx || cx == 0) ? cx : rcx;
             cy = (+cy || cy == 0) ? cy : rcy;
-            var dirx = ~~(x / math.abs(x)),
-                diry = ~~(y / math.abs(y)),
+            var dirx = ~~(x / abs(x)),
+                diry = ~~(y / abs(y)),
                 s = this.node.style,
                 ncx = cx + (rcx - cx) * kx,
                 ncy = cy + (rcy - cy) * ky;
@@ -2949,17 +2950,22 @@
     var curveslengths = {},
     getPointAtSegmentLength = function (p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y, length) {
         var len = 0,
+            precision = 100,
             name = [p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y].join(),
             cache = curveslengths[name],
             old, dot;
         !cache && (curveslengths[name] = cache = {data: []});
         cache.timer && clearTimeout(cache.timer);
         cache.timer = setTimeout(function () {delete curveslengths[name];}, 2000);
-        for (var i = 0; i < 101; i++) {
+        if (length != null) {
+            var total = getPointAtSegmentLength(p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y);
+            precision = ~~total * 10;
+        }
+        for (var i = 0; i < precision + 1; i++) {
             if (cache.data[length] > i) {
-                dot = cache.data[i * 100];
+                dot = cache.data[i * precision];
             } else {
-                dot = R.findDotsAtSegment(p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y, i / 100);
+                dot = R.findDotsAtSegment(p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y, i / precision);
                 cache.data[i] = dot;
             }
             i && (len += pow(pow(old.x - dot.x, 2) + pow(old.y - dot.y, 2), .5));
@@ -3025,14 +3031,11 @@
     };
     elproto.getPointAtLength = function (length) {
         if (this.type != "path") {return;}
-        if (this.node.getPointAtLength) {
-            return this.node.getPointAtLength(length);
-        }
         return getPointAtLength(this.attrs.path, length);
     };
     elproto.getSubpath = function (from, to) {
         if (this.type != "path") {return;}
-        if (math.abs(this.getTotalLength() - to) < "1e-6") {
+        if (abs(this.getTotalLength() - to) < "1e-6") {
             return getSubpathsAtLength(this.attrs.path, from).end;
         }
         var a = getSubpathsAtLength(this.attrs.path, to, 1);
@@ -3277,11 +3280,11 @@
             var t0, t1, t2, x2, d2, i;
             for(t2 = x, i = 0; i < 8; i++) {
                 x2 = sampleCurveX(t2) - x;
-                if (math.abs(x2) < epsilon) {
+                if (abs(x2) < epsilon) {
                     return t2;
                 }
                 d2 = (3 * ax * t2 + 2 * bx) * t2 + cx;
-                if (math.abs(d2) < 1e-6) {
+                if (abs(d2) < 1e-6) {
                     break;
                 }
                 t2 = t2 - x2 / d2;
@@ -3297,7 +3300,7 @@
             }
             while (t0 < t1) {
                 x2 = sampleCurveX(t2);
-                if (math.abs(x2 - x) < epsilon) {
+                if (abs(x2 - x) < epsilon) {
                     return t2;
                 }
                 if (x > x2) {
