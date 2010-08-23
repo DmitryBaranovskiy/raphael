@@ -67,7 +67,7 @@
         rg = /^(?=[\da-f]$)/,
         ISURL = /^url\(['"]?([^\)]+?)['"]?\)$/i,
         colourRegExp = /^\s*((#[a-f\d]{6})|(#[a-f\d]{3})|rgba?\(\s*([\d\.]+\s*,\s*[\d\.]+\s*,\s*[\d\.]+(?:\s*,\s*[\d\.]+)?)\s*\)|rgba?\(\s*([\d\.]+%\s*,\s*[\d\.]+%\s*,\s*[\d\.]+%(?:\s*,\s*[\d\.]+%)?)\s*\)|hsb\(\s*([\d\.]+(?:deg|\xb0)?\s*,\s*[\d\.]+\s*,\s*[\d\.]+)\s*\)|hsb\(\s*([\d\.]+(?:deg|\xb0|%)\s*,\s*[\d\.]+%\s*,\s*[\d\.]+%)\s*\)|hsl\(\s*([\d\.]+(?:deg|\xb0)?\s*,\s*[\d\.]+\s*,\s*[\d\.]+)\s*\)|hsl\(\s*([\d\.]+(?:deg|\xb0|%)\s*,\s*[\d\.]+%\s*,\s*[\d\.]+%)\s*\))\s*$/i,
-        isnan = /^(NaN|-?Infinity)$/,
+        isnan = {"NaN": 1, "Infinity": 1, "-Infinity": 1},
         bezierrg = /^cubic-bezier\(([^,]+),([^,]+),([^,]+),([^\)]+)\)/,
         round = math.round,
         setAttribute = "setAttribute",
@@ -109,7 +109,7 @@
     R.is = function (o, type) {
         type = lowerCase.call(type);
         if (type == "finite") {
-            return !isnan.test(+o);
+            return !isnan[has](+o);
         }
         return  (type == "null" && o === null) ||
                 (type == typeof o) ||
@@ -130,11 +130,21 @@
         }
     };
     R.snapTo = function (values, value, tolerance) {
-        tolerance = tolerance || 10;
-        values = [][concat](values);
-        var i = values.length;
-        while (i--) if (abs(values[i] - value) <= tolerance) {
-            return values[i];
+        tolerance = R.is(tolerance, "finite") ? tolerance : 10;
+        if (R.is(values, array)) {
+            var i = values.length;
+            while (i--) if (abs(values[i] - value) <= tolerance) {
+                return values[i];
+            }
+        } else {
+            values = +values;
+            var rem = value % values;
+            if (rem < tolerance) {
+                return value - rem;
+            }
+            if (rem > values - tolerance) {
+                return value - rem + values;
+            }
         }
         return value;
     };
