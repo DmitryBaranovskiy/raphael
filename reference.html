@@ -329,6 +329,7 @@ c.scale(.5, .75);</code></pre>
                         <p>Please refer to the <a href="http://www.w3.org/TR/SVG/" title="The W3C Recommendation for the SVG language describes these properties in detail.">SVG specification</a> for an explanation of these parameters.</p>
                         <ul>
                             <li id="attr-clip-rect">clip-rect <em>string</em> comma or space separated values: x, y, width and height</li>
+                            <li id="attr-cursor">cursor <em>string</em> CSS type of the cursor</li>
                             <li id="attr-cx">cx <em>number</em></li>
                             <li id="attr-cy">cy <em>number</em></li>
                             <li id="attr-fill">
@@ -346,6 +347,7 @@ c.scale(.5, .75);</code></pre>
                             <li id="attr-font-size">font-size <em>number</em></li>
                             <li id="attr-font-weight">font-weight <em>string</em></li>
                             <li id="attr-height">height <em>number</em></li>
+                            <li id="attr-href">href <em>string</em> URL, if specified element behaves as hyperlink</li>
                             <li id="attr-opacity">opacity <em>number</em></li>
                             <li id="attr-path">path <em>pathString</em> <a href="http://www.w3.org/TR/SVG/paths.html#PathData" title="Details of a path’s data attribute’s format are described in the SVG specification.">SVG path string format</a></li>
                             <li id="attr-r">r <em>number</em></li>
@@ -361,6 +363,9 @@ c.scale(.5, .75);</code></pre>
                             <li id="attr-stroke-miterlimit">stroke-miterlimit <em>number</em></li>
                             <li id="attr-stroke-opacity">stroke-opacity <em>number</em></li>
                             <li id="attr-stroke-width">stroke-width <em>number</em></li>
+                            <li id="attr-target">target <em>string</em> used with <a href="#attr-href">href</a></li>
+                            <li id="attr-text-anchor">text-anchor <em>string</em> [“<samp>start</samp>”, “<samp>middle</samp>”, “<samp>end</samp>”], default is “middle”</li>
+                            <li id="attr-title">title <em>string</em> will create tooltip with a given text</li>
                             <li id="attr-translation">translation <em>string</em> comma or space separated values: x and y</li>
                             <li id="attr-width">width <em>number</em></li>
                             <li id="attr-x">x <em>number</em></li>
@@ -614,8 +619,8 @@ var c = r.clone();</code></pre>
                         </p>
                         <h4>Parameters</h4>
                         <ol>
-                            <li>from <em>number</em> length in pixels from the beginining of the path to the beginining of the subpath</li>
-                            <li>to <em>number</em> length in pixels from the beginining of the path to the end of the subpath</li>
+                            <li>from <em>number</em> length in pixels from the beginning of the path to the beginning of the subpath</li>
+                            <li>to <em>number</em> length in pixels from the beginning of the path to the end of the subpath</li>
                         </ol>
                         <h4>Usage</h4>
                         <pre class="javascript code"><code>var p = r.path("M10,50c0,50,80-50,80,0c0,50-80-50-80,0z");
@@ -646,14 +651,70 @@ var c = r.clone();</code></pre>
                             getRGB
                         </h3>
                         <p>
-                            Parses passes string and returns an color object. Especially usefull for plug-in developers.
+                            Parses passes string and returns an colour object. Especially useful for plug-in developers.
                         </p>
                         <h4>Parameters</h4>
                         <ol>
-                            <li>color <em>string</em> Color in form acceptable by library</li>
+                            <li>color <em>string</em> Colour in form acceptable by library</li>
                         </ol>
                         <h4>Usage</h4>
-                        <pre class="javascript code"><code>var stroke = Raphael.getRGB(circle.attr("stroke")).hex</code></pre>
+                        <pre class="javascript code"><code>var stroke = Raphael.getRGB(circle.attr("stroke")).hex;</code></pre>
+                        <h3 id="angle">
+                            angle
+                        </h3>
+                        <p>
+                            Gives you an angle of the line formed by two points or angle between two lines formed by three points.
+                        </p>
+                        <h4>Parameters</h4>
+                        <ol>
+                            <li>x1 <em>number</em> X of the first point</li>
+                            <li>y1 <em>number</em> Y of the first point</li>
+                            <li>x2 <em>number</em> X of the second point</li>
+                            <li>y2 <em>number</em> Y of the second point</li>
+                            <li>x3 <em>number</em> X of the third point [optional]</li>
+                            <li>y3 <em>number</em> Y of the third point [optional]</li>
+                        </ol>
+                        <h4>Usage</h4>
+                        <pre class="javascript code"><code>var angle = Raphael.angle(10, 10, 50, 50);</code></pre>
+                        <h3 id="rad">
+                            rad
+                        </h3>
+                        <p>
+                            Converts angle to radians.
+                        </p>
+                        <h4>Parameters</h4>
+                        <ol>
+                            <li>deg <em>number</em> value of an angle in degrees</li>
+                        </ol>
+                        <h4>Usage</h4>
+                        <pre class="javascript code"><code>var Sin = Math.sin(Raphael.rad(45));</code></pre>
+                        <h3 id="deg">
+                            deg
+                        </h3>
+                        <p>
+                            Converts angle to degree.
+                        </p>
+                        <h4>Parameters</h4>
+                        <ol>
+                            <li>rad <em>number</em> value of an angle in radians</li>
+                        </ol>
+                        <h3 id="snapTo">
+                            snapTo
+                        </h3>
+                        <p>
+                            Returns a number adjusted to one of various values, if it’s close enough.
+                        </p>
+                        <h4>Parameters</h4>
+                        <ol>
+                            <li>values <em>number or array</em> If values is a number, the value will be snapped to any multiple. If an array, the value will be snapped to the first element that’s within tolerance.</li>
+                            <li>value <em>number</em> The value to adjust</li>
+                            <li>tolerance <em>number</em> The value must be within tolerance of one of the snap values, or it will be returned unchanged [optional, default 10]</li>
+                        </ol>
+                        <h4>Usage</h4>
+                        <pre class="javascript code"><code>// adjust -10..10 to 0, 40..60 to 50, 90-110 to 100, etc
+x = Raphael.snapTo(50, x);
+// adjust 5..35 to 20, 45..75 to 60, otherwise no change
+x = Raphael.snapTo([20, 60], x, 15);</code></pre>
                         <h3 id="getColor">
                             getColor
                         </h3>
@@ -753,6 +814,32 @@ paper.mystuff.star();
 // then use it
 paper.circle(100, 100, 20).red();
 </code></pre>
+                        <h3 id="custom-attributes">
+                            Custom Attributes
+                        </h3>
+                        <p>
+                            If you have a set of attributes that you would like to represent as a function of some number you can do it easily with custom attributes:
+                        </p>
+                        <h4>Usage</h4>
+                        <pre class="javascript code"><code>paper.customAttributes.hue = function (num) {
+    num = num % 1;
+    return {fill: "hsb(" + num + ", .75, 1)"};
+};
+// Custom attribute “hue” will change fill
+// to be given hue with fixed saturation and brightness.
+// Now you can use it like this:
+var c = paper.circle(10, 10, 10).attr({hue: .45});
+// or even like this:
+c.animate({hue: 1}, 1e3);
+
+// You could also create custom attribute
+// with multiple parameters:
+paper.customAttributes.hsb = function (h, s, b) {
+    return {fill: "hsb(" + [h, s, b].join(",") + ")"};
+};
+c.attr({hsb: ".5 .8 1"});
+c.animate({hsb: "1 0 .5"}, 1e3);
+</code></pre>
                         <h3 id="colour">
                             Supported colour formats
                         </h3>
@@ -765,17 +852,19 @@ paper.circle(100, 100, 20).red();
                             <li>#•••••• — full length HTML colour: (“<samp>#000000</samp>”, “<samp>#bd2300</samp>”)</li>
                             <li>rgb(•••, •••, •••) — red, green and blue channels’ values: (“<samp>rgb(200,&nbsp;100,&nbsp;0)</samp>”)</li>
                             <li>rgb(•••%, •••%, •••%) — same as above, but in %: (“<samp>rgb(100%,&nbsp;175%,&nbsp;0%)</samp>”)</li>
-                            <li>rgba(•••, •••, •••, •••) — red, green and blue channels’ values: (“<samp>rgb(200,&nbsp;100,&nbsp;0, .5)</samp>”)</li>
-                            <li>rgba(•••%, •••%, •••%, •••%) — same as above, but in %: (“<samp>rgb(100%,&nbsp;175%,&nbsp;0%, 50%)</samp>”)</li>
+                            <li>rgba(•••, •••, •••, •••) — red, green and blue channels’ values: (“<samp>rgba(200,&nbsp;100,&nbsp;0, .5)</samp>”)</li>
+                            <li>rgba(•••%, •••%, •••%, •••%) — same as above, but in %: (“<samp>rgba(100%,&nbsp;175%,&nbsp;0%, 50%)</samp>”)</li>
                             <li>hsb(•••, •••, •••) — hue, saturation and brightness values: (“<samp>hsb(0.5,&nbsp;0.25,&nbsp;1)</samp>”)</li>
                             <li>hsb(•••%, •••%, •••%) — same as above, but in %</li>
+                            <li>hsba(•••, •••, •••, •••) — same as above, but with opacity</li>
                             <li>hsl(•••, •••, •••) — almost the same as hsb, see <a href="http://en.wikipedia.org/wiki/HSL_and_HSV" title="HSL and HSV - Wikipedia, the free encyclopedia">Wikipedia page</a></li>
-                            <li>hsl(•••%, •••%, •••%) — almost the same as hsb</li>
+                            <li>hsl(•••%, •••%, •••%) — same as above, but in %</li>
+                            <li>hsla(•••, •••, •••) — same as above, but with opacity</li>
                             <li>Optionally for hsb and hsl you could specify hue as a degree: “<samp>hsl(240deg,&nbsp;1,&nbsp;.5)</samp>” or, if you want to go fancy, “<samp>hsl(240°,&nbsp;1,&nbsp;.5)</samp>”</li>
                         </ul>
                         <h4>Usage</h4>
                         <pre class="javascript code"><code>paper.circle(100, 100, 20).attr({
-    fill: "hsb(1, 255, 200)",
+    fill: "hsb(0.6, 1, 0.75)",
     stroke: "red"
 });</code></pre>
                         <h3 id="safari">
@@ -830,9 +919,9 @@ element.hover(function (event) {
     this.attr({fill: "red"});
 }, function (event) {
     this.attr({fill: "black"});
-});</code></pre>
+}, overScope, outScope);</code></pre>
                         <p>
-                            To unbind events use the same method names with “un” prefix, i.e. <samp>element.unclick(f);</samp>
+                            Second parameter is optional scope. By default handlers are run in the scope of the element. To unbind events use the same method names with “un” prefix, i.e. <samp>element.unclick(f);</samp>
                         </p>
                         <h3 id="drag-n-drop">
                             Drag ’n’ Drop
@@ -985,6 +1074,18 @@ c.drag(move, start, up);</code></pre>
                                 <a href="#getRGB"><code>getRGB</code></a>
                             </li>
                             <li>
+                                <a href="#angle"><code>angle</code></a>
+                            </li>
+                            <li>
+                                <a href="#rad"><code>rad</code></a>
+                            </li>
+                            <li>
+                                <a href="#deg"><code>deg</code></a>
+                            </li>
+                            <li>
+                                <a href="#snapTo"><code>snapTo</code></a>
+                            </li>
+                            <li>
                                 <a href="#getColor"><code>getColor</code></a>
                             </li>
                             <li>
@@ -1004,6 +1105,9 @@ c.drag(move, start, up);</code></pre>
                             </li>
                             <li>
                                 <a href="#plugins-elements">Adding your own methods to elements</a>
+                            </li>
+                            <li>
+                                <a href="#custom-attributes">Custom Attributes</a>
                             </li>
                             <li>
                                 <a href="#colour">Supported colour formats</a>
