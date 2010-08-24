@@ -56,6 +56,7 @@
         mmin = math.min,
         abs = math.abs,
         pow = math.pow,
+        PI = math.PI,
         nu = "number",
         string = "string",
         array = "array",
@@ -64,11 +65,10 @@
         objectToString = Object[proto][toString],
         paper = {},
         push = "push",
-        rg = /^(?=[\da-f]$)/,
         ISURL = /^url\(['"]?([^\)]+?)['"]?\)$/i,
-        colourRegExp = /^\s*((#[a-f\d]{6})|(#[a-f\d]{3})|rgba?\(\s*([\d\.]+\s*,\s*[\d\.]+\s*,\s*[\d\.]+(?:\s*,\s*[\d\.]+)?)\s*\)|rgba?\(\s*([\d\.]+%\s*,\s*[\d\.]+%\s*,\s*[\d\.]+%(?:\s*,\s*[\d\.]+%)?)\s*\)|hsb\(\s*([\d\.]+(?:deg|\xb0)?\s*,\s*[\d\.]+\s*,\s*[\d\.]+)\s*\)|hsb\(\s*([\d\.]+(?:deg|\xb0|%)\s*,\s*[\d\.]+%\s*,\s*[\d\.]+%)\s*\)|hsl\(\s*([\d\.]+(?:deg|\xb0)?\s*,\s*[\d\.]+\s*,\s*[\d\.]+)\s*\)|hsl\(\s*([\d\.]+(?:deg|\xb0|%)\s*,\s*[\d\.]+%\s*,\s*[\d\.]+%)\s*\))\s*$/i,
+        colourRegExp = /^\s*((#[a-f\d]{6})|(#[a-f\d]{3})|rgba?\(\s*([\d\.]+%?\s*,\s*[\d\.]+%?\s*,\s*[\d\.]+(?:%?\s*,\s*[\d\.]+)?)%?\s*\)|hsba?\(\s*([\d\.]+(?:deg|\xb0|%)?\s*,\s*[\d\.]+%?\s*,\s*[\d\.]+(?:%?\s*,\s*[\d\.]+)?)%?\s*\)|hsla?\(\s*([\d\.]+(?:deg|\xb0|%)?\s*,\s*[\d\.]+%?\s*,\s*[\d\.]+(?:%?\s*,\s*[\d\.]+)?)%?\s*\))\s*$/i,
         isnan = {"NaN": 1, "Infinity": 1, "-Infinity": 1},
-        bezierrg = /^cubic-bezier\(([^,]+),([^,]+),([^,]+),([^\)]+)\)/,
+        bezierrg = /^(?:cubic-)?bezier\(([^,]+),([^,]+),([^,]+),([^\)]+)\)/,
         round = math.round,
         setAttribute = "setAttribute",
         toFloat = parseFloat,
@@ -78,12 +78,13 @@
         availableAttrs = {blur: 0, "clip-rect": "0 0 1e9 1e9", cursor: "default", cx: 0, cy: 0, fill: "#fff", "fill-opacity": 1, font: '10px "Arial"', "font-family": '"Arial"', "font-size": "10", "font-style": "normal", "font-weight": 400, gradient: 0, height: 0, href: "http://raphaeljs.com/", opacity: 1, path: "M0,0", r: 0, rotation: 0, rx: 0, ry: 0, scale: "1 1", src: "", stroke: "#000", "stroke-dasharray": "", "stroke-linecap": "butt", "stroke-linejoin": "butt", "stroke-miterlimit": 0, "stroke-opacity": 1, "stroke-width": 1, target: "_blank", "text-anchor": "middle", title: "Raphael", translation: "0 0", width: 0, x: 0, y: 0},
         availableAnimAttrs = {along: "along", blur: nu, "clip-rect": "csv", cx: nu, cy: nu, fill: "colour", "fill-opacity": nu, "font-size": nu, height: nu, opacity: nu, path: "path", r: nu, rotation: "csv", rx: nu, ry: nu, scale: "csv", stroke: "colour", "stroke-opacity": nu, "stroke-width": nu, translation: "csv", width: nu, x: nu, y: nu},
         rp = "replace",
-        p2s = /,?([achlmqrstvxz]),?/gi,
+        animKeyFrames= /^(from|to|\d+%?)$/,
         commaSpaces = /\s*,\s*/,
         hsrg = {hs: 1, rg: 1},
-        animKeyFrames= /^(from|to|\d+%)$/,
+        p2s = /,?([achlmqrstvxz]),?/gi,
         pathCommand = /([achlmqstvz])[\s,]*((-?\d*\.?\d*(?:e[-+]?\d+)?\s*,?\s*)+)/ig,
         pathValues = /(-?\d*\.?\d*(?:e[-+]?\d+)?)\s*,?\s*/ig,
+        radial_gradient = /^r(?:\(([^,]+?)\s*,\s*([^\)]+?)\))?/,
         sortByKey = function (a, b) {
             return a.key - b.key;
         };
@@ -124,10 +125,16 @@
             if (!x && !y) {
                 return 0;
             }
-            return ((x < 0) * 180 + math.atan(-y / -x) * 180 / math.PI + 360) % 360;
+            return ((x < 0) * 180 + math.atan(-y / -x) * 180 / PI + 360) % 360;
         } else {
             return R.angle(x1, y1, x3, y3) - R.angle(x2, y2, x3, y3);
         }
+    };
+    R.rad = function (deg) {
+        return deg % 360 * PI / 180;
+    };
+    R.deg = function (rad) {
+        return rad * 180 / PI % 360;
     };
     R.snapTo = function (values, value, tolerance) {
         tolerance = R.is(tolerance, "finite") ? tolerance : 10;
@@ -210,15 +217,16 @@
     rgbtoString = function () {
         return this.hex;
     };
-    R.hsb2rgb = function (h, s, b) {
+    R.hsb2rgb = function (h, s, b, o) {
         if (R.is(h, "object") && "h" in h && "s" in h && "b" in h) {
             b = h.b;
             s = h.s;
             h = h.h;
+            o = h.o;
         }
-        return R.hsl2rgb(h, s, b / 2);
+        return R.hsl2rgb(h, s, b / 2, o);
     };
-    R.hsl2rgb = function (h, s, l) {
+    R.hsl2rgb = function (h, s, l, o) {
         if (R.is(h, "object") && "h" in h && "s" in h && "l" in h) {
             l = h.l;
             s = h.s;
@@ -245,7 +253,7 @@
                 t2 = l + s - l * s;
             }
             t1 = 2 * l - t2;
-            for (var i = 0, ii = channels.length; i < ii; i++) {
+            for (var i = 0; i < 3; i++) {
                 t3 = h + 1 / 3 * -(i - 1);
                 t3 < 0 && t3++;
                 t3 > 1 && t3--;
@@ -263,13 +271,8 @@
         rgb.r *= 255;
         rgb.g *= 255;
         rgb.b *= 255;
-        r = (~~rgb.r)[toString](16);
-        g = (~~rgb.g)[toString](16);
-        b = (~~rgb.b)[toString](16);
-        r = r[rp](rg, "0");
-        g = g[rp](rg, "0");
-        b = b[rp](rg, "0");
-        rgb.hex = "#" + r + g + b;
+        rgb.hex = "#" + (16777216 | rgb.b | (rgb.g << 8) | (rgb.r << 16)).toString(16).slice(1);
+        R.is(o, "finite") && (rgb.opacity = o);
         rgb.toString = rgbtoString;
         return rgb;
     };
@@ -383,13 +386,14 @@
         if (colour == "none") {
             return {r: -1, g: -1, b: -1, hex: "none"};
         }
-        !(hsrg[has](colour.substring(0, 2)) || colour.charAt() == "#") && (colour = toHex(colour));
+        !(hsrg[has](colour.toLowerCase().substring(0, 2)) || colour.charAt() == "#") && (colour = toHex(colour));
         var res,
             red,
             green,
             blue,
             opacity,
             t,
+            values,
             rgb = colour.match(colourRegExp);
         if (rgb) {
             if (rgb[2]) {
@@ -403,60 +407,45 @@
                 red = toInt((t = rgb[3].charAt(1)) + t, 16);
             }
             if (rgb[4]) {
-                rgb = rgb[4][split](commaSpaces);
-                red = toFloat(rgb[0]);
-                green = toFloat(rgb[1]);
-                blue = toFloat(rgb[2]);
-                opacity = toFloat(rgb[3]);
+                values = rgb[4][split](commaSpaces);
+                red = toFloat(values[0]);
+                values[0].slice(-1) == "%" && (red *= 2.55);
+                green = toFloat(values[1]);
+                values[1].slice(-1) == "%" && (green *= 2.55);
+                blue = toFloat(values[2]);
+                values[2].slice(-1) == "%" && (blue *= 2.55);
+                rgb[1].toLowerCase().slice(0, 4) == "rgba" && (opacity = toFloat(values[3]));
+                values[3] && values[3].slice(-1) == "%" && (opacity /= 100);
             }
             if (rgb[5]) {
-                rgb = rgb[5][split](commaSpaces);
-                red = toFloat(rgb[0]) * 2.55;
-                green = toFloat(rgb[1]) * 2.55;
-                blue = toFloat(rgb[2]) * 2.55;
-                opacity = toFloat(rgb[3]);
+                values = rgb[5][split](commaSpaces);
+                red = toFloat(values[0]);
+                values[0].slice(-1) == "%" && (red *= 2.55);
+                green = toFloat(values[1]);
+                values[1].slice(-1) == "%" && (green *= 2.55);
+                blue = toFloat(values[2]);
+                values[2].slice(-1) == "%" && (blue *= 2.55);
+                (values[0].slice(-3) == "deg" || values[0].slice(-1) == "\xb0") && (red /= 360);
+                rgb[1].toLowerCase().slice(0, 4) == "hsba" && (opacity = toFloat(values[3]));
+                values[3] && values[3].slice(-1) == "%" && (opacity /= 100);
+                return R.hsb2rgb(red, green, blue, opacity);
             }
             if (rgb[6]) {
-                rgb = rgb[6][split](commaSpaces);
-                red = toFloat(rgb[0]);
-                green = toFloat(rgb[1]);
-                blue = toFloat(rgb[2]);
-                (rgb[0].slice(-3) == "deg" || rgb[0].slice(-1) == "\xb0") && (red /= 360);
-                return R.hsb2rgb(red, green, blue);
-            }
-            if (rgb[7]) {
-                rgb = rgb[7][split](commaSpaces);
-                red = toFloat(rgb[0]) * 2.55;
-                green = toFloat(rgb[1]) * 2.55;
-                blue = toFloat(rgb[2]) * 2.55;
-                (rgb[0].slice(-3) == "deg" || rgb[0].slice(-1) == "\xb0") && (red /= 360 * 2.55);
-                return R.hsb2rgb(red, green, blue);
-            }
-            if (rgb[8]) {
-                rgb = rgb[8][split](commaSpaces);
-                red = toFloat(rgb[0]);
-                green = toFloat(rgb[1]);
-                blue = toFloat(rgb[2]);
-                (rgb[0].slice(-3) == "deg" || rgb[0].slice(-1) == "\xb0") && (red /= 360);
-                return R.hsl2rgb(red, green, blue);
-            }
-            if (rgb[9]) {
-                rgb = rgb[9][split](commaSpaces);
-                red = toFloat(rgb[0]) * 2.55;
-                green = toFloat(rgb[1]) * 2.55;
-                blue = toFloat(rgb[2]) * 2.55;
-                (rgb[0].slice(-3) == "deg" || rgb[0].slice(-1) == "\xb0") && (red /= 360 * 2.55);
-                return R.hsl2rgb(red, green, blue);
+                values = rgb[6][split](commaSpaces);
+                red = toFloat(values[0]);
+                values[0].slice(-1) == "%" && (red *= 2.55);
+                green = toFloat(values[1]);
+                values[1].slice(-1) == "%" && (green *= 2.55);
+                blue = toFloat(values[2]);
+                values[2].slice(-1) == "%" && (blue *= 2.55);
+                (values[0].slice(-3) == "deg" || values[0].slice(-1) == "\xb0") && (red /= 360);
+                rgb[1].toLowerCase().slice(0, 4) == "hsla" && (opacity = toFloat(values[3]));
+                values[3] && values[3].slice(-1) == "%" && (opacity /= 100);
+                return R.hsl2rgb(red, green, blue, opacity);
             }
             rgb = {r: red, g: green, b: blue};
-            var r = (~~red)[toString](16),
-                g = (~~green)[toString](16),
-                b = (~~blue)[toString](16);
-            r = r[rp](rg, "0");
-            g = g[rp](rg, "0");
-            b = b[rp](rg, "0");
-            rgb.hex = "#" + r + g + b;
-            isFinite(toFloat(opacity)) && (rgb.o = opacity);
+            rgb.hex = "#" + (16777216 | blue | (green << 8) | (red << 16)).toString(16).slice(1);
+            R.is(opacity, "finite") && (rgb.opacity = opacity);
             return rgb;
         }
         return {r: -1, g: -1, b: -1, hex: "none", error: 1};
@@ -520,7 +509,7 @@
             ay = (1 - t) * p1y + t * c1y,
             cx = (1 - t) * c2x + t * p2x,
             cy = (1 - t) * c2y + t * p2y,
-            alpha = (90 - math.atan((mx - nx) / (my - ny)) * 180 / math.PI);
+            alpha = (90 - math.atan((mx - nx) / (my - ny)) * 180 / PI);
         (mx > nx || my < ny) && (alpha += 180);
         return {x: x, y: y, m: {x: mx, y: my}, n: {x: nx, y: ny}, start: {x: ax, y: ay}, end: {x: cx, y: cy}, alpha: alpha};
     };
@@ -738,8 +727,7 @@
         a2c = function (x1, y1, rx, ry, angle, large_arc_flag, sweep_flag, x2, y2, recursive) {
             // for more information of where this math came from visit:
             // http://www.w3.org/TR/SVG11/implnote.html#ArcImplementationNotes
-            var PI = math.PI,
-                _120 = PI * 120 / 180,
+            var _120 = PI * 120 / 180,
                 rad = PI / 180 * (+angle || 0),
                 res = [],
                 xy,
@@ -1090,8 +1078,7 @@
             return function () {
                 throw new Error("Rapha\xebl: you are calling to method \u201c" + methodname + "\u201d of removed object");
             };
-        },
-        radial_gradient = /^r(?:\(([^,]+?)\s*,\s*([^\)]+?)\))?/;
+        };
     R.pathToRelative = pathToRelative;
     // SVG
     if (R.svg) {
@@ -1148,7 +1135,7 @@
                 if (isNaN(angle)) {
                     return null;
                 }
-                var vector = [0, 0, math.cos(angle * math.PI / 180), math.sin(angle * math.PI / 180)],
+                var vector = [0, 0, math.cos(angle * PI / 180), math.sin(angle * PI / 180)],
                     max = 1 / (mmax(abs(vector[2]), abs(vector[3])) || 1);
                 vector[2] *= max;
                 vector[3] *= max;
@@ -1420,11 +1407,11 @@
                                 attrs.fill = "none";
                                 break;
                             }
-                            clr[has]("o") && $(node, {"fill-opacity": clr.o > 1 ? clr.o / 100 : clr.o});
+                            clr[has]("opacity") && $(node, {"fill-opacity": clr.opacity > 1 ? clr.opacity / 100 : clr.opacity});
                         case "stroke":
                             clr = R.getRGB(value);
                             node[setAttribute](att, clr.hex);
-                            att == "stroke" && clr[has]("o") && $(node, {"stroke-opacity": clr.o > 1 ? clr.o / 100 : clr.o});
+                            att == "stroke" && clr[has]("opacity") && $(node, {"stroke-opacity": clr.opacity > 1 ? clr.opacity / 100 : clr.opacity});
                             break;
                         case "gradient":
                             (({circle: 1, ellipse: 1})[has](o.type) || Str(value).charAt() != "r") && addGradientFill(node, value, o.paper);
@@ -1493,7 +1480,7 @@
             $(node, {y: a.y});
             var bb = el.getBBox(),
                 dif = a.y - (bb.y + bb.height / 2);
-            dif && isFinite(dif) && $(node, {y: a.y + dif});
+            dif && R.is(dif, "finite") && $(node, {y: a.y + dif});
         },
         Element = function (node, svg) {
             var X = 0,
@@ -2731,26 +2718,26 @@
             }
             x += scrollX;
             y += scrollY;
-            dragi.move && dragi.move.call(dragi.el, x - dragi.el._drag.x, y - dragi.el._drag.y, x, y);
+            dragi.move && dragi.move.call(dragi.move_scope || dragi.el, x - dragi.el._drag.x, y - dragi.el._drag.y, x, y, e);
         }
     },
-    dragUp = function () {
+    dragUp = function (e) {
         R.unmousemove(dragMove).unmouseup(dragUp);
         var i = drag.length,
             dragi;
         while (i--) {
             dragi = drag[i];
             dragi.el._drag = {};
-            dragi.end && dragi.end.call(dragi.el);
+            dragi.end && dragi.end.call(dragi.end_scope || dragi.start_scope || dragi.move_scope || dragi.el, e);
         }
         drag = [];
     };
     for (var i = events[length]; i--;) {
         (function (eventName) {
-            R[eventName] = Element[proto][eventName] = function (fn) {
+            R[eventName] = Element[proto][eventName] = function (fn, scope) {
                 if (R.is(fn, "function")) {
                     this.events = this.events || [];
-                    this.events.push({name: eventName, f: fn, unbind: addEvent(this.shape || this.node || doc, eventName, fn, this)});
+                    this.events.push({name: eventName, f: fn, unbind: addEvent(this.shape || this.node || doc, eventName, fn, scope || this)});
                 }
                 return this;
             };
@@ -2767,13 +2754,13 @@
             };
         })(events[i]);
     }
-    elproto.hover = function (f_in, f_out) {
-        return this.mouseover(f_in).mouseout(f_out);
+    elproto.hover = function (f_in, f_out, scope_in, scope_out) {
+        return this.mouseover(f_in, scope_in).mouseout(f_out, scope_out || scope_in);
     };
     elproto.unhover = function (f_in, f_out) {
         return this.unmouseover(f_in).unmouseout(f_out);
     };
-    elproto.drag = function (onmove, onstart, onend) {
+    elproto.drag = function (onmove, onstart, onend, move_scope, start_scope, end_scope) {
         this._drag = {};
         this.mousedown(function (e) {
             (e.originalEvent || e).preventDefault();
@@ -2782,9 +2769,9 @@
             this._drag.x = e.clientX + scrollX;
             this._drag.y = e.clientY + scrollY;
             this._drag.id = e.identifier;
-            onstart && onstart.call(this, e.clientX + scrollX, e.clientY + scrollY);
+            onstart && onstart.call(start_scope || move_scope || this, e.clientX + scrollX, e.clientY + scrollY, e);
             !drag.length && R.mousemove(dragMove).mouseup(dragUp);
-            drag.push({el: this, move: onmove, end: onend});
+            drag.push({el: this, move: onmove, end: onend, move_scope: move_scope, start_scope: start_scope, end_scope: end_scope});
         });
         return this;
     };
@@ -3108,7 +3095,7 @@
             }
             var p = .3,
                 s = p / 4;
-            return pow(2, -10 * n) * math.sin((n - s) * (2 * math.PI) / p) + 1;
+            return pow(2, -10 * n) * math.sin((n - s) * (2 * PI) / p) + 1;
         },
         bounce: function (n) {
             var s = 7.5625,
