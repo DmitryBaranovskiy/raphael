@@ -1,8 +1,8 @@
 /*!
- * Raphael 1.5.1 - JavaScript Vector Library
+ * Raphael 1.5.2 - JavaScript Vector Library
  *
  * Copyright (c) 2010 Dmitry Baranovskiy (http://raphaeljs.com)
- * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
+ * Licensed under the MIT (http://raphaeljs.com/license.html) license.
  */
 (function () {
     function R() {
@@ -18,7 +18,7 @@
         }
         return create[apply](R, arguments);
     }
-    R.version = "1.5.1";
+    R.version = "1.5.2";
     var separator = /[, ]+/,
         elements = {circle: 1, rect: 1, path: 1, ellipse: 1, text: 1, image: 1},
         formatrg = /\{(\d+)\}/g,
@@ -2902,7 +2902,7 @@
                             p[path[i][length] - 1] *= fy;
                             p[1] *= kx;
                             p[2] *= ky;
-                            p[5] = +(dirx + diry ? !+p[4] : !!+p[4]);
+                            p[5] = +(dirx + diry ? !!+p[5] : !+p[5]);
                         } else if (P0 == "H") {
                             for (var j = 1, jj = p[length]; j < jj; j++) {
                                 p[j] *= fx;
