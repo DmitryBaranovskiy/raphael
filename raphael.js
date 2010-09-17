@@ -125,7 +125,7 @@
             if (!x && !y) {
                 return 0;
             }
-            return ((x < 0) * 180 + math.atan(-y / -x) * 180 / PI + 360) % 360;
+            return (math.atan2(-y , -x) * 180 / PI + 360) % 360;
         } else {
             return R.angle(x1, y1, x3, y3) - R.angle(x2, y2, x3, y3);
         }
@@ -509,8 +509,7 @@
             ay = (1 - t) * p1y + t * c1y,
             cx = (1 - t) * c2x + t * p2x,
             cy = (1 - t) * c2y + t * p2y,
-            alpha = (90 - math.atan((mx - nx) / (my - ny)) * 180 / PI);
-        (mx > nx || my < ny) && (alpha += 180);
+            alpha = (90 - math.atan2((mx - nx),  (my - ny)) * 180 / PI);
         return {x: x, y: y, m: {x: mx, y: my}, n: {x: nx, y: ny}, start: {x: ax, y: ay}, end: {x: cx, y: cy}, alpha: alpha};
     };
     var pathDimensions = cacher(function (path) {
@@ -3723,3 +3722,4 @@
 
     oldRaphael.was ? (win.Raphael = R) : (Raphael = R);
 })();
+
