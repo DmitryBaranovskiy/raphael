@@ -97,8 +97,7 @@ Raphael.fn.plus = function (cx, cy, r) {
 Raphael.fn.arrow = function (cx, cy, r) {
     return this.path("M".concat(cx - r * .7, ",", cy - r * .4, "l", [r * .6, 0, 0, -r * .4, r, r * .8, -r, r * .8, 0, -r * .4, -r * .6, 0], "z"));
 };
-Raphael.fn.roundRect = function(x,y,w,h,r)
-{
+Raphael.fn.roundRect = function(x,y,w,h,r) {
     var path = ["M", x+r, y,"l",w-r*2,0,"a",r,r,0,0,1,r,r,"l",0,h-r*2,"a",r,r,0,0,1,-r,r,"l",-w+r*2,0,"a",r,r,0,0,1,-r,-r,"l",0,-h+r*2,"a",r,r,0,0,1,r,-r];
     return this.path(path.join(","));
 };
