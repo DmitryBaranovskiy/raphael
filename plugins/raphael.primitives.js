@@ -99,6 +99,6 @@ Raphael.fn.arrow = function (cx, cy, r) {
 };
 Raphael.fn.roundRect = function(x,y,w,h,r)
 {
-	var path = ["M", x+r, y,"l",w-r*2,0,"a",r,r,0,0,1,r,r,"l",0,h-r*2,"a",r,r,0,0,1,-r,r,"l",-w+r*2,0,"a",r,r,0,0,1,-r,-r,"l",0,-h+r*2,"a",r,r,0,0,1,r,-r];
-    	return this.path(path.join(","));
+    var path = ["M", x+r, y,"l",w-r*2,0,"a",r,r,0,0,1,r,r,"l",0,h-r*2,"a",r,r,0,0,1,-r,r,"l",-w+r*2,0,"a",r,r,0,0,1,-r,-r,"l",0,-h+r*2,"a",r,r,0,0,1,r,-r];
+    return this.path(path.join(","));
 };
