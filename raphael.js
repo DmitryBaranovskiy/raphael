@@ -3593,12 +3593,14 @@
           var item = this.items[i];
           switch( item.type ){
             case 'path':
+              console.log( item );
               var path = item.attrs.path, newPath='';
               for(var j=0, jl=path.length; j< jl; j++){
-                newPath += path[j][0];
-                for(var k=1, kl=path.length; k< kl; k+=2){
-                  newPath += ( path[j][k] * w ) +','+ ( path[j][k+1] * h );
+                newPath += path[j].shift();
+                for(var k=0, kl=path[j].length; k< kl; k+=2){
+                  newPath += ( path[j][k] * w ) +','+ ( path[j][k+1] * h ) +',';
                 }
+                newPath = newPath.substr(0, newPath.length-1);
                 newPath += " ";
               }
               item.attr({
@@ -3658,7 +3660,6 @@
               item.attr({
                 font                : (function(){
                                         var font = item.attr('font');
-                                        console.log( ( font.match( /[\.0-9]+px/ )[0].split('px')[0] * wh2 ) + 'px' + font.match( / .+/ ) );
                                         return ( font.match( /[\.0-9]+px/ )[0].split('px')[0] * wh2 ) + 'px' + font.match( / .+/ );
                                       })(),
                 x                   : item.attr('x') * w,
