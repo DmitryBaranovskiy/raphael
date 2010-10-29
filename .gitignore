@@ -1,0 +1,9 @@
+release/
+dist/
+logs/
+
+Unsaved\ Document*
+.DS_Store
+*.swp
+*~
+*.pyc
