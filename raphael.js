@@ -3592,11 +3592,14 @@
             w = [],
             h = [];
         for (var i = this.items[length]; i--;) {
-            var box = this.items[i].getBBox();
-            x[push](box.x);
-            y[push](box.y);
-            w[push](box.x + box.width);
-            h[push](box.y + box.height);
+            var item = this.items[i];
+            if (!item.removed) {
+                var box = item.getBBox();
+                x[push](box.x);
+                y[push](box.y);
+                w[push](box.x + box.width);
+                h[push](box.y + box.height);
+            }
         }
         x = mmin[apply](0, x);
         y = mmin[apply](0, y);
