@@ -3246,12 +3246,12 @@
             switch (this.type) {
                 case "circle":
                 case "ellipse":
-                    this.attr({cx: +x + this.attrs.cx, cy: +y + this.attrs.cy});
+                    this.attr({cx: +x + +this.attrs.cx, cy: +y + +this.attrs.cy});
                     break;
                 case "rect":
                 case "image":
                 case "text":
-                    this.attr({x: +x + this.attrs.x, y: +y + this.attrs.y});
+                    this.attr({x: +x + +this.attrs.x, y: +y + +this.attrs.y});
                     break;
                 case "path":
                     var path = pathToRelative(this.attrs.path);
