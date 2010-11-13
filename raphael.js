@@ -1304,6 +1304,7 @@
                         case "cx":
                             rotxy && (att == "x" || att == "cx") && (rotxy[1] += value - attrs[att]);
                             node[setAttribute](att, value);
+                            attrs[att] = node[att].baseVal.value; //use computed value of attr
                             o.pattern && updatePosition(o);
                             break;
                         case "height":
@@ -1325,6 +1326,7 @@
                         case "cy":
                             rotxy && (att == "y" || att == "cy") && (rotxy[2] += value - attrs[att]);
                             node[setAttribute](att, value);
+                            attrs[att] = node[att].baseVal.value; //use computed value of attr
                             o.pattern && updatePosition(o);
                             break;
                         case "r":
