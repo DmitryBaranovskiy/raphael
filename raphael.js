@@ -1559,7 +1559,7 @@
             return this;
         };
         Element[proto].show = function () {
-            !this.removed && (this.node.style.display = "");
+            !this.removed && (this.node.style.display = "") || this.paper.safari();
             return this;
         };
         Element[proto].remove = function () {
