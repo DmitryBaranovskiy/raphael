@@ -3494,9 +3494,9 @@
                 el: element,
                 t: {x: 0, y: 0}
             });
-            R.is(callback, "function") && (element._ac = setTimeout(function () {
+            R.is(callback, "function") && (element.timeouts.push(setTimeout(function () {
                 callback.call(element);
-            }, ms));
+            }, ms)));
             animationElements[length] == 1 && setTimeout(animation);
         }
         return this;
@@ -3509,8 +3509,6 @@
             clearTimeout(this.timeouts[i]);
         }
         this.timeouts = [];
-        clearTimeout(this._ac);
-        delete this._ac;
         return this;
     };
     elproto.translate = function (x, y) {
