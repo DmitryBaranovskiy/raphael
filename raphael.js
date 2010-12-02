@@ -1533,7 +1533,7 @@
                 cx = toFloat(deg[1]);
                 cy = toFloat(deg[2]);
             }
-            deg = toFloat(deg[0]);
+            deg = toFloat(deg[0] || 0);
             if (cx != null && cx !== false) {
                 this._.rt.deg = deg;
             } else {
