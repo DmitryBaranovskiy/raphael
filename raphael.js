@@ -2626,8 +2626,7 @@
  
     // rest
     // WebKit rendering bug workaround method
-    var version = navigator.userAgent.match(/Version\/(.*?)\s/);
-    if ((navigator.vendor == "Apple Computer, Inc.") && (version && version[1] < 4 || navigator.platform.slice(0, 2) == "iP")) {
+    if(navigator.userAgent.match(/WebKit/) !== null) {
         paperproto.safari = function () {
             var rect = this.rect(-99, -99, this.width + 99, this.height + 99).attr({stroke: "none"});
             win.setTimeout(function () {rect.remove();});
