@@ -2291,6 +2291,9 @@
             !this.removed && (this.Group.style.display = "block");
             return this;
         };
+        elproto.isVisible = function () {
+            return !this.removed && (this.node.style.display != "none");
+        };
         elproto.getBBox = function () {
             if (this.removed) {
                 return this;
