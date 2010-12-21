@@ -1179,9 +1179,11 @@
             return 1;
         };
         //get computed value of the attribute
-        var computedAttr = function(attr){
+        var computedAttr = function(node, attrs, att){
+          var attr = node[att];
+          if(!attr) return;
           var v = attr.baseVal;
-          return v.value !== undefined ?  //could be a SVGAnimatedLength or a SVGAnimatedLengthList
+          attrs[att] = v.value !== undefined ?  //could be a SVGAnimatedLength or a SVGAnimatedLengthList
             v.value : v.getItem(0).value;
         };
         var updatePosition = function (o) {
@@ -1293,7 +1295,7 @@
                             break;
                         case "width":
                             node[setAttribute](att, value);
-                            attrs[att] = computedAttr(node[att]);
+                            computedAttr(node, attrs, att);
                             if (attrs.fx) {
                                 att = "x";
                                 value = attrs.x;
@@ -1311,12 +1313,12 @@
                         case "cx":
                             rotxy && (att == "x" || att == "cx") && (rotxy[1] += value - attrs[att]);
                             node[setAttribute](att, value);
-                            attrs[att] = computedAttr(node[att]);
+                            computedAttr(node, attrs, att);
                             o.pattern && updatePosition(o);
                             break;
                         case "height":
                             node[setAttribute](att, value);
-                            attrs[att] = computedAttr(node[att]);
+                            computedAttr(node, attrs, att);
                             if (attrs.fy) {
                                 att = "y";
                                 value = attrs.y;
@@ -1334,7 +1336,7 @@
                         case "cy":
                             rotxy && (att == "y" || att == "cy") && (rotxy[2] += value - attrs[att]);
                             node[setAttribute](att, value);
-                            attrs[att] = computedAttr(node[att]);
+                            computedAttr(node, attrs, att);
                             o.pattern && updatePosition(o);
                             break;
                         case "r":
@@ -1342,7 +1344,7 @@
                                 $(node, {rx: value, ry: value});
                             } else {
                                 node[setAttribute](att, value);
-                                attrs[att] = computedAttr(node[att]);
+                                computedAttr(node, attrs, att);
                             }
                             break;
                         case "src":
