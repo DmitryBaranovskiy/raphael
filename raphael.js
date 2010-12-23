@@ -1824,6 +1824,7 @@
             (this.desc = $("desc"))[appendChild](doc.createTextNode("Created with Rapha\xebl"));
             c[appendChild](this.desc);
             c[appendChild](this.defs = $("defs"));
+            return this;
         };
         paperproto.remove = function () {
             this.canvas.parentNode && this.canvas.parentNode.removeChild(this.canvas);
