@@ -1573,21 +1573,26 @@
                 this.show();
                 var hide = true;
             }
-            var bbox = {};
+        
             try {
-                bbox = this.node.getBBox();
+                var bbox = this.node.getBBox();
             } catch(e) {
                 // Firefox 3.0.x plays badly here
             } finally {
                 bbox = bbox || {};
             }
+
             if (this.type == "text") {
-                bbox = {x: bbox.x, y: Infinity, width: 0, height: 0};
-                for (var i = 0, ii = this.node.getNumberOfChars(); i < ii; i++) {
+                var bbox = {x: bbox.x, y: Infinity, width: 0, height: 0};
+                var ii = this.node.getNumberOfChars();
+                for (var i = 0; i < ii; i++) {
                     var bb = this.node.getExtentOfChar(i);
-                    (bb.y < bbox.y) && (bbox.y = bb.y);
-                    (bb.y + bb.height - bbox.y > bbox.height) && (bbox.height = bb.y + bb.height - bbox.y);
-                    (bb.x + bb.width - bbox.x > bbox.width) && (bbox.width = bb.x + bb.width - bbox.x);
+                    var bby = bb.y;
+                    (bby < bbox.y) && (bbox.y = bby);
+                    var newheight = bby + bb.height - bbox.y;
+                    (newheight > bbox.height) && (bbox.height = newheight);
+                    var newbboxwidth = bb.x + bb.width - bbox.x;
+                    (newbboxwidth > bbox.width) && (bbox.width = newbboxwidth);
                 }
             }
             hide && this.hide();
