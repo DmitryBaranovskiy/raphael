@@ -1929,7 +1929,7 @@
             }
             if (params.scale) {
                 xy = Str(params.scale)[split](separator);
-                o.scale(+xy[0] || 1, +xy[1] || +xy[0] || 1, +xy[2] || null, +xy[3] || null);
+                o.scale(+xy[0] || 1, +xy[1] || +xy[0] || 1, isNaN(toFloat(xy[2])) ? null : +xy[2], isNaN(toFloat(xy[3])) ? null : +xy[3]);
             }
             if ("clip-rect" in params) {
                 var rect = Str(params["clip-rect"])[split](separator);
