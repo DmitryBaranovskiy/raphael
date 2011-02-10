@@ -1,0 +1,31 @@
+<!DOCTYPE>
+<html>
+  <head>
+    <title>Raphael Issue 287</title>
+    <style>
+      .holder { margin:10px; background:#f8f8f8; width:128px; height:128px; }
+    </style>
+    <script src="../../raphael.js"></script>
+    <script>
+      window.onload = function () {
+        Raphael("p1", 128, 128)
+          .path("M 0,128 L 64,0 L 128,128 Z")
+          .attr("fill", "green")
+          .click(function() {
+            this.scale(0.5, 0.5, 0, 0);
+          });
+        
+        Raphael("p2", 128, 128)
+          .path("M 0,128 L64,0 L 128,128 Z")
+          .attr("fill", "red")
+          .click(function() {
+            this.attr("scale", "0.5 0.5 0 0");
+          });
+      };
+    </script>
+  </head>
+  <body>
+    <div id="p1" class="holder"></div>
+    <div id="p2" class="holder"></div>
+  </body>
+</html>
