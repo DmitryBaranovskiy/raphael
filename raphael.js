@@ -996,7 +996,7 @@
             var container;
             if (R.is(x, string) || R.is(x, "object")) {
                 container = R.is(x, string) ? doc.getElementById(x) : x;
-                if (container.tagName) {
+                if (container && container.tagName) {
                     if (y == null) {
                         return {
                             container: container,
@@ -1006,6 +1006,8 @@
                     } else {
                         return {container: container, width: y, height: w};
                     }
+                } else {
+                    throw new Error("Container '"+x+"' isn't present in the page");
                 }
             } else {
                 return {container: 1, x: x, y: y, width: w, height: h};
