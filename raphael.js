@@ -1435,9 +1435,13 @@
         getContainer = function (x, y, w, h) {
             var container;
             if (R.is(x, string) || R.is(x, "object")) {
-                container = h == null ? g.doc.getElementById(x) : x;
-                if (container == null) {
-                    return;
+                if (x.tagName) {
+                    container = x;
+                } else {
+                    container = h == null ? g.doc.getElementById(x) : x;
+                    if (container == null) {
+                        return;
+                    }
                 }
                 if (container.tagName) {
                     if (y == null) {
