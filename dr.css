@@ -1,0 +1,310 @@
+#dr-js {
+    background: #999;
+    margin: 0;
+    padding: 0;
+}
+#src-dr-js {
+    background: #000;
+    margin: 1em;
+    padding: 0;
+}
+.dr-doc {
+    background: #eee;
+    font: 300 100.01%/1.4 "Myriad Pro", "Helvetica Neue", Helvetica, "Arial Unicode MS", Arial, sans-serif;
+    width: 60em;
+    padding: 0 2em 2em;
+    margin: 0 auto;
+    position: relative;
+}
+.dr-doc code,
+.dr-type em,
+.dr-returns em,
+.dr-property em {
+    font-family: Menlo, Consolas, Monaco, "Lucida Console", monospace;
+}
+pre.code code {
+    color: #fff;
+}
+pre.code {
+    background: #333;
+    color: #fff;
+    overflow-x: auto;
+    padding: 1em 2.5em;
+    margin: 0 -2.5em;
+}
+code b {
+    color: #e9df8f;
+    font-weight: normal;
+}
+code i,
+code i *,
+code i .d {
+    color: #8b9967;
+    font-style: normal;
+}
+code .s {
+    color: #e7be61;
+}
+code .d {
+    color: #cf6a4c;
+}
+code .c,
+code .c * {
+    color: #999;
+    font-style: italic;
+}
+em.amp {
+    font-family: Baskerville, "Goudy Old Style", Palatino, "Book Antiqua", serif;
+    font-style: italic;
+}
+dl.dr-parameters {
+    margin: .5em 0;
+}
+dt.dr-param {
+    color: #666;
+    font-weight: 400;
+    float: left;
+    margin-right: 1em;
+    min-width: 10em;
+}
+dd.dr-type {
+    margin: 0;
+}
+dd.dr-description {
+    display: table;
+    min-height: 1.5em;
+    border: solid 1px #eee;
+}
+.dr-type {
+    float: left;
+}
+.dr-type em,
+.dr-returns em,
+.dr-property em {
+    -webkit-border-radius: .3em;
+    -webkit-border-radius: .3em;
+    -moz-border-radius: .3em;
+    -moz-border-radius: .3em;
+    background: #ccc;
+    border-radius: .3em;
+    border-radius: .3em;
+    float: left;
+    display: block;
+    font-size: .75em;
+    font-style: normal;
+    font-weight: 700;
+    margin: .2em .5em .2em 0;
+    padding: .1em .5em;
+    text-align: center;
+    min-width: 5em;
+}
+.dr-property em.dr-type {
+    margin: .23em 1em 0 0;
+}
+em.dr-type-string {
+    background: #e5ff7f;
+    color: #667f00;
+}
+em.dr-type-object {
+    background: #ff7f7f;
+    color: #7f0000;
+}
+em.dr-type-function {
+    background: #bf7fff;
+    color: #3f007f;
+}
+em.dr-type-number {
+    background: #7fb2ff;
+    color: #00327f;
+}
+em.dr-type-boolean {
+    background: #7fffb2;
+    color: #007f32;
+}
+em.dr-type-array {
+    background: #ffcc7f;
+    color: #7f4c00;
+}
+dd.dr-optional {
+    display: none;
+}
+h1 {
+    font-weight: 400;
+    font-size: 2.6em;
+    margin: 0;
+}
+h2, h3, h4, h5 {
+    margin: 1em 0;
+    padding: .4em 0 0;
+    font-weight: 100;
+    position: relative;
+}
+h5 {
+    font-size: 1.1em;
+}
+h4 {
+    font-size: 1.2em;
+}
+h3 {
+    font-size: 1.8em;
+}
+h2 {
+    font-size: 2.4em;
+}
+h2.dr-method,
+h3.dr-method,
+h4.dr-method,
+h5.dr-method {
+    color: #900;
+}
+h2.dr-property,
+h3.dr-property,
+h4.dr-property,
+h5.dr-property {
+    color: #009;
+}
+p.header {
+    font-size: 1.2em;
+    font-weight: 200;
+}
+.dr-returns {
+    margin-top: 1em;
+}
+.dr-returns .dr-title {
+    float: left;
+    margin-right: 1em;
+    width: 10em;
+}
+.dr-toc {
+    -webkit-border-bottom-left-radius: 1em;
+    -webkit-border-bottom-right-radius: 1em;
+    -moz-border-radius-bottomleft: 1em;
+    -moz-border-radius-bottomright: 1em;
+    border-bottom-left-radius: 1em;
+    border-bottom-right-radius: 1em;
+    float: right;
+    margin: -3px 0 1em 1em;
+    padding: 1em;
+    background: #ddd;
+    list-style: none;
+    border: solid 3px #999;
+    font-family: Menlo, Consolas, Monaco, "Lucida Console", monospace;
+}
+.dr-toc a {
+    display: block;
+    text-decoration: none;
+    color: #333;
+    padding-top: .5em;
+    position: relative;
+    z-index: 1000;
+}
+.dr-toc li.dr-lvl1 a {
+    padding-left: 1em;
+}
+.dr-toc li.dr-lvl2 a {
+    padding-left: 2em;
+}
+.dr-toc li.dr-lvl3 a {
+    padding-left: 3em;
+}
+.dr-toc li.dr-lvl4 a {
+    padding-left: 4em;
+}
+.dr-toc li.dr-lvl5 a {
+    padding-left: 5em;
+}
+.dr-toc li.dr-lvl6 a {
+    padding-left: 6em;
+}
+.dr-toc a.dr-property {
+    color: #339;
+}
+.dr-toc a.dr-method {
+    color: #933;
+}
+.dr-toc a:hover {
+    text-shadow: 0 0 2px #333;
+}
+.dr-toc a.dr-property:hover {
+    text-shadow: 0 0 2px #66c;
+}
+.dr-toc a.dr-method:hover {
+    text-shadow: 0 0 2px #c66;
+}
+a.dr-hash,
+a.dr-sourceline {
+    -webkit-transition: opacity 0.2s linear;
+    color: #333;
+    font-family: Menlo, "Arial Unicode MS", sans-serif;
+/*    left: -20px;*/
+/*    line-height: 1;*/
+    margin: 0 0 0 .3em;
+/*    overflow: hidden;*/
+    opacity: 0;
+    text-decoration: none;
+/*    width: 1em;*/
+}
+a.dr-link {
+    position: relative;
+    color: #3875c0;
+}
+a.dr-link:hover {
+    text-shadow: 0 1px 2px #999;
+    bottom: 1px;
+    padding-bottom: 1px;
+}
+a.dr-link:visited {
+    color: #7051bc;
+}
+h2:hover a.dr-hash,
+h3:hover a.dr-hash,
+h4:hover a.dr-hash,
+h5:hover a.dr-hash,
+h2:hover a.dr-sourceline,
+h3:hover a.dr-sourceline,
+h4:hover a.dr-sourceline,
+h5:hover a.dr-sourceline {
+    opacity: 1;
+}
+p {
+    margin: 0 0 .5em;
+}
+
+.dr-source-line {
+    margin: 0;
+}
+.dr-source-line a {
+    -webkit-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    border-radius: 5px;
+    color: #000;
+    background: #999;
+    font-weight: 400;
+    font-size: .75em;
+    text-decoration: none;
+    padding: 5px;
+}
+#src-dr-js code {
+    -webkit-transition: background 0.2s linear;
+    background: #000;
+    display: block;
+    color: #fff;
+    font-family: Menlo, Consolas, Monaco, "Lucida Console", monospace;
+    white-space: pre;
+    padding-left: 100px;
+    position: relative;
+    line-height: 1.2;
+}
+#src-dr-js code:hover {
+    background: #666;
+}
+#src-dr-js code .ln {
+    position: absolute;
+    left: 0;
+    color: #000;
+    width: 70px;
+    text-align: right;
+}
