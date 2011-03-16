@@ -1,1148 +1,908 @@
 <!DOCTYPE html>
-<html lang="en">
-    <head>
-        <title>Raphaël Reference</title>
-        <meta http-equiv="content-language" content="en">
-        <meta charset="utf-8">
-        <meta name="author" content="Dmitry Baranovskiy">
-        <meta name="description" content="Vector Graphics JavaScript Library">
-        <meta name="keywords" content="JavaScript Library, Raphael, SVG, VML">
-        <meta name="viewport" content="width=450; user-scalable=no">
-        <link rel="apple-touch-icon-precomposed" href="/Raphael.png"/>
-        <link rel="shortcut icon" href="/favicon16.png" type="image/x-icon">
-        <link rel="stylesheet" href="site.css" type="text/css">
-        <link rel="shortcut icon" href="/favicon16.png" type="image/x-icon">
-    </head>
-    <body class="raphael" id="reference">
-        <div id="header">
-            <h1><span>&nbsp;</span>Raphaël—JavaScript Library</h1>
-        </div>
-        <div id="content">
-            <div id="top">&nbsp;</div>
-                    <div id="column-1">
-                        <h2>Main Function</h2>
-                        <h3 id="RAPHAEL">
-                            Raphael
-                        </h3>
-                        <p>
-                            Creates a canvas object on which to draw. You must do this first, as all future calls to drawing methods from this instance will be bound to this canvas.
-                        </p>
-                        <h4>Parameters</h4>
-                        <ol>
-                            <li>container <em>HTMLElement</em> or <em>string</em></li>
-                            <li>width <em>number</em></li>
-                            <li>height <em>number</em></li>
-                        </ol>
-                        <p>or</p>
-                        <ol>
-                            <li>x <em>number</em></li>
-                            <li>y <em>number</em></li>
-                            <li>width <em>number</em></li>
-                            <li>height <em>number</em></li>
-                        </ol>
-                        <p>or</p>
-                        <ol>
-                            <li>all <em>array</em> (first 3 or 4 elements in the array are equal to [containerID, width, height] or [x, y, width, height]. The rest are element descriptions in format {type: type, &lt;attributes>})</li>
-                        </ol>
-                        <h4>Usage</h4>
-                        <pre class="javascript code"><code>// Each of the following examples create a canvas that is 320px wide by 200px high
-// Canvas is created at the viewport’s 10,50 coordinate
-var paper = Raphael(10, 50, 320, 200);
-// Canvas is created at the top left corner of the #notepad element
-// (or its top right corner in dir="rtl" elements)
-var paper = Raphael(document.getElementById("notepad"), 320, 200);
-// Same as above
-var paper = Raphael("notepad", 320, 200);
-// Image dump
-var set = Raphael(["notepad", 320, 200, {
-    type: "rect",
-    x: 10,
-    y: 10,
-    width: 25,
-    height: 25,
-    stroke: "#f00"
+<!-- Generated with Dr.js -->
+<html lang="en"><head><meta charset="utf-8"><title>Raphaël Reference</title><link rel="stylesheet" href="dr.css"></head><body id="dr-js"><div class="dr-doc"><ol class="dr-toc"><li class="dr-lvl0"><a href="#Animation" class="undefined"><span>Animation</span></a></li><li class="dr-lvl1"><a href="#Animation.delay" class="dr-method"><span>Animation.delay()</span></a></li><li class="dr-lvl1"><a href="#Animation.repeat" class="dr-method"><span>Animation.repeat()</span></a></li><li class="dr-lvl0"><a href="#Element" class="undefined"><span>Element</span></a></li><li class="dr-lvl1"><a href="#Element.animate" class="dr-method"><span>Element.animate()</span></a></li><li class="dr-lvl1"><a href="#Element.clone" class="dr-method"><span>Element.clone()</span></a></li><li class="dr-lvl1"><a href="#Element.getBBox" class="dr-method"><span>Element.getBBox()</span></a></li><li class="dr-lvl1"><a href="#Element.getPointAtLength" class="dr-method"><span>Element.getPointAtLength()</span></a></li><li class="dr-lvl1"><a href="#Element.getSubpath" class="dr-method"><span>Element.getSubpath()</span></a></li><li class="dr-lvl1"><a href="#Element.getTotalLength" class="dr-method"><span>Element.getTotalLength()</span></a></li><li class="dr-lvl1"><a href="#Element.glow" class="dr-method"><span>Element.glow()</span></a></li><li class="dr-lvl1"><a href="#Element.rotate" class="dr-method"><span>Element.rotate()</span></a></li><li class="dr-lvl1"><a href="#Element.scale" class="dr-method"><span>Element.scale()</span></a></li><li class="dr-lvl1"><a href="#Element.setTime" class="dr-method"><span>Element.setTime()</span></a></li><li class="dr-lvl1"><a href="#Element.status" class="dr-method"><span>Element.status()</span></a></li><li class="dr-lvl1"><a href="#Element.transform" class="dr-method"><span>Element.transform()</span></a></li><li class="dr-lvl1"><a href="#Element.translate" class="dr-method"><span>Element.translate()</span></a></li><li class="dr-lvl0"><a href="#Paper" class="undefined"><span>Paper</span></a></li><li class="dr-lvl1"><a href="#Paper.bottom" class="dr-property"><span>Paper.bottom</span></a></li><li class="dr-lvl1"><a href="#Paper.circle" class="dr-method"><span>Paper.circle()</span></a></li><li class="dr-lvl1"><a href="#Paper.ellipse" class="dr-method"><span>Paper.ellipse()</span></a></li><li class="dr-lvl1"><a href="#Paper.forEach" class="dr-method"><span>Paper.forEach()</span></a></li><li class="dr-lvl1"><a href="#Paper.getById" class="dr-method"><span>Paper.getById()</span></a></li><li class="dr-lvl1"><a href="#Paper.getElementByPoint" class="dr-method"><span>Paper.getElementByPoint()</span></a></li><li class="dr-lvl1"><a href="#Paper.image" class="dr-method"><span>Paper.image()</span></a></li><li class="dr-lvl1"><a href="#Paper.path" class="dr-method"><span>Paper.path()</span></a></li><li class="dr-lvl1"><a href="#Paper.raphael" class="dr-property"><span>Paper.raphael</span></a></li><li class="dr-lvl1"><a href="#Paper.rect" class="dr-method"><span>Paper.rect()</span></a></li><li class="dr-lvl1"><a href="#Paper.set" class="dr-method"><span>Paper.set()</span></a></li><li class="dr-lvl1"><a href="#Paper.setSize" class="dr-method"><span>Paper.setSize()</span></a></li><li class="dr-lvl1"><a href="#Paper.text" class="dr-method"><span>Paper.text()</span></a></li><li class="dr-lvl1"><a href="#Paper.top" class="dr-property"><span>Paper.top</span></a></li><li class="dr-lvl0"><a href="#Raphael" class="dr-method"><span>Raphael()</span></a></li><li class="dr-lvl1"><a href="#Raphael.angle" class="dr-method"><span>Raphael.angle()</span></a></li><li class="dr-lvl1"><a href="#Raphael.animation" class="dr-method"><span>Raphael.animation()</span></a></li><li class="dr-lvl1"><a href="#Raphael.deg" class="dr-method"><span>Raphael.deg()</span></a></li><li class="dr-lvl1"><a href="#Raphael.easing_formulas" class="dr-property"><span>Raphael.easing_formulas</span></a></li><li class="dr-lvl1"><a href="#Raphael.findDotsAtSegment" class="dr-method"><span>Raphael.findDotsAtSegment()</span></a></li><li class="dr-lvl1"><a href="#Raphael.fn" class="dr-property"><span>Raphael.fn</span></a></li><li class="dr-lvl1"><a href="#Raphael.getColor" class="dr-method"><span>Raphael.getColor()</span></a></li><li class="dr-lvl2"><a href="#Raphael.getColor.reset" class="dr-method"><span>Raphael.getColor.reset()</span></a></li><li class="dr-lvl1"><a href="#Raphael.getPointAtLength" class="dr-method"><span>Raphael.getPointAtLength()</span></a></li><li class="dr-lvl1"><a href="#Raphael.getRGB" class="dr-method"><span>Raphael.getRGB()</span></a></li><li class="dr-lvl1"><a href="#Raphael.getSubpath" class="dr-method"><span>Raphael.getSubpath()</span></a></li><li class="dr-lvl1"><a href="#Raphael.getTotalLength" class="dr-method"><span>Raphael.getTotalLength()</span></a></li><li class="dr-lvl1"><a href="#Raphael.hsb" class="dr-method"><span>Raphael.hsb()</span></a></li><li class="dr-lvl1"><a href="#Raphael.hsb2rgb" class="dr-method"><span>Raphael.hsb2rgb()</span></a></li><li class="dr-lvl1"><a href="#Raphael.hsl" class="dr-method"><span>Raphael.hsl()</span></a></li><li class="dr-lvl1"><a href="#Raphael.hsl2rgb" class="dr-method"><span>Raphael.hsl2rgb()</span></a></li><li class="dr-lvl1"><a href="#Raphael.is" class="dr-method"><span>Raphael.is()</span></a></li><li class="dr-lvl1"><a href="#Raphael.parsePathString" class="dr-method"><span>Raphael.parsePathString()</span></a></li><li class="dr-lvl1"><a href="#Raphael.parseTransformString" class="dr-method"><span>Raphael.parseTransformString()</span></a></li><li class="dr-lvl1"><a href="#Raphael.path2curve" class="dr-method"><span>Raphael.path2curve()</span></a></li><li class="dr-lvl1"><a href="#Raphael.pathToRelative" class="dr-method"><span>Raphael.pathToRelative()</span></a></li><li class="dr-lvl1"><a href="#Raphael.rad" class="dr-method"><span>Raphael.rad()</span></a></li><li class="dr-lvl1"><a href="#Raphael.rgb" class="dr-method"><span>Raphael.rgb()</span></a></li><li class="dr-lvl1"><a href="#Raphael.rgb2hsb" class="dr-method"><span>Raphael.rgb2hsb()</span></a></li><li class="dr-lvl1"><a href="#Raphael.rgb2hsl" class="dr-method"><span>Raphael.rgb2hsl()</span></a></li><li class="dr-lvl1"><a href="#Raphael.setWindow" class="dr-method"><span>Raphael.setWindow()</span></a></li><li class="dr-lvl1"><a href="#Raphael.snapTo" class="dr-method"><span>Raphael.snapTo()</span></a></li><li class="dr-lvl1"><a href="#Raphael.svg" class="dr-property"><span>Raphael.svg</span></a></li><li class="dr-lvl1"><a href="#Raphael.type" class="dr-property"><span>Raphael.type</span></a></li><li class="dr-lvl1"><a href="#Raphael.vml" class="dr-property"><span>Raphael.vml</span></a></li></ol><h1>Raphaël Reference</h1><p class="dr-source">Check out the source: <a href="raphael-src.html">raphael.js</a></p><h2 id="Animation" class="undefined">Animation<a href="#Animation" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to source" href="raphael-src.html#Lundefined">&#x27ad;</a></h2>
+<h3 id="Animation.delay" class="dr-method">Animation.delay(delay)<a href="#Animation.delay" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to source" href="raphael-src.html#L4752">&#x27ad;</a></h3>
+<div class="dr-method"><p>Creates copy of existing animation object with given delay.</p>
+<p class="header">Parameters
+</p>
+<dl class="dr-parameters"><dt class="dr-param">delay</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">number of ms to pass between animation start and actual animation</dd>
+</dl>
+<p class="dr-returns"><strong class="dr-title">Returns:</strong> <em class="dr-type-object">object</em> <span class="dr-description">new altered Animation object</span></p>
+</div><h3 id="Animation.repeat" class="dr-method">Animation.repeat(repeat)<a href="#Animation.repeat" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to source" href="raphael-src.html#L4770">&#x27ad;</a></h3>
+<div class="dr-method"><p>Creates copy of existing animation object with given repetition.</p>
+<p class="header">Parameters
+</p>
+<dl class="dr-parameters"><dt class="dr-param">repeat</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">number iterations of animation. For infinite animation pass <code>Infinity</code></dd>
+</dl>
+<p class="dr-returns"><strong class="dr-title">Returns:</strong> <em class="dr-type-object">object</em> <span class="dr-description">new altered Animation object</span></p>
+</div><h2 id="Element" class="undefined">Element<a href="#Element" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to source" href="raphael-src.html#Lundefined">&#x27ad;</a></h2>
+<h3 id="Element.animate" class="dr-method">Element.animate(…)<a href="#Element.animate" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to source" href="raphael-src.html#L5029">&#x27ad;</a></h3>
+<div class="dr-method"><p>Creates and starts animation for given element.</p>
+<p class="header">Parameters
+</p>
+<dl class="dr-parameters"><dt class="dr-param">params</dt>
+<dd class="dr-type"><em class="dr-type-object">object</em></dd>
+<dd class="dr-description">final attributes for the element, see also <a href="#Element.attr" class="dr-link">Element.attr</a></dd>
+<dt class="dr-param">ms</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">number of milliseconds for animation to run</dd>
+<dt class="dr-param optional">easing</dt>
+<dd class="dr-optional">optional</dd>
+<dd class="dr-type"><em class="dr-type-string">string</em></dd>
+<dd class="dr-description">easing type. Accept on of <a href="#Raphael.easing_formulas" class="dr-link">Raphael.easing_formulas</a> or CSS format: <code>cubic-bezier(XX, XX, XX, XX)</code></dd>
+<dt class="dr-param optional">callback</dt>
+<dd class="dr-optional">optional</dd>
+<dd class="dr-type"><em class="dr-type-function">function</em></dd>
+<dd class="dr-description">callback function. Will be called at the end of animation.</dd>
+</dl>
+<p>or</p>
+<dl class="dr-parameters"><dt class="dr-param">animation</dt>
+<dd class="dr-type"><em class="dr-type-object">object</em></dd>
+<dd class="dr-description">animation object, see <a href="#Raphael.animation" class="dr-link">Raphael.animation</a></dd>
+</dl>
+<p class="dr-returns"><strong class="dr-title">Returns:</strong> <em class="dr-type-object">object</em> <span class="dr-description">original element</span></p>
+</div><h3 id="Element.clone" class="dr-method">Element.clone()<a href="#Element.clone" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to source" href="raphael-src.html#L4225">&#x27ad;</a></h3>
+<div class="dr-method"><p class="dr-returns"><strong class="dr-title">Returns:</strong> <em class="dr-type-object">object</em> <span class="dr-description">clone of a given element</span></p>
+</div><h3 id="Element.getBBox" class="dr-method">Element.getBBox(isWithoutTransform)<a href="#Element.getBBox" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to source" href="raphael-src.html#L4193">&#x27ad;</a></h3>
+<div class="dr-method"><p>Return bounding box for a given element</p>
+<p class="header">Parameters
+</p>
+<dl class="dr-parameters"><dt class="dr-param">isWithoutTransform</dt>
+<dd class="dr-type"><em class="dr-type-boolean">boolean</em></dd>
+<dd class="dr-description">flag, <code>true</code> if you want to have bounding box before transformations. Default is <code>false</code>.</dd>
+</dl>
+<p class="dr-returns"><strong class="dr-title">Returns:</strong> <em class="dr-type-object">object</em> <span class="dr-description">Bounding box object:</span></p>
+<pre class="javascript code"><code>{
+    x: <span class="c">//top left corner x,</span>
+    y: <span class="c">//top left corner y,</span>
+    width: <span class="c">//width,</span>
+    height: <span class="c">//height</span>
+}
+</code></pre>
+</div><h3 id="Element.getPointAtLength" class="dr-method">Element.getPointAtLength(length)<a href="#Element.getPointAtLength" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to source" href="raphael-src.html#L4428">&#x27ad;</a></h3>
+<div class="dr-method"><p>Return coordinates of the point located at the given length on the given path. Only works for element of “path” type.</p>
+<p class="header">Parameters
+</p>
+<dl class="dr-parameters"><dt class="dr-param">length</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">&#160;</dd>
+</dl>
+<p class="dr-returns"><strong class="dr-title">Returns:</strong> <em class="dr-type-object">object</em> <span class="dr-description">representation of the point:</span></p>
+<pre class="javascript code"><code>{
+    x: <span class="c">//x coordinate,</span>
+    y: <span class="c">//y coordinate,</span>
+    alpha: <span class="c">//angle of derivative</span>
+}
+</code></pre>
+</div><h3 id="Element.getSubpath" class="dr-method">Element.getSubpath(from, to)<a href="#Element.getSubpath" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to source" href="raphael-src.html#L4445">&#x27ad;</a></h3>
+<div class="dr-method"><p>Return subpath of a given element from given length to given length. Only works for element of “path” type.</p>
+<p class="header">Parameters
+</p>
+<dl class="dr-parameters"><dt class="dr-param">from</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">position of the start of the segment</dd>
+<dt class="dr-param">to</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">position of the end of the segment</dd>
+</dl>
+<p class="dr-returns"><strong class="dr-title">Returns:</strong> <em class="dr-type-string">string</em> <span class="dr-description">pathstring for the segment</span></p>
+</div><h3 id="Element.getTotalLength" class="dr-method">Element.getTotalLength()<a href="#Element.getTotalLength" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to source" href="raphael-src.html#L4404">&#x27ad;</a></h3>
+<div class="dr-method"><p>Returns length of the path in pixels. Only works for element of “path” type.</p>
+<p class="dr-returns"><strong class="dr-title">Returns:</strong> <em class="dr-type-number">number</em> <span class="dr-description">length.</span></p>
+</div><h3 id="Element.glow" class="dr-method">Element.glow()<a href="#Element.glow" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to source" href="raphael-src.html#L4244">&#x27ad;</a></h3>
+<div class="dr-method"><p>Return set of elements that create glow-like effect around given element. See <a href="#Paper.set." class="dr-link">Paper.set.</a></p>
+<p>Note: Glow is not connected to the elment. If you change element attributes it won’t adjust itself.</p>
+<p class="dr-returns"><strong class="dr-title">Returns:</strong> <em class="dr-type-object">object</em> <span class="dr-description">set of elements that represents glow</span></p>
+</div><h3 id="Element.rotate" class="dr-method">Element.rotate(deg, [cx], [cy])<a href="#Element.rotate" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to source" href="raphael-src.html#L2369">&#x27ad;</a></h3>
+<div class="dr-method"><p>Adds rotation by given angle around given point to the list oftransformations of the element.</p>
+<p class="header">Parameters
+</p>
+<dl class="dr-parameters"><dt class="dr-param">deg</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">angle in degrees</dd>
+<dt class="dr-param optional">cx</dt>
+<dd class="dr-optional">optional</dd>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">x coordinate of the centre of rotation</dd>
+<dt class="dr-param optional">cy</dt>
+<dd class="dr-optional">optional</dd>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">y coordinate of the centre of rotation</dd>
+</dl>
+<p>If cx <em class="amp">&amp;</em> cy aren’t specified centre of the shape is used as a point of rotation.</p>
+<p class="dr-returns"><strong class="dr-title">Returns:</strong> <em class="dr-type-object">object</em> <span class="dr-description"><a href="#Element" class="dr-link">Element</a></span></p>
+</div><h3 id="Element.scale" class="dr-method">Element.scale(sx, sy, [cx], [cy])<a href="#Element.scale" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to source" href="raphael-src.html#L2402">&#x27ad;</a></h3>
+<div class="dr-method"><p>Adds scale by given amount relative to given point to the list oftransformations of the element.</p>
+<p class="header">Parameters
+</p>
+<dl class="dr-parameters"><dt class="dr-param">sx</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">horisontal scale amount</dd>
+<dt class="dr-param">sy</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">vertical scale amount</dd>
+<dt class="dr-param optional">cx</dt>
+<dd class="dr-optional">optional</dd>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">x coordinate of the centre of scale</dd>
+<dt class="dr-param optional">cy</dt>
+<dd class="dr-optional">optional</dd>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">y coordinate of the centre of scale</dd>
+</dl>
+<p>If cx <em class="amp">&amp;</em> cy aren’t specified centre of the shape is used instead.</p>
+<p class="dr-returns"><strong class="dr-title">Returns:</strong> <em class="dr-type-object">object</em> <span class="dr-description"><a href="#Element" class="dr-link">Element</a></span></p>
+</div><h3 id="Element.setTime" class="dr-method">Element.setTime(anim, value)<a href="#Element.setTime" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to source" href="raphael-src.html#L5052">&#x27ad;</a></h3>
+<div class="dr-method"><p>Sets the status of animation of the element in milliseconds. Similar to <a href="#Element.status" class="dr-link">Element.status</a> method.</p>
+<p class="header">Parameters
+</p>
+<dl class="dr-parameters"><dt class="dr-param">anim</dt>
+<dd class="dr-type"><em class="dr-type-object">object</em></dd>
+<dd class="dr-description">animation object</dd>
+<dt class="dr-param">value</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">number of milliseconds from the beginning of the animation</dd>
+</dl>
+<p class="dr-returns"><strong class="dr-title">Returns:</strong> <em class="dr-type-object">object</em> <span class="dr-description">original element if <code>value</code> is specified</span></p>
+</div><h3 id="Element.status" class="dr-method">Element.status([anim], [value])<a href="#Element.status" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to source" href="raphael-src.html#L5082">&#x27ad;</a></h3>
+<div class="dr-method"><p>Gets or sets the status of animation of the element.</p>
+<p class="header">Parameters
+</p>
+<dl class="dr-parameters"><dt class="dr-param optional">anim</dt>
+<dd class="dr-optional">optional</dd>
+<dd class="dr-type"><em class="dr-type-object">object</em></dd>
+<dd class="dr-description">animation object</dd>
+<dt class="dr-param optional">value</dt>
+<dd class="dr-optional">optional</dd>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">0 – 1. If specified, method works like a setter and sets the status of a given animation to the value. This will cause animation to jump to the given position.</dd>
+</dl>
+<p class="dr-returns"><strong class="dr-title">Returns:</strong> <em class="dr-type-number">number</em> <span class="dr-description">status</span></p>
+<p>or</p>
+<p class="dr-returns"><strong class="dr-title">Returns:</strong> <em class="dr-type-array">array</em> <span class="dr-description">status if <code>anim</code> is not specified in format:</span></p>
+<pre class="javascript code"><code>[{
+    anim: <span class="c">// animation object,</span>
+    status: <span class="c">// status</span>
 }, {
-    type: "text",
-    x: 30,
-    y: 40,
-    text: "Dump"
-}]);</code></pre>
-                        <h3 id="circle">
-                            circle
-                        </h3>
-                        <div class="sample" id="circle-sample"></div>
-                        <p>
-                            Draws a circle.
-                        </p>
-                        <h4>Parameters</h4>
-                        <ol>
-                            <li>x <em>number</em> X coordinate of the centre</li>
-                            <li>y <em>number</em> Y coordinate of the centre</li>
-                            <li>r <em>number</em> radius</li>
-                        </ol>
-                        <h4>Usage</h4>
-                        <pre class="javascript code"><code>var c = paper.circle(50, 50, 40);</code></pre>
-                        <h3 id="rect">
-                            rect
-                        </h3>
-                        <div class="sample" id="rect-sample"></div>
-                        <p>
-                            Draws a rectangle.
-                        </p>
-                        <h4>Parameters</h4>
-                        <ol>
-                            <li>x <em>number</em> X coordinate of top left corner</li>
-                            <li>y <em>number</em> Y coordinate of top left corner</li>
-                            <li>width <em>number</em></li>
-                            <li>height <em>number</em></li>
-                            <li>r <em>number</em> [optional] radius for rounded corners, default is 0</li>
-                        </ol>
-                        <h4>Usage</h4>
-                        <pre class="javascript code"><code>// regular rectangle</code>
-<code>var c = paper.rect(10, 10, 50, 50);</code>
-<code>// rectangle with rounded corners</code>
-<code>var c = paper.rect(40, 40, 50, 50, 10);</code></pre>
-                        <h3 id="ellipse">
-                            ellipse
-                        </h3>
-                        <div class="sample" id="ellipse-sample"></div>
-                        <p>
-                            Draws an ellipse.
-                        </p>
-                        <h4>Parameters</h4>
-                        <ol>
-                            <li>x <em>number</em> X coordinate of the centre</li>
-                            <li>y <em>number</em> X coordinate of the centre</li>
-                            <li>rx <em>number</em> Horisontal radius</li>
-                            <li>ry <em>number</em> Vertical radius</li>
-                        </ol>
-                        <h4>Usage</h4>
-                        <pre class="javascript code"><code>var c = paper.ellipse(50, 50, 40, 20);</code></pre>
-                        <h3 id="image">
-                            image
-                        </h3>
-                        <div class="sample" id="image-sample"></div>
-                        <p>
-                            Embeds an image into the SVG/VML canvas.
-                        </p>
-                        <h4>Parameters</h4>
-                        <ol>
-                            <li>src <em>string</em> URI of the source image</li>
-                            <li>x <em>number</em> X coordinate position</li>
-                            <li>y <em>number</em> Y coordinate position</li>
-                            <li>width <em>number</em> Width of the image</li>
-                            <li>height <em>number</em> Height of the image</li>
-                        </ol>
-                        <h4>Usage</h4>
-                        <pre class="javascript code"><code>var c = paper.image("apple.png", 10, 10, 80, 80);</code></pre>
-                        <h3 id="set">
-                            set
-                        </h3>
-                        <div class="sample" id="set-sample"></div>
-                        <p>
-                            Creates array-like object to keep and operate couple of elements at once. Warning: it doesn’t create any elements for itself in the page.
-                        </p>
-                        <h4>Usage</h4>
-                        <pre class="javascript code"><code>var st = paper.set();</code>
-<code>st.push(
-    paper.circle(10, 10, 5),
-    paper.circle(30, 10, 5)
-);</code>
-<code>st.attr({fill: "red"});</code></pre>
-                        <h3 id="text">
-                            text
-                        </h3>
-                        <div class="sample" id="text-sample"></div>
-                        <p>
-                            Draws a text string. If you need line breaks, put “\n” in the string.
-                        </p>
-                        <h4>Parameters</h4>
-                        <ol>
-                            <li>x <em>number</em> X coordinate position.</li>
-                            <li>y <em>number</em> Y coordinate position.</li>
-                            <li>text <em>string</em> The text string to draw.</li>
-                        </ol>
-                        <h4>Usage</h4>
-                        <pre class="javascript code"><code>var t = paper.text(50, 50, "Raphaël\nkicks\nbutt!");</code></pre>
-                        <h3 id="path">
-                            path
-                        </h3>
-                        <div class="sample" id="path-sample"></div>
-                        <p>
-                            Creates a path element by given path data string.
-                        </p>
-                        <h4>Parameters</h4>
-                        <ol>
-                            <li>pathString <em>string</em> [optional] Path data in <a href="http://www.w3.org/TR/SVG/paths.html#PathData" title="Details of a path's data attribute's format are described in the SVG specification.">SVG path string format</a>.</li>
-                        </ol>
-                        <h4>Usage</h4>
-                        <pre class="javascript code"><code>var c = paper.path("M10 10L90 90");
-// draw a diagonal line:
-// move to 10,10, line to 90,90</code></pre>
-                        <h3 id="clear">
-                            clear
-                        </h3>
-                        <p>
-                            Clears the canvas, i.e. removes all the elements.
-                        </p>
-                        <h4>Usage</h4>
-                        <pre class="javascript code"><code>var c = paper.path("M10 10L90 90");
-paper.clear();</code></pre>
-                        <h2 id="Element">
-                            Element’s generic methods
-                        </h2>
-                        <p>
-                            Each object created on the canvas shares these same generic methods:
-                        </p>
-                        <h3 id="node">
-                            node
-                        </h3>
-                        <p>
-                            Gives you a reference to the DOM object, so you can assign event handlers or just mess around.
-                        </p>
-                        <h4>Usage</h4>
-                        <pre class="javascript code"><code>// draw a circle at coordinate 10,10 with radius of 10
-var c = paper.circle(10, 10, 10);
-c.node.onclick = function () {
-    c.attr("fill", "red");
-};</code></pre>
-                        <h3 id="paper">
-                            paper
-                        </h3>
-                        <p>
-                            Internal reference to “paper” where object drawn. Mainly for use in plugins and element extensions.
-                        </p>
-                        <h4>Usage</h4>
-                        <pre class="javascript code"><code>Raphael.el.cross = function () {
-    this.attr({fill: "red"});
-    this.paper.path("M10,10L50,50M50,10L10,50")
-        .attr({stroke: "red"});
-}</code></pre>
-                        <h3 id="remove">
-                            remove
-                        </h3>
-                        <p>
-                            Removes element from the DOM. You can’t use it after this method call.
-                        </p>
-                        <h4>Usage</h4>
-                        <pre class="javascript code"><code>var c = paper.circle(10, 10, 10);
-c.remove();</code></pre>
-                        <h3 id="hide">
-                            hide
-                        </h3>
-                        <p>
-                            Makes element invisible.
-                        </p>
-                        <h4>Usage</h4>
-                        <pre class="javascript code"><code>var c = paper.circle(10, 10, 10);
-c.hide();</code></pre>
-                        <h3 id="show">
-                            show
-                        </h3>
-                        <p>
-                            Makes element visible.
-                        </p>
-                        <h4>Usage</h4>
-                        <pre class="javascript code"><code>var c = paper.circle(10, 10, 10);
-c.show();</code></pre>
-                        <h3 id="rotate">
-                            rotate
-                        </h3>
-                        <p>
-                            Rotates the element by the given degree from its center point.
-                        </p>
-                        <h4>Parameters</h4>
-                        <ol>
-                            <li>degree <em>number</em> Degree of rotation (0 – 360°)</li>
-                            <li>isAbsolute <em>boolean</em> [optional] Specifies is degree is relative to previous position (<code>false</code>) or is it absolute angle (<code>true</code>)</li>
-                        </ol>
-                        <p>or</p>
-                        <ol>
-                            <li>degree <em>number</em> Degree of rotation (0 – 360°)</li>
-                            <li>cx <em>number</em> [optional] X coordinate of the origin of rotation</li>
-                            <li>cY <em>number</em> [optional] Y coordinate of the origin of rotation</li>
-                        </ol>
-                        <h4>Usage</h4>
-                        <pre class="javascript code"><code>var c = paper.circle(10, 10, 10);
-c.rotate(45);        // rotation is relative
-c.rotate(45, true);  // rotation is absolute</code></pre>
-                        <h3 id="translate">
-                            translate
-                        </h3>
-                        <p>
-                            Moves the element around the canvas by the given distances.
-                        </p>
-                        <h4>Parameters</h4>
-                        <ol>
-                            <li>dx <em>number</em> Pixels of translation by X axis</li>
-                            <li>dy <em>number</em> Pixels of translation by Y axis</li>
-                        </ol>
-                        <h4>Usage</h4>
-                        <pre class="javascript code"><code>var c = paper.circle(10, 10, 10);
-// moves the circle 10&nbsp;px to the right and down
-c.translate(10, 10);</code></pre>
-                        <h3 id="scale">
-                            scale
-                        </h3>
-                        <p>
-                            Resizes the element by the given multiplier.
-                        </p>
-                        <h4>Parameters</h4>
-                        <ol>
-                            <li>Xtimes <em>number</em> Amount to scale horizontally</li>
-                            <li>Ytimes <em>number</em> Amount to scale vertically</li>
-                            <li>centerX <em>number</em> [optional] X of the center of scaling, default is the center of the element</li>
-                            <li>centerY <em>number</em> [optional] Y of the center of scaling, default is the center of the element</li>
-                        </ol>
-                        <h4>Usage</h4>
-                        <pre class="javascript code"><code>var c = paper.circle(10, 10, 10);
-// makes the circle 1.5 times larger
-c.scale(1.5, 1.5);
-// makes the circle half as wide, and 75% as high
-c.scale(.5, .75);</code></pre>
-                        <h3 id="attr">
-                            attr
-                        </h3>
-                        <p>
-                            Sets the attributes of elements directly.
-                        </p>
-                        <h4>Parameters</h4>
-                        <ol>
-                            <li>attributeName <em>string</em></li>
-                            <li>value <em>string</em></li>
-                        </ol>
-                        <p>or</p>
-                        <ol>
-                            <li>params <em>object</em></li>
-                        </ol>
-                        <p>or</p>
-                        <ol>
-                            <li>attributeName <em>string</em> in this case method returns current value for given attribute name</li>
-                        </ol>
-                        <p>or</p>
-                        <ol>
-                            <li>attributeNames <em>array</em> in this case method returns array of current values for given attribute names</li>
-                        </ol>
-                        <p>or</p>
-                        <p>no parameters, in this case object containing all attributes will be returned</p>
-                        <h4>Possible parameters</h4>
-                        <p>Please refer to the <a href="http://www.w3.org/TR/SVG/" title="The W3C Recommendation for the SVG language describes these properties in detail.">SVG specification</a> for an explanation of these parameters.</p>
-                        <ul>
-                            <li id="attr-clip-rect">clip-rect <em>string</em> comma or space separated values: x, y, width and height</li>
-                            <li id="attr-cursor">cursor <em>string</em> CSS type of the cursor</li>
-                            <li id="attr-cx">cx <em>number</em></li>
-                            <li id="attr-cy">cy <em>number</em></li>
-                            <li id="attr-fill">
-                                fill <em>colour</em> or <em>gradient</em>
-                                <ul>
-                                    <li>linear gradient: “‹angle›-‹colour›[-‹colour›[:‹offset›]]*-‹colour›”, example: “<samp>90-#fff-#000</samp>” – 90° gradient from white to black or “<samp>0-#fff-#f00:20-#000</samp>” – 0° gradient from white via red (at 20%) to black</li>
-                                    <li>radial gradient: “r[(‹fx›, ‹fy›)]‹colour›[-‹colour›[:‹offset›]]*-‹colour›”, example: “<samp>r#fff-#000</samp>” – gradient from white to black or “<samp>r(0.25, 0.75)#fff-#000</samp>” – gradient from white to black with focus point at 0.25, 0.75</li>
-                                    <li>Focus point coordinates are in 0..1 range</li>
-                                    <li>Radial gradients can only be applied to circles and ellipses</li>
-                                </ul>
-                            </li>
-                            <li id="attr-fill-opacity">fill-opacity <em>number</em></li>
-                            <li id="attr-font">font <em>string</em></li>
-                            <li id="attr-font-family">font-family <em>string</em></li>
-                            <li id="attr-font-size">font-size <em>number</em></li>
-                            <li id="attr-font-weight">font-weight <em>string</em></li>
-                            <li id="attr-height">height <em>number</em></li>
-                            <li id="attr-href">href <em>string</em> URL, if specified element behaves as hyperlink</li>
-                            <li id="attr-opacity">opacity <em>number</em></li>
-                            <li id="attr-path">path <em>pathString</em> <a href="http://www.w3.org/TR/SVG/paths.html#PathData" title="Details of a path’s data attribute’s format are described in the SVG specification.">SVG path string format</a></li>
-                            <li id="attr-r">r <em>number</em></li>
-                            <li id="attr-rotation">rotation <em>number</em></li>
-                            <li id="attr-rx">rx <em>number</em></li>
-                            <li id="attr-ry">ry <em>number</em></li>
-                            <li id="attr-scale">scale <em>string</em> comma or space separated values: xtimes, ytimes, cx, cy. See: <a href="#scale">scale</a></li>
-                            <li id="attr-src">src <em>string</em> (URL)</li>
-                            <li id="attr-stroke">stroke <em>colour</em></li>
-                            <li id="attr-stroke-dasharray">stroke-dasharray <em>string</em> [“”, “<samp>-</samp>”, “<samp>.</samp>”, “<samp>-.</samp>”, “<samp>-..</samp>”, “<samp>. </samp>”, “<samp>- </samp>”, “<samp>--</samp>”, “<samp>-&nbsp;.</samp>”, “<samp>--.</samp>”, “<samp>--..</samp>”]</li>
-                            <li id="attr-stroke-linecap">stroke-linecap <em>string</em> [“<samp>butt</samp>”, “<samp>square</samp>”, “<samp>round</samp>”]</li>
-                            <li id="attr-stroke-linejoin">stroke-linejoin <em>string</em> [“<samp>bevel</samp>”, “<samp>round</samp>”, “<samp>miter</samp>”]</li>
-                            <li id="attr-stroke-miterlimit">stroke-miterlimit <em>number</em></li>
-                            <li id="attr-stroke-opacity">stroke-opacity <em>number</em></li>
-                            <li id="attr-stroke-width">stroke-width <em>number</em></li>
-                            <li id="attr-target">target <em>string</em> used with <a href="#attr-href">href</a></li>
-                            <li id="attr-text-anchor">text-anchor <em>string</em> [“<samp>start</samp>”, “<samp>middle</samp>”, “<samp>end</samp>”], default is “middle”</li>
-                            <li id="attr-title">title <em>string</em> will create tooltip with a given text</li>
-                            <li id="attr-translation">translation <em>string</em> comma or space separated values: x and y</li>
-                            <li id="attr-width">width <em>number</em></li>
-                            <li id="attr-x">x <em>number</em></li>
-                            <li id="attr-y">y <em>number</em></li>
-                        </ul>
-                        <h4>Usage</h4>
-                        <pre class="javascript code"><code>var c = paper.circle(10, 10, 10);
-// using strings
-c.attr("fill", "black");
-// using params object
-c.attr({fill: "#000", stroke: "#f00", opacity: 0.5});
-c.attr({
-    fill: "90-#fff-#000",
-    "stroke-dasharray": "-..",
-    "clip-rect": "10, 10, 100, 100"
-});</code></pre>
-                        <h3 id="animate">
-                            animate
-                        </h3>
-                        <p>
-                            Changes an attribute from its current value to its specified value in the given amount of milliseconds.
-                        </p>
-                        <h4>Parameters</h4>
-                        <ol>
-                            <li>newAttrs <em>object</em> A parameters object of the animation results. (Not all attributes can be animated.)</li>
-                            <li>ms <em>number</em> The duration of the animation, given in milliseconds.</li>
-                            <li>callback <em>function</em> [optional]</li>
-                        </ol>
-                        <p>or</p>
-                        <ol>
-                            <li>newAttrs <em>object</em> A parameters object of the animation results. (Not all attributes can be animated.)</li>
-                            <li>ms <em>number</em> The duration of the animation, given in milliseconds.</li>
-                            <li>easing <em>string</em> [“<samp>></samp>”, “<samp>&lt;</samp>”, “<samp>&lt;></samp>”, “<samp>backIn</samp>”, “<samp>backOut</samp>”, “<samp>bounce</samp>”, “<samp>elastic</samp>”, “<samp>cubic-bezier(p1, p2, p3, p4)</samp>”] or <em>function</em> [optional], see <a href="http://www.w3.org/TR/css3-transitions/#transition-timing-function_tag" title="CSS Transitions Module Level 3">explanation re cubic-bezier syntax</a></li>
-                            <li>callback <em>function</em> [optional]</li>
-                        </ol>
-                        <p>or</p>
-                        <ol>
-                            <li>keyFrames <em>object</em> Key-value map, where key represents keyframe timing: [“from”, “20%”, “to”, “35%”, etc] and value is the same as <code>newAttrs</code> from above, except it could also have <samp>easing</samp> and <samp>callback</samp> properties</li>
-                            <li>ms <em>number</em> The duration of the animation, given in milliseconds.</li>
-                        </ol>
-                        <p>Look at the <a href="bounce.html">example of keyframes usage</a></p>
-                        <h4>Attributes that can be animated</h4>
-                        <p>The <code>newAttrs</code> parameter accepts an object whose properties are the attributes to animate. However, not all attributes listed in the <code>attr</code> method reference can be animated. The following is a list of those properties that can be animated:</p>
-                        <ul>
-                            <li>clip-rect <em>string</em></li>
-                            <li>cx <em>number</em></li>
-                            <li>cy <em>number</em></li>
-                            <li>fill <em>colour</em></li>
-                            <li>fill-opacity <em>number</em></li>
-                            <li>font-size <em>number</em></li>
-                            <li>height <em>number</em></li>
-                            <li>opacity <em>number</em></li>
-                            <li>path <em>pathString</em></li>
-                            <li>r <em>number</em></li>
-                            <li>rotation <em>string</em></li>
-                            <li>rx <em>number</em></li>
-                            <li>ry <em>number</em></li>
-                            <li>scale <em>string</em></li>
-                            <li>stroke <em>colour</em></li>
-                            <li>stroke-opacity <em>number</em></li>
-                            <li>stroke-width <em>number</em></li>
-                            <li>translation <em>string</em></li>
-                            <li>width <em>number</em></li>
-                            <li>x <em>number</em></li>
-                            <li>y <em>number</em></li>
-                        </ul>
-                        <h4>Easing</h4>
-                        <p>
-                            For easing use built in functions or add your own by adding new functions to <code>Raphael.easing_formulas</code> object. Look at the <a href="easing.html">example of easing usage</a>.
-                        </p>
-                        <h4>Usage</h4>
-                        <pre class="javascript code"><code>var c = paper.circle(10, 10, 10);
-c.animate({cx: 20, r: 20}, 2000);
-c.animate({cx: 20, r: 20}, 2000, "bounce");
-c.animate({
-    "20%": {cx: 20, r: 20, easing: ">"},
-    "50%": {cx: 70, r: 120, callback: function () {…}},
-    "100%": {cx: 10, r: 10}
-}, 2000);</code></pre>
-                        <h3 id="animateWith">
-                            animateWith
-                        </h3>
-                        <p>
-                            The same as <a href="#animate"><code>animate</code></a> method, but synchronise animation with another element.
-                        </p>
-                        <h4>Parameters</h4>
-                        <p>The same as for <a href="#animate"><code>animate</code></a> method, but first argument is an element.</p>
-                        <h4>Usage</h4>
-                        <pre class="javascript code"><code>var c = paper.circle(10, 10, 10),
-    r = paper.rect(10, 10, 10, 10);
-c.animate({cx: 20, r: 20}, 2000);
-r.animateWith(c, {x: 20}, 2000);</code></pre>
-                        <h3 id="animateAlong">
-                            animateAlong
-                        </h3>
-                        <div class="sample" id="along-sample"></div>
-                        <p>
-                            Animates element along the given path. As an option it could rotate element along the path.
-                        </p>
-                        <h4>Parameters</h4>
-                        <ol>
-                            <li>path <em>object</em> or <em>string</em> path element or path string along which the element will be animated</li>
-                            <li>ms <em>number</em> The duration of the animation, given in milliseconds.</li>
-                            <li>rotate <em>boolean</em> [optional] if true, element will be rotated along the path</li>
-                            <li>callback <em>function</em> [optional]</li>
-                        </ol>
-                        <h4>Usage</h4>
-                        <pre class="javascript code"><code>var p = r.path("M100,100c0,50 100-50 100,0c0,50 -100-50 -100,0z").attr({stroke: "#ddd"}),
-    e = r.ellipse(104, 100, 4, 4).attr({stroke: "none", fill: "#f00"}),
-    b = r.rect(0, 0, 620, 400).attr({stroke: "none", fill: "#000", opacity: 0}).click(function () {
-        e.attr({rx: 5, ry: 3}).animateAlong(p, 4000, true, function () {
-            e.attr({rx: 4, ry: 4});
-        });
-    });</code></pre>
-                        <h3 id="animateAlongBack">
-                            animateAlongBack
-                        </h3>
-                        <p>
-                            Similar to <a href="animateAlong"><code>animateAlong</code></a>. Animates element along the given path, starting from the end of it.
-                        </p>
-                        <h3 id="onAnimation">
-                            onAnimation
-                        </h3>
-                        <div class="sample" id="onanim-sample"></div>
-                        <p>
-                            Sets or resets the function that will be called on each stage of the animation.
-                        </p>
-                        <h4>Parameters</h4>
-                        <ol>
-                            <li>f <em>function</em> function that will be called on each stage of animation</li>
-                        </ol>
-                        <h4>Usage</h4>
-                        <pre class="javascript code"><code>var p = r.path("M10,50c0,50,80-50,80,0c0,50-80-50-80,0z"),
-    p2 = r.path(),
-    e = r.ellipse(10, 50, 4, 4).attr({stroke: "none", fill: "#f00"}).onAnimation(function () {
-        p2.attr({path: "M50,10L" + e.attr("cx") + "," + e.attr("cy")});
-    }),
-    b = r.rect(0, 0, 620, 400).attr({stroke: "none", fill: "#000", opacity: 0}).click(function () {
-        e.attr({rx: 5, ry: 3}).animateAlong(p, 4000, true, function () {
-            e.attr({rx: 4, ry: 4});
-        });
-    });</code></pre>
-                        <h3 id="getBBox">
-                            getBBox
-                        </h3>
-                        <p>
-                            Returns the dimensions of an element.
-                        </p>
-                        <h4>Usage</h4>
-                        <pre class="javascript code"><code>var c = paper.circle(10, 10, 10);</code>
-<code>var width = c.getBBox().width;</code></pre>
-                        <h3 id="toFront">
-                            toFront
-                        </h3>
-                        <p>
-                            Moves the element so it is the closest to the viewer’s eyes, on top of other elements.
-                        </p>
-                        <h4>Usage</h4>
-                        <pre class="javascript code"><code>var c = paper.circle(10, 10, 10);</code>
-<code>c.toFront();</code></pre>
-                        <h3 id="toBack">
-                            toBack
-                        </h3>
-                        <p>
-                            Moves the element so it is the furthest from the viewer’s eyes, behind other elements.
-                        </p>
-                        <h4>Usage</h4>
-                        <pre class="javascript code"><code>var c = paper.circle(10, 10, 10);</code>
-<code>c.toBack();</code></pre>
-                        <h3 id="insertBefore">
-                            insertBefore
-                        </h3>
-                        <p>
-                            Inserts current object before the given one.
-                        </p>
-                        <h4>Usage</h4>
-                        <pre class="javascript code"><code>var r = paper.rect(10, 10, 10, 10);</code>
-<code>var c = paper.circle(10, 10, 10);</code>
-<code>c.insertBefore(r);</code></pre>
-                        <h3 id="insertAfter">
-                            insertAfter
-                        </h3>
-                        <p>
-                            Inserts current object after the given one.
-                        </p>
-                        <h4>Usage</h4>
-                        <pre class="javascript code"><code>var r = paper.rect(10, 10, 10, 10);
-var c = paper.circle(10, 10, 10);
-r.insertAfter(c);</code></pre>
-                        <h3 id="clone">
-                            clone
-                        </h3>
-                        <p>
-                            Returns a clone of the current element.
-                        </p>
-                        <h4>Usage</h4>
-                        <pre class="javascript code"><code>var r = paper.rect(10, 10, 10, 10);
-var c = r.clone();</code></pre>
-                        <h2>Graphic Primitives</h2>
-                        <p>
-                            Methods of “paper” object, created with <code>Raphael</code> function call.
-                        </p>
-                        <h3 id="raphael">
-                            raphael
-                        </h3>
-                        <p>
-                            Internal reference to <code>Raphael</code> object. In case it is not available.
-                        </p>
-                        <h4>Usage</h4>
-                        <pre class="javascript code"><code>Raphael.el.red = function () {
-    var hsb = this.paper.raphael.rgb2hsb(this.attr("fill"));
-    hsb.h = 1;
-    this.attr({fill: this.paper.raphael.hsb2rgb(hsb).hex});
-}</code></pre>
-                        <h3 id="getTotalLength">
-                            getTotalLength
-                        </h3>
-                        <p>
-                            Path specific method. Returns length of the path in pixels.
-                        </p>
-                        <h4>Usage</h4>
-                        <pre class="javascript code"><code>var p = r.path("M100,100c0,50 100-50 100,0c0,50 -100-50 -100,0z");
-    alert(p.getTotalLength());</code></pre>
-                        <h3 id="getPointAtLength">
-                            getPointAtLength
-                        </h3>
-                        <div class="sample" id="point-sample"></div>
-                        <p>
-                            Path specific method. Returns point description at given length.
-                        </p>
-                        <h4>Parameters</h4>
-                        <ol>
-                            <li>length <em>number</em> length in pixels from the beginining of the path to the point</li>
-                        </ol>
-                        <h4>Usage</h4>
-                        <pre class="javascript code"><code>var p = r.path("M10,50c0,50,80-50,80,0c0,50-80-50-80,0z");
-    var point = p.getPointAtLength(30);
-    r.circle(point.x, point.y, 3);</code></pre>
-                        <p>Returned object format:</p>
-                        <ul>
-                            <li>x – x coordinate of the point</li>
-                            <li>y – y coordinate of the point</li>
-                            <li>alpha – angle of the path at the point</li>
-                        </ul>
-                        <h3 id="getSubpath">
-                            getSubpath
-                        </h3>
-                        <div class="sample" id="subpath-sample"></div>
-                        <p>
-                            Path specific method. Returns the subpath string of a given path.
-                        </p>
-                        <h4>Parameters</h4>
-                        <ol>
-                            <li>from <em>number</em> length in pixels from the beginning of the path to the beginning of the subpath</li>
-                            <li>to <em>number</em> length in pixels from the beginning of the path to the end of the subpath</li>
-                        </ol>
-                        <h4>Usage</h4>
-                        <pre class="javascript code"><code>var p = r.path("M10,50c0,50,80-50,80,0c0,50-80-50-80,0z");
-    var path = p.getSubpath(10, 60);
-    r.path(path).attr({stroke: "#f00"});</code></pre>
-                        <h3 id="setSize">
-                            setSize
-                        </h3>
-                        <p>
-                            If you need to change dimensions of the canvas call this method
-                        </p>
-                        <h4>Parameters</h4>
-                        <ol>
-                            <li>width <em>number</em> new width of the canvas</li>
-                            <li>height <em>number</em> new height of the canvas</li>
-                        </ol>
-                        <h3 id="setWindow">
-                            setWindow
-                        </h3>
-                        <p>
-                            Should be called before main Raphael method. Sets which window should be used for drawing. Default is the current one. You need to use it if you want to draw inside <code>iframe</code>
-                        </p>
-                        <h4>Parameters</h4>
-                        <ol>
-                            <li>window <em>object</em></li>
-                        </ol>
-                        <h3 id="getRGB">
-                            getRGB
-                        </h3>
-                        <p>
-                            Parses passes string and returns an colour object. Especially useful for plug-in developers.
-                        </p>
-                        <h4>Parameters</h4>
-                        <ol>
-                            <li>color <em>string</em> Colour in form acceptable by library</li>
-                        </ol>
-                        <h4>Usage</h4>
-                        <pre class="javascript code"><code>var stroke = Raphael.getRGB(circle.attr("stroke")).hex;</code></pre>
-                        <h3 id="angle">
-                            angle
-                        </h3>
-                        <p>
-                            Gives you an angle of the line formed by two points or angle between two lines formed by three points.
-                        </p>
-                        <h4>Parameters</h4>
-                        <ol>
-                            <li>x1 <em>number</em> X of the first point</li>
-                            <li>y1 <em>number</em> Y of the first point</li>
-                            <li>x2 <em>number</em> X of the second point</li>
-                            <li>y2 <em>number</em> Y of the second point</li>
-                            <li>x3 <em>number</em> X of the third point [optional]</li>
-                            <li>y3 <em>number</em> Y of the third point [optional]</li>
-                        </ol>
-                        <h4>Usage</h4>
-                        <pre class="javascript code"><code>var angle = Raphael.angle(10, 10, 50, 50);</code></pre>
-                        <h3 id="rad">
-                            rad
-                        </h3>
-                        <p>
-                            Converts angle to radians.
-                        </p>
-                        <h4>Parameters</h4>
-                        <ol>
-                            <li>deg <em>number</em> value of an angle in degrees</li>
-                        </ol>
-                        <h4>Usage</h4>
-                        <pre class="javascript code"><code>var Sin = Math.sin(Raphael.rad(45));</code></pre>
-                        <h3 id="deg">
-                            deg
-                        </h3>
-                        <p>
-                            Converts angle to degree.
-                        </p>
-                        <h4>Parameters</h4>
-                        <ol>
-                            <li>rad <em>number</em> value of an angle in radians</li>
-                        </ol>
-                        <h3 id="snapTo">
-                            snapTo
-                        </h3>
-                        <p>
-                            Returns a number adjusted to one of various values, if it’s close enough.
-                        </p>
-                        <h4>Parameters</h4>
-                        <ol>
-                            <li>values <em>number or array</em> If values is a number, the value will be snapped to any multiple. If an array, the value will be snapped to the first element that’s within tolerance.</li>
-                            <li>value <em>number</em> The value to adjust</li>
-                            <li>tolerance <em>number</em> The value must be within tolerance of one of the snap values, or it will be returned unchanged [optional, default 10]</li>
-                        </ol>
-                        <h4>Usage</h4>
-                        <pre class="javascript code"><code>// adjust -10..10 to 0, 40..60 to 50, 90-110 to 100, etc
-x = Raphael.snapTo(50, x);
-// adjust 5..35 to 20, 45..75 to 60, otherwise no change
-x = Raphael.snapTo([20, 60], x, 15);</code></pre>
-                        <h3 id="getColor">
-                            getColor
-                        </h3>
-                        <p>
-                            Returns a colour object for the next colour in spectrum
-                        </p>
-                        <h4>Parameters</h4>
-                        <ol>
-                            <li>value <em>number</em> brightness [optional]</li>
-                        </ol>
-                        <h4>Usage</h4>
-                        <pre class="javascript code"><code>var c = paper.path("M10,10L100,100").attr({stroke: Raphael.getColor()});</code></pre>
-                        <h3 id="getColor-reset">
-                            getColor.reset
-                        </h3>
-                        <p>
-                            Resets getColor function, so it will start from the beginning
-                        </p>
-                        <h3 id="registerFont">
-                            registerFont
-                        </h3>
-                        <p>
-                            Adds given font to the registered set of fonts for Raphaël. Should be used as an internal call from within Cufón’s font file. <a href="http://wiki.github.com/sorccu/cufon/about">More about Cufón and how to convert your font form TTF, OTF, etc to JavaScript file</a>. Returns original parameter, so it could be used with chaining.
-                        </p>
-                        <h4>Parameters</h4>
-                        <ol>
-                            <li>font <em>object</em> the font to register</li>
-                        </ol>
-                        <h4>Usage</h4>
-                        <pre class="javascript code"><code>Cufon.registerFont(Raphael.registerFont({…}))</code></pre>
-                        <h3 id="getFont">
-                            getFont
-                        </h3>
-                        <p>
-                            Finds font object in the registered fonts by given parameters. You could specify only one word from the font name, like “Myriad” for “Myriad Pro”.
-                        </p>
-                        <h4>Parameters</h4>
-                        <ol>
-                            <li>family <em>string</em> font family name or any word from it</li>
-                            <li>weight <em>string</em> weight of the font [optional]</li>
-                            <li>style <em>string</em> style of the font [optional]</li>
-                            <li>stretch <em>string</em> stretch of the font [optional]</li>
-                        </ol>
-                        <h4>Usage</h4>
-                        <pre class="javascript code"><code>paper.print(100, 100, "Test string", paper.getFont("Times", 800), 30);</code></pre>
-                        <h3 id="print">
-                            print
-                        </h3>
-                        <div class="sample" id="print-sample"></div>
-                        <p>
-                            Creates set of shapes to represent given font at given position with given size. Result of the method is set object (see <a href="#set">set</a>) which contains each letter as separate path object.
-                        </p>
-                        <h4>Parameters</h4>
-                        <ol>
-                            <li>x <em>number</em> x position of the text</li>
-                            <li>y <em>number</em> y position of the text</li>
-                            <li>text <em>string</em> text to print</li>
-                            <li>font <em>object</em> font object (see <a href="#getFont">getFont</a>)</li>
-                            <li>font_size <em>number</em> size of the font</li>
-                        </ol>
-                        <h4>Usage</h4>
-                        <pre class="javascript code"><code>var txt = r.print(10, 50, "print", r.getFont("Museo"), 30).attr({fill: "#fff"});
-// following line will paint first letter in red
-txt[0].attr({fill: "#f00"});</code></pre>
-                        <h3 id="plugins-canvas">
-                            Adding your own methods to canvas
-                        </h3>
-                        <p>
-                            You can add your own method to the canvas. For example if you want to draw pie chart, you can create your own pie chart function and ship it as a Raphaël plugin. To do this you need to extend Raphael.fn object. Please note that you can create your own namespaces inside fn object. Methods will be run in context of canvas anyway. You should alter fn object before Raphaël instance was created, otherwise it will take no effect.
-                        </p>
-                        <h4>Usage</h4>
-                        <pre class="javascript code"><code>Raphael.fn.arrow = function (x1, y1, x2, y2, size) {
-    return this.path( ... );
+    anim: <span class="c">// animation object,</span>
+    status: <span class="c">// status</span>
+}, ...]
+</code></pre>
+<p>or</p>
+<p class="dr-returns"><strong class="dr-title">Returns:</strong> <em class="dr-type-object">object</em> <span class="dr-description">original element if <code>value</code> is specified</span></p>
+</div><h3 id="Element.transform" class="dr-method">Element.transform([tstr])<a href="#Element.transform" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to source" href="raphael-src.html#L2468">&#x27ad;</a></h3>
+<div class="dr-method"><p>Adds transformation to the element which is separate to other attributes,i.e. translation doesn’t change <code>x</code> or <code>y</code> of the rectange. The formatof transformation string is similar to the path string syntax:</p>
+<pre class="javascript code"><code><i>"t100,100r30,<span class="d">100</span>,100s2,<span class="d">2</span>,<span class="d">100</span>,100r45s1<span class="d">.5</span>"</i>
+</code></pre>
+<p>Each letter is a command. There are four commands: <code>t</code> is for translate, <code>r</code> is for rotate, <code>s</code> is forscale and <code>m</code> is for matrix.</p>
+<p>So, example line could be read like “translate by 100, 100, rotate 30° around 100, 100, scale twice around 100, 100rotate 45° around centre and scale 1.5 times relative to centre”. As you see rotate and scale commands has origincoordinates as a optional parameters.Matrix accepts six parameters.</p>
+<p class="header">Parameters
+</p>
+<dl class="dr-parameters"><dt class="dr-param optional">tstr</dt>
+<dd class="dr-optional">optional</dd>
+<dd class="dr-type"><em class="dr-type-string">string</em></dd>
+<dd class="dr-description">transformation string</dd>
+</dl>
+<p>If tstr isn’t specified</p>
+<p class="dr-returns"><strong class="dr-title">Returns:</strong> <em class="dr-type-string">string</em> <span class="dr-description">current transformation string</span></p>
+<p>else</p>
+<p class="dr-returns"><strong class="dr-title">Returns:</strong> <em class="dr-type-object">object</em> <span class="dr-description"><a href="#Element" class="dr-link">Element</a></span></p>
+</div><h3 id="Element.translate" class="dr-method">Element.translate(dx, dy)<a href="#Element.translate" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to source" href="raphael-src.html#L2433">&#x27ad;</a></h3>
+<div class="dr-method"><p>Adds translation by given amount to the list of transformations of the element.</p>
+<p class="header">Parameters
+</p>
+<dl class="dr-parameters"><dt class="dr-param">dx</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">horisontal shift</dd>
+<dt class="dr-param">dy</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">vertical shift</dd>
+</dl>
+<p class="dr-returns"><strong class="dr-title">Returns:</strong> <em class="dr-type-object">object</em> <span class="dr-description"><a href="#Element" class="dr-link">Element</a></span></p>
+</div><h2 id="Paper" class="undefined">Paper<a href="#Paper" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to source" href="raphael-src.html#Lundefined">&#x27ad;</a></h2>
+<h3 id="Paper.bottom" class="dr-property">Paper.bottom<a href="#Paper.bottom" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to source" href="raphael-src.html#L4065">&#x27ad;</a></h3>
+<div class="dr-property"><p>Points to the bottom element on the paper</p>
+</div><h3 id="Paper.circle" class="dr-method">Paper.circle(x, y, r)<a href="#Paper.circle" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to source" href="raphael-src.html#L3905">&#x27ad;</a></h3>
+<div class="dr-method"><p>Draws a circle.</p>
+<p class="header">Parameters
+</p>
+<dl class="dr-parameters"><dt class="dr-param">x</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">x coordinate of the centre</dd>
+<dt class="dr-param">y</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">y coordinate of the centre</dd>
+<dt class="dr-param">r</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">radius</dd>
+</dl>
+<p class="dr-returns"><strong class="dr-title">Returns:</strong> <em class="dr-type-object">object</em> <span class="dr-description">Raphaël element object with type “circle”</span></p>
+<p class="header">Usage
+</p>
+<pre class="javascript code"><code><b>var</b> c<span class="s"> = </span>paper.circle(<span class="d">50</span>, <span class="d">50</span>, <span class="d">40</span>);
+</code></pre>
+</div><h3 id="Paper.ellipse" class="dr-method">Paper.ellipse(x, y, rx, ry)<a href="#Paper.ellipse" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to source" href="raphael-src.html#L3949">&#x27ad;</a></h3>
+<div class="dr-method"><p>Draws an ellipse.</p>
+<p class="header">Parameters
+</p>
+<dl class="dr-parameters"><dt class="dr-param">x</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">x coordinate of the centre</dd>
+<dt class="dr-param">y</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">y coordinate of the centre</dd>
+<dt class="dr-param">rx</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">horisontal radius</dd>
+<dt class="dr-param">ry</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">vertical radius</dd>
+</dl>
+<p class="dr-returns"><strong class="dr-title">Returns:</strong> <em class="dr-type-object">object</em> <span class="dr-description">Raphaël element object with type “ellipse”</span></p>
+<p class="header">Usage
+</p>
+<pre class="javascript code"><code><b>var</b> c<span class="s"> = </span>paper.ellipse(<span class="d">50</span>, <span class="d">50</span>, <span class="d">40</span>, <span class="d">20</span>);
+</code></pre>
+</div><h3 id="Paper.forEach" class="dr-method">Paper.forEach(callback, thisArg)<a href="#Paper.forEach" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to source" href="raphael-src.html#L4160">&#x27ad;</a></h3>
+<div class="dr-method"><p>Executes given function for each element on the paper</p>
+<p>If function returns <code>false</code> it will stop loop running.</p>
+<p class="header">Parameters
+</p>
+<dl class="dr-parameters"><dt class="dr-param">callback</dt>
+<dd class="dr-type"><em class="dr-type-function">function</em></dd>
+<dd class="dr-description">function to run</dd>
+<dt class="dr-param">thisArg</dt>
+<dd class="dr-type"><em class="dr-type-object">object</em></dd>
+<dd class="dr-description">context object for the callback</dd>
+</dl>
+<p class="dr-returns"><strong class="dr-title">Returns:</strong> <em class="dr-type-object">object</em> <span class="dr-description">Paper object</span></p>
+</div><h3 id="Paper.getById" class="dr-method">Paper.getById(id)<a href="#Paper.getById" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to source" href="raphael-src.html#L4136">&#x27ad;</a></h3>
+<div class="dr-method"><p>Returns you element by it’s internal ID.</p>
+<p class="header">Parameters
+</p>
+<dl class="dr-parameters"><dt class="dr-param">id</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">id</dd>
+</dl>
+<p class="dr-returns"><strong class="dr-title">Returns:</strong> <em class="dr-type-object">object</em> <span class="dr-description">Raphaël element object</span></p>
+</div><h3 id="Paper.getElementByPoint" class="dr-method">Paper.getElementByPoint(x, y)<a href="#Paper.getElementByPoint" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to source" href="raphael-src.html#L4100">&#x27ad;</a></h3>
+<div class="dr-method"><p>Returns you topmost element under given point.</p>
+<p class="dr-returns"><strong class="dr-title">Returns:</strong> <em class="dr-type-object">object</em> <span class="dr-description">Raphaël element object</span></p>
+<p class="header">Parameters
+</p>
+<dl class="dr-parameters"><dt class="dr-param">x</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">x coordinate from the top left corner of the window</dd>
+<dt class="dr-param">y</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">y coordinate from the top left corner of the window</dd>
+</dl>
+<p class="header">Usage
+</p>
+<pre class="javascript code"><code>paper.getElementByPoint(mouseX, mouseY).attr({stroke: <i>"#f00"</i>});
+</code></pre>
+</div><h3 id="Paper.image" class="dr-method">Paper.image(src, x, y, width, height)<a href="#Paper.image" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to source" href="raphael-src.html#L3991">&#x27ad;</a></h3>
+<div class="dr-method"><p>Embeds an image into the surface.</p>
+<p class="header">Parameters
+</p>
+<dl class="dr-parameters"><dt class="dr-param">src</dt>
+<dd class="dr-type"><em class="dr-type-string">string</em></dd>
+<dd class="dr-description">URI of the source image</dd>
+<dt class="dr-param">x</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">x coordinate position</dd>
+<dt class="dr-param">y</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">y coordinate position</dd>
+<dt class="dr-param">width</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">width of the image</dd>
+<dt class="dr-param">height</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">height of the image</dd>
+</dl>
+<p class="dr-returns"><strong class="dr-title">Returns:</strong> <em class="dr-type-object">object</em> <span class="dr-description">Raphaël element object with type “image”</span></p>
+<p class="header">Usage
+</p>
+<pre class="javascript code"><code><b>var</b> c<span class="s"> = </span>paper.image(<i>"apple.png"</i>, <span class="d">10</span>, <span class="d">10</span>, <span class="d">80</span>, <span class="d">80</span>);
+</code></pre>
+</div><h3 id="Paper.path" class="dr-method">Paper.path(pathString)<a href="#Paper.path" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to source" href="raphael-src.html#L3969">&#x27ad;</a></h3>
+<div class="dr-method"><p>Creates a path element by given path data string.</p>
+<p class="header">Parameters
+</p>
+<dl class="dr-parameters"><dt class="dr-param">pathString</dt>
+<dd class="dr-type"><em class="dr-type-string">string</em></dd>
+<dd class="dr-description">path data in SVG path string format.</dd>
+</dl>
+<p class="dr-returns"><strong class="dr-title">Returns:</strong> <em class="dr-type-object">object</em> <span class="dr-description">Raphaël element object with type “ellipse”</span></p>
+Details of a path's data attribute's format are described in the <a href="http://www.w3.org/TR/SVG/paths.html#PathData">SVG specification</a>.
+<p class="header">Usage
+</p>
+<pre class="javascript code"><code><b>var</b> c<span class="s"> = </span>paper.path(<i>"M10 10L90 <span class="d">90</span>"</i>);
+<span class="c">// draw a diagonal line:</span>
+<span class="c">// move to <span class="d">10</span>,<span class="d">10</span>, line to <span class="d">90</span>,<span class="d">90</span></span>
+</code></pre>
+</div><h3 id="Paper.raphael" class="dr-property">Paper.raphael<a href="#Paper.raphael" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to source" href="raphael-src.html#L4072">&#x27ad;</a></h3>
+<div class="dr-property"><p>Points to the <a href="#Raphael" class="dr-link">Raphael</a> object/function</p>
+</div><h3 id="Paper.rect" class="dr-method">Paper.rect(x, y, width, height, r)<a href="#Paper.rect" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to source" href="raphael-src.html#L3929">&#x27ad;</a></h3>
+<div class="dr-method"><p></p>
+<p>Draws a rectangle.</p>
+<p class="header">Parameters
+</p>
+<dl class="dr-parameters"><dt class="dr-param">x</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">x coordinate of the top left corner</dd>
+<dt class="dr-param">y</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">y coordinate of the top left corner</dd>
+<dt class="dr-param">width</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">width</dd>
+<dt class="dr-param">height</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">height</dd>
+<dt class="dr-param">r</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description"><a href="#optional" class="dr-link">optional</a> radius for rounded corners, default is 0</dd>
+</dl>
+<p class="dr-returns"><strong class="dr-title">Returns:</strong> <em class="dr-type-object">object</em> <span class="dr-description">Raphaël element object with type “rect”</span></p>
+<p class="header">Usage
+</p>
+<pre class="javascript code"><code><span class="c">// regular rectangle</span>
+<b>var</b> c<span class="s"> = </span>paper.rect(<span class="d">10</span>, <span class="d">10</span>, <span class="d">50</span>, <span class="d">50</span>);
+<span class="c">// rectangle <b>with</b> rounded corners</span>
+<b>var</b> c<span class="s"> = </span>paper.rect(<span class="d">40</span>, <span class="d">40</span>, <span class="d">50</span>, <span class="d">50</span>, <span class="d">10</span>);
+</code></pre>
+</div><h3 id="Paper.set" class="dr-method">Paper.set()<a href="#Paper.set" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to source" href="raphael-src.html#L4029">&#x27ad;</a></h3>
+<div class="dr-method"><p>Creates array-like object to keep and operate couple of elements at once.Warning: it doesn’t create any elements for itself in the page.</p>
+<p class="dr-returns"><strong class="dr-title">Returns:</strong> <em class="dr-type-object">object</em> <span class="dr-description">array-like object that represents set of elements</span></p>
+<p class="header">Usage
+</p>
+<pre class="javascript code"><code><b>var</b> st<span class="s"> = </span>paper.set();
+st.push(
+    paper.circle(<span class="d">10</span>, <span class="d">10</span>, <span class="d">5</span>),
+    paper.circle(<span class="d">30</span>, <span class="d">10</span>, <span class="d">5</span>)
+);
+st.attr({fill: <i>"red"</i>});
+</code></pre>
+</div><h3 id="Paper.setSize" class="dr-method">Paper.setSize(width, height)<a href="#Paper.setSize" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to source" href="raphael-src.html#L4051">&#x27ad;</a></h3>
+<div class="dr-method"><p>If you need to change dimensions of the canvas call this method</p>
+<p class="header">Parameters
+</p>
+<dl class="dr-parameters"><dt class="dr-param">width</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">new width of the canvas</dd>
+<dt class="dr-param">height</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">new height of the canvas</dd>
+</dl>
+<p class="header">Usage
+</p>
+<pre class="javascript code"><code><b>var</b> st<span class="s"> = </span>paper.set();
+st.push(
+    paper.circle(<span class="d">10</span>, <span class="d">10</span>, <span class="d">5</span>),
+    paper.circle(<span class="d">30</span>, <span class="d">10</span>, <span class="d">5</span>)
+);
+st.attr({fill: <i>"red"</i>});
+</code></pre>
+</div><h3 id="Paper.text" class="dr-method">Paper.text(x, y, text)<a href="#Paper.text" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to source" href="raphael-src.html#L4010">&#x27ad;</a></h3>
+<div class="dr-method"><p>Draws a text string. If you need line breaks, put “\n” in the string.</p>
+<p class="header">Parameters
+</p>
+<dl class="dr-parameters"><dt class="dr-param">x</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">x coordinate position</dd>
+<dt class="dr-param">y</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">y coordinate position</dd>
+<dt class="dr-param">text</dt>
+<dd class="dr-type"><em class="dr-type-string">string</em></dd>
+<dd class="dr-description">The text string to draw</dd>
+</dl>
+<p class="dr-returns"><strong class="dr-title">Returns:</strong> <em class="dr-type-object">object</em> <span class="dr-description">Raphaël element object with type “text”</span></p>
+<p class="header">Usage
+</p>
+<pre class="javascript code"><code><b>var</b> t<span class="s"> = </span>paper.text(<span class="d">50</span>, <span class="d">50</span>, <i>"Raphaël\nkicks\nbutt!"</i>);
+</code></pre>
+</div><h3 id="Paper.top" class="dr-property">Paper.top<a href="#Paper.top" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to source" href="raphael-src.html#L4059">&#x27ad;</a></h3>
+<div class="dr-property"><p>Points to the topmost element on the paper</p>
+</div><h2 id="Raphael" class="dr-method">Raphael(…)<a href="#Raphael" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to source" href="raphael-src.html#L55">&#x27ad;</a></h2>
+<div class="dr-method"><p>Creates a canvas object on which to draw.You must do this first, as all future calls to drawing methodsfrom this instance will be bound to this canvas.</p>
+<p class="header">Parameters
+</p>
+<dl class="dr-parameters"><dt class="dr-param">container</dt>
+<dd class="dr-type"><em class="dr-type-HTMLElement">HTMLElement</em> <em class="dr-type-string">string</em></dd>
+<dd class="dr-description">DOM element or it’s id which is going to be a parent for drawing surface</dd>
+<dt class="dr-param">width</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">&#160;</dd>
+<dt class="dr-param">height</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">&#160;</dd>
+</dl>
+<p>or</p>
+<dl class="dr-parameters"><dt class="dr-param">x</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">&#160;</dd>
+<dt class="dr-param">y</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">&#160;</dd>
+<dt class="dr-param">width</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">&#160;</dd>
+<dt class="dr-param">height</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">&#160;</dd>
+</dl>
+<p>or</p>
+<dl class="dr-parameters"><dt class="dr-param">all</dt>
+<dd class="dr-type"><em class="dr-type-array">array</em></dd>
+<dd class="dr-description">(first 3 or 4 elements in the array are equal to [containerID, width, height] or [x, y, width, height]. The rest are element descriptions in format {type: type, &lt;attributes>})</dd>
+</dl>
+<p>or</p>
+<dl class="dr-parameters"><dt class="dr-param">onReadyCallback</dt>
+<dd class="dr-type"><em class="dr-type-function">function</em></dd>
+<dd class="dr-description">function that is going to be called on DOM ready event. You can also subscribe to this event via Eve’s “DOMLoad” event. In this case method returns <code>undefined</code>.</dd>
+</dl>
+<p class="dr-returns"><strong class="dr-title">Returns:</strong> <em class="dr-type-object">object</em> <span class="dr-description"><a href="#Paper" class="dr-link">Paper</a></span></p>
+<p class="header">Usage
+</p>
+<pre class="javascript code"><code><span class="c">// Each of the following examples create a canvas that is 320px wide by 200px high</span>
+<span class="c">// Canvas is created at the viewport’s <span class="d">10</span>,<span class="d">50</span> coordinate</span>
+<b>var</b> paper<span class="s"> = </span>Raphael(<span class="d">10</span>, <span class="d">50</span>, <span class="d">320</span>, <span class="d">200</span>);
+<span class="c">// Canvas is created at the top left corner of the #notepad element</span>
+<span class="c">// (or its top right corner <b>in</b> dir=<i>"rtl"</i> elements)</span>
+<b>var</b> paper<span class="s"> = </span>Raphael(document.getElementById(<i>"notepad"</i>), <span class="d">320</span>, <span class="d">200</span>);
+<span class="c">// Same as above</span>
+<b>var</b> paper<span class="s"> = </span>Raphael(<i>"notepad"</i>, <span class="d">320</span>, <span class="d">200</span>);
+<span class="c">// Image dump</span>
+<b>var</b> set<span class="s"> = </span>Raphael([<i>"notepad"</i>, <span class="d">320</span>, <span class="d">200</span>, {
+    type: <i>"rect"</i>,
+    x: <span class="d">10</span>,
+    y: <span class="d">10</span>,
+    width: <span class="d">25</span>,
+    height: <span class="d">25</span>,
+    stroke: <i>"#f00"</i>
+}, {
+    type: <i>"text"</i>,
+    x: <span class="d">30</span>,
+    y: <span class="d">40</span>,
+    text: <i>"Dump"</i>
+}]);
+</code></pre>
+</div><h3 id="Raphael.angle" class="dr-method">Raphael.angle(x1, y1, x2, y2, [x3], [y3])<a href="#Raphael.angle" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to source" href="raphael-src.html#L298">&#x27ad;</a></h3>
+<div class="dr-method"><p>Returns angle between two or three points</p>
+<p class="header">Parameters
+</p>
+<dl class="dr-parameters"><dt class="dr-param">x1</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">x coord of first point</dd>
+<dt class="dr-param">y1</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">y coord of first point</dd>
+<dt class="dr-param">x2</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">x coord of second point</dd>
+<dt class="dr-param">y2</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">y coord of second point</dd>
+<dt class="dr-param optional">x3</dt>
+<dd class="dr-optional">optional</dd>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">x coord of third point</dd>
+<dt class="dr-param optional">y3</dt>
+<dd class="dr-optional">optional</dd>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">y coord of third point</dd>
+</dl>
+<p class="dr-returns"><strong class="dr-title">Returns:</strong> <em class="dr-type-number">number</em> <span class="dr-description">angle in degrees.</span></p>
+</div><h3 id="Raphael.animation" class="dr-method">Raphael.animation(params, ms, [easing], [callback])<a href="#Raphael.animation" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to source" href="raphael-src.html#L4990">&#x27ad;</a></h3>
+<div class="dr-method"><p>Creates animation object. That later could be used for <a href="#Element.animate" class="dr-link">Element.animate</a> or <a href="#Element.animateWith" class="dr-link">Element.animateWith</a> methods.See also <a href="#Animation.delay" class="dr-link">Animation.delay</a> and <a href="#Animation.repeat" class="dr-link">Animation.repeat</a> methods.</p>
+<p class="header">Parameters
+</p>
+<dl class="dr-parameters"><dt class="dr-param">params</dt>
+<dd class="dr-type"><em class="dr-type-object">object</em></dd>
+<dd class="dr-description">final attributes for the element, see also <a href="#Element.attr" class="dr-link">Element.attr</a></dd>
+<dt class="dr-param">ms</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">number of milliseconds for animation to run</dd>
+<dt class="dr-param optional">easing</dt>
+<dd class="dr-optional">optional</dd>
+<dd class="dr-type"><em class="dr-type-string">string</em></dd>
+<dd class="dr-description">easing type. Accept one of <a href="#Raphael.easing_formulas" class="dr-link">Raphael.easing_formulas</a> or CSS format: <code>cubic-bezier(XX, XX, XX, XX)</code></dd>
+<dt class="dr-param optional">callback</dt>
+<dd class="dr-optional">optional</dd>
+<dd class="dr-type"><em class="dr-type-function">function</em></dd>
+<dd class="dr-description">callback function. Will be called at the end of animation.</dd>
+</dl>
+<p class="dr-returns"><strong class="dr-title">Returns:</strong> <em class="dr-type-object">object</em> <span class="dr-description"><a href="#Animation" class="dr-link">Animation</a></span></p>
+</div><h3 id="Raphael.deg" class="dr-method">Raphael.deg(deg)<a href="#Raphael.deg" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to source" href="raphael-src.html#L331">&#x27ad;</a></h3>
+<div class="dr-method"><p>Transform angle to degrees</p>
+<p class="header">Parameters
+</p>
+<dl class="dr-parameters"><dt class="dr-param">deg</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">angle in radians</dd>
+</dl>
+<p class="dr-returns"><strong class="dr-title">Returns:</strong> <em class="dr-type-number">number</em> <span class="dr-description">angle in degrees.</span></p>
+</div><h3 id="Raphael.easing_formulas" class="dr-property">Raphael.easing_formulas<a href="#Raphael.easing_formulas" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to source" href="raphael-src.html#L4466">&#x27ad;</a></h3>
+<div class="dr-property"><p>Object that contains easing formulas for animation. You could extend it with your owns. By default it has following list of easing:</p>
+<ul>
+    <li>“linear”</li>
+    <li>“&lt;” or “easeIn” or “ease-in”</li>
+    <li>“>” or “easeOut” or “ease-out”</li>
+    <li>“&lt;>” or “easeInOut” or “ease-in-out”</li>
+    <li>“backIn” or “back-in”</li>
+    <li>“backOut” or “back-out”</li>
+    <li>“elastic”</li>
+    <li>“bounce”</li>
+</ul>
+<p>See also <a href="http://raphaeljs.com/easing.html">Easing demo</a>.</p>
+</div><h3 id="Raphael.findDotsAtSegment" class="dr-method">Raphael.findDotsAtSegment(p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y, t)<a href="#Raphael.findDotsAtSegment" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to source" href="raphael-src.html#L940">&#x27ad;</a></h3>
+<div class="dr-method"><p>Utility methodFind dot coordinates on the given cubic bezier curve at the given t.</p>
+<p class="header">Parameters
+</p>
+<dl class="dr-parameters"><dt class="dr-param">p1x</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">x of the first point of the curve</dd>
+<dt class="dr-param">p1y</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">y of the first point of the curve</dd>
+<dt class="dr-param">c1x</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">x of the first anchor of the curve</dd>
+<dt class="dr-param">c1y</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">y of the first anchor of the curve</dd>
+<dt class="dr-param">c2x</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">x of the second anchor of the curve</dd>
+<dt class="dr-param">c2y</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">y of the second anchor of the curve</dd>
+<dt class="dr-param">p2x</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">x of the second point of the curve</dd>
+<dt class="dr-param">p2y</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">y of the second point of the curve</dd>
+<dt class="dr-param">t</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">position on the curve (0..1)</dd>
+</dl>
+<p class="dr-returns"><strong class="dr-title">Returns:</strong> <em class="dr-type-object">object</em> <span class="dr-description">point information in format:</span></p>
+<pre class="javascript code"><code>{
+    x: <span class="c">// x coordinate of the point,</span>
+    y: <span class="c">// y coordinate of the point,</span>
+    m: {
+        x: <span class="c">// x coordinate of the left anchor,</span>
+        y: <span class="c">// y coordinate of the left anchor</span>
+    },
+    n: {
+        x: <span class="c">// x coordinate of the right anchor,</span>
+        y: <span class="c">// y coordinate of the right anchor</span>
+    },
+    start: {
+        x: <span class="c">// x coordinate of the start of the curve,</span>
+        y: <span class="c">// y coordinate of the start of the curve</span>
+    },
+    end: {
+        x: <span class="c">// x coordinate of the end of the curve,</span>
+        y: <span class="c">// y coordinate of the end of the curve</span>
+    },
+    alpha: <span class="c">// angle of the curve derivative at the point.</span>
+}
+</code></pre>
+</div><h3 id="Raphael.fn" class="dr-property">Raphael.fn<a href="#Raphael.fn" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to source" href="raphael-src.html#L262">&#x27ad;</a></h3>
+<div class="dr-property"><em class="dr-type dr-type-object">object</em><p>You can add your own method to the canvas. For example if you want to draw pie chart,you can create your own pie chart function and ship it as a Raphaël plugin. To do thisyou need to extend <code>Raphael.fn</code> object. Please note that you can create your own namespacesinside <code>fn</code> object. Methods will be run in context of canvas anyway. You should alter <code>fn</code>object before Raphaël instance was created, otherwise it will take no effect.</p>
+<p class="header">Usage
+</p>
+<pre class="javascript code"><code>Raphael.fn.arrow<span class="s"> = </span><b>function</b> (x1, y1, x2, y2, size) {
+    <b>return</b> <b>this</b>.path( ... );
 };
-// or create namespace
-Raphael.fn.mystuff = {
-    arrow: function () {…},
-    star: function () {…},
-    // etc…
+<span class="c">// or create namespace</span>
+Raphael.fn.mystuff<span class="s"> = </span>{
+    arrow: <b>function</b> () {…},
+    star: <b>function</b> () {…},
+    <span class="c">// etc…</span>
 };
-var paper = Raphael(10, 10, 630, 480);
-// then use it
-paper.arrow(10, 10, 30, 30, 5).attr({fill: "#f00"});
+<b>var</b> paper<span class="s"> = </span>Raphael(<span class="d">10</span>, <span class="d">10</span>, <span class="d">630</span>, <span class="d">480</span>);
+<span class="c">// then use it</span>
+paper.arrow(<span class="d">10</span>, <span class="d">10</span>, <span class="d">30</span>, <span class="d">30</span>, <span class="d">5</span>).attr({fill: <i>"#f00"</i>});
 paper.mystuff.arrow();
 paper.mystuff.star();
 </code></pre>
-                        <h3 id="plugins-elements">
-                            Adding your own methods to elements
-                        </h3>
-                        <p>
-                            You can add your own method to elements. This is usefull when you want to hack default functionality or want to wrap some common transformation or attributes in one method. In difference to canvas mathods, you can redefine element method at any time.
-                        </p>
-                        <h4>Usage</h4>
-                        <pre class="javascript code"><code>Raphael.el.red = function () {
-    this.attr({fill: "#f00"});
-};
-// then use it
-paper.circle(100, 100, 20).red();
+</div><h3 id="Raphael.getColor" class="dr-method">Raphael.getColor([value])<a href="#Raphael.getColor" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to source" href="raphael-src.html#L803">&#x27ad;</a></h3>
+<div class="dr-method"><p>On each call returns next colour in the spectrum. To reset it back to red call <a href="#Raphael.getColor.reset" class="dr-link">Raphael.getColor.reset</a></p>
+<p class="header">Parameters
+</p>
+<dl class="dr-parameters"><dt class="dr-param optional">value</dt>
+<dd class="dr-optional">optional</dd>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">brightness, default is <code>0.75</code></dd>
+</dl>
+<p class="dr-returns"><strong class="dr-title">Returns:</strong> <em class="dr-type-string">string</em> <span class="dr-description">hex representation of the colour.</span></p>
+</div><h4 id="Raphael.getColor.reset" class="dr-method">Raphael.getColor.reset()<a href="#Raphael.getColor.reset" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to source" href="raphael-src.html#L820">&#x27ad;</a></h4>
+<div class="dr-method"><p>Resets spectrum position for <a href="#Raphael.getColor" class="dr-link">Raphael.getColor</a> back to red.</p>
+</div><h3 id="Raphael.getPointAtLength" class="dr-method">Raphael.getPointAtLength(path, length)<a href="#Raphael.getPointAtLength" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to source" href="raphael-src.html#L4375">&#x27ad;</a></h3>
+<div class="dr-method"><p>Return coordinates of the point located at the given length on the given path.</p>
+<p class="header">Parameters
+</p>
+<dl class="dr-parameters"><dt class="dr-param">path</dt>
+<dd class="dr-type"><em class="dr-type-string">string</em></dd>
+<dd class="dr-description">SVG path string</dd>
+<dt class="dr-param">length</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">&#160;</dd>
+</dl>
+<p class="dr-returns"><strong class="dr-title">Returns:</strong> <em class="dr-type-object">object</em> <span class="dr-description">representation of the point:</span></p>
+<pre class="javascript code"><code>{
+    x: <span class="c">//x coordinate,</span>
+    y: <span class="c">//y coordinate,</span>
+    alpha: <span class="c">//angle of derivative</span>
+}
 </code></pre>
-                        <h3 id="custom-attributes">
-                            Custom Attributes
-                        </h3>
-                        <p>
-                            If you have a set of attributes that you would like to represent as a function of some number you can do it easily with custom attributes:
-                        </p>
-                        <h4>Usage</h4>
-                        <pre class="javascript code"><code>paper.customAttributes.hue = function (num) {
-    num = num % 1;
-    return {fill: "hsb(" + num + ", .75, 1)"};
-};
-// Custom attribute “hue” will change fill
-// to be given hue with fixed saturation and brightness.
-// Now you can use it like this:
-var c = paper.circle(10, 10, 10).attr({hue: .45});
-// or even like this:
-c.animate({hue: 1}, 1e3);
-
-// You could also create custom attribute
-// with multiple parameters:
-paper.customAttributes.hsb = function (h, s, b) {
-    return {fill: "hsb(" + [h, s, b].join(",") + ")"};
-};
-c.attr({hsb: ".5 .8 1"});
-c.animate({hsb: "1 0 .5"}, 1e3);
+</div><h3 id="Raphael.getRGB" class="dr-method">Raphael.getRGB(colour)<a href="#Raphael.getRGB" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to source" href="raphael-src.html#L681">&#x27ad;</a></h3>
+<div class="dr-method"><p>Parses colour string as RGB object</p>
+<p class="header">Parameters
+</p>
+<dl class="dr-parameters"><dt class="dr-param">colour</dt>
+<dd class="dr-type"><em class="dr-type-string">string</em></dd>
+<dd class="dr-description">colour string in one of formats:</dd>
+</dl>
+<p class="dr-returns"><strong class="dr-title">Returns:</strong> <em class="dr-type-object">object</em> <span class="dr-description">RGB object in format:</span></p>
+<pre class="javascript code"><code>{
+    r: <span class="c">// red,</span>
+    g: <span class="c">// green,</span>
+    b: <span class="c">// blue</span>
+    hex: <span class="c">// color <b>in</b> HTML/CSS format: #••••••,</span>
+    error: <span class="c">// <b>true</b> <b>if</b> string can’t be parsed</span>
+}
 </code></pre>
-                        <h3 id="colour">
-                            Supported colour formats
-                        </h3>
-                        <p>
-                            You could specify colour in this formats:
-                        </p>
-                        <ul>
-                            <li>Colour name (“<samp>red</samp>”, “<samp>green</samp>”, “<samp>cornflowerblue</samp>”, etc)</li>
-                            <li>#••• — shortened HTML colour: (“<samp>#000</samp>”, “<samp>#fc0</samp>”, etc)</li>
-                            <li>#•••••• — full length HTML colour: (“<samp>#000000</samp>”, “<samp>#bd2300</samp>”)</li>
-                            <li>rgb(•••, •••, •••) — red, green and blue channels’ values: (“<samp>rgb(200,&nbsp;100,&nbsp;0)</samp>”)</li>
-                            <li>rgb(•••%, •••%, •••%) — same as above, but in %: (“<samp>rgb(100%,&nbsp;175%,&nbsp;0%)</samp>”)</li>
-                            <li>rgba(•••, •••, •••, •••) — red, green and blue channels’ values: (“<samp>rgba(200,&nbsp;100,&nbsp;0, .5)</samp>”)</li>
-                            <li>rgba(•••%, •••%, •••%, •••%) — same as above, but in %: (“<samp>rgba(100%,&nbsp;175%,&nbsp;0%, 50%)</samp>”)</li>
-                            <li>hsb(•••, •••, •••) — hue, saturation and brightness values: (“<samp>hsb(0.5,&nbsp;0.25,&nbsp;1)</samp>”)</li>
-                            <li>hsb(•••%, •••%, •••%) — same as above, but in %</li>
-                            <li>hsba(•••, •••, •••, •••) — same as above, but with opacity</li>
-                            <li>hsl(•••, •••, •••) — almost the same as hsb, see <a href="http://en.wikipedia.org/wiki/HSL_and_HSV" title="HSL and HSV - Wikipedia, the free encyclopedia">Wikipedia page</a></li>
-                            <li>hsl(•••%, •••%, •••%) — same as above, but in %</li>
-                            <li>hsla(•••, •••, •••) — same as above, but with opacity</li>
-                            <li>Optionally for hsb and hsl you could specify hue as a degree: “<samp>hsl(240deg,&nbsp;1,&nbsp;.5)</samp>” or, if you want to go fancy, “<samp>hsl(240°,&nbsp;1,&nbsp;.5)</samp>”</li>
-                        </ul>
-                        <h4>Usage</h4>
-                        <pre class="javascript code"><code>paper.circle(100, 100, 20).attr({
-    fill: "hsb(0.6, 1, 0.75)",
-    stroke: "red"
-});</code></pre>
-                        <h3 id="safari">
-                            safari
-                        </h3>
-                        <p>
-                            There is an inconvenient rendering bug is Safari (WebKit): sometimes the rendering should be forced. This method should help with dealing with this bug.
-                        </p>
-                        <h4>Usage</h4>
-                        <pre class="javascript code"><code>paper.safari();</code></pre>
-                        <h3 id="ninja-mode">
-                            “Ninja Mode”
-                        </h3>
-                        <p>
-                            If you want to leave no trace of Raphaël (Well, Raphaël creates only one global variable <code>Raphael</code>, but anyway.) You can use <code>ninja</code> method. Beware, that in this case plugins could stop working, because they are depending on global variable existance.
-                        </p>
-                        <h4>Usage</h4>
-                        <pre class="javascript code"><code>(function (local_raphael) {
-    var paper = local_raphael(10, 10, 320, 200);
-    …
-})(Raphael.ninja());
+</div><h3 id="Raphael.getSubpath" class="dr-method">Raphael.getSubpath(path, from, to)<a href="#Raphael.getSubpath" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to source" href="raphael-src.html#L4390">&#x27ad;</a></h3>
+<div class="dr-method"><p>Return subpath of a given path from given length to given length.</p>
+<p class="header">Parameters
+</p>
+<dl class="dr-parameters"><dt class="dr-param">path</dt>
+<dd class="dr-type"><em class="dr-type-string">string</em></dd>
+<dd class="dr-description">SVG path string</dd>
+<dt class="dr-param">from</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">position of the start of the segment</dd>
+<dt class="dr-param">to</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">position of the end of the segment</dd>
+</dl>
+<p class="dr-returns"><strong class="dr-title">Returns:</strong> <em class="dr-type-string">string</em> <span class="dr-description">pathstring for the segment</span></p>
+</div><h3 id="Raphael.getTotalLength" class="dr-method">Raphael.getTotalLength(path)<a href="#Raphael.getTotalLength" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to source" href="raphael-src.html#L4356">&#x27ad;</a></h3>
+<div class="dr-method"><p>Returns length of the given path in pixels.</p>
+<p class="header">Parameters
+</p>
+<dl class="dr-parameters"><dt class="dr-param">path</dt>
+<dd class="dr-type"><em class="dr-type-string">string</em></dd>
+<dd class="dr-description">SVG path string.</dd>
+</dl>
+<p class="dr-returns"><strong class="dr-title">Returns:</strong> <em class="dr-type-number">number</em> <span class="dr-description">length.</span></p>
+</div><h3 id="Raphael.hsb" class="dr-method">Raphael.hsb(h, s, b)<a href="#Raphael.hsb" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to source" href="raphael-src.html#L763">&#x27ad;</a></h3>
+<div class="dr-method"><p>Converts HSB values to hex representation of the colour.</p>
+<p class="header">Parameters
+</p>
+<dl class="dr-parameters"><dt class="dr-param">h</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">hue</dd>
+<dt class="dr-param">s</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">saturation</dd>
+<dt class="dr-param">b</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">value or brightness</dd>
+</dl>
+<p class="dr-returns"><strong class="dr-title">Returns:</strong> <em class="dr-type-string">string</em> <span class="dr-description">hex representation of the colour.</span></p>
+</div><h3 id="Raphael.hsb2rgb" class="dr-method">Raphael.hsb2rgb(h, s, v)<a href="#Raphael.hsb2rgb" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to source" href="raphael-src.html#L488">&#x27ad;</a></h3>
+<div class="dr-method"><p>Converts HSB values to RGB object.</p>
+<p class="header">Parameters
+</p>
+<dl class="dr-parameters"><dt class="dr-param">h</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">hue</dd>
+<dt class="dr-param">s</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">saturation</dd>
+<dt class="dr-param">v</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">value or brightness</dd>
+</dl>
+<p class="dr-returns"><strong class="dr-title">Returns:</strong> <em class="dr-type-object">object</em> <span class="dr-description">RGB object in format:</span></p>
+<pre class="javascript code"><code>{
+    r: <span class="c">// red,</span>
+    g: <span class="c">// green,</span>
+    b: <span class="c">// blue</span>
+    hex: <span class="c">// color <b>in</b> HTML/CSS format: #••••••</span>
+}
 </code></pre>
-                        <h3 id="events">
-                            Events
-                        </h3>
-                        <p>
-                            You can attach events to elements by using element.node and your favourite library (<samp>$(circle.node).click(…)</samp>) or you can use built-in methods:
-                        </p>
-                        <h4>Usage</h4>
-                        <pre class="javascript code"><code>element.click(function (event) {
-    this.attr({fill: "red"});
-});
-element.dblclick(function (event) {
-    this.attr({fill: "red"});
-});
-element.mousedown(function (event) {
-    this.attr({fill: "red"});
-});
-element.mousemove(function (event) {
-    this.attr({fill: "red"});
-});
-element.mouseout(function (event) {
-    this.attr({fill: "red"});
-});
-element.mouseover(function (event) {
-    this.attr({fill: "red"});
-});
-element.mouseup(function (event) {
-    this.attr({fill: "red"});
-});
-element.hover(function (event) {
-    this.attr({fill: "red"});
-}, function (event) {
-    this.attr({fill: "black"});
-}, overScope, outScope);</code></pre>
-                        <p>
-                            Second parameter is optional scope. By default handlers are run in the scope of the element. To unbind events use the same method names with “un” prefix, i.e. <samp>element.unclick(f);</samp>
-                        </p>
-                        <h3 id="drag-n-drop">
-                            Drag ’n’ Drop
-                        </h3>
-                        <p>
-                            To make element “draggable” you need to call method <code>drag</code> on element.
-                        </p>
-                        <h4>Parameters</h4>
-                        <ol>
-                            <li>onmove <em>function</em> event handler for moving</li>
-                            <li>onstart <em>function</em> event handler for start</li>
-                            <li>onend <em>function</em> event handler for end of the drag</li>
-                        </ol>
-                        <h4>Usage</h4>
-                        <pre class="javascript code"><code>var c = R.circle(100, 100, 50).attr({
-    fill: "hsb(.8, 1, 1)",
-    stroke: "none",
-    opacity: .5
-});
-var start = function () {
-    // storing original coordinates
-    this.ox = this.attr("cx");
-    this.oy = this.attr("cy");
-    this.attr({opacity: 1});
-},
-move = function (dx, dy) {
-    // move will be called with dx and dy
-    this.attr({cx: this.ox + dx, cy: this.oy + dy});
-},
-up = function () {
-    // restoring state
-    this.attr({opacity: .5});
-};
-c.drag(move, start, up);</code></pre>
-                        <p>
-                            To unbind drag use the <samp>undrag</samp> method.
-                        </p>
-                    </div>
-                    <div id="column-2">
-                        <h2>
-                            <a href="index.html">Home</a>
-                        </h2>
-                        <h2>
-                            Contents
-                        </h2>
-                        <ul id="contents">
-                            <li>
-                                <a href="#Raphael"><code>Raphael</code></a>
-                            </li>
-                            <li>
-                                <a href="#circle"><code>circle</code></a>
-                            </li>
-                            <li>
-                                <a href="#rect"><code>rect</code></a>
-                            </li>
-                            <li>
-                                <a href="#ellipse"><code>ellipse</code></a>
-                            </li>
-                            <li>
-                                <a href="#image"><code>image</code></a>
-                            </li>
-                            <li>
-                                <a href="#set"><code>set</code></a>
-                            </li>
-                            <li>
-                                <a href="#text"><code>text</code></a>
-                            </li>
-                            <li>
-                                <a href="#path"><code>path</code></a>
-                            </li>
-                            <li>
-                                <a href="#clear"><code>clear</code></a>
-                            </li>
-                            <li>
-                                <a href="#node"><code>node</code></a>
-                            </li>
-                            <li>
-                                <a href="#paper"><code>paper</code></a>
-                            </li>
-                            <li>
-                                <a href="#remove"><code>remove</code></a>
-                            </li>
-                            <li>
-                                <a href="#hide"><code>hide</code></a>
-                            </li>
-                            <li>
-                                <a href="#show"><code>show</code></a>
-                            </li>
-                            <li>
-                                <a href="#rotate"><code>rotate</code></a>
-                            </li>
-                            <li>
-                                <a href="#translate"><code>translate</code></a>
-                            </li>
-                            <li>
-                                <a href="#scale"><code>scale</code></a>
-                            </li>
-                            <li>
-                                <a href="#attr"><code>attr</code></a>
-                            </li>
-                            <li>
-                                <a href="#animate"><code>animate</code></a>
-                            </li>
-                            <li>
-                                <a href="#animateWith"><code>animateWith</code></a>
-                            </li>
-                            <li>
-                                <a href="#animateAlong"><code>animateAlong</code></a>
-                            </li>
-                            <li>
-                                <a href="#animateAlongBack"><code>animateAlongBack</code></a>
-                            </li>
-                            <li>
-                                <a href="#getBBox"><code>getBBox</code></a>
-                            </li>
-                            <li>
-                                <a href="#toFront"><code>toFront</code></a>
-                            </li>
-                            <li>
-                                <a href="#toBack"><code>toBack</code></a>
-                            </li>
-                            <li>
-                                <a href="#insertBefore"><code>insertBefore</code></a>
-                            </li>
-                            <li>
-                                <a href="#insertAfter"><code>insertAfter</code></a>
-                            </li>
-                            <li>
-                                <a href="#clone"><code>clone</code></a>
-                            </li>
-                            <li>
-                                <a href="#raphael"><code>raphael</code></a>
-                            </li>
-                            <li>
-                                <a href="#getTotalLength"><code>getTotalLength</code></a>
-                            </li>
-                            <li>
-                                <a href="#getPointAtLength"><code>getPointAtLength</code></a>
-                            </li>
-                            <li>
-                                <a href="#getSubpath"><code>getSubpath</code></a>
-                            </li>
-                            <li>
-                                <a href="#setSize"><code>setSize</code></a>
-                            </li>
-                            <li>
-                                <a href="#setWindow"><code>setWindow</code></a>
-                            </li>
-                            <li>
-                                <a href="#getRGB"><code>getRGB</code></a>
-                            </li>
-                            <li>
-                                <a href="#angle"><code>angle</code></a>
-                            </li>
-                            <li>
-                                <a href="#rad"><code>rad</code></a>
-                            </li>
-                            <li>
-                                <a href="#deg"><code>deg</code></a>
-                            </li>
-                            <li>
-                                <a href="#snapTo"><code>snapTo</code></a>
-                            </li>
-                            <li>
-                                <a href="#getColor"><code>getColor</code></a>
-                            </li>
-                            <li>
-                                <a href="#getColor-reset"><code>getColor.reset</code></a>
-                            </li>
-                            <li>
-                                <a href="#registerFont"><code>registerFont</code></a>
-                            </li>
-                            <li>
-                                <a href="#getFont"><code>getFont</code></a>
-                            </li>
-                            <li>
-                                <a href="#print"><code>print</code></a>
-                            </li>
-                            <li>
-                                <a href="#plugins-canvas">Adding your own methods to canvas</a>
-                            </li>
-                            <li>
-                                <a href="#plugins-elements">Adding your own methods to elements</a>
-                            </li>
-                            <li>
-                                <a href="#custom-attributes">Custom Attributes</a>
-                            </li>
-                            <li>
-                                <a href="#colour">Supported colour formats</a>
-                            </li>
-                            <li>
-                                <a href="#safari">safari</a>
-                            </li>
-                            <li>
-                                <a href="#ninja-mode">“Ninja Mode”</a>
-                            </li>
-                            <li>
-                                <a href="#events">Events</a>
-                            </li>
-                        </ul>
-                    </div>
-                    <div  id="footer">
-                        <h3 id="copyright">
-                            <a href="http://www.opensource.org/licenses/mit-license.php" title="MIT License" rel="license">Some Rights Reserved</a> by <a href="http://dmitry.baranovskiy.com/">Dmitry Baranovskiy</a>
-                        </h3>
-                        <h3 id="font">
-                            Logo by <a href="http://wasabicube.com/">Wasabicube</a>
-                        </h3>
-                    </div>
-        </div>
-        <script src="raphael.js" type="text/javascript" charset="utf-8"></script>
-        <script src="syntax.js" type="text/javascript" charset="utf-8"></script>
-        <script src="museo.js" type="text/javascript" charset="utf-8"></script>
-        <script src="site.js" type="text/javascript" charset="utf-8"></script>
-        <script type="text/javascript">
-        var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-        document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-        </script>
-        <script type="text/javascript">
-        var pageTracker = _gat._getTracker("UA-616618-3");
-        pageTracker._trackPageview();
-        </script>
-    </body>
-</html>
+</div><h3 id="Raphael.hsl" class="dr-method">Raphael.hsl(h, s, l)<a href="#Raphael.hsl" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to source" href="raphael-src.html#L777">&#x27ad;</a></h3>
+<div class="dr-method"><p>Converts HSL values to hex representation of the colour.</p>
+<p class="header">Parameters
+</p>
+<dl class="dr-parameters"><dt class="dr-param">h</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">hue</dd>
+<dt class="dr-param">s</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">saturation</dd>
+<dt class="dr-param">l</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">luminosity</dd>
+</dl>
+<p class="dr-returns"><strong class="dr-title">Returns:</strong> <em class="dr-type-string">string</em> <span class="dr-description">hex representation of the colour.</span></p>
+</div><h3 id="Raphael.hsl2rgb" class="dr-method">Raphael.hsl2rgb(h, s, l)<a href="#Raphael.hsl2rgb" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to source" href="raphael-src.html#L525">&#x27ad;</a></h3>
+<div class="dr-method"><p>Converts HSL values to RGB object.</p>
+<p class="header">Parameters
+</p>
+<dl class="dr-parameters"><dt class="dr-param">h</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">hue</dd>
+<dt class="dr-param">s</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">saturation</dd>
+<dt class="dr-param">l</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">luminosity</dd>
+</dl>
+<p class="dr-returns"><strong class="dr-title">Returns:</strong> <em class="dr-type-object">object</em> <span class="dr-description">RGB object in format:</span></p>
+<pre class="javascript code"><code>{
+    r: <span class="c">// red,</span>
+    g: <span class="c">// green,</span>
+    b: <span class="c">// blue</span>
+    hex: <span class="c">// color <b>in</b> HTML/CSS format: #••••••</span>
+}
+</code></pre>
+</div><h3 id="Raphael.is" class="dr-method">Raphael.is(o, type)<a href="#Raphael.is" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to source" href="raphael-src.html#L273">&#x27ad;</a></h3>
+<div class="dr-method"><p>Handfull replacement for <code>typeof</code> operator.</p>
+<p class="header">Parameters
+</p>
+<dl class="dr-parameters"><dt class="dr-param">o</dt>
+<dd class="dr-type"><em class="dr-type-…">…</em></dd>
+<dd class="dr-description">any object or primitive</dd>
+<dt class="dr-param">type</dt>
+<dd class="dr-type"><em class="dr-type-string">string</em></dd>
+<dd class="dr-description">name of the type, i.e. “string”, “function”, “number”, etc.</dd>
+</dl>
+<p class="dr-returns"><strong class="dr-title">Returns:</strong> <em class="dr-type-boolean">boolean</em> <span class="dr-description">is given value is of given type</span></p>
+</div><h3 id="Raphael.parsePathString" class="dr-method">Raphael.parsePathString(pathString)<a href="#Raphael.parsePathString" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to source" href="raphael-src.html#L835">&#x27ad;</a></h3>
+<div class="dr-method"><p>Utility methodParses given path string into an array of arrays of path segments.</p>
+<p class="header">Parameters
+</p>
+<dl class="dr-parameters"><dt class="dr-param">pathString</dt>
+<dd class="dr-type"><em class="dr-type-string">string</em> <em class="dr-type-array">array</em></dd>
+<dd class="dr-description">path string or array of segments (in the last case it will be returned stright away)</dd>
+</dl>
+<p class="dr-returns"><strong class="dr-title">Returns:</strong> <em class="dr-type-array">array</em> <span class="dr-description">array of segments.</span></p>
+</div><h3 id="Raphael.parseTransformString" class="dr-method">Raphael.parseTransformString(TString)<a href="#Raphael.parseTransformString" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to source" href="raphael-src.html#L878">&#x27ad;</a></h3>
+<div class="dr-method"><p>Utility methodParses given path string into an array of transformations.</p>
+<p class="header">Parameters
+</p>
+<dl class="dr-parameters"><dt class="dr-param">TString</dt>
+<dd class="dr-type"><em class="dr-type-string">string</em> <em class="dr-type-array">array</em></dd>
+<dd class="dr-description">transform string or array of transformations (in the last case it will be returned stright away)</dd>
+</dl>
+<p class="dr-returns"><strong class="dr-title">Returns:</strong> <em class="dr-type-array">array</em> <span class="dr-description">array of transformations.</span></p>
+</div><h3 id="Raphael.path2curve" class="dr-method">Raphael.path2curve(pathString)<a href="#Raphael.path2curve" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to source" href="raphael-src.html#L1659">&#x27ad;</a></h3>
+<div class="dr-method"><p>Utility methodConverts path to path where all segments are cubic bezier curves.</p>
+<p class="header">Parameters
+</p>
+<dl class="dr-parameters"><dt class="dr-param">pathString</dt>
+<dd class="dr-type"><em class="dr-type-string">string</em> <em class="dr-type-array">array</em></dd>
+<dd class="dr-description">path string or array of segments</dd>
+</dl>
+<p class="dr-returns"><strong class="dr-title">Returns:</strong> <em class="dr-type-array">array</em> <span class="dr-description">array of segments.</span></p>
+</div><h3 id="Raphael.pathToRelative" class="dr-method">Raphael.pathToRelative(pathString)<a href="#Raphael.pathToRelative" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to source" href="raphael-src.html#L1647">&#x27ad;</a></h3>
+<div class="dr-method"><p>Utility methodConverts path to relative form</p>
+<p class="header">Parameters
+</p>
+<dl class="dr-parameters"><dt class="dr-param">pathString</dt>
+<dd class="dr-type"><em class="dr-type-string">string</em> <em class="dr-type-array">array</em></dd>
+<dd class="dr-description">path string or array of segments</dd>
+</dl>
+<p class="dr-returns"><strong class="dr-title">Returns:</strong> <em class="dr-type-array">array</em> <span class="dr-description">array of segments.</span></p>
+</div><h3 id="Raphael.rad" class="dr-method">Raphael.rad(deg)<a href="#Raphael.rad" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to source" href="raphael-src.html#L319">&#x27ad;</a></h3>
+<div class="dr-method"><p>Transform angle to radians</p>
+<p class="header">Parameters
+</p>
+<dl class="dr-parameters"><dt class="dr-param">deg</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">angle in degrees</dd>
+</dl>
+<p class="dr-returns"><strong class="dr-title">Returns:</strong> <em class="dr-type-number">number</em> <span class="dr-description">angle in radians.</span></p>
+</div><h3 id="Raphael.rgb" class="dr-method">Raphael.rgb(r, g, b)<a href="#Raphael.rgb" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to source" href="raphael-src.html#L791">&#x27ad;</a></h3>
+<div class="dr-method"><p>Converts RGB values to hex representation of the colour.</p>
+<p class="header">Parameters
+</p>
+<dl class="dr-parameters"><dt class="dr-param">r</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">red</dd>
+<dt class="dr-param">g</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">green</dd>
+<dt class="dr-param">b</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">blue</dd>
+</dl>
+<p class="dr-returns"><strong class="dr-title">Returns:</strong> <em class="dr-type-string">string</em> <span class="dr-description">hex representation of the colour.</span></p>
+</div><h3 id="Raphael.rgb2hsb" class="dr-method">Raphael.rgb2hsb(r, g, b)<a href="#Raphael.rgb2hsb" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to source" href="raphael-src.html#L565">&#x27ad;</a></h3>
+<div class="dr-method"><p>Converts RGB values to HSB object.</p>
+<p class="header">Parameters
+</p>
+<dl class="dr-parameters"><dt class="dr-param">r</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">red</dd>
+<dt class="dr-param">g</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">green</dd>
+<dt class="dr-param">b</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">blue</dd>
+</dl>
+<p class="dr-returns"><strong class="dr-title">Returns:</strong> <em class="dr-type-object">object</em> <span class="dr-description">HSB object in format:</span></p>
+<pre class="javascript code"><code>{
+    h: <span class="c">// hue,</span>
+    s: <span class="c">// saturation,</span>
+    b: <span class="c">// brightness</span>
+}
+</code></pre>
+</div><h3 id="Raphael.rgb2hsl" class="dr-method">Raphael.rgb2hsl(r, g, b)<a href="#Raphael.rgb2hsl" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to source" href="raphael-src.html#L598">&#x27ad;</a></h3>
+<div class="dr-method"><p>Converts RGB values to HSL object.</p>
+<p class="header">Parameters
+</p>
+<dl class="dr-parameters"><dt class="dr-param">r</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">red</dd>
+<dt class="dr-param">g</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">green</dd>
+<dt class="dr-param">b</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">blue</dd>
+</dl>
+<p class="dr-returns"><strong class="dr-title">Returns:</strong> <em class="dr-type-object">object</em> <span class="dr-description">HSL object in format:</span></p>
+<pre class="javascript code"><code>{
+    h: <span class="c">// hue,</span>
+    s: <span class="c">// saturation,</span>
+    l: <span class="c">// luminosity</span>
+}
+</code></pre>
+</div><h3 id="Raphael.setWindow" class="dr-method">Raphael.setWindow(newwin)<a href="#Raphael.setWindow" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to source" href="raphael-src.html#L383">&#x27ad;</a></h3>
+<div class="dr-method"><p>Used when you need to draw in <code>&lt;iframe></code>. Switched window to the iframe one.</p>
+<p class="header">Parameters
+</p>
+<dl class="dr-parameters"><dt class="dr-param">newwin</dt>
+<dd class="dr-type"><em class="dr-type-window">window</em></dd>
+<dd class="dr-description">new window object</dd>
+</dl>
+</div><h3 id="Raphael.snapTo" class="dr-method">Raphael.snapTo(values, value, [tolerance])<a href="#Raphael.snapTo" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to source" href="raphael-src.html#L345">&#x27ad;</a></h3>
+<div class="dr-method"><p>Snaps given value to given grid.</p>
+<p class="header">Parameters
+</p>
+<dl class="dr-parameters"><dt class="dr-param">values</dt>
+<dd class="dr-type"><em class="dr-type-array">array</em> <em class="dr-type-number">number</em></dd>
+<dd class="dr-description">given array of values or step of the grid</dd>
+<dt class="dr-param">value</dt>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">value to adjust</dd>
+<dt class="dr-param optional">tolerance</dt>
+<dd class="dr-optional">optional</dd>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">tolerance for snapping. Default is <code>10</code>.</dd>
+</dl>
+<p class="dr-returns"><strong class="dr-title">Returns:</strong> <em class="dr-type-number">number</em> <span class="dr-description">adjusted value.</span></p>
+</div><h3 id="Raphael.svg" class="dr-property">Raphael.svg<a href="#Raphael.svg" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to source" href="raphael-src.html#L226">&#x27ad;</a></h3>
+<div class="dr-property"><em class="dr-type dr-type-boolean">boolean</em><p><code>true</code> if browser supports SVG.</p>
+</div><h3 id="Raphael.type" class="dr-property">Raphael.type<a href="#Raphael.type" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to source" href="raphael-src.html#L208">&#x27ad;</a></h3>
+<div class="dr-property"><em class="dr-type dr-type-string">string</em><p>Can be “SVG”, “VML” or empty, depending on browser support.</p>
+</div><h3 id="Raphael.vml" class="dr-property">Raphael.vml<a href="#Raphael.vml" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to source" href="raphael-src.html#L232">&#x27ad;</a></h3>
+<div class="dr-property"><em class="dr-type dr-type-boolean">boolean</em><p><code>true</code> if browser supports VML.</p>
+</div></div></body></html>
