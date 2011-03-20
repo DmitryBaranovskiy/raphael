@@ -231,6 +231,32 @@
     \*/
     R.svg = !(R.vml = R.type == "VML");
     paperproto = Paper.prototype = R.prototype;
+    /*\
+     * Paper.customAttributes
+     [ property (object) ]
+     **
+     * If you have a set of attributes that you would like to represent
+     * as a function of some number you can do it easily with custom attributes:
+     > Usage
+     | paper.customAttributes.hue = function (num) {
+     |     num = num % 1;
+     |     return {fill: "hsb(" + num + ", .75, 1)"};
+     | };
+     | // Custom attribute “hue” will change fill
+     | // to be given hue with fixed saturation and brightness.
+     | // Now you can use it like this:
+     | var c = paper.circle(10, 10, 10).attr({hue: .45});
+     | // or even like this:
+     | c.animate({hue: 1}, 1e3);
+     | 
+     | // You could also create custom attribute
+     | // with multiple parameters:
+     | paper.customAttributes.hsb = function (h, s, b) {
+     |     return {fill: "hsb(" + [h, s, b].join(",") + ")"};
+     | };
+     | c.attr({hsb: ".5 .8 1"});
+     | c.animate({hsb: "1 0 .5"}, 1e3);
+    \*/
     paperproto.customAttributes = {};
     R._id = 0;
     R._oid = 0;
@@ -478,12 +504,12 @@
      - s (number) saturation
      - v (number) value or brightness
      = (object) RGB object in format:
-     | {
-     |     r: // red,
-     |     g: // green,
-     |     b: // blue
-     |     hex: // color in HTML/CSS format: #••••••
-     | }
+     o {
+     o     r (number) red,
+     o     g (number) green,
+     o     b (number) blue,
+     o     hex (string) color in HTML/CSS format: #••••••
+     o }
     \*/
     R.hsb2rgb = function (h, s, v, o) {
         if (this.is(h, "object") && "h" in h && "s" in h && "b" in h) {
@@ -515,12 +541,12 @@
      - s (number) saturation
      - l (number) luminosity
      = (object) RGB object in format:
-     | {
-     |     r: // red,
-     |     g: // green,
-     |     b: // blue
-     |     hex: // color in HTML/CSS format: #••••••
-     | }
+     o {
+     o     r (number) red,
+     o     g (number) green,
+     o     b (number) blue,
+     o     hex (string) color in HTML/CSS format: #••••••
+     o }
     \*/
     R.hsl2rgb = function (h, s, l, o) {
         if (this.is(h, "object") && "h" in h && "s" in h && "l" in h) {
@@ -556,11 +582,11 @@
      - g (number) green
      - b (number) blue
      = (object) HSB object in format:
-     | {
-     |     h: // hue,
-     |     s: // saturation,
-     |     b: // brightness
-     | }
+     o {
+     o     h (number) hue
+     o     s (number) saturation
+     o     b (number) brightness
+     o }
     \*/
     R.rgb2hsb = function (r, g, b) {
         b = prepareRGB(r, g, b);
@@ -589,11 +615,11 @@
      - g (number) green
      - b (number) blue
      = (object) HSL object in format:
-     | {
-     |     h: // hue,
-     |     s: // saturation,
-     |     l: // luminosity
-     | }
+     o {
+     o     h (number) hue
+     o     s (number) saturation
+     o     l (number) luminosity
+     o }
     \*/
     R.rgb2hsl = function (r, g, b) {
         b = prepareRGB(r, g, b);
@@ -670,13 +696,13 @@
          <li>hsl(•••%, •••%, •••%) — same as hsb</li>
      </ul>
      = (object) RGB object in format:
-     | {
-     |     r: // red,
-     |     g: // green,
-     |     b: // blue
-     |     hex: // color in HTML/CSS format: #••••••,
-     |     error: // true if string can’t be parsed
-     | }
+     o {
+     o     r (number) red,
+     o     g (number) green,
+     o     b (number) blue
+     o     hex (string) color in HTML/CSS format: #••••••,
+     o     error (boolean) true if string can’t be parsed
+     o }
     \*/
     R.getRGB = cacher(function (colour) {
         if (!colour || !!((colour = Str(colour)).indexOf("-") + 1)) {
@@ -915,27 +941,27 @@
      - p2y (number) y of the second point of the curve
      - t (number) position on the curve (0..1)
      = (object) point information in format:
-     | {
-     |     x: // x coordinate of the point,
-     |     y: // y coordinate of the point,
-     |     m: {
-     |         x: // x coordinate of the left anchor,
-     |         y: // y coordinate of the left anchor
-     |     },
-     |     n: {
-     |         x: // x coordinate of the right anchor,
-     |         y: // y coordinate of the right anchor
-     |     },
-     |     start: {
-     |         x: // x coordinate of the start of the curve,
-     |         y: // y coordinate of the start of the curve
-     |     },
-     |     end: {
-     |         x: // x coordinate of the end of the curve,
-     |         y: // y coordinate of the end of the curve
-     |     },
-     |     alpha: // angle of the curve derivative at the point.
-     | }
+     o {
+     o     x: (number) x coordinate of the point
+     o     y: (number) y coordinate of the point
+     o     m: {
+     o         x: (number) x coordinate of the left anchor
+     o         y: (number) y coordinate of the left anchor
+     o     }
+     o     n: {
+     o         x: (number) x coordinate of the right anchor
+     o         y: (number) y coordinate of the right anchor
+     o     }
+     o     start: {
+     o         x: (number) x coordinate of the start of the curve
+     o         y: (number) y coordinate of the start of the curve
+     o     }
+     o     end: {
+     o         x: (number) x coordinate of the end of the curve
+     o         y: (number) y coordinate of the end of the curve
+     o     }
+     o     alpha: (number) angle of the curve derivative at the point
+     o }
     \*/
     R.findDotsAtSegment = function (p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y, t) {
         var t1 = 1 - t,
@@ -1434,21 +1460,19 @@
         }),
         getContainer = function (x, y, w, h) {
             var container;
-            if (R.is(x, string) || R.is(x, "object")) {
-                container = h == null ? g.doc.getElementById(x) : x;
-                if (container == null) {
-                    return;
-                }
-                if (container.tagName) {
-                    if (y == null) {
-                        return {
-                            container: container,
-                            width: container.style.pixelWidth || container.offsetWidth,
-                            height: container.style.pixelHeight || container.offsetHeight
-                        };
-                    } else {
-                        return {container: container, width: y, height: w};
-                    }
+            container = h == null && !R.is(x, "object") ? g.doc.getElementById(x) : x;
+            if (container == null) {
+                return;
+            }
+            if (container.tagName) {
+                if (y == null) {
+                    return {
+                        container: container,
+                        width: container.style.pixelWidth || container.offsetWidth,
+                        height: container.style.pixelHeight || container.offsetHeight
+                    };
+                } else {
+                    return {container: container, width: y, height: w};
                 }
             }
             return {container: 1, x: x, y: y, width: w, height: h};
@@ -1754,9 +1778,6 @@
                 oval: "M2.5,0A2.5,2.5,0,0,1,2.5,5 2.5,2.5,0,0,1,2.5,0z"
             },
             markerCounter = {};
-        round = function (num) {
-            return +num + (~~num === num) * .5;
-        };
         R.toString = function () {
             return  "Your browser supports SVG.\nYou are running Rapha\xebl " + this.version;
         };
@@ -2329,12 +2350,55 @@
         Element = function (node, svg) {
             var X = 0,
                 Y = 0;
+            /*\
+             * Element.node
+             [ property (object) ]
+             **
+             * Gives you a reference to the DOM object, so you can assign event handlers or just mess around.
+             > Usage
+             | // draw a circle at coordinate 10,10 with radius of 10
+             | var c = paper.circle(10, 10, 10);
+             | c.node.onclick = function () {
+             |     c.attr("fill", "red");
+             | };
+            \*/
             this[0] = this.node = node;
+            /*\
+             * Element.raphael
+             [ property (object) ]
+             **
+             * Internal reference to @Raphael object. In case it is not available.
+             > Usage
+             | Raphael.el.red = function () {
+             |     var hsb = this.paper.raphael.rgb2hsb(this.attr("fill"));
+             |     hsb.h = 1;
+             |     this.attr({fill: this.paper.raphael.hsb2rgb(hsb).hex});
+             | }
+            \*/
             node.raphael = true;
+            /*\
+             * Element.id
+             [ property (number) ]
+             **
+             * Unique id of the element. Especially usesful when you want to listen to events of the element, 
+             * because all events are fired in format `<module>.<action>.<id>`. Also useful for @Paper.getById method.
+            \*/
             this.id = R._oid++;
             node.raphaelid = this.id;
             this.matrix = new Matrix;
             this.realPath = null;
+            /*\
+             * Element.paper
+             [ property (object) ]
+             **
+             * Internal reference to “paper” where object drawn. Mainly for use in plugins and element extensions.
+             > Usage
+             | Raphael.el.cross = function () {
+             |     this.attr({fill: "red"});
+             |     this.paper.path("M10,10L50,50M50,10L10,50")
+             |         .attr({stroke: "red"});
+             | }
+            \*/
             this.paper = svg;
             this.attrs = this.attrs || {};
             this._ = {
@@ -2347,9 +2411,21 @@
                 dirty: 1
             };
             !svg.bottom && (svg.bottom = this);
+            /*\
+             * Element.prev
+             [ property (object) ]
+             **
+             * Reference to the previous element in the hierarchy.
+            \*/
             this.prev = svg.top;
             svg.top && (svg.top.next = this);
             svg.top = this;
+            /*\
+             * Element.next
+             [ property (object) ]
+             **
+             * Reference to the next element in the hierarchy.
+            \*/
             this.next = null;
         },
         elproto = Element.prototype;
@@ -2458,6 +2534,19 @@
          * rotate 45° around centre and scale 1.5 times relative to centre”. As you see rotate and scale commands has origin
          * coordinates as a optional parameters.
          * Matrix accepts six parameters.
+         > Usage
+         | var el = paper.rect(10, 20, 300, 200);
+         | // translate 100, 100, rotate 45°, translate -100, 0
+         | el.transform("t100,100r45t-100,0");
+         | // if you want you can append or prepend transformations
+         | el.transform("...t50,50");
+         | el.transform("s2...");
+         | // or even wrap
+         | el.transform("t50,50...t-50-50");
+         | // to reset transformation call method with empty string
+         | el.transform("");
+         | // to get current value call it without parameters
+         | console.log(el.transform());
          > Parameters
          - tstr (string) #optional transformation string
          * If tstr isn’t specified
@@ -2484,14 +2573,34 @@
 
             return this;
         };
+        /*\
+         * Element.hide
+         [ method ]
+         **
+         * Makes element invisible. See @Element.show.
+         = (object) @Element
+        \*/
         elproto.hide = function () {
-            !this.removed && (this.node.style.display = "none");
+            !this.removed && this.paper.safari(this.node.style.display = "none");
             return this;
         };
+        /*\
+         * Element.show
+         [ method ]
+         **
+         * Makes element visible. See @Element.hide.
+         = (object) @Element
+        \*/
         elproto.show = function () {
-            !this.removed && (this.node.style.display = "");
+            !this.removed && this.paper.safari(this.node.style.display = "");
             return this;
         };
+        /*\
+         * Element.remove
+         [ method ]
+         **
+         * Removes element form the paper.
+        \*/
         elproto.remove = function () {
             if (this.removed) {
                 return;
@@ -2520,6 +2629,87 @@
             hide && this.hide();
             return bbox;
         };
+        /*\
+         * Element.attr
+         [ method ]
+         **
+         * Sets the attributes of the element.
+         > Parameters
+         - attrName (string) attribute’s name
+         - value (string) value
+         * or
+         - params (object) object of name/value pairs
+         * or
+         - attrName (string) attribute’s name
+         * or
+         - attrNames (array) in this case method returns array of current values for given attribute names
+         = (object) @Element if attrsName & value or params are passed in.
+         = (...) value of the attribute if only attrsName is passed in.
+         = (array) array of values of the attribute if attrsNames is passed in.
+         = (object) object of attributes if nothing is passed in.
+         > Possible parameters
+         # <p>Please refer to the <a href="http://www.w3.org/TR/SVG/" title="The W3C Recommendation for the SVG language describes these properties in detail.">SVG specification</a> for an explanation of these parameters.</p>
+         o arrow-end (string) arrowhead on the end of the path. The format for string is `<type>[-<width>[-<length>]]`. Possible types: `classic`, `block`, `open`, `oval`, `diamond`, `none`, width: `wide`, `narrow`, `midium`, length: `long`, `short`, `midium`.
+         o clip-rect (string) comma or space separated values: x, y, width and height
+         o cursor (string) CSS type of the cursor
+         o cx (number)
+         o cy (number)
+         o fill (string) colour, gradient or image
+         o fill-opacity (number)
+         o font (string)
+         o font-family (string)
+         o font-size (number) font size in pixels
+         o font-weight (string)
+         o height (number)
+         o href (string) URL, if specified element behaves as hyperlink
+         o opacity (number)
+         o path (string) SVG path string format
+         o r (number)
+         o rx (number)
+         o ry (number)
+         o src (string) image URL, only works for @Element.image element
+         o stroke (string) stroke colour
+         o stroke-dasharray (string) [“”, “`-`”, “`.`”, “`-.`”, “`-..`”, “`. `”, “`- `”, “`--`”, “`- .`”, “`--.`”, “`--..`”]
+         o stroke-linecap (string) [“`butt`”, “`square`”, “`round`”]
+         o stroke-linejoin (string) [“`bevel`”, “`round`”, “`miter`”]
+         o stroke-miterlimit (number)
+         o stroke-opacity (number)
+         o stroke-width (number) stroke width in pixels, default is '1'
+         o target (string) used with href
+         o text (string) contents of the text element. Use `\n` for multiline text
+         o text-anchor (string) [“`start`”, “`middle`”, “`end`”], default is “`middle`”
+         o title (string) will create tooltip with a given text
+         o transform (string) see @Element.transform
+         o width (number)
+         o x (number)
+         o y (number)
+         > Gradients
+         * Linear gradient format: “`‹angle›-‹colour›[-‹colour›[:‹offset›]]*-‹colour›`”, example: “`90-#fff-#000`” – 90°
+         * gradient from white to black or “`0-#fff-#f00:20-#000`” – 0° gradient from white via red (at 20%) to black.
+         *
+         * radial gradient: “`r[(‹fx›, ‹fy›)]‹colour›[-‹colour›[:‹offset›]]*-‹colour›`”, example: “`r#fff-#000`” –
+         * gradient from white to black or “`r(0.25, 0.75)#fff-#000`” – gradient from white to black with focus point
+         * at 0.25, 0.75. Focus point coordinates are in 0..1 range. Radial gradients can only be applied to circles and ellipses.
+         > Path String
+         # <p>Please refer to <a href="http://www.w3.org/TR/SVG/paths.html#PathData" title="Details of a path’s data attribute’s format are described in the SVG specification.">SVG documentation regarding path string</a>. Raphaël fully supports it.</p>
+         > Colour Parsing
+         # <ul>
+         #     <li>Colour name (“<code>red</code>”, “<code>green</code>”, “<code>cornflowerblue</code>”, etc)</li>
+         #     <li>#••• — shortened HTML colour: (“<code>#000</code>”, “<code>#fc0</code>”, etc)</li>
+         #     <li>#•••••• — full length HTML colour: (“<code>#000000</code>”, “<code>#bd2300</code>”)</li>
+         #     <li>rgb(•••, •••, •••) — red, green and blue channels’ values: (“<code>rgb(200,&nbsp;100,&nbsp;0)</code>”)</li>
+         #     <li>rgb(•••%, •••%, •••%) — same as above, but in %: (“<code>rgb(100%,&nbsp;175%,&nbsp;0%)</code>”)</li>
+         #     <li>rgba(•••, •••, •••, •••) — red, green and blue channels’ values: (“<code>rgba(200,&nbsp;100,&nbsp;0, .5)</code>”)</li>
+         #     <li>rgba(•••%, •••%, •••%, •••%) — same as above, but in %: (“<code>rgba(100%,&nbsp;175%,&nbsp;0%, 50%)</code>”)</li>
+         #     <li>hsb(•••, •••, •••) — hue, saturation and brightness values: (“<code>hsb(0.5,&nbsp;0.25,&nbsp;1)</code>”)</li>
+         #     <li>hsb(•••%, •••%, •••%) — same as above, but in %</li>
+         #     <li>hsba(•••, •••, •••, •••) — same as above, but with opacity</li>
+         #     <li>hsl(•••, •••, •••) — almost the same as hsb, see <a href="http://en.wikipedia.org/wiki/HSL_and_HSV" title="HSL and HSV - Wikipedia, the free encyclopedia">Wikipedia page</a></li>
+         #     <li>hsl(•••%, •••%, •••%) — same as above, but in %</li>
+         #     <li>hsla(•••, •••, •••) — same as above, but with opacity</li>
+         #     <li>Optionally for hsb and hsl you could specify hue as a degree: “<code>hsl(240deg,&nbsp;1,&nbsp;.5)</code>” or, if you want to go fancy, “<code>hsl(240°,&nbsp;1,&nbsp;.5)</code>”</li>
+         # </ul>
+        \*/
         elproto.attr = function (name, value) {
             if (this.removed) {
                 return this;
@@ -2571,6 +2761,13 @@
             setFillAndStroke(this, params);
             return this;
         };
+        /*\
+         * Element.toFront
+         [ method ]
+         **
+         * Moves the element so it is the closest to the viewer’s eyes, on top of other elements.
+         = (object) @Element
+        \*/
         elproto.toFront = function () {
             if (this.removed) {
                 return this;
@@ -2580,6 +2777,13 @@
             svg.top != this && tofront(this, svg);
             return this;
         };
+        /*\
+         * Element.toBack
+         [ method ]
+         **
+         * Moves the element so it is the furthest from the viewer’s eyes, behind other elements.
+         = (object) @Element
+        \*/
         elproto.toBack = function () {
             if (this.removed) {
                 return this;
@@ -2591,6 +2795,13 @@
             }
             return this;
         };
+        /*\
+         * Element.insertAfter
+         [ method ]
+         **
+         * Inserts current object after the given one.
+         = (object) @Element
+        \*/
         elproto.insertAfter = function (element) {
             if (this.removed) {
                 return this;
@@ -2604,6 +2815,13 @@
             insertafter(this, element, this.paper);
             return this;
         };
+        /*\
+         * Element.insertBefore
+         [ method ]
+         **
+         * Inserts current object before the given one.
+         = (object) @Element
+        \*/
         elproto.insertBefore = function (element) {
             if (this.removed) {
                 return this;
@@ -2764,6 +2982,12 @@
             this._viewBox = [x, y, w, h, !!fit];
             return this;
         };
+        /*\
+         * Paper.clear
+         [ method ]
+         **
+         * Clears the paper, i.e. removes all the elements.
+        \*/
         paperproto.clear = function () {
             eve("clear", this);
             var c = this.canvas;
@@ -2775,6 +2999,12 @@
             c.appendChild(this.desc);
             c.appendChild(this.defs = $("defs"));
         };
+        /*\
+         * Paper.remove
+         [ method ]
+         **
+         * Removes the paper from the DOM.
+        \*/
         paperproto.remove = function () {
             eve("remove", this);
             this.canvas.parentNode && this.canvas.parentNode.removeChild(this.canvas);
@@ -3626,10 +3856,8 @@
             }
             this._viewBox = [x, y, w, h, !!fit];
             this.forEach(function (el) {
-                el.transform("+");
+                el.transform("...");
             });
-            // this.canvas.coordsize = size + S + size;
-            // this.canvas.coordorigin = x + S + y;
             return this;
         };
         var createNode,
@@ -3710,8 +3938,21 @@
     }
  
     // WebKit rendering bug workaround method
-    var version = navigator.userAgent.match(/Version\/(.*?)\s/);
-    if ((navigator.vendor == "Apple Computer, Inc.") && (version && version[1] < 4 || navigator.platform.slice(0, 2) == "iP")) {
+    var version = navigator.userAgent.match(/Version\/(.*?)\s/) || navigator.userAgent.match(/Chrome\/(\d+)/);
+    if ((navigator.vendor == "Apple Computer, Inc.") && (version && version[1] < 4 || navigator.platform.slice(0, 2) == "iP") ||
+        (navigator.vendor == "Google Inc." && version && version[1] < 8)) {
+        /*\
+         * Paper.safari
+         [ method ]
+         **
+         * Adds event handlers for hover for the element.
+         > Parameters
+         - f_in (function) handler for hover in
+         - f_out (function) handler for hover out
+         - icontext (object) #optional context for hover in handler
+         - ocontext (object) #optional context for hover out handler
+         = (object) @Element
+        \*/
         paperproto.safari = function () {
             var rect = this.rect(-99, -99, this.width + 99, this.height + 99).attr({stroke: "none"});
             setTimeout(function () {rect.remove();});
@@ -3849,12 +4090,64 @@
             };
         })(events[i]);
     }
+    /*\
+     * Element.hover
+     [ method ]
+     **
+     * Adds event handlers for hover for the element.
+     > Parameters
+     - f_in (function) handler for hover in
+     - f_out (function) handler for hover out
+     - icontext (object) #optional context for hover in handler
+     - ocontext (object) #optional context for hover out handler
+     = (object) @Element
+    \*/
     elproto.hover = function (f_in, f_out, scope_in, scope_out) {
         return this.mouseover(f_in, scope_in).mouseout(f_out, scope_out || scope_in);
     };
+    /*\
+     * Element.unhover
+     [ method ]
+     **
+     * Removes event handlers for hover for the element.
+     > Parameters
+     - f_in (function) handler for hover in
+     - f_out (function) handler for hover out
+     = (object) @Element
+    \*/
     elproto.unhover = function (f_in, f_out) {
         return this.unmouseover(f_in).unmouseout(f_out);
     };
+    /*\
+     * Element.drag
+     [ method ]
+     **
+     * Adds event handlers for drag of the element.
+     > Parameters
+     - onmove (function) handler for moving
+     - onstart (function) handler for drag start
+     - onend (function) handler for drag end
+     - mcontext (object) #optional context for moving handler
+     - scontext (object) #optional context for drag start handler
+     - econtext (object) #optional context for drag end handler
+     * Additionaly following `drag` events will be triggered: `drag.start.<id>` on start, 
+     * `drag.end.<id>` on end and `drag.move.<id>` on every move. When element will be dragged over another element 
+     * `drag.over.<id>` will be fired as well.
+     *
+     * Start event and start handler will be called in specified context or in context of the element with following parameters:
+     o x (number) x position of the mouse
+     o y (number) y position of the mouse
+     o event (object) DOM event object
+     * Move event and move handler will be called in specified context or in context of the element with following parameters:
+     o dx (number) shift by x from the start point
+     o dy (number) shift by y from the start point
+     o x (number) x position of the mouse
+     o y (number) y position of the mouse
+     o event (object) DOM event object
+     * End event and end handler will be called in specified context or in context of the element with following parameters:
+     o event (object) DOM event object
+     = (object) @Element
+    \*/
     elproto.drag = function (onmove, onstart, onend, move_scope, start_scope, end_scope) {
         function start(e) {
             (e.originalEvent || e).preventDefault();
@@ -3874,9 +4167,23 @@
         this.mousedown(start);
         return this;
     };
+    /*\
+     * Element.onDragOver
+     [ method ]
+     **
+     * Shortcut for assigning event handler for `drag.over.<id>` event, where id is id of the element (see @Element.id).
+     > Parameters
+     - f (function) handler for event
+    \*/
     elproto.onDragOver = function (f) {
         f ? eve.on("drag.over." + this.id, f) : eve.unbind("drag.over." + this.id);
     };
+    /*\
+     * Element.undrag
+     [ method ]
+     **
+     * Removes all drag event handlers from given element.
+    \*/
     elproto.undrag = function () {
         var i = drag.length;
         while (i--) if (drag[i].el == this) {
@@ -4049,6 +4356,22 @@
      | st.attr({fill: "red"});
     \*/
     paperproto.setSize = setSize;
+    /*\
+     * Paper.setViewBox
+     [ method ]
+     **
+     * Sets the view box of the paper. Practically it gives you ability to zoom and pan whole paper surface by 
+     * specifying new boundaries.
+     **
+     > Parameters
+     **
+     x, y, w, h, fit
+     - x (number) new x position, default is `0`
+     - y (number) new y position, default is `0`
+     - w (number) new width of the canvas
+     - h (number) new height of the canvas
+     - fit (boolean) `true` if you want graphics to fit into new boundary box
+    \*/
     paperproto.setViewBox = setViewBox;
     /*\
      * Paper.top
@@ -4183,12 +4506,12 @@
      **
      - isWithoutTransform (boolean) flag, `true` if you want to have bounding box before transformations. Default is `false`.
      = (object) Bounding box object:
-     | {
-     |     x: //top left corner x,
-     |     y: //top left corner y,
-     |     width: //width,
-     |     height: //height
-     | }
+     o {
+     o     x: (number) top left corner x
+     o     y: (number) top left corner y
+     o     width: (number) width
+     o     height: (number) height
+     o }
     \*/
     elproto.getBBox = function (isWithoutTransform) {
         if (this.removed) {
@@ -4239,7 +4562,7 @@
      *
      * Note: Glow is not connected to the elment. If you change element attributes it won’t adjust itself.
      **
-     = (object) set of elements that represents glow
+     = (object) @Paper.set of elements that represents glow
     \*/
     elproto.glow = function (glow) {
         if (this.type == "text") {
@@ -4366,11 +4689,11 @@
      - length (number)
      **
      = (object) representation of the point:
-     | {
-     |     x: //x coordinate,
-     |     y: //y coordinate,
-     |     alpha: //angle of derivative
-     | }
+     o {
+     o     x: (number) x coordinate
+     o     y: (number) y coordinate
+     o     alpha: (number) angle of derivative
+     o }
     \*/
     R.getPointAtLength = getPointAtLength;
     /*\
@@ -4419,11 +4742,11 @@
      - length (number)
      **
      = (object) representation of the point:
-     | {
-     |     x: //x coordinate,
-     |     y: //y coordinate,
-     |     alpha: //angle of derivative
-     | }
+     o {
+     o     x: (number) x coordinate
+     o     y: (number) y coordinate
+     o     alpha: (number) angle of derivative
+     o }
     \*/
     elproto.getPointAtLength = function (length) {
         if (this.type != "path") {return;}
@@ -4658,6 +4981,23 @@
         upto255 = function (color) {
             return mmax(mmin(color, 255), 0);
         };
+    /*\
+     * Element.animateWith
+     [ method ]
+     **
+     * Acts similar to @Element.animate, but ensure that given animation runs in sync with another given element.
+     **
+     > Parameters
+     **
+     - params (object) final attributes for the element, see also @Element.attr
+     - ms (number) number of milliseconds for animation to run
+     - easing (string) #optional easing type. Accept on of @Raphael.easing_formulas or CSS format: `cubic&#x2010;bezier(XX,&#160;XX,&#160;XX,&#160;XX)`
+     - callback (function) #optional callback function. Will be called at the end of animation.
+     * or
+     - animation (object) animation object, see @Raphael.animation
+     **
+     = (object) original element
+    \*/
     elproto.animateWith = function (element, params, ms, easing, callback) {
         for (var i = 0, ii = animationElements.length; i < ii; i++) {
             if (animationElements[i].el.id == element.id) {
@@ -4982,7 +5322,7 @@
      **
      - params (object) final attributes for the element, see also @Element.attr
      - ms (number) number of milliseconds for animation to run
-     - easing (string) #optional easing type. Accept one of @Raphael.easing_formulas or CSS format: `cubic-bezier(XX, XX, XX, XX)`
+     - easing (string) #optional easing type. Accept one of @Raphael.easing_formulas or CSS format: `cubic&#x2010;bezier(XX,&#160;XX,&#160;XX,&#160;XX)`
      - callback (function) #optional callback function. Will be called at the end of animation.
      **
      = (object) @Animation
@@ -5019,7 +5359,7 @@
      **
      - params (object) final attributes for the element, see also @Element.attr
      - ms (number) number of milliseconds for animation to run
-     - easing (string) #optional easing type. Accept on of @Raphael.easing_formulas or CSS format: `cubic-bezier(XX, XX, XX, XX)`
+     - easing (string) #optional easing type. Accept on of @Raphael.easing_formulas or CSS format: `cubic&#x2010;bezier(XX,&#160;XX,&#160;XX,&#160;XX)`
      - callback (function) #optional callback function. Will be called at the end of animation.
      * or
      - animation (object) animation object, see @Raphael.animation
@@ -5048,6 +5388,9 @@
      - value (number) number of milliseconds from the beginning of the animation
      **
      = (object) original element if `value` is specified
+     * Note, that during animation following events are triggered:
+     *
+     * On each animation frame event `anim.frame.<id>`, on start `anim.start.<id>` and on end `anim.finish.<id>`.
     \*/
     elproto.setTime = function (anim, value) {
         if (anim && value != null) {
@@ -5068,14 +5411,11 @@
      **
      = (number) status
      * or
-     = (array) status if `anim` is not specified in format:
-     | [{
-     |     anim: // animation object,
-     |     status: // status
-     | }, {
-     |     anim: // animation object,
-     |     status: // status
-     | }, ...]
+     = (array) status if `anim` is not specified. Array of objects in format:
+     o {
+     o     anim: (object) animation object
+     o     status: (number) status
+     o }
      * or
      = (object) original element if `value` is specified
     \*/
@@ -5104,6 +5444,18 @@
             return out;
         }
     };
+    /*\
+     * Element.pause
+     [ method ]
+     **
+     * Stops animation of the element with ability to resume it later on.
+     **
+     > Parameters
+     **
+     - anim (object) #optional animation object
+     **
+     = (object) original element
+    \*/
     elproto.pause = function (anim) {
         for (var i = 0; i < animationElements.length; i++) if (animationElements[i].el.id == this.id && (!anim || animationElements[i].anim == anim)) {
             if (eve("anim.pause." + this.id, this, animationElements[i].anim) !== false) {
@@ -5112,6 +5464,18 @@
         }
         return this;
     };
+    /*\
+     * Element.resume
+     [ method ]
+     **
+     * Resumes animation if it was paused with @Element.pause method.
+     **
+     > Parameters
+     **
+     - anim (object) #optional animation object
+     **
+     = (object) original element
+    \*/
     elproto.resume = function (anim) {
         for (var i = 0; i < animationElements.length; i++) if (animationElements[i].el.id == this.id && (!anim || animationElements[i].anim == anim)) {
             var e = animationElements[i];
@@ -5122,6 +5486,18 @@
         }
         return this;
     };
+    /*\
+     * Element.stop
+     [ method ]
+     **
+     * Stops animation of the element.
+     **
+     > Parameters
+     **
+     - anim (object) #optional animation object
+     **
+     = (object) original element
+    \*/
     elproto.stop = function (anim) {
         for (var i = 0; i < animationElements.length; i++) if (animationElements[i].el.id == this.id && (!anim || animationElements[i].anim == anim)) {
             if (eve("anim.stop." + this.id, this, animationElements[i].anim) !== false) {
@@ -5149,6 +5525,13 @@
         }
     },
     setproto = Set.prototype;
+    /*\
+     * Set.push
+     [ method ]
+     **
+     * Adds each argument to the current set.
+     = (object) original element
+    \*/
     setproto.push = function () {
         var item,
             len;
@@ -5162,17 +5545,46 @@
         }
         return this;
     };
+    /*\
+     * Set.pop
+     [ method ]
+     **
+     * Removes last element and returns it.
+     = (object) element
+    \*/
     setproto.pop = function () {
         this.length && delete this[this.length--];
         return this.items.pop();
     };
+    /*\
+     * Set.forEach
+     [ method ]
+     **
+     * Executes given function for each element in the set.
+     *
+     * If function returns `false` it will stop loop running.
+     **
+     > Parameters
+     **
+     - callback (function) function to run
+     - thisArg (object) context object for the callback
+     = (object) Set object
+    \*/
+    setproto.forEach = function (callback, thisArg) {
+        for (var i = 0, ii = this.items.length; i < ii; i++) {
+            if (callback.call(thisArg, this.items[i]) === false) {
+                return this;
+            }
+        }
+        return this;
+    };
     for (var method in elproto) if (elproto[has](method)) {
         setproto[method] = (function (methodname) {
             return function () {
-                for (var i = 0, ii = this.items.length; i < ii; i++) {
-                    this.items[i][methodname][apply](this.items[i], arguments);
-                }
-                return this;
+                var arg = arguments;
+                return this.forEach(function (el) {
+                    el[methodname][apply](el, arg);
+                });
             };
         })(method);
     }
@@ -5348,6 +5760,20 @@
         oldRaphael.was ? (g.win.Raphael = oldRaphael.is) : delete Raphael;
         return R;
     };
+    /*\
+     * Raphael.el
+     [ property (object) ]
+     **
+     * You can add your own method to elements. This is usefull when you want to hack default functionality or
+     * want to wrap some common transformation or attributes in one method. In difference to canvas methods,
+     * you can redefine element method at any time. Expending element methods wouldn’t affect set
+     > Usage
+     | Raphael.el.red = function () {
+     |     this.attr({fill: "#f00"});
+     | };
+     | // then use it
+     | paper.circle(100, 100, 20).red();
+    \*/
     R.el = elproto;
     R.st = setproto;
     // Firefox <3.6 fix: http://webreflection.blogspot.com/2009/11/195-chars-to-help-lazy-loading.html
