@@ -1,7 +1,13 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
 #dr-js {
     background: #999;
     margin: 0;
     padding: 0;
+    overflow-y: hidden;
 }
 #src-dr-js {
     background: #000;
@@ -10,11 +16,39 @@
 }
 .dr-doc {
     background: #eee;
+    border-right: solid #eee 3px;
+    float: right;
     font: 300 100.01%/1.4 "Myriad Pro", "Helvetica Neue", Helvetica, "Arial Unicode MS", Arial, sans-serif;
+    height: 100%;
+    margin: 0;
+    overflow: auto;
+    padding: 0 2em;
     width: 60em;
-    padding: 0 2em 2em;
+}
+.dr-toc {
+    margin: 0;
+    padding: 0 1em;
+    background: #ddd;
+    list-style: none;
+    font-family: Menlo, Consolas, Monaco, "Lucida Console", monospace;
+    overflow: auto;
+    border-right: solid #ddd 3px;
+    height: 100%;
+    float: right;
+    width: 15em;
+}
+#dr {
     margin: 0 auto;
-    position: relative;
+    width: 82em;
+    height: 100%;
+}
+::-moz-selection {
+    background: #c00;
+    color: #fff;
+}
+::selection {
+    background: #c00;
+    color: #fff;
 }
 .dr-doc code,
 .dr-type em,
@@ -81,22 +115,19 @@ dd.dr-description {
 .dr-type em,
 .dr-returns em,
 .dr-property em {
-    -webkit-border-radius: .3em;
-    -webkit-border-radius: .3em;
     -moz-border-radius: .3em;
-    -moz-border-radius: .3em;
+    -webkit-border-radius: .3em;
     background: #ccc;
     border-radius: .3em;
-    border-radius: .3em;
-    float: left;
     display: block;
+    float: left;
     font-size: .75em;
     font-style: normal;
     font-weight: 700;
     margin: .2em .5em .2em 0;
+    min-width: 5em;
     padding: .1em .5em;
     text-align: center;
-    min-width: 5em;
 }
 .dr-property em.dr-type {
     margin: .23em 1em 0 0;
@@ -127,6 +158,24 @@ em.dr-type-array {
 }
 dd.dr-optional {
     display: none;
+}
+ol.dr-json {
+    background: #ddd;
+    list-style: none;
+    margin: 0 -2em;
+    padding: 1em 2em;
+}
+ol.dr-json .dr-json-key {
+    float: left;
+    min-width: 3em;
+    margin-right: 1em;
+}
+ol.dr-json .dr-json-description {
+    display: table;
+}
+ol.dr-json ol.dr-json  {
+    margin: 0;
+    padding: 0 0 0 3em;
 }
 h1 {
     font-weight: 400;
@@ -175,21 +224,6 @@ p.header {
     margin-right: 1em;
     width: 10em;
 }
-.dr-toc {
-    -webkit-border-bottom-left-radius: 1em;
-    -webkit-border-bottom-right-radius: 1em;
-    -moz-border-radius-bottomleft: 1em;
-    -moz-border-radius-bottomright: 1em;
-    border-bottom-left-radius: 1em;
-    border-bottom-right-radius: 1em;
-    float: right;
-    margin: -3px 0 1em 1em;
-    padding: 1em;
-    background: #ddd;
-    list-style: none;
-    border: solid 3px #999;
-    font-family: Menlo, Consolas, Monaco, "Lucida Console", monospace;
-}
 .dr-toc a {
     display: block;
     text-decoration: none;
@@ -236,13 +270,9 @@ a.dr-sourceline {
     -webkit-transition: opacity 0.2s linear;
     color: #333;
     font-family: Menlo, "Arial Unicode MS", sans-serif;
-/*    left: -20px;*/
-/*    line-height: 1;*/
     margin: 0 0 0 .3em;
-/*    overflow: hidden;*/
     opacity: 0;
     text-decoration: none;
-/*    width: 1em;*/
 }
 a.dr-link {
     position: relative;
@@ -288,7 +318,6 @@ p {
     padding: 5px;
 }
 #src-dr-js code {
-    -webkit-transition: background 0.2s linear;
     background: #000;
     display: block;
     color: #fff;
@@ -299,12 +328,49 @@ p {
     line-height: 1.2;
 }
 #src-dr-js code:hover {
-    background: #666;
+    background: #333;
+}
+#src-dr-js code:hover .ln {
+/*    background: #666;*/
+    color: #fff;
 }
 #src-dr-js code .ln {
     position: absolute;
     left: 0;
-    color: #000;
+    color: #333;
     width: 70px;
     text-align: right;
+}
+
+/*Scrollbar*/
+.dr-doc::-webkit-scrollbar,
+.dr-toc::-webkit-scrollbar {
+    width: 7px;
+    height: 9px;
+}
+.dr-doc::-webkit-scrollbar-button:start:decrement, 
+.dr-doc::-webkit-scrollbar-button:end:increment,
+.dr-toc::-webkit-scrollbar-button:start:decrement, 
+.dr-toc::-webkit-scrollbar-button:end:increment {
+    display: block;
+    height: 0;
+    background-color: transparent;
+}
+.dr-doc::-webkit-scrollbar-track-piece,
+.dr-toc::-webkit-scrollbar-track-piece {
+    -webkit-border-radius: 0;
+    -webkit-border-bottom-right-radius: 4px;
+    -webkit-border-bottom-left-radius: 4px;
+}
+.dr-doc::-webkit-scrollbar-thumb:vertical,
+.dr-toc::-webkit-scrollbar-thumb:vertical {
+    height: 50px;
+    background-color: rgba(0, 0, 0, 0.2);
+    -webkit-border-radius: 4px;
+}
+.dr-doc::-webkit-scrollbar-thumb:horizontal,
+.dr-toc::-webkit-scrollbar-thumb:horizontal {
+    width: 50px;
+    background-color: rgba(0, 0, 0, 0.2);
+    -webkit-border-radius: 4px;
 }
