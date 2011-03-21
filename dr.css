@@ -18,16 +18,16 @@ html, body {
     background: #eee;
     border-right: solid #eee 3px;
     float: right;
-    font: 300 100.01%/1.4 "Myriad Pro", "Helvetica Neue", Helvetica, "Arial Unicode MS", Arial, sans-serif;
+    font: 300 16px/1.4 "Myriad Pro", "Helvetica Neue", Helvetica, "Arial Unicode MS", Arial, sans-serif;
     height: 100%;
     margin: 0;
     overflow: auto;
-    padding: 0 2em;
-    width: 60em;
+    padding: 0 30px;
+    width: 800px;
 }
 .dr-toc {
     margin: 0;
-    padding: 0 1em;
+    padding: 0 16px;
     background: #ddd;
     list-style: none;
     font-family: Menlo, Consolas, Monaco, "Lucida Console", monospace;
@@ -35,11 +35,11 @@ html, body {
     border-right: solid #ddd 3px;
     height: 100%;
     float: right;
-    width: 15em;
+    width: 240px;
 }
 #dr {
     margin: 0 auto;
-    width: 82em;
+    width: 1152px;
     height: 100%;
 }
 ::-moz-selection {
@@ -63,8 +63,8 @@ pre.code {
     background: #333;
     color: #fff;
     overflow-x: auto;
-    padding: 1em 2.5em;
-    margin: 0 -2.5em;
+    padding: 16px 30px;
+    margin: 0 -30px;
 }
 code b {
     color: #e9df8f;
@@ -92,21 +92,21 @@ em.amp {
     font-style: italic;
 }
 dl.dr-parameters {
-    margin: .5em 0;
+    margin: 8px 0;
 }
 dt.dr-param {
     color: #666;
     font-weight: 400;
     float: left;
-    margin-right: 1em;
-    min-width: 10em;
+    margin-right: 16px;
+    min-width: 160px;
 }
 dd.dr-type {
     margin: 0;
 }
 dd.dr-description {
     display: table;
-    min-height: 1.5em;
+    min-height: 24px;
     border: solid 1px #eee;
 }
 .dr-type {
@@ -115,46 +115,57 @@ dd.dr-description {
 .dr-type em,
 .dr-returns em,
 .dr-property em {
-    -moz-border-radius: .3em;
-    -webkit-border-radius: .3em;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
     background: #ccc;
-    border-radius: .3em;
-    display: block;
+    border-radius: 5px;
     float: left;
     font-size: .75em;
     font-style: normal;
     font-weight: 700;
-    margin: .2em .5em .2em 0;
-    min-width: 5em;
-    padding: .1em .5em;
+    margin: 0 8px 0 0;
+    min-width: 80px;
+    padding: 2px 5px;
     text-align: center;
 }
+.dr-type em.amp,
+.dr-returns em.amp,
+.dr-property em.amp {
+    float: none;
+    background: none;
+    font-size: 1em;
+    font-weight: 400;
+    font-style: italic;
+    margin: 0;
+    padding: 0;
+    min-width: 0;
+}
 .dr-property em.dr-type {
-    margin: .23em 1em 0 0;
+    margin: 4px 16px 0 0;
 }
 em.dr-type-string {
-    background: #e5ff7f;
-    color: #667f00;
+    background: #e1edb1;
+    color: #3d4c00;
 }
 em.dr-type-object {
-    background: #ff7f7f;
-    color: #7f0000;
+    background: #edb1b1;
+    color: #4c0000;
 }
 em.dr-type-function {
-    background: #bf7fff;
-    color: #3f007f;
+    background: #cfb1ed;
+    color: #26004c;
 }
 em.dr-type-number {
-    background: #7fb2ff;
-    color: #00327f;
+    background: #b1c9ed;
+    color: #001e4c;
 }
 em.dr-type-boolean {
-    background: #7fffb2;
-    color: #007f32;
+    background: #b1edc9;
+    color: #004c1e;
 }
 em.dr-type-array {
-    background: #ffcc7f;
-    color: #7f4c00;
+    background: #edd5b1;
+    color: #4c2d00;
 }
 dd.dr-optional {
     display: none;
@@ -162,20 +173,20 @@ dd.dr-optional {
 ol.dr-json {
     background: #ddd;
     list-style: none;
-    margin: 0 -2em;
-    padding: 1em 2em;
+    margin: 0 -30px;
+    padding: 16px 30px;
 }
 ol.dr-json .dr-json-key {
     float: left;
-    min-width: 3em;
-    margin-right: 1em;
+    min-width: 50px;
+    margin-right: 16px;
 }
 ol.dr-json .dr-json-description {
     display: table;
 }
 ol.dr-json ol.dr-json  {
     margin: 0;
-    padding: 0 0 0 3em;
+    padding: 0 0 0 50px;
 }
 h1 {
     font-weight: 400;
@@ -183,22 +194,22 @@ h1 {
     margin: 0;
 }
 h2, h3, h4, h5 {
-    margin: 1em 0;
-    padding: .4em 0 0;
-    font-weight: 100;
+    margin: 1em 0 .5em 0;
+    padding: 6px 0 0;
+    font-weight: 600;
     position: relative;
 }
 h5 {
-    font-size: 1.1em;
+    font-size: 18px;
 }
 h4 {
-    font-size: 1.2em;
+    font-size: 20px;
 }
 h3 {
-    font-size: 1.8em;
+    font-size: 28px;
 }
 h2 {
-    font-size: 2.4em;
+    font-size: 38px;
 }
 h2.dr-method,
 h3.dr-method,
@@ -212,23 +223,35 @@ h4.dr-property,
 h5.dr-property {
     color: #009;
 }
+i.dr-trixie {
+    border: solid 10px #eee;
+    border-left-color: #999;
+    height: 0;
+    margin-left: -30px;
+    margin-top: -10px;
+    overflow: hidden;
+    position: absolute;
+    top: 50%;
+    width: 0;
+}
 p.header {
-    font-size: 1.2em;
-    font-weight: 200;
+    font-size: 19px;
+    font-weight: 600;
+    margin: 1em 0 .3em;
 }
 .dr-returns {
-    margin-top: 1em;
+    margin-top: 16px;
 }
 .dr-returns .dr-title {
     float: left;
-    margin-right: 1em;
-    width: 10em;
+    margin-right: 16px;
+    width: 160px;
 }
 .dr-toc a {
     display: block;
     text-decoration: none;
     color: #333;
-    padding-top: .5em;
+    padding-top: 8px;
     position: relative;
     z-index: 1000;
 }
@@ -331,7 +354,6 @@ p {
     background: #333;
 }
 #src-dr-js code:hover .ln {
-/*    background: #666;*/
     color: #fff;
 }
 #src-dr-js code .ln {

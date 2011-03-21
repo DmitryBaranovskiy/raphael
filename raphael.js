@@ -29,8 +29,9 @@
      - onReadyCallback (function) function that is going to be called on DOM ready event. You can also subscribe to this event via Eve’s “DOMLoad” event. In this case method returns `undefined`.
      = (object) @Paper
      > Usage
-     | // Each of the following examples create a canvas that is 320px wide by 200px high
-     | // Canvas is created at the viewport’s 10,50 coordinate
+     | // Each of the following examples create a canvas
+     | // that is 320px wide by 200px high.
+     | // Canvas is created at the viewport’s 10,50 coordinate.
      | var paper = Raphael(10, 50, 320, 200);
      | // Canvas is created at the top left corner of the #notepad element
      | // (or its top right corner in dir="rtl" elements)
@@ -685,12 +686,12 @@
      > Parameters
      - colour (string) colour string in one of formats:
      # <ul>
-     #     <li>Colour name (“<samp>red</samp>”, “<samp>green</samp>”, “<samp>cornflowerblue</samp>”, etc)</li>
-     #     <li>#••• — shortened HTML colour: (“<samp>#000</samp>”, “<samp>#fc0</samp>”, etc)</li>
-     #     <li>#•••••• — full length HTML colour: (“<samp>#000000</samp>”, “<samp>#bd2300</samp>”)</li>
-     #     <li>rgb(•••, •••, •••) — red, green and blue channels’ values: (“<samp>rgb(200,&nbsp;100,&nbsp;0)</samp>”)</li>
-     #     <li>rgb(•••%, •••%, •••%) — same as above, but in %: (“<samp>rgb(100%,&nbsp;175%,&nbsp;0%)</samp>”)</li>
-     #     <li>hsb(•••, •••, •••) — hue, saturation and brightness values: (“<samp>hsb(0.5,&nbsp;0.25,&nbsp;1)</samp>”)</li>
+     #     <li>Colour name (“<code>red</code>”, “<code>green</code>”, “<code>cornflowerblue</code>”, etc)</li>
+     #     <li>#••• — shortened HTML colour: (“<code>#000</code>”, “<code>#fc0</code>”, etc)</li>
+     #     <li>#•••••• — full length HTML colour: (“<code>#000000</code>”, “<code>#bd2300</code>”)</li>
+     #     <li>rgb(•••, •••, •••) — red, green and blue channels’ values: (“<code>rgb(200,&nbsp;100,&nbsp;0)</code>”)</li>
+     #     <li>rgb(•••%, •••%, •••%) — same as above, but in %: (“<code>rgb(100%,&nbsp;175%,&nbsp;0%)</code>”)</li>
+     #     <li>hsb(•••, •••, •••) — hue, saturation and brightness values: (“<code>hsb(0.5,&nbsp;0.25,&nbsp;1)</code>”)</li>
      #     <li>hsb(•••%, •••%, •••%) — same as above, but in %</li>
      #     <li>hsl(•••, •••, •••) — same as hsb</li>
      #     <li>hsl(•••%, •••%, •••%) — same as hsb</li>
@@ -5763,7 +5764,7 @@
      **
      * You can add your own method to elements. This is usefull when you want to hack default functionality or
      * want to wrap some common transformation or attributes in one method. In difference to canvas methods,
-     * you can redefine element method at any time. Expending element methods wouldn’t affect set
+     * you can redefine element method at any time. Expending element methods wouldn’t affect set.
      > Usage
      | Raphael.el.red = function () {
      |     this.attr({fill: "#f00"});
