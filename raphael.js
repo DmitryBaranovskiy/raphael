@@ -15,7 +15,7 @@
      * from this instance will be bound to this canvas.
      > Parameters
      **
-     - container (HTMLElement|string) DOM element or it’s id which is going to be a parent for drawing surface
+     - container (HTMLElement|string) DOM element or its ID which is going to be a parent for drawing surface
      - width (number)
      - height (number)
      * or
@@ -264,11 +264,11 @@
      * Raphael.fn
      [ property (object) ]
      **
-     * You can add your own method to the canvas. For example if you want to draw pie chart,
+     * You can add your own method to the canvas. For example if you want to draw a pie chart,
      * you can create your own pie chart function and ship it as a Raphaël plugin. To do this
-     * you need to extend `Raphael.fn` object. Please note that you can create your own namespaces
-     * inside `fn` object. Methods will be run in context of canvas anyway. You should alter `fn`
-     * object before Raphaël instance was created, otherwise it will take no effect.
+     * you need to extend the `Raphael.fn` object. Please note that you can create your own namespaces
+     * inside the `fn` object — methods will be run in the context of canvas anyway. You should alter
+     * the `fn` object before a Raphaël instance is created, otherwise it will take no effect.
      > Usage
      | Raphael.fn.arrow = function (x1, y1, x2, y2, size) {
      |     return this.path( ... );
@@ -684,17 +684,17 @@
      * Parses colour string as RGB object
      > Parameters
      - colour (string) colour string in one of formats:
-     <ul>
-         <li>Colour name (“<samp>red</samp>”, “<samp>green</samp>”, “<samp>cornflowerblue</samp>”, etc)</li>
-         <li>#••• — shortened HTML colour: (“<samp>#000</samp>”, “<samp>#fc0</samp>”, etc)</li>
-         <li>#•••••• — full length HTML colour: (“<samp>#000000</samp>”, “<samp>#bd2300</samp>”)</li>
-         <li>rgb(•••, •••, •••) — red, green and blue channels’ values: (“<samp>rgb(200,&nbsp;100,&nbsp;0)</samp>”)</li>
-         <li>rgb(•••%, •••%, •••%) — same as above, but in %: (“<samp>rgb(100%,&nbsp;175%,&nbsp;0%)</samp>”)</li>
-         <li>hsb(•••, •••, •••) — hue, saturation and brightness values: (“<samp>hsb(0.5,&nbsp;0.25,&nbsp;1)</samp>”)</li>
-         <li>hsb(•••%, •••%, •••%) — same as above, but in %</li>
-         <li>hsl(•••, •••, •••) — same as hsb</li>
-         <li>hsl(•••%, •••%, •••%) — same as hsb</li>
-     </ul>
+     # <ul>
+     #     <li>Colour name (“<samp>red</samp>”, “<samp>green</samp>”, “<samp>cornflowerblue</samp>”, etc)</li>
+     #     <li>#••• — shortened HTML colour: (“<samp>#000</samp>”, “<samp>#fc0</samp>”, etc)</li>
+     #     <li>#•••••• — full length HTML colour: (“<samp>#000000</samp>”, “<samp>#bd2300</samp>”)</li>
+     #     <li>rgb(•••, •••, •••) — red, green and blue channels’ values: (“<samp>rgb(200,&nbsp;100,&nbsp;0)</samp>”)</li>
+     #     <li>rgb(•••%, •••%, •••%) — same as above, but in %: (“<samp>rgb(100%,&nbsp;175%,&nbsp;0%)</samp>”)</li>
+     #     <li>hsb(•••, •••, •••) — hue, saturation and brightness values: (“<samp>hsb(0.5,&nbsp;0.25,&nbsp;1)</samp>”)</li>
+     #     <li>hsb(•••%, •••%, •••%) — same as above, but in %</li>
+     #     <li>hsl(•••, •••, •••) — same as hsb</li>
+     #     <li>hsl(•••%, •••%, •••%) — same as hsb</li>
+     # </ul>
      = (object) RGB object in format:
      o {
      o     r (number) red,
@@ -855,7 +855,7 @@
      **
      * Parses given path string into an array of arrays of path segments.
      > Parameters
-     - pathString (string|array) path string or array of segments (in the last case it will be returned stright away)
+     - pathString (string|array) path string or array of segments (in the last case it will be returned straight away)
      = (array) array of segments.
     \*/
     R.parsePathString = cacher(function (pathString) {
@@ -898,7 +898,7 @@
      **
      * Parses given path string into an array of transformations.
      > Parameters
-     - TString (string|array) transform string or array of transformations (in the last case it will be returned stright away)
+     - TString (string|array) transform string or array of transformations (in the last case it will be returned straight away)
      = (array) array of transformations.
     \*/
     R.parseTransformString = cacher(function (TString) {
@@ -1675,7 +1675,7 @@
      **
      * Utility method
      **
-     * Converts path to path where all segments are cubic bezier curves.
+     * Converts path to a new path where all segments are cubic bezier curves.
      > Parameters
      - pathString (string|array) path string or array of segments
      = (array) array of segments.
@@ -2530,9 +2530,9 @@
          * Each letter is a command. There are four commands: `t` is for translate, `r` is for rotate, `s` is for
          * scale and `m` is for matrix.
          *
-         * So, example line could be read like “translate by 100, 100, rotate 30° around 100, 100, scale twice around 100, 100
-         * rotate 45° around centre and scale 1.5 times relative to centre”. As you see rotate and scale commands has origin
-         * coordinates as a optional parameters.
+         * So, the example line above could be read like “translate by 100, 100; rotate 30° around 100, 100; scale twice around 100, 100;
+         * rotate 45° around centre; scale 1.5 times relative to centre”. As you can see rotate and scale commands have origin
+         * coordinates as optional parameters, the default is the centre point of the element.
          * Matrix accepts six parameters.
          > Usage
          | var el = paper.rect(10, 20, 300, 200);
@@ -3945,13 +3945,9 @@
          * Paper.safari
          [ method ]
          **
-         * Adds event handlers for hover for the element.
-         > Parameters
-         - f_in (function) handler for hover in
-         - f_out (function) handler for hover out
-         - icontext (object) #optional context for hover in handler
-         - ocontext (object) #optional context for hover out handler
-         = (object) @Element
+         * There is an inconvenient rendering bug in Safari (WebKit):
+         * sometimes the rendering should be forced.
+         * This method should help with dealing with this bug.
         \*/
         paperproto.safari = function () {
             var rect = this.rect(-99, -99, this.width + 99, this.height + 99).attr({stroke: "none"});
@@ -4224,7 +4220,7 @@
      - y (number) y coordinate of the top left corner
      - width (number) width
      - height (number) height
-     - r (number) @optional radius for rounded corners, default is 0
+     - r (number) #optional radius for rounded corners, default is 0
      = (object) Raphaël element object with type “rect”
      **
      > Usage
@@ -4246,7 +4242,7 @@
      **
      - x (number) x coordinate of the centre
      - y (number) y coordinate of the centre
-     - rx (number) horisontal radius
+     - rx (number) horizontal radius
      - ry (number) vertical radius
      = (object) Raphaël element object with type “ellipse”
      **
@@ -4321,8 +4317,9 @@
      * Paper.set
      [ method ]
      **
-     * Creates array-like object to keep and operate couple of elements at once.
-     * Warning: it doesn’t create any elements for itself in the page.
+     * Creates array-like object to keep and operate several elements at once.
+     * Warning: it doesn’t create any elements for itself in the page, it just groups existing elements.
+     * Sets act as pseudo elements — all methods available to an element can be used on a set.
      = (object) array-like object that represents set of elements
      **
      > Usage
@@ -4449,7 +4446,7 @@
      * Paper.getById
      [ method ]
      **
-     * Returns you element by it’s internal ID.
+     * Returns you element by its internal ID.
      **
      > Parameters
      **
@@ -4472,7 +4469,7 @@
      **
      * Executes given function for each element on the paper
      *
-     * If function returns `false` it will stop loop running.
+     * If callback function returns `false` it will stop loop running.
      **
      > Parameters
      **
@@ -4560,7 +4557,7 @@
      **
      * Return set of elements that create glow-like effect around given element. See @Paper.set.
      *
-     * Note: Glow is not connected to the elment. If you change element attributes it won’t adjust itself.
+     * Note: Glow is not connected to the element. If you change element attributes it won’t adjust itself.
      **
      = (object) @Paper.set of elements that represents glow
     \*/
@@ -4773,7 +4770,7 @@
      * Raphael.easing_formulas
      [ property ]
      **
-     * Object that contains easing formulas for animation. You could extend it with your owns. By default it has following list of easing:
+     * Object that contains easing formulas for animation. You could extend it with your own. By default it has following list of easing:
      # <ul>
      #     <li>“linear”</li>
      #     <li>“&lt;” or “easeIn” or “ease-in”</li>
@@ -5081,7 +5078,7 @@
      * Animation.delay
      [ method ]
      **
-     * Creates copy of existing animation object with given delay.
+     * Creates a copy of existing animation object with given delay.
      **
      > Parameters
      **
@@ -5099,7 +5096,7 @@
      * Animation.repeat
      [ method ]
      **
-     * Creates copy of existing animation object with given repetition.
+     * Creates a copy of existing animation object with given repetition.
      **
      > Parameters
      **
@@ -5315,7 +5312,7 @@
      * Raphael.animation
      [ method ]
      **
-     * Creates animation object. That later could be used for @Element.animate or @Element.animateWith methods.
+     * Creates an animation object that can be passed to the @Element.animate or @Element.animateWith methods.
      * See also @Animation.delay and @Animation.repeat methods.
      **
      > Parameters
@@ -5359,7 +5356,7 @@
      **
      - params (object) final attributes for the element, see also @Element.attr
      - ms (number) number of milliseconds for animation to run
-     - easing (string) #optional easing type. Accept on of @Raphael.easing_formulas or CSS format: `cubic&#x2010;bezier(XX,&#160;XX,&#160;XX,&#160;XX)`
+     - easing (string) #optional easing type. Accept one of @Raphael.easing_formulas or CSS format: `cubic&#x2010;bezier(XX,&#160;XX,&#160;XX,&#160;XX)`
      - callback (function) #optional callback function. Will be called at the end of animation.
      * or
      - animation (object) animation object, see @Raphael.animation
