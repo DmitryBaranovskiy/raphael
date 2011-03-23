@@ -2922,7 +2922,8 @@
                 throw new Error("SVG container not found.");
             }
             var cnvs = $("svg"),
-                css = "overflow:hidden;";
+                css = "overflow:hidden;",
+                isFloating;
             x = x || 0;
             y = y || 0;
             width = width || 512;
@@ -2936,8 +2937,9 @@
             if (container == 1) {
                 cnvs.style.cssText = css + "position:absolute;left:" + x + "px;top:" + y + "px";
                 g.doc.body.appendChild(cnvs);
+                isFloating = 1;
             } else {
-                cnvs.style.cssText = css;
+                cnvs.style.cssText = css + "position:relative";
                 if (container.firstChild) {
                     container.insertBefore(cnvs, container.firstChild);
                 } else {
@@ -2950,6 +2952,9 @@
             container.canvas = cnvs;
             plugins.call(container, container, R.fn);
             container.clear();
+            container._left = container._top = 0;
+            isFloating && (container.renderfix = fun);
+            container.renderfix();
             return container;
         },
         setViewBox = function (x, y, w, h, fit) {
@@ -2982,6 +2987,33 @@
             }
             this._viewBox = [x, y, w, h, !!fit];
             return this;
+        };
+        /*\
+         * Paper.renderfix
+         [ method ]
+         **
+         * Fixes the issue of Firefox and IE9 regarding subpixel rendering. If paper is dependant
+         * on other elements after reflow it could shift half pixel which cause for lines to lost their crispness.
+         * This method fixes the issue.
+         **
+           Special thanks to Mariusz Nowak (http://www.medikoo.com/) for this method.
+        \*/
+        paperproto.renderfix = function () {
+            var cnvs = this.canvas,
+                s = cnvs.style,
+                pos = cnvs.getScreenCTM(),
+                left = -pos.e % 1,
+                top = -pos.f % 1;
+            if (left || top) {
+                if (left) {
+                    this._left = (this._left + left) % 1;
+                    s.left = this._left + "px";
+                }
+                if (top) {
+                    this._top = (this._top + top) % 1;
+                    s.top = this._top + "px";
+                }
+            }
         };
         /*\
          * Paper.clear
@@ -3918,6 +3950,7 @@
                 }
             }
             plugins.call(res, res, R.fn);
+            res.renderfix = fun;
             return res;
         };
         paperproto.clear = function () {
@@ -4560,6 +4593,17 @@
      *
      * Note: Glow is not connected to the element. If you change element attributes it won’t adjust itself.
      **
+     > Parameters
+     **
+     - glow (object) #optional parameters object with all properties optional:
+     o {
+     o     width (number) size of the glow, default is `10`
+     o     fill (boolean) will it be filled, default is `false`
+     o     opacity: opacity, default is `0.5`
+     o     offsetx: horizontal offset, default is `0`
+     o     offsety: vertical offset, default is `0`
+     o     color: glow colour, default is `black`
+     o }
      = (object) @Paper.set of elements that represents glow
     \*/
     elproto.glow = function (glow) {
@@ -4568,7 +4612,7 @@
         }
         glow = glow || {};
         var s = {
-            width: glow.width || 10,
+            width: (glow.width || 10) + (+this.attr("stroke-width") || 1),
             fill: glow.fill || false,
             opacity: glow.opacity || .5,
             offsetx: glow.offsetx || 0,
@@ -4581,7 +4625,14 @@
             path = this.realPath || getPath[this.type](this);
         path = this.matrix ? mapPath(path, this.matrix) : path;
         for (var i = 1; i < c + 1; i++) {
-            out.push(r.path(path).attr({stroke: s.color, fill: s.fill ? s.color : "none", "stroke-linejoin": "round", "stroke-linecap": "round", "stroke-width": +(s.width / c * i).toFixed(3), opacity: +(s.opacity / c).toFixed(3)}));
+            out.push(r.path(path).attr({
+                stroke: s.color,
+                fill: s.fill ? s.color : "none",
+                "stroke-linejoin": "round",
+                "stroke-linecap": "round",
+                "stroke-width": +(s.width / c * i).toFixed(3),
+                opacity: +(s.opacity / c).toFixed(3)
+            }));
         }
         return out.insertBefore(this).translate(s.offsetx, s.offsety);
     };
@@ -4961,6 +5012,7 @@
                             R.is(f, "function") && f.call(el);
                         });
                     })(e.callback, that, e.anim);
+                    console.log(e.repeat);
                     if (--e.repeat) {
                         that.attr(e.origin);
                         e.start = Now;
@@ -4997,10 +5049,14 @@
      = (object) original element
     \*/
     elproto.animateWith = function (element, params, ms, easing, callback) {
+        this.animate(params, ms, easing, callback);
+        var start, el;
         for (var i = 0, ii = animationElements.length; i < ii; i++) {
-            if (animationElements[i].el.id == element.id) {
-                params.start = animationElements[i].timestamp;
-                break;
+            el = animationElements[i];
+            if (el.el.id == element.id) {
+                start = el.timestamp;
+            } else if (el.el.id == this.id) {
+                el.start = start;
             }
         }
         return this.animate(params, ms, easing, callback);
@@ -5139,7 +5195,7 @@
                 }
             }
         } else {
-            status = 0 / 0;
+            status = +to; // NaN
         }
         for (var i = 0, ii = anim.percents.length; i < ii; i++) {
             if (anim.percents[i] == percent || anim.percents[i] > status * anim.top) {
