@@ -186,7 +186,7 @@
             if (!matrix) {
                 return path;
             }
-            var x, y, i, j, pathi;
+            var x, y, i, ii, j, jj, pathi;
             path = path2curve(path);
             for (i = 0, ii = path.length; i < ii; i++) {
                 pathi = path[i];
@@ -1202,7 +1202,11 @@
                     var X = x * math.cos(rad) - y * math.sin(rad),
                         Y = x * math.sin(rad) + y * math.cos(rad);
                     return {x: X, y: Y};
-                });
+                }),
+                f1,
+                f2,
+                cx,
+                cy;
             if (!recursive) {
                 xy = rotate(x1, y1, -rad);
                 x1 = xy.x;
@@ -1223,11 +1227,11 @@
                 var rx2 = rx * rx,
                     ry2 = ry * ry,
                     k = (large_arc_flag == sweep_flag ? -1 : 1) *
-                        math.sqrt(abs((rx2 * ry2 - rx2 * y * y - ry2 * x * x) / (rx2 * y * y + ry2 * x * x))),
-                    cx = k * rx * y / ry + (x1 + x2) / 2,
-                    cy = k * -ry * x / rx + (y1 + y2) / 2,
-                    f1 = math.asin(((y1 - cy) / ry).toFixed(9)),
-                    f2 = math.asin(((y2 - cy) / ry).toFixed(9));
+                        math.sqrt(abs((rx2 * ry2 - rx2 * y * y - ry2 * x * x) / (rx2 * y * y + ry2 * x * x)));
+                cx = k * rx * y / ry + (x1 + x2) / 2;
+                cy = k * -ry * x / rx + (y1 + y2) / 2;
+                f1 = math.asin(((y1 - cy) / ry).toFixed(9));
+                f2 = math.asin(((y2 - cy) / ry).toFixed(9));
 
                 f1 = x1 < cx ? PI - f1 : f1;
                 f2 = x2 < cx ? PI - f2 : f2;
@@ -1768,6 +1772,21 @@
 
     R.Matrix = Matrix;
 
+
+    var addArrow,
+        setFillAndStroke,
+        addGradientFill,
+        elproto,
+        thePath,
+        theRect,
+        theEllipse,
+        theCircle,
+        theImage,
+        theText,
+        setSize,
+        setViewBox,
+        create;
+
     // SVG
     if (R.svg) {
         var xlink = "http://www.w3.org/1999/xlink",
@@ -1799,7 +1818,7 @@
                 el.style && (el.style.webkitTapHighlightColor = "rgba(0,0,0,0)");
             }
             return el;
-        },
+        };
         thePath = function (pathString, SVG) {
             var el = $("path");
             SVG.canvas && SVG.canvas.appendChild(el);
@@ -1807,8 +1826,8 @@
             p.type = "path";
             setFillAndStroke(p, {fill: "none", stroke: "#000", path: pathString});
             return p;
-        },
-        gradients = {},
+        };
+        var gradients = {},
         rgGrad = /^url\(#(.*)\)$/,
         removeGradientFill = function (node, paper) {
             var oid = node.getAttribute(fillString);
@@ -1817,7 +1836,7 @@
                 delete gradients[oid[1]];
                 paper.defs.removeChild(g.doc.getElementById(oid[1]));
             }
-        },
+        };
         addGradientFill = function (element, gradient) {
             var type = "linear",
                 id = element.id + gradient,
@@ -1898,11 +1917,11 @@
             s.opacity = 1;
             s.fillOpacity = 1;
             return 1;
-        },
-        updatePosition = function (o) {
+        };
+        var updatePosition = function (o) {
             var bbox = o.getBBox(1);
             $(o.pattern, {patternTransform: o.matrix.invert() + " translate(" + bbox.x + "," + bbox.y + ")"});
-        },
+        };
         addArrow = function (o, value, isEnd) {
             if (o.type == "path") {
                 var values = Str(value).toLowerCase().split("-"),
@@ -2041,7 +2060,7 @@
                     item && item.parentNode.removeChild(item);
                 }
             }
-        },
+        };
         setFillAndStroke = function (o, params) {
             var dasharray = {
                     "": [0],
@@ -2225,7 +2244,7 @@
                         case fillString:
                             var isURL = Str(value).match(ISURL);
                             if (isURL) {
-                                el = $("pattern");
+                                var el = $("pattern");
                                 var ig = $("image");
                                 el.id = createUUID();
                                 $(el, {x: 0, y: 0, patternUnits: "userSpaceOnUse", height: 1, width: 1});
@@ -2290,9 +2309,9 @@
                             // fall
                         case "fill-opacity":
                             if (attrs.gradient) {
-                                gradient = g.doc.getElementById(node.getAttribute(fillString).replace(/^url\(#|\)$/g, E));
+                                var gradient = g.doc.getElementById(node.getAttribute(fillString).replace(/^url\(#|\)$/g, E));
                                 if (gradient) {
-                                    stops = gradient.getElementsByTagName("stop");
+                                    var stops = gradient.getElementsByTagName("stop");
                                     $(stops[stops.length - 1], {"stop-opacity": value});
                                 }
                                 break;
@@ -2311,15 +2330,16 @@
             }
 
             tuneText(o, params);
-        },
-        leading = 1.2,
+        };
+        var leading = 1.2,
         tuneText = function (el, params) {
             if (el.type != "text" || !(params[has]("text") || params[has]("font") || params[has]("font-size") || params[has]("x") || params[has]("y"))) {
                 return;
             }
             var a = el.attrs,
                 node = el.node,
-                fontSize = node.firstChild ? toInt(g.doc.defaultView.getComputedStyle(node.firstChild, E).getPropertyValue("font-size"), 10) : 10;
+                fontSize = node.firstChild ? toInt(g.doc.defaultView.getComputedStyle(node.firstChild, E).getPropertyValue("font-size"), 10) : 10,
+                tspans;
  
             if (params[has]("text")) {
                 a.text = params.text;
@@ -2327,8 +2347,8 @@
                     node.removeChild(node.firstChild);
                 }
                 var texts = Str(params.text).split("\n"),
-                    tspans = [],
                     tspan;
+                tspans = [];
                 for (var i = 0, ii = texts.length; i < ii; i++) if (texts[i]) {
                     tspan = $("tspan");
                     i && $(tspan, {dy: fontSize * leading, x: a.x});
@@ -2338,7 +2358,7 @@
                 }
             } else {
                 tspans = node.getElementsByTagName("tspan");
-                for (i = 0, ii = tspans.length; i < ii; i++) {
+                for (var i = 0, ii = tspans.length; i < ii; i++) {
                     i && $(tspans[i], {dy: fontSize * leading, x: a.x});
                 }
             }
@@ -2428,7 +2448,7 @@
              * Reference to the next element in the hierarchy.
             \*/
             this.next = null;
-        },
+        };
         elproto = Element.prototype;
         /*\
          * Element.rotate
@@ -2746,8 +2766,9 @@
                 }
                 return values;
             }
+            var params;
             if (value != null) {
-                var params = {};
+                params = {};
                 params[name] = value;
             } else if (name != null && R.is(name, "object")) {
                 params = name;
@@ -2854,7 +2875,7 @@
                 t.node.removeAttribute("filter");
             }
         };
-        var theCircle = function (svg, x, y, r) {
+        theCircle = function (svg, x, y, r) {
             var el = $("circle");
             svg.canvas && svg.canvas.appendChild(el);
             var res = new Element(el, svg);
@@ -2862,7 +2883,7 @@
             res.type = "circle";
             $(el, res.attrs);
             return res;
-        },
+        };
         theRect = function (svg, x, y, w, h, r) {
             var el = $("rect");
             svg.canvas && svg.canvas.appendChild(el);
@@ -2871,7 +2892,7 @@
             res.type = "rect";
             $(el, res.attrs);
             return res;
-        },
+        };
         theEllipse = function (svg, x, y, rx, ry) {
             var el = $("ellipse");
             svg.canvas && svg.canvas.appendChild(el);
@@ -2880,7 +2901,7 @@
             res.type = "ellipse";
             $(el, res.attrs);
             return res;
-        },
+        };
         theImage = function (svg, src, x, y, w, h) {
             var el = $("image");
             $(el, {x: x, y: y, width: w, height: h, preserveAspectRatio: "none"});
@@ -2890,7 +2911,7 @@
             res.attrs = {x: x, y: y, width: w, height: h, src: src};
             res.type = "image";
             return res;
-        },
+        };
         theText = function (svg, x, y, text) {
             var el = $("text");
             $(el, {x: x, y: y, "text-anchor": "middle"});
@@ -2900,7 +2921,7 @@
             res.type = "text";
             setFillAndStroke(res, res.attrs);
             return res;
-        },
+        };
         setSize = function (width, height) {
             this.width = width || this.width;
             this.height = height || this.height;
@@ -2910,7 +2931,7 @@
                 this.setViewBox.apply(this, this._viewBox);
             }
             return this;
-        },
+        };
         create = function () {
             var con = getContainer[apply](0, arguments),
                 container = con && con.container,
@@ -2956,7 +2977,7 @@
             isFloating && (container.renderfix = fun);
             container.renderfix();
             return container;
-        },
+        };
         setViewBox = function (x, y, w, h, fit) {
             eve("setViewBox", this, this._viewBox, [x, y, w, h, fit]);
             var size = mmax(w / this.width, h / this.height),
@@ -3059,11 +3080,12 @@
             ovalTypes = {circle: 1, ellipse: 1},
             path2vml = function (path) {
                 var total =  /[ahqstv]/ig,
-                    command = pathToAbsolute;
+                    command = pathToAbsolute,
+                    res;
                 Str(path).match(total) && (command = path2curve);
                 total = /[clmz]/g;
                 if (command == pathToAbsolute && !Str(path).match(total)) {
-                    var res = Str(path).replace(bites, function (all, command, args) {
+                    res = Str(path).replace(bites, function (all, command, args) {
                         var vals = [],
                             isMove = lowerCase.call(command) == "m",
                             res = map[command];
@@ -3132,7 +3154,7 @@
                     fill = fill && fill[0];
                     o.removeChild(fill);
                     if (fillpos) {
-                        c = compensation(deg, m.x(fillpos[0], fillpos[1]), m.y(fillpos[0], fillpos[1]));
+                        var c = compensation(deg, m.x(fillpos[0], fillpos[1]), m.y(fillpos[0], fillpos[1]));
                         fill.position = c.dx * y + S + c.dy * y;
                     }
                     if (_.fillsize) {
@@ -3259,14 +3281,15 @@
                 params["stroke-linejoin"] != null ||
                 params["stroke-linecap"] != null) {
                 var fill = node.getElementsByTagName(fillString),
-                    newfill = false;
+                    newfill = false,
+                    opacity;
                 fill = fill && fill[0];
                 !fill && (newfill = fill = createNode(fillString));
                 if (o.type == "image" && params.src) {
                     fill.src = params.src;
                 }
                 if ("fill-opacity" in params || "opacity" in params) {
-                    var opacity = ((+a["fill-opacity"] + 1 || 2) - 1) * ((+a.opacity + 1 || 2) - 1) * ((+R.getRGB(params.fill).o + 1 || 2) - 1);
+                    opacity = ((+a["fill-opacity"] + 1 || 2) - 1) * ((+a.opacity + 1 || 2) - 1) * ((+R.getRGB(params.fill).o + 1 || 2) - 1);
                     opacity = mmin(mmax(opacity, 0), 1);
                     fill.opacity = opacity;
                 }
@@ -4967,7 +4990,7 @@
                                     now = [];
                                     for (i = 0, ii = from[attr].length; i < ii; i++) {
                                         now[i] = [from[attr][i][0]];
-                                        for (j = 1, jj = from[attr][i].length; j < jj; j++) {
+                                        for (var j = 1, jj = from[attr][i].length; j < jj; j++) {
                                             now[i][j] = from[attr][i][j] + pos * ms * diff[attr][i][j];
                                         }
                                     }
@@ -5253,7 +5276,7 @@
                                 diff[attr].real = true;
                                 for (i = 0, ii = from[attr].length; i < ii; i++) {
                                     diff[attr][i] = [from[attr][i][0]];
-                                    for (j = 1, jj = from[attr][i].length; j < jj; j++) {
+                                    for (var j = 1, jj = from[attr][i].length; j < jj; j++) {
                                         diff[attr][i][j] = (to[attr][i][j] - from[attr][i][j]) / ms;
                                     }
                                 }
@@ -5329,7 +5352,7 @@
                 }
             }
             timestamp = params.start || anim.start || +new Date;
-            e = {
+            var e = {
                 anim: anim,
                 percent: percent,
                 timestamp: timestamp,
