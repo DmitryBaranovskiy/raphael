@@ -18,13 +18,16 @@
      - container (HTMLElement|string) DOM element or its ID which is going to be a parent for drawing surface
      - width (number)
      - height (number)
+     - callback (function) #optional callback function which is going to be executed in the context of newly created paper
      * or
      - x (number)
      - y (number)
      - width (number)
      - height (number)
+     - callback (function) #optional callback function which is going to be executed in the context of newly created paper
      * or
      - all (array) (first 3 or 4 elements in the array are equal to [containerID, width, height] or [x, y, width, height]. The rest are element descriptions in format {type: type, <attributes>})
+     - callback (function) #optional callback function which is going to be executed in the context of newly created paper
      * or
      - onReadyCallback (function) function that is going to be called on DOM ready event. You can also subscribe to this event via Eve’s “DOMLoad” event. In this case method returns `undefined`.
      = (object) @Paper
@@ -55,7 +58,7 @@
     \*/
     function R(first) {
         if (R.is(first, "function")) {
-            return eve.on("DOMload", first);
+            return loaded ? first() : eve.on("DOMload", first);
         } else if (R.is(first, array)) {
             var a = first,
                 cnv = create[apply](R, a.splice(0, 3 + R.is(a[0], nu))),
@@ -68,11 +71,21 @@
                 elements[has](j.type) && res.push(cnv[j.type]().attr(j));
             }
             return res;
+        } else {
+            var args = Array.prototype.slice.call(arguments, 0);
+            if (R.is(args[args.length - 1], "function")) {
+                var f = args.pop();
+                return loaded ? f.call(create[apply](R, args)) : eve.on("DOMload", function () {
+                    f.call(create[apply](R, args));
+                });
+            } else {
+                return create[apply](R, arguments);
+            }
         }
-        return create[apply](R, arguments);
     }
     R.version = "2.0.0";
-    var separator = /[, ]+/,
+    var loaded,
+        separator = /[, ]+/,
         elements = {circle: 1, rect: 1, path: 1, ellipse: 1, text: 1, image: 1},
         formatrg = /\{(\d+)\}/g,
         proto = "prototype",
@@ -1601,8 +1614,8 @@
             _.sx = sx;
             _.sy = sy;
             _.deg = deg;
-            _.dx = dx = m.m[0][2];
-            _.dy = dy = m.m[1][2];
+            _.dx = dx = m.e;
+            _.dy = dy = m.f;
 
             if (sx == 1 && sy == 1 && !deg && _.bbox) {
                 _.bbox.x += +dx;
@@ -1682,50 +1695,75 @@
      = (array) array of segments.
     \*/
     R.path2curve = path2curve;
-    // Matrix
-    // var m = document.createElementNS("http://www.w3.org/2000/svg", "svg").createSVGMatrix();
+    /*\
+     * Raphael.matrix
+     [ method ]
+     **
+     * Utility method
+     **
+     * Returns matrix based on given parameters.
+     > Parameters
+     - a (number)
+     - b (number)
+     - c (number)
+     - d (number)
+     - e (number)
+     - f (number)
+     = (object) @Matrix
+    \*/
+    R.matrix = function (a, b, c, d, e, f) {
+        return new Matrix(a, b, c, d, e, f);
+    };
     function Matrix(a, b, c, d, e, f) {
         if (a != null) {
-            this.m = [[a, c, e], [b, d, f], [0, 0, 1]];
+            this.a = a;
+            this.b = b;
+            this.c = c;
+            this.d = d;
+            this.e = e;
+            this.f = f;
         } else {
-            this.m = [[1, 0, 0], [0, 1, 0], [0, 0, 1]];
+            this.a = 1;
+            this.b = 0;
+            this.c = 0;
+            this.d = 1;
+            this.e = 0;
+            this.f = 0;
         }
     }
     var matrixproto = Matrix.prototype;
     matrixproto.add = function (a, b, c, d, e, f) {
         var out = [[], [], []],
+            m = [[this.a, this.c, this.e], [this.b, this.d, this.f], [0, 0, 1]],
             matrix = [[a, c, e], [b, d, f], [0, 0, 1]],
             x, y, z, res;
+
+        if (a && a instanceof Matrix) {
+            matrix = [[a.a, a.c, a.e], [a.b, a.d, a.f], [0, 0, 1]];
+        }
 
         for (x = 0; x < 3; x++) {
             for (y = 0; y < 3; y++) {
                 res = 0;
                 for (z = 0; z < 3; z++) {
-                    res += this.m[x][z] * matrix[z][y];
+                    res += m[x][z] * matrix[z][y];
                 }
                 out[x][y] = res;
             }
         }
-        this.m = out;
+        this.a = out[0][0];
+        this.b = out[1][0];
+        this.c = out[0][1];
+        this.d = out[1][1];
+        this.e = out[0][2];
+        this.f = out[1][2];
     };
     matrixproto.invert = function () {
-        var a = this.m[0][0],
-            b = this.m[1][0],
-            c = this.m[0][1],
-            d = this.m[1][1],
-            e = this.m[0][2],
-            f = this.m[1][2],
-            x = a * d - b * c;
+        var x = a * d - b * c;
         return new Matrix(d / x, -b / x, -c / x, a / x, (c * f - d * e) / x, (b * e - a * f) / x);
     };
     matrixproto.clone = function () {
-        var a = this.m[0][0],
-            b = this.m[1][0],
-            c = this.m[0][1],
-            d = this.m[1][1],
-            e = this.m[0][2],
-            f = this.m[1][2];
-        return new Matrix(a, b, c, d, e, f);
+        return new Matrix(this.a, this.b, this.c, this.d, this.e, this.f);
     };
     matrixproto.translate = function (x, y) {
         this.add(1, 0, 0, 1, x, y);
@@ -1744,29 +1782,27 @@
         this.add(1, 0, 0, 1, -x, -y);
     };
     matrixproto.x = function (x, y) {
-        return x * this.m[0][0] + y * this.m[0][1] + this.m[0][2];
+        return x * this.a + y * this.c + this.e;
     };
     matrixproto.y = function (x, y) {
-        return x * this.m[1][0] + y * this.m[1][1] + this.m[1][2];
+        return x * this.b + y * this.d + this.f;
     };
-    matrixproto.get = function (i, j) {
-        return +this.m[i][j].toFixed(4);
+    matrixproto.get = function (i) {
+        return +this[Str.fromCharCode(97 + i)].toFixed(4);
     };
     matrixproto.toString = function () {
         return R.svg ?
-            "matrix(" + [this.get(0, 0), this.get(1, 0), this.get(0, 1), this.get(1, 1), this.get(0, 2), this.get(1, 2)].join() + ")" :
-            [this.get(0, 0), this.get(0, 1), this.get(1, 0), this.get(1, 1), 0, 0].join();
+            "matrix(" + [this.get(0), this.get(1), this.get(2), this.get(3), this.get(4), this.get(5)].join() + ")" :
+            [this.get(0), this.get(2), this.get(1), this.get(3), 0, 0].join();
     };
     matrixproto.toFilter = function () {
-        return "progid:DXImageTransform.Microsoft.Matrix(M11=" + this.get(0, 0) +
-            ", M12=" + this.get(0, 1) + ", M21=" + this.get(1, 0) + ", M22=" + this.get(1, 1) +
-            ", Dx=" + this.get(0, 2) + ", Dy=" + this.get(1, 2) + ", sizingmedthod='auto expand')";
+        return "progid:DXImageTransform.Microsoft.Matrix(M11=" + this.get(0) +
+            ", M12=" + this.get(2) + ", M21=" + this.get(1) + ", M22=" + this.get(3) +
+            ", Dx=" + this.get(4) + ", Dy=" + this.get(5) + ", sizingmedthod='auto expand')";
     };
     matrixproto.offset = function () {
-        return [this.m[0][2].toFixed(4), this.m[1][2].toFixed(4)];
+        return [this.e.toFixed(4), this.f.toFixed(4)];
     };
-
-    R.Matrix = Matrix;
 
     // SVG
     if (R.svg) {
@@ -2320,7 +2356,7 @@
             var a = el.attrs,
                 node = el.node,
                 fontSize = node.firstChild ? toInt(g.doc.defaultView.getComputedStyle(node.firstChild, E).getPropertyValue("font-size"), 10) : 10;
- 
+
             if (params[has]("text")) {
                 a.text = params.text;
                 while (node.firstChild) {
@@ -2338,15 +2374,17 @@
                 }
             } else {
                 tspans = node.getElementsByTagName("tspan");
-                for (i = 0, ii = tspans.length; i < ii; i++) {
-                    i && $(tspans[i], {dy: fontSize * leading, x: a.x});
+                for (i = 0, ii = tspans.length; i < ii; i++) if (i) {
+                    $(tspans[i], {dy: fontSize * leading, x: a.x});
+                } else {
+                    $(tspans[0], {dy: 0});
                 }
             }
-            $(node, {y: a.y});
+            $(node, {x: a.x, y: a.y});
             el._.dirty = 1;
             var bb = el._getBBox(),
                 dif = a.y - (bb.y + bb.height / 2);
-            dif && R.is(dif, "finite") && $(tspans[0], {dy: a.y + dif});
+            dif && R.is(dif, "finite") && $(tspans[0], {dy: dif});
         },
         Element = function (node, svg) {
             var X = 0,
@@ -2893,10 +2931,18 @@
         },
         theText = function (svg, x, y, text) {
             var el = $("text");
-            $(el, {x: x, y: y, "text-anchor": "middle"});
+            // $(el, {x: x, y: y, "text-anchor": "middle"});
             svg.canvas && svg.canvas.appendChild(el);
             var res = new Element(el, svg);
-            res.attrs = {x: x, y: y, "text-anchor": "middle", text: text, font: availableAttrs.font, stroke: "none", fill: "#000"};
+            res.attrs = {
+                x: x,
+                y: y,
+                "text-anchor": "middle",
+                text: text,
+                font: availableAttrs.font,
+                stroke: "none",
+                fill: "#000"
+            };
             res.type = "text";
             setFillAndStroke(res, res.attrs);
             return res;
@@ -2957,6 +3003,7 @@
             container.renderfix();
             return container;
         },
+        
         setViewBox = function (x, y, w, h, fit) {
             eve("setViewBox", this, this._viewBox, [x, y, w, h, fit]);
             var size = mmax(w / this.width, h / this.height),
@@ -4580,10 +4627,7 @@
         if (this.removed) {
             return null;
         }
-        var attr = this.attr();
-        delete attr.scale;
-        delete attr.translation;
-        return this.paper[this.type]().attr(attr);
+        return this.paper[this.type]().attr(this.attr());
     };
     /*\
      * Element.glow
@@ -5979,4 +6023,12 @@
         };
         return eve;
     })();
+    
+    // Eve finished
+    
+    eve.on("DOMload", function () {
+        loaded = true;
+    });
+    
+    
 })();
