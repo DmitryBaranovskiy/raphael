@@ -1026,6 +1026,13 @@
             width: mmax[apply](0, X) - xmin,
             height: mmax[apply](0, Y) - ymin
         };
+    }, null, function (o) {
+        return {
+            x: o.x,
+            y: o.y,
+            width: o.width,
+            height: o.height
+        };
     }),
         pathClone = function (pathArray) {
             var res = [];
@@ -1716,12 +1723,12 @@
     };
     function Matrix(a, b, c, d, e, f) {
         if (a != null) {
-            this.a = a;
-            this.b = b;
-            this.c = c;
-            this.d = d;
-            this.e = e;
-            this.f = f;
+            this.a = +a;
+            this.b = +b;
+            this.c = +c;
+            this.d = +d;
+            this.e = +e;
+            this.f = +f;
         } else {
             this.a = 1;
             this.b = 0;
@@ -1759,8 +1766,9 @@
         this.f = out[1][2];
     };
     matrixproto.invert = function () {
-        var x = a * d - b * c;
-        return new Matrix(d / x, -b / x, -c / x, a / x, (c * f - d * e) / x, (b * e - a * f) / x);
+        var me = this,
+            x = me.a * me.d - me.b * me.c;
+        return new Matrix(me.d / x, -me.b / x, -me.c / x, me.a / x, (me.c * me.f - me.d * me.e) / x, (me.b * me.e - me.a * me.f) / x);
     };
     matrixproto.clone = function () {
         return new Matrix(this.a, this.b, this.c, this.d, this.e, this.f);
@@ -2595,7 +2603,7 @@
         \*/
         elproto.transform = function (tstr) {
             var _ = this._;
-            if (!tstr) {
+            if (tstr == null) {
                 return _.transform;
             }
             extractTransform(this, tstr);
@@ -3525,8 +3533,13 @@
             }
             extractTransform(this, tstr);
             var matrix = this.matrix.clone(),
+                vbs = this.paper._viewBoxShift,
                 skew = this.skew;
             matrix.translate(-.5, -.5);
+            if (vbs) {
+                matrix.scale(vbs.scale, vbs.scale, -1, -1);
+                matrix.add(1, 0, 0, 1, vbs.dx, vbs.dy);
+            }
             if (this.type == "image") {
                 if (Str(tstr).indexOf("m") + 1) {
                     this.node.style.filter = matrix.toFilter();
@@ -3551,7 +3564,7 @@
                     // angle = fill.angle;
 
                 this.node.style.filter = E;
-                skew.matrix = matrix;
+                skew.matrix = Str(matrix);
                 skew.offset = matrix.offset();
                 
                 // if (0&&angle) {
@@ -3922,7 +3935,7 @@
             eve("setViewBox", this, this._viewBox, [x, y, w, h, fit]);
             var width = this.width,
                 height = this.height,
-                size = 1e3 * mmax(w / width, h / height),
+                size = 1 / mmax(w / width, h / height),
                 H, W;
             if (fit) {
                 H = height / h;
@@ -3935,6 +3948,11 @@
                 }
             }
             this._viewBox = [x, y, w, h, !!fit];
+            this._viewBoxShift = {
+                dx: -x,
+                dy: -y,
+                scale: size
+            };
             this.forEach(function (el) {
                 el.transform("...");
             });
@@ -4612,6 +4630,7 @@
             }
             _.bbox = pathDimensions(mapPath(this.realPath, this.matrix));
             _.bbox.toString = x_y_w_h;
+            console.log(mapPath(this.realPath, this.matrix)+"");
             _.dirty = _.dirtyT = 0;
         }
         return _.bbox;
