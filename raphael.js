@@ -4630,7 +4630,6 @@
             }
             _.bbox = pathDimensions(mapPath(this.realPath, this.matrix));
             _.bbox.toString = x_y_w_h;
-            console.log(mapPath(this.realPath, this.matrix)+"");
             _.dirty = _.dirtyT = 0;
         }
         return _.bbox;
@@ -5075,7 +5074,6 @@
                             R.is(f, "function") && f.call(el);
                         });
                     })(e.callback, that, e.anim);
-                    console.log(e.repeat);
                     if (--e.repeat) {
                         that.attr(e.origin);
                         e.start = Now;
