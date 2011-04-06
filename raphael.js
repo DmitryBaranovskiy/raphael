@@ -147,7 +147,7 @@
         pathCommand = /([achlmqstvz])[\s,]*((-?\d*\.?\d*(?:e[-+]?\d+)?\s*,?\s*)+)/ig,
         tCommand = /([rstm])[\s,]*((-?\d*\.?\d*(?:e[-+]?\d+)?\s*,?\s*)+)/ig,
         pathValues = /(-?\d*\.?\d*(?:e[-+]?\d+)?)\s*,?\s*/ig,
-        radial_gradient = /^r(?:\(([^,]+?)\s*,\s*([^\)]+?)\))?/,
+        radial_gradient = /^r(?:\(([^,]+?)\s*,\s*([^\)]+?)\)-?)?/,
         sortByKey = function (a, b) {
             return a.key - b.key;
         },
@@ -1452,6 +1452,9 @@
                     return null;
                 }
                 dot.color = dot.color.hex;
+                if (par[1].match(/^(?:hsb|rgb|hsl)a\((?:\d+,){3}(\d+)\)$/)) {
+                    dot.opacity = parseFloat(RegExp.$1);
+                }
                 par[2] && (dot.offset = par[2] + "%");
                 dots.push(dot);
             }
@@ -1864,7 +1867,7 @@
         },
         addGradientFill = function (element, gradient) {
             var type = "linear",
-                id = element.id + gradient,
+                id = element.id + escape(gradient),
                 fx = .5, fy = .5,
                 o = element.node,
                 SVG = element.paper,
@@ -1927,10 +1930,16 @@
                 });
                 SVG.defs.appendChild(el);
                 for (var i = 0, ii = dots.length; i < ii; i++) {
-                    el.appendChild($("stop", {
+                    var attrs = {
                         offset: dots[i].offset ? dots[i].offset : i ? "100%" : "0%",
                         "stop-color": dots[i].color || "#fff"
-                    }));
+                    };
+
+                    if (dots[i].hasOwnProperty('opacity') && dots[i].opacity < 1) {
+                        attrs["stop-opacity"] = dots[i].opacity;
+                    }
+
+                    el.appendChild($("stop", attrs));
                 }
             }
             $(o, {
@@ -2302,7 +2311,7 @@
                                 !R.is(attrs["fill-opacity"], "undefined") &&
                                     R.is(params["fill-opacity"], "undefined") &&
                                     $(node, {"fill-opacity": attrs["fill-opacity"]});
-                            } else if ((o.type == "circle" || o.type == "ellipse" || Str(value).charAt() != "r") && addGradientFill(o, value)) {
+                            } else if (addGradientFill(o, value)) {
                                 if ("opacity" in attrs || "fill-opacity" in attrs) {
                                     var gradient = g.doc.getElementById(node.getAttribute(fillString).replace(/^url\(#|\)$/g, E));
                                     if (gradient) {
