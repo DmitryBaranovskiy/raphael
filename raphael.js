@@ -3892,7 +3892,7 @@
             path.textpathok = true;
             o.string = Str(text);
             o.on = true;
-            el.style.cssText = "position:absolute;left:0;top:0;width:1;height:1";
+            el.style.cssText = "position:absolute;left:0;top:0;width:1px;height:1px";
             el.coordsize = zoom + S + zoom;
             el.coordorigin = "0 0";
             var p = new Element(el, vml),
