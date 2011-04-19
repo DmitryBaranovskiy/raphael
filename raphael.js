@@ -411,6 +411,26 @@
             v = c == "x" ? r : (r & 3 | 8);
         return v.toString(16);
     });
+    
+    var safeIDEncode = (function (input) {
+        var data = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789:-_";
+        var result = "";
+        var c1, c2, c3, c4, b1, b2, b3, i = 0;
+        while (i < input.length) {
+            b1 = input.charCodeAt(i++);
+            b2 = input.charCodeAt(i++);
+            b3 = input.charCodeAt(i++);
+            result += data.charAt(b1 >> 2);
+            result += data.charAt(((b1 & 3) << 4) | ((b2 || 0) & 15));
+            if (isNaN(b2)) {
+                result += data.charAt(64) + data.charAt(64);
+            } else {
+                result += data.charAt(((b2 & 15) << 2) | ((b3 || 0) & 3));
+                result += data.charAt(isNaN(b3) ? 64 : (b3 & 63));
+            } 
+        }
+        return result;
+    })
 
     /*\
      * Raphael.setWindow
@@ -1864,7 +1884,7 @@
         },
         addGradientFill = function (element, gradient) {
             var type = "linear",
-                id = element.id + createUUID(),
+                id = 'I' + element.id + safeIDEncode(gradient),
                 fx = .5, fy = .5,
                 o = element.node,
                 SVG = element.paper,
