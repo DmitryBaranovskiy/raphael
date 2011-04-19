@@ -5722,6 +5722,10 @@
             item,
             set = this,
             collector;
+            
+        if (len == 0) {
+          return this;
+        }
         callback && (collector = function () {
             !--len && callback.call(set);
         });
