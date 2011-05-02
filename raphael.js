@@ -2373,7 +2373,7 @@
                 var texts = Str(params.text).split("\n"),
                     tspans = [],
                     tspan;
-                for (var i = 0, ii = texts.length; i < ii; i++) if (texts[i]) {
+                for (var i = 0, ii = texts.length; i < ii; i++) if (typeof texts[i] == 'string') {
                     tspan = $("tspan");
                     i && $(tspan, {dy: fontSize * leading, x: a.x});
                     tspan.appendChild(g.doc.createTextNode(texts[i]));
@@ -5722,6 +5722,10 @@
             item,
             set = this,
             collector;
+            
+        if (len == 0) {
+          return this;
+        }
         callback && (collector = function () {
             !--len && callback.call(set);
         });
