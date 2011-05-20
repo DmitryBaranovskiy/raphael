@@ -3054,8 +3054,11 @@
            Special thanks to Mariusz Nowak (http://www.medikoo.com/) for this method.
         \*/
         paperproto.renderfix = function () {
-            var cnvs = this.canvas,
-                s = cnvs.style,
+            // Certain builds of firefox do not support this method on the root element
+            if (!((cnvs = this.canvas).getScreenCTM()))
+                return;
+
+            var s = cnvs.style,
                 pos = cnvs.getScreenCTM(),
                 left = -pos.e % 1,
                 top = -pos.f % 1;
