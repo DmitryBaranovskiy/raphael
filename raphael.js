@@ -2373,7 +2373,7 @@
                 var texts = Str(params.text).split("\n"),
                     tspans = [],
                     tspan;
-                for (var i = 0, ii = texts.length; i < ii; i++) if (texts[i]) {
+                for (var i = 0, ii = texts.length; i < ii; i++) if (typeof texts[i] == 'string') {
                     tspan = $("tspan");
                     i && $(tspan, {dy: fontSize * leading, x: a.x});
                     tspan.appendChild(g.doc.createTextNode(texts[i]));
@@ -3054,8 +3054,11 @@
            Special thanks to Mariusz Nowak (http://www.medikoo.com/) for this method.
         \*/
         paperproto.renderfix = function () {
-            var cnvs = this.canvas,
-                s = cnvs.style,
+            // Certain builds of firefox do not support this method on the root element
+            if (!((cnvs = this.canvas).getScreenCTM()))
+                return;
+
+            var s = cnvs.style,
                 pos = cnvs.getScreenCTM(),
                 left = -pos.e % 1,
                 top = -pos.f % 1;
@@ -5722,6 +5725,10 @@
             item,
             set = this,
             collector;
+            
+        if (len == 0) {
+          return this;
+        }
         callback && (collector = function () {
             !--len && callback.call(set);
         });
