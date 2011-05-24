@@ -3054,9 +3054,15 @@
            Special thanks to Mariusz Nowak (http://www.medikoo.com/) for this method.
         \*/
         paperproto.renderfix = function () {
-            // Certain builds of firefox do not support this method on the root element
-            if (!((cnvs = this.canvas).getScreenCTM()))
-                return;
+            try {
+                // Certain builds of firefox do not support this method on the root element
+                if (!((cnvs = this.canvas).getScreenCTM()))
+                    return;
+            } catch(err) {
+                // IE9 returns an error for this, skip the fix
+                if (String(err).match(/unexpected call to method or property access/i))
+                    return;
+            }
 
             var s = cnvs.style,
                 pos = cnvs.getScreenCTM(),
