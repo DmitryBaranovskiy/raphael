@@ -3741,7 +3741,7 @@
         };
         elproto.toFront = function () {
             !this.removed && this.node.parentNode.appendChild(this.node);
-            this.paper.top != this && tofront(this, this.paper);
+            this.paper && this.paper.top != this && tofront(this, this.paper);
             return this;
         };
         elproto.toBack = function () {
