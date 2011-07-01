@@ -1,10 +1,10 @@
-/*
- * Raphaël 2.0.0 - JavaScript Vector Library
- *
- * Copyright (c) 2011 Dmitry Baranovskiy (http://raphaeljs.com)
- * Copyright (c) 2011 Sencha Labs (http://sencha.com)
- * Licensed under the MIT (http://raphaeljs.com/license.html) license.
- */
+// ┌─────────────────────────────────────────────────────────────────────┐ \\
+// │ Raphaël 2 - JavaScript Vector Library                               │ \\
+// ├─────────────────────────────────────────────────────────────────────┤ \\
+// │ Copyright (c) 2008-2011 Dmitry Baranovskiy (http://raphaeljs.com)   │ \\
+// │ Copyright (c) 2008-2011 Sencha Labs (http://sencha.com)             │ \\
+// │ Licensed under the MIT (http://raphaeljs.com/license.html) license. │ \\
+// └─────────────────────────────────────────────────────────────────────┘ \\
 (function () {
     /*\
      * Raphael
@@ -144,9 +144,9 @@
         commaSpaces = /\s*,\s*/,
         hsrg = {hs: 1, rg: 1},
         p2s = /,?([achlmqrstvxz]),?/gi,
-        pathCommand = /([achlmqstvz])[\s,]*((-?\d*\.?\d*(?:e[-+]?\d+)?\s*,?\s*)+)/ig,
-        tCommand = /([rstm])[\s,]*((-?\d*\.?\d*(?:e[-+]?\d+)?\s*,?\s*)+)/ig,
-        pathValues = /(-?\d*\.?\d*(?:e[-+]?\d+)?)\s*,?\s*/ig,
+        pathCommand = /([achlmqstvz])[\s,]*((-?\d*\.?\d*(?:e[\-+]?\d+)?\s*,?\s*)+)/ig,
+        tCommand = /([rstm])[\s,]*((-?\d*\.?\d*(?:e[\-+]?\d+)?\s*,?\s*)+)/ig,
+        pathValues = /(-?\d*\.?\d*(?:e[\-+]?\d+)?)\s*,?\s*/ig,
         radial_gradient = /^r(?:\(([^,]+?)\s*,\s*([^\)]+?)\))?/,
         sortByKey = function (a, b) {
             return a.key - b.key;
@@ -227,7 +227,7 @@
         b = d.firstChild;
         b.style.behavior = "url(#default#VML)";
         if (!(b && typeof b.adj == "object")) {
-            return R.type = E;
+            return (R.type = E);
         }
         d = null;
     }
@@ -508,6 +508,60 @@
         R.is(o, "finite") && (rgb.opacity = o);
         return rgb;
     };
+    
+    /*\
+     * Raphael.color
+     [ method ]
+     **
+     * Parses the color string and returns object with all values for the given color.
+     > Parameters
+     - clr (string) color string in one of the supported formasts (see @Raphael.getRGB)
+     = (object) Combined RGB & HSB object in format:
+     o {
+     o     r (number) red,
+     o     g (number) green,
+     o     b (number) blue,
+     o     hex (string) color in HTML/CSS format: #••••••,
+     o     error (boolean) `true` if string can’t be parsed,
+     o     h (number) hue,
+     o     s (number) saturation,
+     o     v (number) value (brightness),
+     o     l (number) lightness
+     o }
+    \*/
+    R.color = function (clr) {
+        var rgb;
+        if (R.is(clr, "object") && "h" in clr && "s" in clr && "b" in clr) {
+            rgb = R.hsb2rgb(clr);
+            clr.r = rgb.r;
+            clr.g = rgb.g;
+            clr.b = rgb.b;
+            clr.hex = rgb.hex;
+        } else if (R.is(clr, "object") && "h" in clr && "s" in clr && "l" in clr) {
+            rgb = R.hsl2rgb(clr);
+            clr.r = rgb.r;
+            clr.g = rgb.g;
+            clr.b = rgb.b;
+            clr.hex = rgb.hex;
+        } else {
+            if (R.is(clr, "string")) {
+                clr = R.getRGB(clr);
+            }
+            if (R.is(clr, "object") && "r" in clr && "g" in clr && "b" in clr) {
+                rgb = R.rgb2hsl(clr);
+                clr.h = rgb.h;
+                clr.s = rgb.s;
+                clr.l = rgb.l;
+                rgb = R.rgb2hsb(clr);
+                clr.v = rgb.b;
+            } else {
+                clr = {hex: "none"};
+                crl.r = clr.g = clr.b = clr.h = clr.s = clr.v = clr.l = -1;
+            }
+        }
+        clr.toString = rgbtoString;
+        return clr;
+    };
     /*\
      * Raphael.hsb2rgb
      [ method ]
@@ -614,8 +668,9 @@
         H = (C == 0 ? null :
              V == r ? (g - b) / C :
              V == g ? (b - r) / C + 2 :
-                      (r - g) / C + 4);
-        H = (H % 6) * 60;
+                      (r - g) / C + 4
+            );
+        H = ((H + 360) % 6) * 60 / 360;
         S = C == 0 ? 0 : C / V;
         return {h: H, s: S, b: V, toString: hsbtoString};
     };
@@ -649,7 +704,7 @@
              M == r ? (g - b) / C :
              M == g ? (b - r) / C + 2 :
                       (r - g) / C + 4);
-        H = (H % 6) * 60;
+        H = ((H + 360) % 6) * 60 / 360;
         L = (M + m) / 2;
         S = (C == 0 ? 0 :
              L < .5 ? C / (2 * L) :
@@ -696,6 +751,10 @@
         g.doc.body.appendChild(img);
         img.src = src;
     }
+    
+    function clrToString() {
+        return this.hex;
+    }
 
     /*\
      * Raphael.getRGB
@@ -726,10 +785,10 @@
     \*/
     R.getRGB = cacher(function (colour) {
         if (!colour || !!((colour = Str(colour)).indexOf("-") + 1)) {
-            return {r: -1, g: -1, b: -1, hex: "none", error: 1};
+            return {r: -1, g: -1, b: -1, hex: "none", error: 1, toString: clrToString};
         }
         if (colour == "none") {
-            return {r: -1, g: -1, b: -1, hex: "none"};
+            return {r: -1, g: -1, b: -1, hex: "none", toString: clrToString};
         }
         !(hsrg[has](colour.toLowerCase().substring(0, 2)) || colour.charAt() == "#") && (colour = toHex(colour));
         var res,
@@ -788,12 +847,12 @@
                 values[3] && values[3].slice(-1) == "%" && (opacity /= 100);
                 return R.hsl2rgb(red, green, blue, opacity);
             }
-            rgb = {r: red, g: green, b: blue};
+            rgb = {r: red, g: green, b: blue, toString: clrToString};
             rgb.hex = "#" + (16777216 | blue | (green << 8) | (red << 16)).toString(16).slice(1);
             R.is(opacity, "finite") && (rgb.opacity = opacity);
             return rgb;
         }
-        return {r: -1, g: -1, b: -1, hex: "none", error: 1};
+        return {r: -1, g: -1, b: -1, hex: "none", error: 1, toString: clrToString};
     }, R);
     /*\
      * Raphael.hsb
@@ -1131,6 +1190,9 @@
         pathToAbsolute = cacher(function (pathArray) {
             if (!R.is(pathArray, array) || !R.is(pathArray && pathArray[0], array)) { // rough assumption
                 pathArray = R.parsePathString(pathArray);
+            }
+            if (!pathArray || !pathArray.length) {
+                return [["M", 0, 0]];
             }
             var res = [],
                 x = 0,
@@ -1831,7 +1893,6 @@
             // translation
             out.dx = this.e;
             out.dy = this.f;
-            this.e = this.f = 0;
 
             // scale and shear
             var row = [[this.a, this.c], [this.b, this.d]];
@@ -1846,9 +1907,19 @@
             out.shear /= out.scaley;
 
             // rotation
-            out.rotate = R.deg(math.asin(-row[0][1]));
+            var sin = -row[0][1],
+                cos = row[1][1];
+            if (cos < 0) {
+                out.rotate = R.deg(math.acos(cos));
+                if (sin < 0) {
+                    out.rotate = 360 - out.rotate;
+                }
+            } else {
+                out.rotate = R.deg(math.asin(sin));
+            }
 
             out.isSimple = !+out.shear.toFixed(9) && (out.scalex.toFixed(9) == out.scaley.toFixed(9) || !out.rotate);
+            out.isSuperSimple = !+out.shear.toFixed(9) && out.scalex.toFixed(9) == out.scaley.toFixed(9) && !out.rotate;
 
             return out;
         };
@@ -1963,6 +2034,7 @@
                     delete element.gradient;
                 }
 
+                id = id.replace(/[\(\)\s,\xb0#]/g, "-");
                 el = $(type + "Gradient", {id: id});
                 element.gradient = el;
                 $(el, type == "radial" ? {
@@ -2423,7 +2495,7 @@
                 var texts = Str(params.text).split("\n"),
                     tspans = [],
                     tspan;
-                for (var i = 0, ii = texts.length; i < ii; i++) if (texts[i]) {
+                for (var i = 0, ii = texts.length; i < ii; i++) {
                     tspan = $("tspan");
                     i && $(tspan, {dy: fontSize * leading, x: a.x});
                     tspan.appendChild(g.doc.createTextNode(texts[i]));
@@ -2812,8 +2884,8 @@
             }
             if (name == null) {
                 var res = {};
-                for (var i in this.attrs) if (this.attrs[has](i)) {
-                    res[i] = this.attrs[i];
+                for (var a in this.attrs) if (this.attrs[has](a)) {
+                    res[a] = this.attrs[a];
                 }
                 res.gradient && res.fill == "none" && (res.fill = res.gradient) && delete res.gradient;
                 res.transform = this._.transform;
@@ -2826,20 +2898,26 @@
                 if (name == "transform") {
                     return this._.transform;
                 }
-                if (name in this.attrs) {
-                    return this.attrs[name];
-                } else if (R.is(this.paper.customAttributes[name], "function")) {
-                    return this.paper.customAttributes[name].def;
-                } else {
-                    return availableAttrs[name];
+                var names = name.split(separator),
+                    out = {};
+                for (var i = 0, ii = names.length; i < ii; i++) {
+                    name = names[i];
+                    if (name in this.attrs) {
+                        out[name] = this.attrs[name];
+                    } else if (R.is(this.paper.customAttributes[name], "function")) {
+                        out[name] = this.paper.customAttributes[name].def;
+                    } else {
+                        out[name] = availableAttrs[name];
+                    }
                 }
+                return ii - 1 ? out : out[names[0]];
             }
             if (value == null && R.is(name, array)) {
-                var values = {};
-                for (var j = 0, jj = name.length; j < jj; j++) {
-                    values[name[j]] = this.attr(name[j]);
+                out = {};
+                for (i = 0, ii = name.length; i < ii; i++) {
+                    out[name[i]] = this.attr(name[i]);
                 }
-                return values;
+                return out;
             }
             if (value != null) {
                 var params = {};
@@ -3497,6 +3575,8 @@
         addGradientFill = function (o, gradient, fill) {
             o.attrs = o.attrs || {};
             var attrs = o.attrs,
+                opacity,
+                oindex,
                 type = "linear",
                 fxfy = ".5 .5";
             o.attrs.gradient = gradient;
@@ -3533,7 +3613,7 @@
                 for (var i = 0, ii = dots.length; i < ii; i++) {
                     dots[i].offset && clrs.push(dots[i].offset + S + dots[i].color);
                 }
-                fill.colors && (fill.colors.value = clrs.length ? clrs.join() : "0% " + fill.color);
+                fill.colors = clrs.length ? clrs.join() : "0% " + fill.color;
                 if (type == "radial") {
                     fill.type = "gradientTitle";
                     fill.focus = "100%";
@@ -3546,7 +3626,6 @@
                     fill.angle = (270 - angle) % 360;
                 }
                 o.appendChild(fill);
-                // alert(fill.outerHTML);
             }
             return 1;
         };
@@ -3585,17 +3664,19 @@
             var matrix = this.matrix.clone(),
                 vbs = this.paper._viewBoxShift,
                 skew = this.skew,
-                o = this.node;
+                o = this.node,
+                split,
+                isGrad = Str(this.attrs.fill).indexOf("-") + 1;
             matrix.translate(-.5, -.5);
             if (vbs) {
                 matrix.scale(vbs.scale, vbs.scale, -1, -1);
                 matrix.translate(vbs.dx, vbs.dy);
             }
-            if (Str(this.attrs.fill).indexOf("-") + 1 || this.type == "image") {
+            if (isGrad || this.type == "image") {
                 skew.matrix = "1 0 0 1";
                 skew.offset = "0 0";
-                var split = matrix.split();
-                if (!split.isSimple) {
+                // just translation?
+                if (isGrad || !(split = matrix.split()).isSimple) {
                     o.style.filter = matrix.toFilter();
                     var bb = this.getBBox(),
                         bbt = this.getBBox(1),
@@ -3605,7 +3686,6 @@
                     setCoords(this, 1, 1, dx, dy, 0);
                 } else {
                     o.style.filter = E;
-                    alert("clean");
                     setCoords(this, split.scalex, split.scaley, split.dx, split.dy, split.rotate);
                 }
             } else {
@@ -3722,8 +3802,8 @@
             }
             if (name == null) {
                 var res = {};
-                for (var i in this.attrs) if (this.attrs[has](i)) {
-                    res[i] = this.attrs[i];
+                for (var a in this.attrs) if (this.attrs[has](a)) {
+                    res[a] = this.attrs[a];
                 }
                 res.gradient && res.fill == "none" && (res.fill = res.gradient) && delete res.gradient;
                 res.transform = this._.transform;
@@ -3733,20 +3813,26 @@
                 if (name == fillString && this.attrs.fill == "none" && this.attrs.gradient) {
                     return this.attrs.gradient;
                 }
-                if (name in this.attrs) {
-                    return this.attrs[name];
-                } else if (R.is(this.paper.customAttributes[name], "function")) {
-                    return this.paper.customAttributes[name].def;
-                } else {
-                    return availableAttrs[name];
+                var names = name.split(separator),
+                    out = {};
+                for (var i = 0, ii = names.length; i < ii; i++) {
+                    name = names[i];
+                    if (name in this.attrs) {
+                        out[name] = this.attrs[name];
+                    } else if (R.is(this.paper.customAttributes[name], "function")) {
+                        out[name] = this.paper.customAttributes[name].def;
+                    } else {
+                        out[name] = availableAttrs[name];
+                    }
                 }
+                return ii - 1 ? out : out[names[0]];
             }
             if (this.attrs && value == null && R.is(name, array)) {
-                var ii, values = {};
+                out = {};
                 for (i = 0, ii = name.length; i < ii; i++) {
-                    values[name[i]] = this.attr(name[i]);
+                    out[name[i]] = this.attr(name[i]);
                 }
-                return values;
+                return out;
             }
             var params;
             if (value != null) {
@@ -3776,7 +3862,7 @@
         };
         elproto.toFront = function () {
             !this.removed && this.node.parentNode.appendChild(this.node);
-            this.paper.top != this && tofront(this, this.paper);
+            this.paper && this.paper.top != this && tofront(this, this.paper);
             return this;
         };
         elproto.toBack = function () {
@@ -4107,8 +4193,12 @@
     addEvent = (function () {
         if (g.doc.addEventListener) {
             return function (obj, type, fn, element) {
-                var realName = supportsTouch && touchMap[type] ? touchMap[type] : type;
-                var f = function (e) {
+                var realName = supportsTouch && touchMap[type] ? touchMap[type] : type,
+                    f = function (e) {
+                        var scrollY = g.doc.documentElement.scrollTop || g.doc.body.scrollTop,
+                            scrollX = g.doc.documentElement.scrollLeft || g.doc.body.scrollLeft,
+                            x = e.clientX + scrollX,
+                            y = e.clientY + scrollY;
                     if (supportsTouch && touchMap[has](type)) {
                         for (var i = 0, ii = e.targetTouches && e.targetTouches.length; i < ii; i++) {
                             if (e.targetTouches[i].target == obj) {
@@ -4121,7 +4211,7 @@
                             }
                         }
                     }
-                    return fn.call(element, e);
+                    return fn.call(element, e, x, y);
                 };
                 obj.addEventListener(realName, f, false);
                 return function () {
@@ -4133,9 +4223,13 @@
             return function (obj, type, fn, element) {
                 var f = function (e) {
                     e = e || g.win.event;
+                    var scrollY = g.doc.documentElement.scrollTop || g.doc.body.scrollTop,
+                        scrollX = g.doc.documentElement.scrollLeft || g.doc.body.scrollLeft,
+                        x = e.clientX + scrollX,
+                        y = e.clientY + scrollY;
                     e.preventDefault = e.preventDefault || preventDefault;
                     e.stopPropagation = e.stopPropagation || stopPropagation;
-                    return fn.call(element, e);
+                    return fn.call(element, e, x, y);
                 };
                 obj.attachEvent("on" + type, f);
                 var detacher = function () {
@@ -4465,7 +4559,7 @@
      | st.attr({fill: "red"});
     \*/
     paperproto.set = function (itemsArray) {
-        arguments.length > 1 && (itemsArray = Array.prototype.splice.call(arguments, 0, arguments.length));
+        !R.is(itemsArray, "array") && (itemsArray = Array.prototype.splice.call(arguments, 0, arguments.length));
         return new Set(itemsArray);
     };
     /*\
@@ -5105,6 +5199,7 @@
                 } else {
                     (function(f, el, a) {
                         setTimeout(function() {
+                            eve("anim.frame." + el.id, el, a);
                             eve("anim.finish." + el.id, el, a);
                             R.is(f, "function") && f.call(el);
                         });
@@ -5748,6 +5843,11 @@
         }
         return this;
     };
+    setproto.clear = function () {
+        while (this.length) {
+            this.pop();
+        }
+    };
     setproto.animate = function (params, ms, easing, callback) {
         (R.is(easing, "function") || !easing) && (callback = easing || null);
         var len = this.items.length,
@@ -5755,6 +5855,9 @@
             item,
             set = this,
             collector;
+        if (!len) {
+            return this;
+        }
         callback && (collector = function () {
             !--len && callback.call(set);
         });
@@ -6213,6 +6316,4 @@
     eve.on("DOMload", function () {
         loaded = true;
     });
-    
-    
 })();
