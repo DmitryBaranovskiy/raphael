@@ -4489,7 +4489,7 @@
      > Parameters
      **
      - pathString (string) path data in SVG path string format.
-     = (object) Raphaël element object with type “ellipse”
+     = (object) Raphaël element object with type “path”
      # Details of a path's data attribute's format are described in the <a href="http://www.w3.org/TR/SVG/paths.html#PathData">SVG specification</a>.
      **
      > Usage
