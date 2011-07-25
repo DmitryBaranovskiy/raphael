@@ -18,6 +18,7 @@ window.Raphael.vml && function (R) {
         abs = math.abs,
         fillString = "fill",
         separator = /[, ]+/,
+        eve = R.eve,
         S = " ",
         E = "";
     // VML
@@ -37,7 +38,7 @@ window.Raphael.vml && function (R) {
             if (command == R._pathToAbsolute && !Str(path).match(total)) {
                 var res = Str(path).replace(bites, function (all, command, args) {
                     var vals = [],
-                        isMove = lowerCase.call(command) == "m",
+                        isMove = command.toLowerCase() == "m",
                         res = map[command];
                     args.replace(val, function (value) {
                         if (isMove && vals.length == 2) {
@@ -183,7 +184,7 @@ window.Raphael.vml && function (R) {
             if (rect.length == 4) {
                 rect[2] = +rect[2] + (+rect[0]);
                 rect[3] = +rect[3] + (+rect[1]);
-                var div = node.clipRect || g.doc.createElement("div"),
+                var div = node.clipRect || R._g.doc.createElement("div"),
                     dstyle = div.style,
                     group = node.parentNode;
                 dstyle.clip = R.format("rect({1}px {2}px {3}px {0}px)", rect);
@@ -935,7 +936,7 @@ window.Raphael.vml && function (R) {
     R.prototype.clear = function () {
         R.eve("clear", this);
         this.canvas.innerHTML = E;
-        this.span = g.doc.createElement("span");
+        this.span = R._g.doc.createElement("span");
         this.span.style.cssText = "position:absolute;left:-9999em;top:-9999em;padding:0;margin:0;line-height:1;display:inline;";
         this.canvas.appendChild(this.span);
         this.bottom = this.top = null;

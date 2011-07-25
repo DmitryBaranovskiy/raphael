@@ -3895,9 +3895,14 @@
                 var prev = i && font.glyphs[letters[i - 1]] || {},
                     curr = font.glyphs[letters[i]];
                 shift += i ? (prev.w || font.w) + (prev.k && prev.k[letters[i]] || 0) + (font.w * letter_spacing) : 0;
-                curr && curr.d && out.push(this.path(curr.d).attr({fill: "#000", stroke: "none", transform: [["t", shift, 0]]}));
+                curr && curr.d && out.push(this.path(curr.d).attr({
+                    fill: "#000",
+                    stroke: "none",
+                    transform: [["t", shift * scale, 0]]
+                }));
             }
-            out.scale(scale, scale, top, height).translate(x - top, y - height);
+            out.transform(["...s", scale, scale, top, height, "t", (x - top) / scale, (y - height) / scale]);
+            // out.scale(scale, scale, top, height).translate(x - top, y - height);
         }
         return out;
     };

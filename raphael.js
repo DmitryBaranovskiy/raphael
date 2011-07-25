@@ -4236,7 +4236,9 @@ window.Raphael.svg && function (R) {
         math = Math,
         mmax = math.max,
         abs = math.abs,
+        pow = math.pow,
         separator = /[, ]+/,
+        eve = R.eve,
         E = "";
     // SVG
     var xlink = "http://www.w3.org/1999/xlink",
@@ -4276,7 +4278,7 @@ window.Raphael.svg && function (R) {
         oid = oid && oid.match(rgGrad);
         if (oid && !--gradients[oid[1]]) {
             delete gradients[oid[1]];
-            paper.defs.removeChild(g.doc.getElementById(oid[1]));
+            paper.defs.removeChild(R._g.doc.getElementById(oid[1]));
         }
     },
     addGradientFill = function (element, gradient) {
@@ -4430,7 +4432,7 @@ window.Raphael.svg && function (R) {
             if (type != "none") {
                 var pathId = "raphael-marker-" + type,
                     markerId = "raphael-marker-" + se + type + w + h;
-                if (!g.doc.getElementById(pathId)) {
+                if (!R._g.doc.getElementById(pathId)) {
                     p.defs.appendChild($($("path"), {
                         "stroke-linecap": "round",
                         d: markers[type],
@@ -4440,7 +4442,7 @@ window.Raphael.svg && function (R) {
                 } else {
                     markerCounter[pathId]++;
                 }
-                var marker = g.doc.getElementById(markerId),
+                var marker = R._g.doc.getElementById(markerId),
                     use;
                 if (!marker) {
                     marker = $($("marker"), {
@@ -4499,7 +4501,7 @@ window.Raphael.svg && function (R) {
                 delete o._.arrows[se + "String"];
             }
             for (attr in markerCounter) if (markerCounter[has](attr) && !markerCounter[attr]) {
-                var item = g.doc.getElementById(attr);
+                var item = R._g.doc.getElementById(attr);
                 item && item.parentNode.removeChild(item);
             }
         }
@@ -4522,7 +4524,7 @@ window.Raphael.svg && function (R) {
             node = o.node,
             attrs = o.attrs,
             addDashes = function (o, value) {
-                value = dasharray[lowerCase.call(value)];
+                value = dasharray[Str(value).toLowerCase()];
                 if (value) {
                     var width = o.attrs["stroke-width"] || "1",
                         butt = {round: width, square: width, butt: 0}[o.attrs["stroke-linecap"] || params["stroke-linecap"]] || 0,
@@ -4549,7 +4551,7 @@ window.Raphael.svg && function (R) {
                     case "title":
                     case "target":
                         var pn = node.parentNode;
-                        if (lowerCase.call(pn.tagName) != "a") {
+                        if (pn.tagName.toLowerCase() != "a") {
                             var hl = $("a");
                             pn.insertBefore(hl, node);
                             hl.appendChild(node);
@@ -4592,7 +4594,7 @@ window.Raphael.svg && function (R) {
                             o.clip = rc;
                         }
                         if (!value) {
-                            var clip = g.doc.getElementById(node.getAttribute("clip-path").replace(/(^url\(#|\)$)/g, E));
+                            var clip = R._g.doc.getElementById(node.getAttribute("clip-path").replace(/(^url\(#|\)$)/g, E));
                             clip && clip.parentNode.removeChild(clip);
                             $(node, {"clip-path": E});
                             delete o.clip;
@@ -4722,7 +4724,7 @@ window.Raphael.svg && function (R) {
                                 $(node, {"fill-opacity": attrs["fill-opacity"]});
                         } else if ((o.type == "circle" || o.type == "ellipse" || Str(value).charAt() != "r") && addGradientFill(o, value)) {
                             if ("opacity" in attrs || "fill-opacity" in attrs) {
-                                var gradient = g.doc.getElementById(node.getAttribute("fill").replace(/^url\(#|\)$/g, E));
+                                var gradient = R._g.doc.getElementById(node.getAttribute("fill").replace(/^url\(#|\)$/g, E));
                                 if (gradient) {
                                     var stops = gradient.getElementsByTagName("stop");
                                     $(stops[stops.length - 1], {"stop-opacity": ("opacity" in attrs ? attrs.opacity : 1) * ("fill-opacity" in attrs ? attrs["fill-opacity"] : 1)});
@@ -4752,7 +4754,7 @@ window.Raphael.svg && function (R) {
                         // fall
                     case "fill-opacity":
                         if (attrs.gradient) {
-                            gradient = g.doc.getElementById(node.getAttribute("fill").replace(/^url\(#|\)$/g, E));
+                            gradient = R._g.doc.getElementById(node.getAttribute("fill").replace(/^url\(#|\)$/g, E));
                             if (gradient) {
                                 stops = gradient.getElementsByTagName("stop");
                                 $(stops[stops.length - 1], {"stop-opacity": value});
@@ -5567,6 +5569,7 @@ window.Raphael.vml && function (R) {
         abs = math.abs,
         fillString = "fill",
         separator = /[, ]+/,
+        eve = R.eve,
         S = " ",
         E = "";
     // VML
@@ -5586,7 +5589,7 @@ window.Raphael.vml && function (R) {
             if (command == R._pathToAbsolute && !Str(path).match(total)) {
                 var res = Str(path).replace(bites, function (all, command, args) {
                     var vals = [],
-                        isMove = lowerCase.call(command) == "m",
+                        isMove = command.toLowerCase() == "m",
                         res = map[command];
                     args.replace(val, function (value) {
                         if (isMove && vals.length == 2) {
@@ -5732,7 +5735,7 @@ window.Raphael.vml && function (R) {
             if (rect.length == 4) {
                 rect[2] = +rect[2] + (+rect[0]);
                 rect[3] = +rect[3] + (+rect[1]);
-                var div = node.clipRect || g.doc.createElement("div"),
+                var div = node.clipRect || R._g.doc.createElement("div"),
                     dstyle = div.style,
                     group = node.parentNode;
                 dstyle.clip = R.format("rect({1}px {2}px {3}px {0}px)", rect);
@@ -6484,7 +6487,7 @@ window.Raphael.vml && function (R) {
     R.prototype.clear = function () {
         R.eve("clear", this);
         this.canvas.innerHTML = E;
-        this.span = g.doc.createElement("span");
+        this.span = R._g.doc.createElement("span");
         this.span.style.cssText = "position:absolute;left:-9999em;top:-9999em;padding:0;margin:0;line-height:1;display:inline;";
         this.canvas.appendChild(this.span);
         this.bottom = this.top = null;
