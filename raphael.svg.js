@@ -601,6 +601,8 @@ window.Raphael.svg && function (R) {
          [ property (object) ]
          **
          * Gives you a reference to the DOM object, so you can assign event handlers or just mess around.
+         **
+         * Note: Don’t mess with it.
          > Usage
          | // draw a circle at coordinate 10,10 with radius of 10
          | var c = paper.circle(10, 10, 10);

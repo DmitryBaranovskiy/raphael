@@ -1,5 +1,5 @@
 // ┌─────────────────────────────────────────────────────────────────────┐ \\
-// │ Raphaël 2 - JavaScript Vector Library                               │ \\
+// │ "Raphaël 2.0" - JavaScript Vector Library                           │ \\
 // ├─────────────────────────────────────────────────────────────────────┤ \\
 // │ Copyright (c) 2008-2011 Dmitry Baranovskiy (http://raphaeljs.com)   │ \\
 // │ Copyright (c) 2008-2011 Sencha Labs (http://sencha.com)             │ \\
@@ -84,6 +84,7 @@
         }
     }
     R.version = "2.0.0";
+    R.eve = eve;
     var loaded,
         separator = /[, ]+/,
         elements = {circle: 1, rect: 1, path: 1, ellipse: 1, text: 1, image: 1},
@@ -1869,6 +1870,21 @@
         }
     }
     (function (matrixproto) {
+        /*\
+         * Matrix.add
+         [ method ]
+         **
+         * Adds given matrix to existing one.
+         > Parameters
+         - a (number)
+         - b (number)
+         - c (number)
+         - d (number)
+         - e (number)
+         - f (number)
+         or
+         - matrix (object) @Matrix
+        \*/
         matrixproto.add = function (a, b, c, d, e, f) {
             var out = [[], [], []],
                 m = [[this.a, this.c, this.e], [this.b, this.d, this.f], [0, 0, 1]],
@@ -1895,33 +1911,99 @@
             this.e = out[0][2];
             this.f = out[1][2];
         };
+        /*\
+         * Matrix.invert
+         [ method ]
+         **
+         * Returns inverted version of the matrix
+         = (object) @Matrix
+        \*/
         matrixproto.invert = function () {
             var me = this,
                 x = me.a * me.d - me.b * me.c;
             return new Matrix(me.d / x, -me.b / x, -me.c / x, me.a / x, (me.c * me.f - me.d * me.e) / x, (me.b * me.e - me.a * me.f) / x);
         };
+        /*\
+         * Matrix.clone
+         [ method ]
+         **
+         * Returns copy of the matrix
+         = (object) @Matrix
+        \*/
         matrixproto.clone = function () {
             return new Matrix(this.a, this.b, this.c, this.d, this.e, this.f);
         };
+        /*\
+         * Matrix.translate
+         [ method ]
+         **
+         * Translate the matrix
+         > Parameters
+         - x (number)
+         - y (number)
+        \*/
         matrixproto.translate = function (x, y) {
             this.add(1, 0, 0, 1, x, y);
         };
+        /*\
+         * Matrix.scale
+         [ method ]
+         **
+         * Scales the matrix
+         > Parameters
+         - x (number)
+         - y (number) #optional
+         - cx (number) #optional
+         - cy (number) #optional
+        \*/
         matrixproto.scale = function (x, y, cx, cy) {
             y == null && (y = x);
-            this.add(1, 0, 0, 1, cx, cy);
+            cx || cy && this.add(1, 0, 0, 1, cx, cy);
             this.add(x, 0, 0, y, 0, 0);
-            this.add(1, 0, 0, 1, -cx, -cy);
+            cx || cy && this.add(1, 0, 0, 1, -cx, -cy);
         };
+        /*\
+         * Matrix.rotate
+         [ method ]
+         **
+         * Rotates the matrix
+         > Parameters
+         - a (number)
+         - x (number)
+         - y (number)
+        \*/
         matrixproto.rotate = function (a, x, y) {
             a = R.rad(a);
+            x = x || 0;
+            y = y || 0;
             var cos = +math.cos(a).toFixed(9),
                 sin = +math.sin(a).toFixed(9);
             this.add(cos, sin, -sin, cos, x, y);
             this.add(1, 0, 0, 1, -x, -y);
         };
+        /*\
+         * Matrix.x
+         [ method ]
+         **
+         * Return x coordinate for given point after transformation described by the matrix. See also @Matrix.y
+         > Parameters
+         - x (number)
+         - y (number)
+         = (number) x
+        \*/
         matrixproto.x = function (x, y) {
             return x * this.a + y * this.c + this.e;
         };
+        /*\
+         * Matrix.y
+         [ method ]
+         **
+         * Return y coordinate for given point after transformation described by the matrix. See also @Matrix.x
+         > Parameters
+         - x (number)
+         - y (number)
+         = (number) y
+        \*/
         matrixproto.y = function (x, y) {
             return x * this.b + y * this.d + this.f;
         };
@@ -1949,6 +2031,20 @@
             a[0] && (a[0] /= mag);
             a[1] && (a[1] /= mag);
         }
+        /*\
+         * Matrix.split
+         [ method ]
+         **
+         * Splits matrix into primitive transformations
+         = (object) in format:
+         o dx (number) translation by x
+         o dy (number) translation by y
+         o scalex (number) scale by x
+         o scaley (number) scale by y
+         o shear (number) shear
+         o rotate (number) rotation in deg
+         o isSimple (boolean) could it be represented via simple transformations
+        \*/
         matrixproto.split = function () {
             var out = {};
             // translation
@@ -1984,6 +2080,13 @@
             out.noRotation = !+out.shear.toFixed(9) && !out.rotate;
             return out;
         };
+        /*\
+         * Matrix.toTransformString
+         [ method ]
+         **
+         * Return transform string that represents given matrix
+         = (string) transform string
+        \*/
         matrixproto.toTransformString = function () {
             var s = this.split();
             if (s.isSimple) {
@@ -2687,10 +2790,10 @@
      o {
      o     width (number) size of the glow, default is `10`
      o     fill (boolean) will it be filled, default is `false`
-     o     opacity: opacity, default is `0.5`
-     o     offsetx: horizontal offset, default is `0`
-     o     offsety: vertical offset, default is `0`
-     o     color: glow colour, default is `black`
+     o     opacity (number) opacity, default is `0.5`
+     o     offsetx (number) horizontal offset, default is `0`
+     o     offsety (number) vertical offset, default is `0`
+     o     color (string) glow colour, default is `black`
      o }
      = (object) @Paper.set of elements that represents glow
     \*/
@@ -3902,11 +4005,29 @@
                 }));
             }
             out.transform(["...s", scale, scale, top, height, "t", (x - top) / scale, (y - height) / scale]);
-            // out.scale(scale, scale, top, height).translate(x - top, y - height);
         }
         return out;
     };
 
+    /*\
+     * Raphael.format
+     [ method ]
+     **
+     * Simple format function. Replaces construction of type “`{<number>}`” to the corresponding argument.
+     **
+     > Parameters
+     **
+     - token (string) string to format
+     - … (string) rest of arguments will be treated as parameters for replacement
+     = (string) formated string
+     > Usage
+     | var x = 10,
+     |     y = 20,
+     |     width = 40,
+     |     height = 50;
+     | // this will draw a rectangular shape equivalent to "M10,20h40v50h-40z"
+     | paper.path(Raphael.format("M{1},{2}h{3}v{4}h{5}z", x, y, width, height, -width));
+    \*/
     R.format = function (token, params) {
         var args = R.is(params, array) ? [0][concat](params) : arguments;
         token && R.is(token, string) && args.length - 1 && (token = token.replace(formatrg, function (str, i) {
@@ -3914,6 +4035,66 @@
         }));
         return token || E;
     };
+    /*\
+     * Raphael.fullfill
+     [ method ]
+     **
+     * A little bit more advanced format function than @Raphael.format. Replaces construction of type “`{<name>}`” to the corresponding argument.
+     **
+     > Parameters
+     **
+     - token (string) string to format
+     - json (object) object which properties will be used as a replacement
+     = (string) formated string
+     > Usage
+     | // this will draw a rectangular shape equivalent to "M10,20h40v50h-40z"
+     | paper.path(Raphael.format("M{x},{y}h{dim.width}v{dim.height}h{dim['negative width']}z", {
+     |     x: 10,
+     |     y: 20,
+     |     dim: {
+     |         width: 40,
+     |         height: 50,
+     |         "negative width": -40
+     |     }
+     | }));
+    \*/
+    R.fullfill = (function () {
+        var tokenRegex = /\{([^\}]+)\}/g,
+            objNotationRegex = /(?:(?:^|\.)(.+?)(?=\[|\.|$|\()|\[('|")(.+?)\2\])(\(\))?/g, // matches .xxxxx or ["xxxxx"] to run over object properties
+            replacer = function (all, key, obj) {
+                var res = obj;
+                key.replace(objNotationRegex, function (all, name, quote, quotedName, isFunc) {
+                    name = name || quotedName;
+                    if (res) {
+                        if (name in res) {
+                            res = res[name];
+                        }
+                        typeof res == "function" && isFunc && (res = res());
+                    }
+                });
+                res = (res == null || res == obj ? all : res) + "";
+                return res;
+            };
+        return function (str, obj) {
+            return String(str).replace(tokenRegex, function (all, key) {
+                return replacer(all, key, obj);
+            });
+        };
+    })();
+    /*\
+     * Raphael.ninja
+     [ method ]
+     **
+     * If you want to leave no trace of Raphaël (Well, Raphaël creates only one global variable `Raphael`, but anyway.) You can use `ninja` method.
+     * Beware, that in this case plugins could stop working, because they are depending on global variable existance.
+     **
+     = (object) Raphael object
+     > Usage
+     | (function (local_raphael) {
+     |     var paper = local_raphael(10, 10, 320, 200);
+     |     …
+     | })(Raphael.ninja());
+    \*/
     R.ninja = function () {
         oldRaphael.was ? (g.win.Raphael = oldRaphael.is) : delete Raphael;
         return R;
@@ -3922,15 +4103,21 @@
      * Raphael.st
      [ property (object) ]
      **
-     * You can add your own method to elements. This is usefull when you want to hack default functionality or
-     * want to wrap some common transformation or attributes in one method. In difference to canvas methods,
-     * you can redefine element method at any time. Expending element methods wouldn’t affect set.
+     * You can add your own method to elements and sets. It is wise to add a set method for each element method
+     * you added, so you will be able to call the same method on sets too.
+     **
+     * See also @Raphael.el.
      > Usage
      | Raphael.el.red = function () {
      |     this.attr({fill: "#f00"});
      | };
+     | Raphael.st.red = function () {
+     |     this.forEach(function () {
+     |         this.red();
+     |     });
+     | };
      | // then use it
-     | paper.circle(100, 100, 20).red();
+     | paper.set(paper.circle(100, 100, 20), paper.circle(110, 100, 20)).red();
     \*/
     R.st = setproto;
     // Firefox <3.6 fix: http://webreflection.blogspot.com/2009/11/195-chars-to-help-lazy-loading.html
@@ -3949,275 +4136,6 @@
     })(document, "DOMContentLoaded");
 
     oldRaphael.was ? (g.win.Raphael = R) : (Raphael = R);
-
-    /*
-     * Eve 0.2.3 - JavaScript Events Library
-     *
-     * Copyright (c) 2010 Dmitry Baranovskiy (http://dmitry.baranovskiy.com/)
-     * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
-     */
-
-    var eve = R.eve = (function () {
-        var version = "0.2.3",
-            has = "hasOwnProperty",
-            separator = /[\.\/]/,
-            wildcard = "*",
-            fun = function () {},
-            numsort = function (a, b) {
-                return a - b;
-            },
-            current_event,
-            events = {n: {}},
-        /*\
-         * eve
-         [ method ]
-         **
-         * Fires event with given `name`, given scope and other parameters.
-         **
-         > Arguments
-         **
-         - name (string) name of the event, dot (`.`) or slash (`/`) separated
-         - scope (object) context for the event handlers
-         - varargs (...) the rest of arguments will be sent to event handlers
-         **
-         = (array) array of errors, if any. Each element of the array is in format:
-         o {
-         o     error (string) error message
-         o     func (function) handler that caused error
-         o }
-        \*/
-            eve = function (name, scope) {
-                var e = events,
-                    args = Array.prototype.slice.call(arguments, 2),
-                    listeners = eve.listeners(name),
-                    z = 0,
-                    f = false,
-                    l,
-                    indexed = [],
-                    queue = {},
-                    errors = [];
-                current_event = name;
-                for (var i = 0, ii = listeners.length; i < ii; i++) if ("zIndex" in listeners[i]) {
-                    indexed.push(listeners[i].zIndex);
-                    if (listeners[i].zIndex < 0) {
-                        queue[listeners[i].zIndex] = listeners[i];
-                    }
-                }
-                indexed.sort(numsort);
-                while (indexed[z] < 0) {
-                    l = queue[indexed[z++]];
-                    if (l.apply(scope, args) === f) {
-                        return f;
-                    }
-                }
-                for (i = 0; i < ii; i++) {
-                    l = listeners[i];
-                    if ("zIndex" in l) {
-                        if (l.zIndex == indexed[z]) {
-                            if (l.apply(scope, args) === f) {
-                                return f;
-                            }
-                            do {
-                                z++;
-                                l = queue[indexed[z]];
-                                if (l) {
-                                    if (l.apply(scope, args) === f) {
-                                        return f;
-                                    }
-                                }
-                            } while (l)
-                        } else {
-                            queue[l.zIndex] = l;
-                        }
-                    } else {
-                        if (l.apply(scope, args) === f) {
-                            return f;
-                        }
-                    }
-                }
-            };
-        /*\
-         * eve.listeners
-         [ method ]
-         **
-         * Internal method which gives you array of all event handlers that will be triggered by the given `name`.
-         **
-         > Arguments
-         **
-         - name (string) name of the event, dot (`.`) or slash (`/`) separated
-         **
-         = (array) array of event handlers
-        \*/
-        eve.listeners = function (name) {
-            var names = name.split(separator),
-                e = events,
-                item,
-                items,
-                k,
-                i,
-                ii,
-                j,
-                jj,
-                nes,
-                es = [e],
-                out = [];
-            for (i = 0, ii = names.length; i < ii; i++) {
-                nes = [];
-                for (j = 0, jj = es.length; j < jj; j++) {
-                    e = es[j].n;
-                    items = [e[names[i]], e[wildcard]];
-                    k = 2;
-                    while (k--) {
-                        item = items[k];
-                        if (item) {
-                            nes.push(item);
-                            out = out.concat(item.f || []);
-                        }
-                    }
-                }
-                es = nes;
-            }
-            return out;
-        };
-    
-        /*\
-         * eve.on
-         [ method ]
-         **
-         * Binds given event handler with a given name. You can use wildcards “`*`” for the names:
-         | eve.on("*.under.*", f);
-         | eve("mouse.under.floor"); // triggers f
-         * Use @eve to trigger the listener.
-         **
-         > Arguments
-         **
-         - name (string) name of the event, dot (`.`) or slash (`/`) separated, with optional wildcards
-         - f (function) event handler function
-         **
-         = (function) returned function accept one number parameter that represents z-index of the handler. It is optional feature and only used when you need to ensure that some subset of handlers will be invoked in a given order, despite of the order of assignment. 
-         > Example:
-         | eve.on("mouse", eat)(2);
-         | eve.on("mouse", scream);
-         | eve.on("mouse", catch)(1);
-         * This will ensure that `catch` function will be called before `eat`.
-         * If you want to put you hadler before not indexed handlers specify negative value.
-         * Note: I assume most of the time you don’t need to worry about z-index, but it’s nice to have this feature “just in case”.
-        \*/
-        eve.on = function (name, f) {
-            var names = name.split(separator),
-                e = events;
-            for (var i = 0, ii = names.length; i < ii; i++) {
-                e = e.n;
-                !e[names[i]] && (e[names[i]] = {n: {}});
-                e = e[names[i]];
-            }
-            e.f = e.f || [];
-            for (i = 0, ii = e.f.length; i < ii; i++) if (e.f[i] == f) {
-                return fun;
-            }
-            e.f.push(f);
-            return function (zIndex) {
-                if (+zIndex == +zIndex) {
-                    f.zIndex = +zIndex;
-                }
-            };
-        };
-        /*\
-         * eve.nt
-         [ method ]
-         **
-         * Could be used inside event handler to figure out actual name of the event.
-         **
-         > Arguments
-         **
-         - subname (string) #optional subname of the event
-         **
-         = (string) name of the event, if `subname` is not specified
-         * or
-         = (boolean) `true`, if current event’s name contains `subname`
-        \*/
-        eve.nt = function (subname) {
-            if (subname) {
-                return new RegExp("(?:\\.|\\/|^)" + subname + "(?:\\.|\\/|$)").test(current_event);
-            }
-            return current_event;
-        };
-        /*\
-         * eve.unbind
-         [ method ]
-         **
-         * Removes given function from the list of event listeners assigned to given name.
-         **
-         > Arguments
-         **
-         - name (string) name of the event, dot (`.`) or slash (`/`) separated, with optional wildcards
-         - f (function) event handler function
-        \*/
-        eve.unbind = function (name, f) {
-            var names = name.split(separator),
-                e,
-                key,
-                splice,
-                cur = [events];
-            for (var i = 0, ii = names.length; i < ii; i++) {
-                for (var j = 0; j < cur.length; j += splice.length - 2) {
-                    splice = [j, 1];
-                    e = cur[j].n;
-                    if (names[i] != wildcard) {
-                        if (e[names[i]]) {
-                            splice.push(e[names[i]]);
-                        }
-                    } else {
-                        for (key in e) if (e[has](key)) {
-                            splice.push(e[key]);
-                        }
-                    }
-                    cur.splice.apply(cur, splice);
-                }
-            }
-            for (i = 0, ii = cur.length; i < ii; i++) {
-                e = cur[i];
-                while (e.n) {
-                    if (f) {
-                        if (e.f) {
-                            for (i = 0, ii = e.f.length; i < ii; i++) if (e.f[i] == f) {
-                                e.f.splice(i, 1);
-                                break;
-                            }
-                            !e.f.length && delete e.f;
-                        }
-                        for (key in e.n) if (e.n[has](key) && e.n[key].f) {
-                            var funcs = e.n[key].f;
-                            for (i = 0, ii = funcs.length; i < ii; i++) if (funcs[i] == f) {
-                                funcs.splice(i, 1);
-                                break;
-                            }
-                            !funcs.length && delete e.n[key].f;
-                        }
-                    } else {
-                        delete e.f;
-                        for (key in e.n) if (e.n[has](key) && e.n[key].f) {
-                            delete e.n[key].f;
-                        }
-                    }
-                    e = e.n;
-                }
-            }
-        };
-        /*\
-         * eve.version
-         [ property (string) ]
-         **
-         * Current version of the library.
-        \*/
-        eve.version = version;
-        eve.toString = function () {
-            return "You are running Eve " + version;
-        };
-        return eve;
-    })();
-    
-    // Eve finished
     
     eve.on("DOMload", function () {
         loaded = true;
