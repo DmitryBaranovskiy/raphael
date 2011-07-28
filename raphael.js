@@ -6,12 +6,12 @@
 // │ Licensed under the MIT (http://raphaeljs.com/license.html) license. │ \\
 // └─────────────────────────────────────────────────────────────────────┘ \\
 
-/*
- * Eve 0.3.0 - JavaScript Events Library
- *
- * Copyright (c) 2011 Dmitry Baranovskiy (http://dmitry.baranovskiy.com/)
- * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
- */
+// ┌──────────────────────────────────────────────────────────────────────────────────────┐ \\
+// │ Eve 0.3.0 - JavaScript Events Library                                                │ \\
+// ├──────────────────────────────────────────────────────────────────────────────────────┤ \\
+// │ Copyright (c) 2008-2011 Dmitry Baranovskiy (http://dmitry.baranovskiy.com/)          │ \\
+// │ Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license. │ \\
+// └──────────────────────────────────────────────────────────────────────────────────────┘ \\
 
 (function (glob) {
     var version = "0.3.0",
@@ -37,7 +37,7 @@
      - scope (object) context for the event handlers
      - varargs (...) the rest of arguments will be sent to event handlers
      **
-     = (boolean) `false` if any of callbacks return false, `true` otherwise
+     = (object) array of returned values from the listeners
     \*/
         eve = function (name, scope) {
             var e = events,
@@ -494,6 +494,7 @@
         tCommand = /([rstm])[\s,]*((-?\d*\.?\d*(?:e[\-+]?\d+)?\s*,?\s*)+)/ig,
         pathValues = /(-?\d*\.?\d*(?:e[\-+]?\d+)?)\s*,?\s*/ig,
         radial_gradient = R._radial_gradient = /^r(?:\(([^,]+?)\s*,\s*([^\)]+?)\))?/,
+        eldata = {},
         sortByKey = function (a, b) {
             return a.key - b.key;
         },
@@ -2556,6 +2557,63 @@
         })(events[i]);
     }
     
+    /*\
+     * Element.data
+     [ method ]
+     **
+     * Adds or retrieves given value asociated with given key.
+     ** 
+     * See also @Element.removeData
+     > Parameters
+     - key (string) key to store data
+     - value (any) #optional value to store
+     = (object) @Element
+     * or, if value is not specified:
+     = (any) value
+     > Usage
+     | for (var i = 0, i < 5, i++) {
+     |     paper.circle(10 + 15 * i, 10, 10)
+     |          .attr({fill: "#000"})
+     |          .data("i", i)
+     |          .click(function () {
+     |             alert(this.data("i"));
+     |          });
+     | }
+    \*/
+    elproto.data = function (key, value) {
+        var data = eldata[this.id] = eldata[this.id] || {};
+        if (arguments.length == 1) {
+            if (R.is(key, "object")) {
+                for (var i in key) if (key[has](i)) {
+                    this.data(i, key[i]);
+                }
+                return this;
+            }
+            eve("data.get." + this.id, this, data[key], key);
+            return data[key];
+        }
+        data[key] = value;
+        eve("data.set." + this.id, this, value, key);
+        return this;
+    };
+    /*\
+     * Element.removeData
+     [ method ]
+     **
+     * Removes value associated with an element by given key.
+     * If key is not provided, removes all the data of the element.
+     > Parameters
+     - key (string) #optional key
+     = (object) @Element
+    \*/
+    elproto.removeData = function (key) {
+        if (key == null) {
+            eldata[this.id] = {};
+        } else {
+            eldata[this.id] && delete eldata[this.id][key];
+        }
+        return this;
+    };
     /*\
      * Element.hover
      [ method ]
