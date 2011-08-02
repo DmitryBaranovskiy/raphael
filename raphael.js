@@ -3483,6 +3483,7 @@
                 t: {x: 0, y: 0}
             });
             R.is(callback, "function") && (element._ac = setTimeout(function () {
+                element.attr(to);
                 callback.call(element);
             }, ms));
             animationElements[length] == 1 && setTimeout(animation);
