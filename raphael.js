@@ -1569,6 +1569,9 @@
             if (this.type == "path") {
                 return pathDimensions(this.attrs.path);
             }
+            if (this.type == "textonpath") {
+                return pathDimensions(this.path.attrs.path);
+            }
             if (this.node.style.display == "none") {
                 this.show();
                 var hide = true;
@@ -1754,6 +1757,43 @@
             res.attrs = {x: x, y: y, "text-anchor": "middle", text: text, font: availableAttrs.font, stroke: "none", fill: "#000"};
             res.type = "text";
             setFillAndStroke(res, res.attrs);
+            return res;
+        },
+        theTextPath = function (svg, pathString, text){
+            // output
+            /*
+            <defs>
+                <path ... d="[pathString]" id="[pathId]"/>
+            </defs>
+            <text ...>
+                <textPath xlink:href="#[pathId]">[text]</textPath>
+            </svg>
+            */
+            var pathId = createUUID();
+            
+            var path = $("path");
+            svg.defs[appendChild](path);
+            var p = new Element(path, svg);
+            p.type = "path";
+            setFillAndStroke(p, {fill: "none", stroke: "#000", path: pathString});
+            p.node[setAttribute]("id", pathId);
+            
+            var textPath = $('textPath');
+            textPath[appendChild](doc.createTextNode(text));
+            var t = new Element(textPath, svg);
+            t.type = "textPath";
+            textPath.setAttributeNS(svg.xlink, "href", "#"+pathId);
+                       
+            var el = $("text");
+            el[appendChild](textPath);
+            svg.canvas && svg.canvas[appendChild](el);
+            var res = new Element(el, svg);
+            res.attrs = {font: availableAttrs.font, stroke: "none", fill: "#000"};
+            res.type = "textonpath";
+            res.path = p;
+            res.textPath = t;
+            setFillAndStroke(res, res.attrs);
+            
             return res;
         },
         setSize = function (width, height) {
@@ -2078,6 +2118,10 @@
                     break;
                 }
             }
+			if (res.type == "textPath") {
+				res.node.style["v-text-align"] = "left";
+			}
+			
         };
         addGradientFill = function (o, gradient) {
             o.attrs = o.attrs || {};
@@ -2544,6 +2588,38 @@
             vml.canvas[appendChild](g);
             return res;
         };
+          theTextPath = function (vml, pathString, text) {
+            var g = createNode("group");
+            g.style.cssText = "position:absolute;left:0;top:0;width:" + vml.width + "px;height:" + vml.height + "px";
+            g.coordsize = vml.coordsize;
+            g.coordorigin = vml.coordorigin;
+            var el = createNode("shape"), ol = el.style;
+            ol.width = vml.width;
+            ol.height = vml.height;
+            el.coordsize = coordsize;
+            el.coordorigin = vml.coordorigin;
+            g[appendChild](el);
+            var p = createNode("path");
+            p.type = "path";
+            p.v = path2vml(pathString);
+			p.textpathok = true;
+			el[appendChild](p);
+			var tp = createNode("textPath");
+			tp.on = true;
+			tp.fitpath = false;
+			tp.string = Str(text);
+			el[appendChild](tp);
+			var res = new Element(tp, g, vml);
+			res.shape = el;
+			res.textpath = tp;
+			res.type = "textPath";
+			res.attrs.w = 1;
+            res.attrs.h = 1;
+			setFillAndStroke(res, {font: availableAttrs.font, stroke: "none", fill: "#000"});
+			res.setBox();
+			vml.canvas[appendChild](g);
+            return res; 
+        };
         setSize = function (width, height) {
             var cs = this.canvas.style;
             width == +width && (width += "px");
@@ -2800,6 +2876,10 @@
     };
     paperproto.text = function (x, y, text) {
         return theText(this, x || 0, y || 0, Str(text));
+    };
+    paperproto.textPath = function (pathString, text) {
+        pathString && !R.is(pathString, string) && !R.is(pathString[0], array) && (pathString += E);
+    	return theTextPath(this, R.format[apply](R, arguments), Str(text));
     };
     paperproto.set = function (itemsArray) {
         arguments[length] > 1 && (itemsArray = Array[proto].splice.call(arguments, 0, arguments[length]));
