@@ -20,7 +20,6 @@ window.Raphael.svg && function (R) {
         eve = R.eve,
         E = "",
         S = " ";
-    // SVG
     var xlink = "http://www.w3.org/1999/xlink",
         markers = {
             block: "M5,0 0,2.5 5,5z",
