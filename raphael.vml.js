@@ -33,7 +33,7 @@ window.Raphael.vml && function (R) {
         path2vml = function (path) {
             var total =  /[ahqstv]/ig,
                 command = R._pathToAbsolute;
-            Str(path).match(total) && (command = path2curve);
+            Str(path).match(total) && (command = R._path2curve);
             total = /[clmz]/g;
             if (command == R._pathToAbsolute && !Str(path).match(total)) {
                 var res = Str(path).replace(bites, function (all, command, args) {
@@ -333,7 +333,7 @@ window.Raphael.vml && function (R) {
             var brect = span.getBoundingClientRect();
             res.W = a.w = (brect.right - brect.left) / m;
             res.H = a.h = (brect.bottom - brect.top) / m;
-            res.paper.canvas.style.display = "none";
+            // res.paper.canvas.style.display = "none";
             res.X = a.x;
             res.Y = a.y + res.H / 2;
 
@@ -811,7 +811,12 @@ window.Raphael.vml && function (R) {
         el.coordsize = zoom + S + zoom;
         el.coordorigin = "0 0";
         var p = new Element(el, vml),
-            attr = {fill: "#000", stroke: "none", font: availableAttrs.font, text: text};
+            attr = {
+                fill: "#000",
+                stroke: "none",
+                font: R._availableAttrs.font,
+                text: text
+            };
         p.shape = el;
         p.path = path;
         p.textpath = o;

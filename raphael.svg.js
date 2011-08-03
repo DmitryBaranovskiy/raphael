@@ -18,7 +18,8 @@ window.Raphael.svg && function (R) {
         pow = math.pow,
         separator = /[, ]+/,
         eve = R.eve,
-        E = "";
+        E = "",
+        S = " ";
     // SVG
     var xlink = "http://www.w3.org/1999/xlink",
         markers = {
@@ -285,36 +286,38 @@ window.Raphael.svg && function (R) {
             }
         }
     },
+    dasharray = {
+        "": [0],
+        "none": [0],
+        "-": [3, 1],
+        ".": [1, 1],
+        "-.": [3, 1, 1, 1],
+        "-..": [3, 1, 1, 1, 1, 1],
+        ". ": [1, 3],
+        "- ": [4, 3],
+        "--": [8, 3],
+        "- .": [4, 3, 1, 3],
+        "--.": [8, 3, 1, 3],
+        "--..": [8, 3, 1, 3, 1, 3]
+    },
+    addDashes = function (o, value, params) {
+        value = dasharray[Str(value).toLowerCase()];
+        if (value) {
+            var width = o.attrs["stroke-width"] || "1",
+                butt = {round: width, square: width, butt: 0}[o.attrs["stroke-linecap"] || params["stroke-linecap"]] || 0,
+                dashes = [],
+                i = value.length;
+            while (i--) {
+                dashes[i] = value[i] * width + ((i % 2) ? 1 : -1) * butt;
+            }
+            $(o.node, {"stroke-dasharray": dashes.join(",")});
+        }
+    },
     setFillAndStroke = function (o, params) {
-        var dasharray = {
-                "": [0],
-                "none": [0],
-                "-": [3, 1],
-                ".": [1, 1],
-                "-.": [3, 1, 1, 1],
-                "-..": [3, 1, 1, 1, 1, 1],
-                ". ": [1, 3],
-                "- ": [4, 3],
-                "--": [8, 3],
-                "- .": [4, 3, 1, 3],
-                "--.": [8, 3, 1, 3],
-                "--..": [8, 3, 1, 3, 1, 3]
-            },
-            node = o.node,
+        var node = o.node,
             attrs = o.attrs,
-            addDashes = function (o, value) {
-                value = dasharray[Str(value).toLowerCase()];
-                if (value) {
-                    var width = o.attrs["stroke-width"] || "1",
-                        butt = {round: width, square: width, butt: 0}[o.attrs["stroke-linecap"] || params["stroke-linecap"]] || 0,
-                        dashes = [],
-                        i = value.length;
-                    while (i--) {
-                        dashes[i] = value[i] * width + ((i % 2) ? 1 : -1) * butt;
-                    }
-                    $(node, {"stroke-dasharray": dashes.join(",")});
-                }
-            };
+            vis = node.style.visibility;
+        node.style.visibility = "hidden";
         for (var att in params) {
             if (params[has](att)) {
                 if (!R._availableAttrs[has](att)) {
@@ -455,7 +458,7 @@ window.Raphael.svg && function (R) {
                         }
                         node.setAttribute(att, value);
                         if (attrs["stroke-dasharray"]) {
-                            addDashes(o, attrs["stroke-dasharray"]);
+                            addDashes(o, attrs["stroke-dasharray"], params);
                         }
                         if (o._.arrows) {
                             "startString" in o._.arrows && addArrow(o, o._.arrows.startString);
@@ -463,7 +466,7 @@ window.Raphael.svg && function (R) {
                         }
                         break;
                     case "stroke-dasharray":
-                        addDashes(o, value);
+                        addDashes(o, value, params);
                         break;
                     case "fill":
                         var isURL = Str(value).match(R._ISURL);
@@ -554,6 +557,7 @@ window.Raphael.svg && function (R) {
         }
 
         tuneText(o, params);
+        node.style.visibility = vis;
     },
     leading = 1.2,
     tuneText = function (el, params) {
@@ -686,7 +690,11 @@ window.Raphael.svg && function (R) {
         SVG.canvas && SVG.canvas.appendChild(el);
         var p = new Element(el, SVG);
         p.type = "path";
-        setFillAndStroke(p, {fill: "none", stroke: "#000", path: pathString});
+        setFillAndStroke(p, {
+            fill: "none",
+            stroke: "#000",
+            path: pathString
+        });
         return p;
     };
     /*\
@@ -965,7 +973,7 @@ window.Raphael.svg && function (R) {
      #     <li>hsba(•••, •••, •••, •••) — same as above, but with opacity</li>
      #     <li>hsl(•••, •••, •••) — almost the same as hsb, see <a href="http://en.wikipedia.org/wiki/HSL_and_HSV" title="HSL and HSV - Wikipedia, the free encyclopedia">Wikipedia page</a></li>
      #     <li>hsl(•••%, •••%, •••%) — same as above, but in %</li>
-     #     <li>hsla(•••, •••, •••) — same as above, but with opacity</li>
+     #     <li>hsla(•••, •••, •••, •••) — same as above, but with opacity</li>
      #     <li>Optionally for hsb and hsl you could specify hue as a degree: “<code>hsl(240deg,&nbsp;1,&nbsp;.5)</code>” or, if you want to go fancy, “<code>hsl(240°,&nbsp;1,&nbsp;.5)</code>”</li>
      # </ul>
     \*/
