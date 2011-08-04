@@ -493,7 +493,6 @@
             initWin(g.win);
         }
     };
-    // colour utilities
     var toHex = function (color) {
         if (R.vml) {
             // http://dean.edwards.name/weblog/2009/10/convert-any-colour-value-to-hex-in-msie/
@@ -2122,7 +2121,6 @@
         paperproto.safari = fun;
     }
  
-    // Events
     var preventDefault = function () {
         this.returnValue = false;
     },

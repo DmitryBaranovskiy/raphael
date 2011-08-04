@@ -656,7 +656,7 @@ window.Raphael.vml && function (R) {
     };
     elproto.toFront = function () {
         !this.removed && this.node.parentNode.appendChild(this.node);
-        this.paper && this.paper.top != this && tofront(this, this.paper);
+        this.paper && this.paper.top != this && R._tofront(this, this.paper);
         return this;
     };
     elproto.toBack = function () {
@@ -665,7 +665,7 @@ window.Raphael.vml && function (R) {
         }
         if (this.node.parentNode.firstChild != this.node) {
             this.node.parentNode.insertBefore(this.node, this.node.parentNode.firstChild);
-            toback(this, this.paper);
+            R._toback(this, this.paper);
         }
         return this;
     };

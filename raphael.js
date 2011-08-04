@@ -532,7 +532,6 @@
             initWin(g.win);
         }
     };
-    // colour utilities
     var toHex = function (color) {
         if (R.vml) {
             // http://dean.edwards.name/weblog/2009/10/convert-any-colour-value-to-hex-in-msie/
@@ -1820,7 +1819,6 @@
         paperproto.safari = fun;
     }
  
-    // Events
     var preventDefault = function () {
         this.returnValue = false;
     },
@@ -3091,6 +3089,7 @@
         return "Rapha\xebl\u2018s set";
     };
 
+    
     R.registerFont = function (font) {
         if (!font.face) {
             return font;
@@ -3130,6 +3129,7 @@
         }
         return font;
     };
+    
     paperproto.getFont = function (family, weight, style, stretch) {
         stretch = stretch || "normal";
         style = style || "normal";
@@ -3158,6 +3158,7 @@
         }
         return thefont;
     };
+    
     paperproto.print = function (x, y, string, font, size, origin, letter_spacing) {
         origin = origin || "middle"; // baseline|middle
         letter_spacing = mmax(mmin(letter_spacing || 0, 1), -1);
@@ -3270,7 +3271,6 @@ window.Raphael.svg && function (R) {
         eve = R.eve,
         E = "",
         S = " ";
-    // SVG
     var xlink = "http://www.w3.org/1999/xlink",
         markers = {
             block: "M5,0 0,2.5 5,5z",
@@ -3808,7 +3808,6 @@ window.Raphael.svg && function (R) {
 
         tuneText(o, params);
         node.style.visibility = vis;
-        console.log("new");
     },
     leading = 1.2,
     tuneText = function (el, params) {
@@ -4988,7 +4987,7 @@ window.Raphael.vml && function (R) {
     };
     elproto.toFront = function () {
         !this.removed && this.node.parentNode.appendChild(this.node);
-        this.paper && this.paper.top != this && tofront(this, this.paper);
+        this.paper && this.paper.top != this && R._tofront(this, this.paper);
         return this;
     };
     elproto.toBack = function () {
@@ -4997,7 +4996,7 @@ window.Raphael.vml && function (R) {
         }
         if (this.node.parentNode.firstChild != this.node) {
             this.node.parentNode.insertBefore(this.node, this.node.parentNode.firstChild);
-            toback(this, this.paper);
+            R._toback(this, this.paper);
         }
         return this;
     };
