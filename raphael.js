@@ -2560,17 +2560,12 @@
         };
     
     elproto.animateWith = function (element, params, ms, easing, callback) {
+        // var a = R.animation(params, ms, easing, callback);
+        //     status = element.status(anim);
+        // this.animate(a);
+        // this.status(a, status);
         this.animate(params, ms, easing, callback);
-        var start, el;
-        for (var i = 0, ii = animationElements.length; i < ii; i++) {
-            el = animationElements[i];
-            if (el.el.id == element.id) {
-                start = el.timestamp;
-            } else if (el.el.id == this.id) {
-                el.start = start;
-            }
-        }
-        return this.animate(params, ms, easing, callback);
+        return this;
     };
     function CubicBezierAtTime(t, p1x, p1y, p2x, p2y, duration) {
         var cx = 3 * p1x,
@@ -3024,9 +3019,49 @@
         }
         return this;
     };
+    
     setproto.clear = function () {
         while (this.length) {
             this.pop();
+        }
+    };
+    
+    setproto.splice = function (index, count, insertion) {
+        index = index < 0 ? mmax(this.length + index, 0) : index;
+        count = mmax(0, mmin(this.length - index, count));
+        var tail = [],
+            todel = [],
+            args = [],
+            i;
+        for (i = 2; i < arguments.length; i++) {
+            args.push(arguments[i]);
+        }
+        for (i = 0; i < count; i++) {
+            todel.push(this[index + i]);
+        }
+        for (; i < this.length - index; i++) {
+            tail.push(this[index + i]);
+        }
+        var arglen = args.length;
+        for (i = 0; i < arglen + tail.length; i++) {
+            this.items[index + i] = this[index + i] = i < arglen ? args[i] : tail[i - arglen];
+        }
+        i = this.items.length = this.length -= count - arglen;
+        while (this[i]) {
+            delete this[i++];
+        }
+        return new Set(todel);
+    };
+    
+    setproto.exclude = function (el) {
+        for (var i = 0, ii = this.length, found; i < ii; i++) if (found || this[i] == el) {
+            this[i] = this[i + 1];
+            found = 1;
+        }
+        if (found) {
+            this.length--;
+            delete this[i];
+            return true;
         }
     };
     setproto.animate = function (params, ms, easing, callback) {
@@ -4504,10 +4539,10 @@ window.Raphael.vml && function (R) {
             node.path = path2vml(a.path);
         }
         if (isOval) {
-            var cx = a.cx,
-                cy = a.cy,
-                rx = a.rx || a.r || 0,
-                ry = a.ry || a.r || 0;
+            var cx = +a.cx,
+                cy = +a.cy,
+                rx = +a.rx || +a.r || 0,
+                ry = +a.ry || +a.r || 0;
             node.path = R.format("ar{0},{1},{2},{3},{4},{1},{4},{1}x", round((cx - rx) * zoom), round((cy - ry) * zoom), round((cx + rx) * zoom), round((cy + ry) * zoom), round(cx * zoom));
         }
         if ("clip-rect" in params) {
@@ -4785,19 +4820,21 @@ window.Raphael.vml && function (R) {
         if (tstr == null) {
             return this._.transform;
         }
-        R._extractTransform(this, tstr);
+        var vbs = this.paper._viewBoxShift,
+            vbt = vbs ? "s" + [vbs.scale, vbs.scale] + "-1-1t" + [vbs.dx, vbs.dy] : E,
+            oldt;
+        if (vbs) {
+            oldt = tstr = Str(tstr).replace(/\.{3}|\u2026/g, this._.transform || E);
+        }
+        R._extractTransform(this, vbt + tstr);
         var matrix = this.matrix.clone(),
-            vbs = this.paper._viewBoxShift,
             skew = this.skew,
             o = this.node,
             split,
-            isGrad = Str(this.attrs.fill).indexOf("-") + 1;
+            isGrad = ~Str(this.attrs.fill).indexOf("-"),
+            isPatt = !Str(this.attrs.fill).indexOf("url(");
         matrix.translate(-.5, -.5);
-        if (vbs) {
-            matrix.scale(vbs.scale, vbs.scale, -1, -1);
-            matrix.translate(vbs.dx, vbs.dy);
-        }
-        if (isGrad || this.type == "image") {
+        if (isPatt || isGrad || this.type == "image") {
             skew.matrix = "1 0 0 1";
             skew.offset = "0 0";
             split = matrix.split();
@@ -4818,6 +4855,7 @@ window.Raphael.vml && function (R) {
             skew.matrix = Str(matrix);
             skew.offset = matrix.offset();
         }
+        oldt && (this._.transform = oldt);
         return this;
     };
     elproto.rotate = function (deg, cx, cy) {
@@ -5004,7 +5042,7 @@ window.Raphael.vml && function (R) {
         if (this.removed) {
             return this;
         }
-        if (element.constructor == Set) {
+        if (element.constructor == R.st.constructor) {
             element = element[element.length - 1];
         }
         if (element.node.nextSibling) {
@@ -5019,7 +5057,7 @@ window.Raphael.vml && function (R) {
         if (this.removed) {
             return this;
         }
-        if (element.constructor == Set) {
+        if (element.constructor == R.st.constructor) {
             element = element[0];
         }
         element.node.parentNode.insertBefore(this.node, element.node);

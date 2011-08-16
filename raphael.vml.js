@@ -173,10 +173,10 @@ window.Raphael.vml && function (R) {
             node.path = path2vml(a.path);
         }
         if (isOval) {
-            var cx = a.cx,
-                cy = a.cy,
-                rx = a.rx || a.r || 0,
-                ry = a.ry || a.r || 0;
+            var cx = +a.cx,
+                cy = +a.cy,
+                rx = +a.rx || +a.r || 0,
+                ry = +a.ry || +a.r || 0;
             node.path = R.format("ar{0},{1},{2},{3},{4},{1},{4},{1}x", round((cx - rx) * zoom), round((cy - ry) * zoom), round((cx + rx) * zoom), round((cy + ry) * zoom), round(cx * zoom));
         }
         if ("clip-rect" in params) {
@@ -454,19 +454,21 @@ window.Raphael.vml && function (R) {
         if (tstr == null) {
             return this._.transform;
         }
-        R._extractTransform(this, tstr);
+        var vbs = this.paper._viewBoxShift,
+            vbt = vbs ? "s" + [vbs.scale, vbs.scale] + "-1-1t" + [vbs.dx, vbs.dy] : E,
+            oldt;
+        if (vbs) {
+            oldt = tstr = Str(tstr).replace(/\.{3}|\u2026/g, this._.transform || E);
+        }
+        R._extractTransform(this, vbt + tstr);
         var matrix = this.matrix.clone(),
-            vbs = this.paper._viewBoxShift,
             skew = this.skew,
             o = this.node,
             split,
-            isGrad = Str(this.attrs.fill).indexOf("-") + 1;
+            isGrad = ~Str(this.attrs.fill).indexOf("-"),
+            isPatt = !Str(this.attrs.fill).indexOf("url(");
         matrix.translate(-.5, -.5);
-        if (vbs) {
-            matrix.scale(vbs.scale, vbs.scale, -1, -1);
-            matrix.translate(vbs.dx, vbs.dy);
-        }
-        if (isGrad || this.type == "image") {
+        if (isPatt || isGrad || this.type == "image") {
             skew.matrix = "1 0 0 1";
             skew.offset = "0 0";
             split = matrix.split();
@@ -487,6 +489,7 @@ window.Raphael.vml && function (R) {
             skew.matrix = Str(matrix);
             skew.offset = matrix.offset();
         }
+        oldt && (this._.transform = oldt);
         return this;
     };
     elproto.rotate = function (deg, cx, cy) {
@@ -673,7 +676,7 @@ window.Raphael.vml && function (R) {
         if (this.removed) {
             return this;
         }
-        if (element.constructor == Set) {
+        if (element.constructor == R.st.constructor) {
             element = element[element.length - 1];
         }
         if (element.node.nextSibling) {
@@ -688,7 +691,7 @@ window.Raphael.vml && function (R) {
         if (this.removed) {
             return this;
         }
-        if (element.constructor == Set) {
+        if (element.constructor == R.st.constructor) {
             element = element[0];
         }
         element.node.parentNode.insertBefore(this.node, element.node);

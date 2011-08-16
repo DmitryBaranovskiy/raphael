@@ -3509,17 +3509,12 @@
      = (object) original element
     \*/
     elproto.animateWith = function (element, params, ms, easing, callback) {
+        // var a = R.animation(params, ms, easing, callback);
+        //     status = element.status(anim);
+        // this.animate(a);
+        // this.status(a, status);
         this.animate(params, ms, easing, callback);
-        var start, el;
-        for (var i = 0, ii = animationElements.length; i < ii; i++) {
-            el = animationElements[i];
-            if (el.el.id == element.id) {
-                start = el.timestamp;
-            } else if (el.el.id == this.id) {
-                el.start = start;
-            }
-        }
-        return this.animate(params, ms, easing, callback);
+        return this;
     };
     function CubicBezierAtTime(t, p1x, p1y, p2x, p2y, duration) {
         var cx = 3 * p1x,
@@ -4119,9 +4114,76 @@
         }
         return this;
     };
+    /*\
+     * Set.clear
+     [ method ]
+     **
+     * Removeds all elements from the set
+    \*/
     setproto.clear = function () {
         while (this.length) {
             this.pop();
+        }
+    };
+    /*\
+     * Set.splice
+     [ method ]
+     **
+     * Removes given element from the set
+     **
+     > Parameters
+     **
+     - index (number) position of the deletion
+     - count (number) number of element to remove
+     - insertion… (object) #optional elements to insert
+     = (object) set elements that were deleted
+    \*/
+    setproto.splice = function (index, count, insertion) {
+        index = index < 0 ? mmax(this.length + index, 0) : index;
+        count = mmax(0, mmin(this.length - index, count));
+        var tail = [],
+            todel = [],
+            args = [],
+            i;
+        for (i = 2; i < arguments.length; i++) {
+            args.push(arguments[i]);
+        }
+        for (i = 0; i < count; i++) {
+            todel.push(this[index + i]);
+        }
+        for (; i < this.length - index; i++) {
+            tail.push(this[index + i]);
+        }
+        var arglen = args.length;
+        for (i = 0; i < arglen + tail.length; i++) {
+            this.items[index + i] = this[index + i] = i < arglen ? args[i] : tail[i - arglen];
+        }
+        i = this.items.length = this.length -= count - arglen;
+        while (this[i]) {
+            delete this[i++];
+        }
+        return new Set(todel);
+    };
+    /*\
+     * Set.exclude
+     [ method ]
+     **
+     * Removes given element from the set
+     **
+     > Parameters
+     **
+     - element (object) element to remove
+     = (boolean) `true` if object was found & removed from the set
+    \*/
+    setproto.exclude = function (el) {
+        for (var i = 0, ii = this.length, found; i < ii; i++) if (found || this[i] == el) {
+            this[i] = this[i + 1];
+            found = 1;
+        }
+        if (found) {
+            this.length--;
+            delete this[i];
+            return true;
         }
     };
     setproto.animate = function (params, ms, easing, callback) {
