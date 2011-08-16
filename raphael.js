@@ -362,7 +362,7 @@
         commaSpaces = /\s*,\s*/,
         hsrg = {hs: 1, rg: 1},
         p2s = /,?([achlmqrstvxz]),?/gi,
-        pathCommand = /([achlmqstvz])[\s,]*((-?\d*\.?\d*(?:e[\-+]?\d+)?\s*,?\s*)+)/ig,
+        pathCommand = /([achlmrqstvz])[\s,]*((-?\d*\.?\d*(?:e[\-+]?\d+)?\s*,?\s*)+)/ig,
         tCommand = /([rstm])[\s,]*((-?\d*\.?\d*(?:e[\-+]?\d+)?\s*,?\s*)+)/ig,
         pathValues = /(-?\d*\.?\d*(?:e[\-+]?\d+)?)\s*,?\s*/ig,
         radial_gradient = R._radial_gradient = /^r(?:\(([^,]+?)\s*,\s*([^\)]+?)\))?/,
@@ -884,7 +884,7 @@
         if (!pathString) {
             return null;
         }
-        var paramCounts = {a: 7, c: 6, h: 1, l: 2, m: 2, q: 4, s: 4, t: 2, v: 1, z: 0},
+        var paramCounts = {a: 7, c: 6, h: 1, l: 2, m: 2, r: 4, q: 4, s: 4, t: 2, v: 1, z: 0},
             data = [];
         if (R.is(pathString, array) && R.is(pathString[0], array)) { // rough assumption
             data = pathClone(pathString);
@@ -2559,13 +2559,11 @@
             return color > 255 ? 255 : color < 0 ? 0 : color;
         };
     
-    elproto.animateWith = function (element, params, ms, easing, callback) {
-        // var a = R.animation(params, ms, easing, callback);
-        //     status = element.status(anim);
-        // this.animate(a);
-        // this.status(a, status);
-        this.animate(params, ms, easing, callback);
-        return this;
+    elproto.animateWith = function (element, anim, params, ms, easing, callback) {
+        var a = params ? R.animation(params, ms, easing, callback) : anim;
+            status = element.status(anim);
+        this.animate(a);
+        return this.status(a, status * anim.ms / a.ms);
     };
     function CubicBezierAtTime(t, p1x, p1y, p2x, p2y, duration) {
         var cx = 3 * p1x,
@@ -2840,12 +2838,15 @@
                 totalOrigin: totalOrigin
             };
             animationElements.push(e);
-            if (status && !isInAnim) {
+            if (status && !isInAnim && !isInAnimSet) {
                 e.stop = true;
                 e.start = new Date - ms * status;
                 if (animationElements.length == 1) {
                     return animation();
                 }
+            }
+            if (isInAnimSet) {
+                e.start = new Date - e.ms * status;
             }
             animationElements.length == 1 && requestAnimFrame(animation);
         } else {
@@ -2856,6 +2857,9 @@
     }
     
     R.animation = function (params, ms, easing, callback) {
+        if (params instanceof Animation) {
+            return params;
+        }
         if (R.is(easing, "function") || !easing) {
             callback = callback || easing || null;
             easing = null;
@@ -2912,7 +2916,10 @@
                     if (anim) {
                         return e.status;
                     }
-                    out.push({anim: e.anim, status: e.status});
+                    out.push({
+                        anim: e.anim,
+                        status: e.status
+                    });
                 }
             }
             if (anim) {
@@ -3078,7 +3085,7 @@
             !--len && callback.call(set);
         });
         easing = R.is(easing, string) ? easing : collector;
-        var anim = params instanceof Animation ? params : R.animation(params, ms, easing, collector);
+        var anim = R.animation(params, ms, easing, collector);
         item = this.items[--i].animate(anim);
         while (i--) {
             this.items[i] && !this.items[i].removed && this.items[i].animateWith(item, anim);
