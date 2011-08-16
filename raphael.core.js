@@ -3515,8 +3515,7 @@
     elproto.animateWith = function (element, anim, params, ms, easing, callback) {
         var a = params ? R.animation(params, ms, easing, callback) : anim;
             status = element.status(anim);
-        this.animate(a);
-        return this.status(a, status * anim.ms / a.ms);
+        return this.animate(a).status(a, status * anim.ms / a.ms);
     };
     function CubicBezierAtTime(t, p1x, p1y, p2x, p2y, duration) {
         var cx = 3 * p1x,
