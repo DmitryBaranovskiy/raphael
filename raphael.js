@@ -289,14 +289,13 @@
         paper = {},
         push = "push",
         ISURL = R._ISURL = /^url\(['"]?([^\)]+?)['"]?\)$/i,
-        colourRegExp = /^\s*((#[a-f\d]{6})|(#[a-f\d]{3})|rgba?\(\s*([\d\.]+%?\s*,\s*[\d\.]+%?\s*,\s*[\d\.]+(?:%?\s*,\s*[\d\.]+)?)%?\s*\)|hsba?\(\s*([\d\.]+(?:deg|\xb0|%)?\s*,\s*[\d\.]+%?\s*,\s*[\d\.]+(?:%?\s*,\s*[\d\.]+)?)%?\s*\)|hsla?\(\s*([\d\.]+(?:deg|\xb0|%)?\s*,\s*[\d\.]+%?\s*,\s*[\d\.]+(?:%?\s*,\s*[\d\.]+)?)%?\s*\))\s*$/i,
+        colourRegExp = /^\s*((#[a-f\d]{6})|(#[a-f\d]{3})|rgba?\(\s*([\d\.]+%?\s*,\s*[\d\.]+%?\s*,\s*[\d\.]+%?(?:\s*,\s*[\d\.]+%?)?)\s*\)|hsba?\(\s*([\d\.]+(?:deg|\xb0|%)?\s*,\s*[\d\.]+%?\s*,\s*[\d\.]+(?:%?\s*,\s*[\d\.]+)?)%?\s*\)|hsla?\(\s*([\d\.]+(?:deg|\xb0|%)?\s*,\s*[\d\.]+%?\s*,\s*[\d\.]+(?:%?\s*,\s*[\d\.]+)?)%?\s*\))\s*$/i,
         isnan = {"NaN": 1, "Infinity": 1, "-Infinity": 1},
         bezierrg = /^(?:cubic-)?bezier\(([^,]+),([^,]+),([^,]+),([^\)]+)\)/,
         round = math.round,
         setAttribute = "setAttribute",
         toFloat = parseFloat,
         toInt = parseInt,
-        ms = " progid:DXImageTransform.Microsoft",
         upperCase = Str.prototype.toUpperCase,
         availableAttrs = R._availableAttrs = {
             "arrow-end": "none",
@@ -371,7 +370,7 @@
             return a.key - b.key;
         },
         sortByNumber = function (a, b) {
-            return a - b;
+            return toFloat(a) - toFloat(b);
         },
         fun = function () {},
         pipe = function (x) {
@@ -879,6 +878,32 @@
         delete this.start;
     };
 
+    // http://schepers.cc/getting-to-the-point
+    function catmullRom2bezier(crp) {
+        var d = [];
+        for (var i = 0, iLen = crp.length; iLen - 2 > i; i += 2) {
+            var p = [{x: +crp[i],     y: +crp[i + 1]},
+                     {x: +crp[i],     y: +crp[i + 1]},
+                     {x: +crp[i + 2], y: +crp[i + 3]},
+                     {x: +crp[i + 4], y: +crp[i + 5]}];
+            if (iLen - 4 == i) {
+                p[0] = {x: +crp[i - 2], y: +crp[i - 1]};
+                p[3] = p[2];
+            } else if (i) {
+                p[0] = {x: +crp[i - 2], y: +crp[i - 1]};
+            }
+            d.push(["C",
+                (-p[0].x + 6 * p[1].x + p[2].x) / 6,
+                (-p[0].y + 6 * p[1].y + p[2].y) / 6,
+                (p[1].x + 6 * p[2].x - p[3].x) / 6,
+                (p[1].y + 6*p[2].y - p[3].y) / 6,
+                p[2].x,
+                p[2].y
+            ]);
+        }
+
+        return d;
+    }
     
     R.parsePathString = cacher(function (pathString) {
         if (!pathString) {
@@ -892,7 +917,7 @@
         if (!data.length) {
             Str(pathString).replace(pathCommand, function (a, b, c) {
                 var params = [],
-                    name = lowerCase.call(b);
+                    name = b.toLowerCase();
                 c.replace(pathValues, function (a, b) {
                     b && params.push(+b);
                 });
@@ -901,7 +926,9 @@
                     name = "l";
                     b = b == "m" ? "l" : "L";
                 }
-                while (params.length >= paramCounts[name]) {
+                if (name == "r") {
+                    data.push([b][concat](params));
+                } else while (params.length >= paramCounts[name]) {
                     data.push([b][concat](params.splice(0, paramCounts[name])));
                     if (!paramCounts[name]) {
                         break;
@@ -1114,9 +1141,9 @@
                 start++;
                 res[0] = ["M", x, y];
             }
-            for (var i = start, ii = pathArray.length; i < ii; i++) {
-                var r = res[i] = [],
-                    pa = pathArray[i];
+            for (var r, pa, i = start, ii = pathArray.length; i < ii; i++) {
+                res.push(r = []);
+                pa = pathArray[i];
                 if (pa[0] != upperCase.call(pa[0])) {
                     r[0] = upperCase.call(pa[0]);
                     switch (r[0]) {
@@ -1135,17 +1162,31 @@
                         case "H":
                             r[1] = +pa[1] + x;
                             break;
+                        case "R":
+                            var dots = [x, y][concat](pa.slice(1));
+                            for (var j = 2, jj = dots.length; j < jj; j++) {
+                                dots[j] = +dots[j] + x;
+                                dots[++j] = +dots[j] + y;
+                            }
+                            res.pop();
+                            res = res[concat](catmullRom2bezier(dots));
+                            break;
                         case "M":
                             mx = +pa[1] + x;
                             my = +pa[2] + y;
                         default:
-                            for (var j = 1, jj = pa.length; j < jj; j++) {
+                            for (j = 1, jj = pa.length; j < jj; j++) {
                                 r[j] = +pa[j] + ((j % 2) ? x : y);
                             }
                     }
+                } else if (pa[0] == "R") {
+                    dots = [x, y][concat](pa.slice(1));
+                    res.pop();
+                    res = res[concat](catmullRom2bezier(dots));
+                    r = ["R"][concat](pa.slice(-2));
                 } else {
                     for (var k = 0, kk = pa.length; k < kk; k++) {
-                        res[i][k] = pa[k];
+                        r[k] = pa[k];
                     }
                 }
                 switch (r[0]) {
@@ -1160,11 +1201,11 @@
                         y = r[1];
                         break;
                     case "M":
-                        mx = res[i][res[i].length - 2];
-                        my = res[i][res[i].length - 1];
+                        mx = r[r.length - 2];
+                        my = r[r.length - 1];
                     default:
-                        x = res[i][res[i].length - 2];
-                        y = res[i][res[i].length - 1];
+                        x = r[r.length - 2];
+                        y = r[r.length - 1];
                 }
             }
             res.toString = R._path2string;
@@ -2621,16 +2662,18 @@
         return this;
     };
     function Animation(anim, ms) {
-        var percents = [];
-        this.anim = anim;
+        var percents = [],
+            newAnim = {};
         this.ms = ms;
         this.times = 1;
-        if (this.anim) {
-            for (var attr in this.anim) if (this.anim[has](attr)) {
-                percents.push(+attr);
+        if (anim) {
+            for (var attr in anim) if (anim[has](attr)) {
+                newAnim[toFloat(attr)] = anim[attr];
+                percents.push(toFloat(attr));
             }
             percents.sort(sortByNumber);
         }
+        this.anim = newAnim;
         this.top = percents[percents.length - 1];
         this.percents = percents;
     }
@@ -2868,7 +2911,7 @@
         var p = {},
             json,
             attr;
-        for (attr in params) if (params[has](attr) && toFloat(attr) != attr) {
+        for (attr in params) if (params[has](attr) && toFloat(attr) != attr && toFloat(attr) + "%" != attr) {
             json = true;
             p[attr] = params[attr];
         }
@@ -3925,6 +3968,7 @@ window.Raphael.svg && function (R) {
     Element.prototype = elproto;
     elproto.constructor = Element;
 
+    
     R._engine.path = function (pathString, SVG) {
         var el = $("path");
         SVG.canvas && SVG.canvas.appendChild(el);
@@ -4391,16 +4435,16 @@ window.Raphael.vml && function (R) {
         fillString = "fill",
         separator = /[, ]+/,
         eve = R.eve,
+        ms = " progid:DXImageTransform.Microsoft",
         S = " ",
-        E = "";
-    // VML
-    var map = {M: "m", L: "l", C: "c", Z: "x", m: "t", l: "r", c: "v", z: "x"},
+        E = "",
+        map = {M: "m", L: "l", C: "c", Z: "x", m: "t", l: "r", c: "v", z: "x"},
         bites = /([clmz]),?([^clmz]*)/gi,
         blurregexp = / progid:\S+Blur\([^\)]+\)/g,
         val = /-?[^,\s-]+/g,
         cssDot = "position:absolute;left:0;top:0;width:1px;height:1px",
         zoom = 21600,
-        pathTypes = {path: 1, rect: 1},
+        pathTypes = {path: 1, rect: 1, image: 1},
         ovalTypes = {circle: 1, ellipse: 1},
         path2vml = function (path) {
             var total =  /[ahqstv]/ig,
@@ -4540,10 +4584,16 @@ window.Raphael.vml && function (R) {
         params.target && (node.target = params.target);
         params.cursor && (s.cursor = params.cursor);
         "blur" in params && o.blur(params.blur);
-        "transform" in params && o.transform(params.transform);
         if (params.path && o.type == "path" || newpath) {
-            node.path = path2vml(a.path);
+            // node.path = path2vml(a.path);
+            node.path = path2vml(~Str(a.path).toLowerCase().indexOf("r") ? R._pathToAbsolute(a.path) : a.path);
+            if (o.type == "image") {
+                o._.fillpos = [a.x, a.y];
+                o._.fillsize = [a.width, a.height];
+                setCoords(o, 1, 1, 0, 0, 0);
+            }
         }
+        "transform" in params && o.transform(params.transform);
         if (isOval) {
             var cx = +a.cx,
                 cy = +a.cy,

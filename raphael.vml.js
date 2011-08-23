@@ -19,16 +19,16 @@ window.Raphael.vml && function (R) {
         fillString = "fill",
         separator = /[, ]+/,
         eve = R.eve,
+        ms = " progid:DXImageTransform.Microsoft",
         S = " ",
-        E = "";
-    // VML
-    var map = {M: "m", L: "l", C: "c", Z: "x", m: "t", l: "r", c: "v", z: "x"},
+        E = "",
+        map = {M: "m", L: "l", C: "c", Z: "x", m: "t", l: "r", c: "v", z: "x"},
         bites = /([clmz]),?([^clmz]*)/gi,
         blurregexp = / progid:\S+Blur\([^\)]+\)/g,
         val = /-?[^,\s-]+/g,
         cssDot = "position:absolute;left:0;top:0;width:1px;height:1px",
         zoom = 21600,
-        pathTypes = {path: 1, rect: 1},
+        pathTypes = {path: 1, rect: 1, image: 1},
         ovalTypes = {circle: 1, ellipse: 1},
         path2vml = function (path) {
             var total =  /[ahqstv]/ig,
@@ -168,10 +168,15 @@ window.Raphael.vml && function (R) {
         params.target && (node.target = params.target);
         params.cursor && (s.cursor = params.cursor);
         "blur" in params && o.blur(params.blur);
-        "transform" in params && o.transform(params.transform);
         if (params.path && o.type == "path" || newpath) {
-            node.path = path2vml(a.path);
+            node.path = path2vml(~Str(a.path).toLowerCase().indexOf("r") ? R._pathToAbsolute(a.path) : a.path);
+            if (o.type == "image") {
+                o._.fillpos = [a.x, a.y];
+                o._.fillsize = [a.width, a.height];
+                setCoords(o, 1, 1, 0, 0, 0);
+            }
         }
+        "transform" in params && o.transform(params.transform);
         if (isOval) {
             var cx = +a.cx,
                 cy = +a.cy,
