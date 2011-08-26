@@ -99,7 +99,35 @@
             was: Object.prototype[has].call(g.win, "Raphael"),
             is: g.win.Raphael
         },
-        Paper = function () {},
+        Paper = function () {
+            /*\
+             * Paper.customAttributes
+             [ property (object) ]
+             **
+             * If you have a set of attributes that you would like to represent
+             * as a function of some number you can do it easily with custom attributes:
+             > Usage
+             | paper.customAttributes.hue = function (num) {
+             |     num = num % 1;
+             |     return {fill: "hsb(" + num + ", .75, 1)"};
+             | };
+             | // Custom attribute “hue” will change fill
+             | // to be given hue with fixed saturation and brightness.
+             | // Now you can use it like this:
+             | var c = paper.circle(10, 10, 10).attr({hue: .45});
+             | // or even like this:
+             | c.animate({hue: 1}, 1e3);
+             | 
+             | // You could also create custom attribute
+             | // with multiple parameters:
+             | paper.customAttributes.hsb = function (h, s, b) {
+             |     return {fill: "hsb(" + [h, s, b].join(",") + ")"};
+             | };
+             | c.attr({hsb: ".5 .8 1"});
+             | c.animate({hsb: "1 0 .5"}, 1e3);
+            \*/
+            this.customAttributes = {};
+        },
         paperproto,
         appendChild = "appendChild",
         apply = "apply",
@@ -332,33 +360,6 @@
      | paper.mystuff.star();
     \*/
     R.fn = paperproto = Paper.prototype = R.prototype;
-    /*\
-     * Paper.customAttributes
-     [ property (object) ]
-     **
-     * If you have a set of attributes that you would like to represent
-     * as a function of some number you can do it easily with custom attributes:
-     > Usage
-     | paper.customAttributes.hue = function (num) {
-     |     num = num % 1;
-     |     return {fill: "hsb(" + num + ", .75, 1)"};
-     | };
-     | // Custom attribute “hue” will change fill
-     | // to be given hue with fixed saturation and brightness.
-     | // Now you can use it like this:
-     | var c = paper.circle(10, 10, 10).attr({hue: .45});
-     | // or even like this:
-     | c.animate({hue: 1}, 1e3);
-     | 
-     | // You could also create custom attribute
-     | // with multiple parameters:
-     | paper.customAttributes.hsb = function (h, s, b) {
-     |     return {fill: "hsb(" + [h, s, b].join(",") + ")"};
-     | };
-     | c.attr({hsb: ".5 .8 1"});
-     | c.animate({hsb: "1 0 .5"}, 1e3);
-    \*/
-    paperproto.customAttributes = {};
     R._id = 0;
     R._oid = 0;
     /*\
@@ -2662,7 +2663,7 @@
      **
      * Shortcut for assigning event handler for `drag.over.<id>` event, where id is id of the element (see @Element.id).
      > Parameters
-     - f (function) handler for event
+     - f (function) handler for event, first argument would be the element you are dragging over
     \*/
     elproto.onDragOver = function (f) {
         f ? eve.on("drag.over." + this.id, f) : eve.unbind("drag.over." + this.id);
@@ -2756,13 +2757,26 @@
      [ method ]
      **
      * Creates a path element by given path data string.
-     **
      > Parameters
-     **
-     - pathString (string) path data in SVG path string format.
-     = (object) Raphaël element object with type “path”
-     # Details of a path's data attribute's format are described in the <a href="http://www.w3.org/TR/SVG/paths.html#PathData">SVG specification</a>.
-     **
+     - pathString (string) #optional path string in SVG format.
+     * Path string consists of one-letter commands, followed by comma seprarated arguments in numercal form. Example:
+     | "M10,20L30,40"
+     * Here we can see two commands: “M”, with arguments `(10, 20)` and “L” with arguments `(30, 40)`. Upper case letter mean command is absolute, lower case—relative.
+     *
+     # <p>Here is short list of commands available, for more details see <a href="http://www.w3.org/TR/SVG/paths.html#PathData" title="Details of a path's data attribute's format are described in the SVG specification.">SVG path string format</a>.</p>
+     # <table><thead><tr><th>Command</th><th>Name</th><th>Parameters</th></tr></thead><tbody>
+     # <tr><td>M</td><td>moveto</td><td>(x y)+</td></tr>
+     # <tr><td>Z</td><td>closepath</td><td>(none)</td></tr>
+     # <tr><td>L</td><td>lineto</td><td>(x y)+</td></tr>
+     # <tr><td>H</td><td>horizontal lineto</td><td>x+</td></tr>
+     # <tr><td>V</td><td>vertical lineto</td><td>y+</td></tr>
+     # <tr><td>C</td><td>curveto</td><td>(x1 y1 x2 y2 x y)+</td></tr>
+     # <tr><td>S</td><td>smooth curveto</td><td>(x2 y2 x y)+</td></tr>
+     # <tr><td>Q</td><td>quadratic Bézier curveto</td><td>(x1 y1 x y)+</td></tr>
+     # <tr><td>T</td><td>smooth quadratic Bézier curveto</td><td>(x y)+</td></tr>
+     # <tr><td>A</td><td>elliptical arc</td><td>(rx ry x-axis-rotation large-arc-flag sweep-flag x y)+</td></tr>
+     # <tr><td>R</td><td><a href="http://en.wikipedia.org/wiki/Catmull–Rom_spline#Catmull.E2.80.93Rom_spline">Catmull-Rom curveto</a>*</td><td>x1 y1 (x y)+</td></tr></tbody></table>
+     * * “Catmull-Rom curveto” is a not standard SVG command and added in 2.0 to make life easier.
      > Usage
      | var c = paper.path("M10 10L90 90");
      | // draw a diagonal line:
@@ -3208,7 +3222,7 @@
                 sp += p.shift() + p;
             }
             subpaths.end = sp;
-            point = istotal ? len : subpath ? subpaths : R.findDotsAtSegment(x, y, p[1], p[2], p[3], p[4], p[5], p[6], 1);
+            point = istotal ? len : subpath ? subpaths : R.findDotsAtSegment(x, y, p[0], p[1], p[2], p[3], p[4], p[5], 1);
             point.alpha && (point = {x: point.x, y: point.y, alpha: point.alpha});
             return point;
         };
@@ -3263,7 +3277,7 @@
      = (string) pathstring for the segment
     \*/
     R.getSubpath = function (path, from, to) {
-        if (abs(this.getTotalLength(path) - to) < 1e-6) {
+        if (this.getTotalLength(path) - to < 1e-6) {
             return getSubpathsAtLength(path, from).end;
         }
         var a = getSubpathsAtLength(path, to, 1);

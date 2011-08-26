@@ -257,7 +257,10 @@
             was: Object.prototype[has].call(g.win, "Raphael"),
             is: g.win.Raphael
         },
-        Paper = function () {},
+        Paper = function () {
+            
+            this.customAttributes = {};
+        },
         paperproto,
         appendChild = "appendChild",
         apply = "apply",
@@ -451,8 +454,6 @@
     R._Paper = Paper;
     
     R.fn = paperproto = Paper.prototype = R.prototype;
-    
-    paperproto.customAttributes = {};
     R._id = 0;
     R._oid = 0;
     
@@ -2366,7 +2367,7 @@
                 sp += p.shift() + p;
             }
             subpaths.end = sp;
-            point = istotal ? len : subpath ? subpaths : R.findDotsAtSegment(x, y, p[1], p[2], p[3], p[4], p[5], p[6], 1);
+            point = istotal ? len : subpath ? subpaths : R.findDotsAtSegment(x, y, p[0], p[1], p[2], p[3], p[4], p[5], 1);
             point.alpha && (point = {x: point.x, y: point.y, alpha: point.alpha});
             return point;
         };
@@ -2380,7 +2381,7 @@
     R.getPointAtLength = getPointAtLength;
     
     R.getSubpath = function (path, from, to) {
-        if (abs(this.getTotalLength(path) - to) < 1e-6) {
+        if (this.getTotalLength(path) - to < 1e-6) {
             return getSubpathsAtLength(path, from).end;
         }
         var a = getSubpathsAtLength(path, to, 1);
@@ -3968,7 +3969,6 @@ window.Raphael.svg && function (R) {
     Element.prototype = elproto;
     elproto.constructor = Element;
 
-    
     R._engine.path = function (pathString, SVG) {
         var el = $("path");
         SVG.canvas && SVG.canvas.appendChild(el);
@@ -4585,7 +4585,6 @@ window.Raphael.vml && function (R) {
         params.cursor && (s.cursor = params.cursor);
         "blur" in params && o.blur(params.blur);
         if (params.path && o.type == "path" || newpath) {
-            // node.path = path2vml(a.path);
             node.path = path2vml(~Str(a.path).toLowerCase().indexOf("r") ? R._pathToAbsolute(a.path) : a.path);
             if (o.type == "image") {
                 o._.fillpos = [a.x, a.y];
