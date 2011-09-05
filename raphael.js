@@ -4607,8 +4607,7 @@ window.Raphael.vml && function (R) {
                 rect[2] = +rect[2] + (+rect[0]);
                 rect[3] = +rect[3] + (+rect[1]);
                 var div = node.clipRect || R._g.doc.createElement("div"),
-                    dstyle = div.style,
-                    group = node.parentNode;
+                    dstyle = div.style;
                 dstyle.clip = R.format("rect({1}px {2}px {3}px {0}px)", rect);
                 if (!node.clipRect) {
                     dstyle.position = "absolute";
@@ -4616,8 +4615,8 @@ window.Raphael.vml && function (R) {
                     dstyle.left = 0;
                     dstyle.width = o.paper.width + "px";
                     dstyle.height = o.paper.height + "px";
-                    group.parentNode.insertBefore(div, group);
-                    div.appendChild(group);
+                    node.parentNode.insertBefore(div, node);
+                    div.appendChild(node);
                     node.clipRect = div;
                 }
             }
