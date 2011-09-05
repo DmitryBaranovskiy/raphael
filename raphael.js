@@ -416,7 +416,7 @@
                 return rectPath(bbox.x, bbox.y, bbox.width, bbox.height);
             }
         },
-        mapPath = function (path, matrix) {
+        mapPath = R.mapPath = function (path, matrix) {
             if (!matrix) {
                 return path;
             }
@@ -513,7 +513,8 @@
         return value;
     };
     
-    var createUUID = R._createUUID = (function (uuidRegEx, uuidReplacer) {
+    
+    var createUUID = R.createUUID = (function (uuidRegEx, uuidReplacer) {
         return function () {
             return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(uuidRegEx, uuidReplacer).toUpperCase();
         };
@@ -3698,7 +3699,7 @@ window.Raphael.svg && function (R) {
                             o.clip && o.clip.parentNode.parentNode.removeChild(o.clip.parentNode);
                             var el = $("clipPath"),
                                 rc = $("rect");
-                            el.id = R._createUUID();
+                            el.id = R.createUUID();
                             $(rc, {
                                 x: rect[0],
                                 y: rect[1],
@@ -3808,7 +3809,7 @@ window.Raphael.svg && function (R) {
                         if (isURL) {
                             el = $("pattern");
                             var ig = $("image");
-                            el.id = R._createUUID();
+                            el.id = R.createUUID();
                             $(el, {x: 0, y: 0, patternUnits: "userSpaceOnUse", height: 1, width: 1});
                             $(ig, {x: 0, y: 0, "xlink:href": isURL[1]});
                             el.appendChild(ig);
@@ -4206,7 +4207,7 @@ window.Raphael.svg && function (R) {
             var fltr = $("filter"),
                 blur = $("feGaussianBlur");
             t.attrs.blur = size;
-            fltr.id = R._createUUID();
+            fltr.id = R.createUUID();
             $(blur, {stdDeviation: +size || 1.5});
             fltr.appendChild(blur);
             t.paper.defs.appendChild(fltr);

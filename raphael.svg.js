@@ -362,7 +362,7 @@ window.Raphael.svg && function (R) {
                             o.clip && o.clip.parentNode.parentNode.removeChild(o.clip.parentNode);
                             var el = $("clipPath"),
                                 rc = $("rect");
-                            el.id = R._createUUID();
+                            el.id = R.createUUID();
                             $(rc, {
                                 x: rect[0],
                                 y: rect[1],
@@ -472,7 +472,7 @@ window.Raphael.svg && function (R) {
                         if (isURL) {
                             el = $("pattern");
                             var ig = $("image");
-                            el.id = R._createUUID();
+                            el.id = R.createUUID();
                             $(el, {x: 0, y: 0, patternUnits: "userSpaceOnUse", height: 1, width: 1});
                             $(ig, {x: 0, y: 0, "xlink:href": isURL[1]});
                             el.appendChild(ig);
@@ -1110,7 +1110,7 @@ window.Raphael.svg && function (R) {
             var fltr = $("filter"),
                 blur = $("feGaussianBlur");
             t.attrs.blur = size;
-            fltr.id = R._createUUID();
+            fltr.id = R.createUUID();
             $(blur, {stdDeviation: +size || 1.5});
             fltr.appendChild(blur);
             t.paper.defs.appendChild(fltr);
@@ -1280,7 +1280,7 @@ window.Raphael.svg && function (R) {
     R.prototype.renderfix = function () {
         var cnvs = this.canvas,
             s = cnvs.style,
-            pos = cnvs.getScreenCTM(),
+            pos = cnvs.getScreenCTM() || cnvs.createSVGMatrix(),
             left = -pos.e % 1,
             top = -pos.f % 1;
         if (left || top) {

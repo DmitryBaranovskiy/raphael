@@ -283,7 +283,7 @@
                 return rectPath(bbox.x, bbox.y, bbox.width, bbox.height);
             }
         },
-        mapPath = function (path, matrix) {
+        mapPath = R.mapPath = function (path, matrix) {
             if (!matrix) {
                 return path;
             }
@@ -467,7 +467,13 @@
         return value;
     };
     
-    var createUUID = R._createUUID = (function (uuidRegEx, uuidReplacer) {
+    /*\
+     * Raphael.createUUID
+     [ method ]
+     **
+     * Returns RFC4122, version 4 ID
+    \*/
+    var createUUID = R.createUUID = (function (uuidRegEx, uuidReplacer) {
         return function () {
             return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(uuidRegEx, uuidReplacer).toUpperCase();
         };
@@ -3655,6 +3661,9 @@
      - delay (number) number of ms to pass between animation start and actual animation
      **
      = (object) new altered Animation object
+     | var anim = Raphael.animation({cx: 10, cy: 20}, 2e3);
+     | circle1.animate(anim); // run the given animation immediately
+     | circle2.animate(anim.delay(500)); // run the given animation after 500 ms
     \*/
     Animation.prototype.delay = function (delay) {
         var a = new Animation(this.anim, this.ms);
