@@ -7,14 +7,14 @@
 // └─────────────────────────────────────────────────────────────────────┘ \\
 
 // ┌──────────────────────────────────────────────────────────────────────────────────────┐ \\
-// │ Eve 0.3.0 - JavaScript Events Library                                                │ \\
+// │ Eve 0.3.1 - JavaScript Events Library                                                │ \\
 // ├──────────────────────────────────────────────────────────────────────────────────────┤ \\
 // │ Copyright (c) 2008-2011 Dmitry Baranovskiy (http://dmitry.baranovskiy.com/)          │ \\
 // │ Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license. │ \\
 // └──────────────────────────────────────────────────────────────────────────────────────┘ \\
 
 (function (glob) {
-    var version = "0.3.0",
+    var version = "0.3.1",
         has = "hasOwnProperty",
         separator = /[\.\/]/,
         wildcard = "*",
@@ -173,16 +173,16 @@
             while (e.n) {
                 if (f) {
                     if (e.f) {
-                        for (i = 0, ii = e.f.length; i < ii; i++) if (e.f[i] == f) {
-                            e.f.splice(i, 1);
+                        for (j = 0, jj = e.f.length; j < jj; j++) if (e.f[j] == f) {
+                            e.f.splice(j, 1);
                             break;
                         }
                         !e.f.length && delete e.f;
                     }
                     for (key in e.n) if (e.n[has](key) && e.n[key].f) {
                         var funcs = e.n[key].f;
-                        for (i = 0, ii = funcs.length; i < ii; i++) if (funcs[i] == f) {
-                            funcs.splice(i, 1);
+                        for (j = 0, jj = funcs.length; j < jj; j++) if (funcs[j] == f) {
+                            funcs.splice(j, 1);
                             break;
                         }
                         !funcs.length && delete e.n[key].f;
@@ -2266,7 +2266,9 @@
         if (this.removed) {
             return null;
         }
-        return this.paper[this.type]().attr(this.attr());
+        var out = this.paper[this.type]().attr(this.attr());
+        this.__set__ && this.__set__.push(out);
+        return out;
     };
     
     elproto.glow = function (glow) {
@@ -5231,7 +5233,7 @@ window.Raphael.vml && function (R) {
         path.textpathok = true;
         o.string = Str(text);
         o.on = true;
-        el.style.cssText = "position:absolute;left:0;top:0;width:1px;height:1px";
+        el.style.cssText = cssDot;
         el.coordsize = zoom + S + zoom;
         el.coordorigin = "0 0";
         var p = new Element(el, vml),
@@ -5378,4 +5380,16 @@ window.Raphael.vml && function (R) {
         }
         return true;
     };
+
+    var setproto = R.st;
+    for (var method in elproto) if (elproto[has](method) && !setproto[has](method)) {
+        setproto[method] = (function (methodname) {
+            return function () {
+                var arg = arguments;
+                return this.forEach(function (el) {
+                    el[methodname].apply(el, arg);
+                });
+            };
+        })(method);
+    }
 }(window.Raphael);

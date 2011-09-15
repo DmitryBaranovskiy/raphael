@@ -814,7 +814,7 @@ window.Raphael.vml && function (R) {
         path.textpathok = true;
         o.string = Str(text);
         o.on = true;
-        el.style.cssText = "position:absolute;left:0;top:0;width:1px;height:1px";
+        el.style.cssText = cssDot;
         el.coordsize = zoom + S + zoom;
         el.coordorigin = "0 0";
         var p = new Element(el, vml),
@@ -961,4 +961,16 @@ window.Raphael.vml && function (R) {
         }
         return true;
     };
+
+    var setproto = R.st;
+    for (var method in elproto) if (elproto[has](method) && !setproto[has](method)) {
+        setproto[method] = (function (methodname) {
+            return function () {
+                var arg = arguments;
+                return this.forEach(function (el) {
+                    el[methodname].apply(el, arg);
+                });
+            };
+        })(method);
+    }
 }(window.Raphael);

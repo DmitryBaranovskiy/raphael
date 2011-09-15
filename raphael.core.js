@@ -3106,7 +3106,9 @@
         if (this.removed) {
             return null;
         }
-        return this.paper[this.type]().attr(this.attr());
+        var out = this.paper[this.type]().attr(this.attr());
+        this.__set__ && this.__set__.push(out);
+        return out;
     };
     /*\
      * Element.glow
