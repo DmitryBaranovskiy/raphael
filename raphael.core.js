@@ -1738,12 +1738,15 @@
                         tlen = t.length,
                         absolute = t[0] != (t[0] = Str(t[0]).toLowerCase()),
                         inver = absolute ? m.invert() : 0,
-                        x1 = inver && inver.x(0, 0),
-                        y1 = inver && inver.y(0, 0),
-                        x2, y2,
+                        x1,
+                        y1,
+                        x2,
+                        y2,
                         bb;
                     if (t[0] == "t" && tlen == 3) {
                         if (absolute) {
+                            x1 = inver.x(0, 0),
+                            y1 = inver.y(0, 0),
                             x2 = inver.x(t[1], t[2]);
                             y2 = inver.y(t[1], t[2]);
                             m.translate(x2 - x1, y2 - y1);
@@ -1759,7 +1762,7 @@
                             if (absolute) {
                                 x2 = inver.x(t[2], t[3]);
                                 y2 = inver.y(t[2], t[3]);
-                                m.rotate(t[1], x2 - x1, y2 - y1);
+                                m.rotate(t[1], x2, y2);
                             } else {
                                 m.rotate(t[1], t[2], t[3]);
                             }
@@ -1775,7 +1778,7 @@
                             if (absolute) {
                                 x2 = inver.x(t[3], t[4]);
                                 y2 = inver.y(t[3], t[4]);
-                                m.scale(t[1], t[2], x2 - x1, y2 - y1);
+                                m.scale(t[1], t[2], x2, y2);
                             } else {
                                 m.scale(t[1], t[2], t[3], t[4]);
                             }

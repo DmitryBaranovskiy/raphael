@@ -1590,7 +1590,7 @@
                             if (absolute) {
                                 x2 = inver.x(t[2], t[3]);
                                 y2 = inver.y(t[2], t[3]);
-                                m.rotate(t[1], x2 - x1, y2 - y1);
+                                m.rotate(t[1], x2, y2);
                             } else {
                                 m.rotate(t[1], t[2], t[3]);
                             }
