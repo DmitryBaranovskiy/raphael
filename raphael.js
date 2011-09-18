@@ -7,14 +7,14 @@
 // └─────────────────────────────────────────────────────────────────────┘ \\
 
 // ┌──────────────────────────────────────────────────────────────────────────────────────┐ \\
-// │ Eve 0.3.1 - JavaScript Events Library                                                │ \\
+// │ Eve 0.3.2 - JavaScript Events Library                                                │ \\
 // ├──────────────────────────────────────────────────────────────────────────────────────┤ \\
 // │ Copyright (c) 2008-2011 Dmitry Baranovskiy (http://dmitry.baranovskiy.com/)          │ \\
 // │ Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license. │ \\
 // └──────────────────────────────────────────────────────────────────────────────────────┘ \\
 
 (function (glob) {
-    var version = "0.3.1",
+    var version = "0.3.2",
         has = "hasOwnProperty",
         separator = /[\.\/]/,
         wildcard = "*",
@@ -28,6 +28,7 @@
     
         eve = function (name, scope) {
             var e = events,
+                oldstop = stop,
                 args = Array.prototype.slice.call(arguments, 2),
                 listeners = eve.listeners(name),
                 z = 0,
@@ -50,6 +51,7 @@
                 l = queue[indexed[z++]];
                 out.push(l.apply(scope, args));
                 if (stop) {
+                    stop = oldstop;
                     return out;
                 }
             }
@@ -59,6 +61,7 @@
                     if (l.zIndex == indexed[z]) {
                         out.push(l.apply(scope, args));
                         if (stop) {
+                            stop = oldstop;
                             return out;
                         }
                         do {
@@ -66,6 +69,7 @@
                             l = queue[indexed[z]];
                             l && out.push(l.apply(scope, args));
                             if (stop) {
+                                stop = oldstop;
                                 return out;
                             }
                         } while (l)
@@ -75,10 +79,12 @@
                 } else {
                     out.push(l.apply(scope, args));
                     if (stop) {
+                        stop = oldstop;
                         return out;
                     }
                 }
             }
+            stop = oldstop;
             return out.length ? out : null;
         };
     
@@ -958,7 +964,7 @@
                 c.replace(pathValues, function (a, b) {
                     b && params.push(+b);
                 });
-                data.push([name][concat](params));
+                data.push([b][concat](params));
             });
         }
         data.toString = R._path2string;
@@ -1561,17 +1567,33 @@
                 for (var i = 0, ii = tdata.length; i < ii; i++) {
                     var t = tdata[i],
                         tlen = t.length,
+                        absolute = t[0] != (t[0] = Str(t[0]).toLowerCase()),
+                        inver = absolute ? m.invert() : 0,
+                        x1 = inver && inver.x(0, 0),
+                        y1 = inver && inver.y(0, 0),
+                        x2, y2,
                         bb;
-                    t[0] = Str(t[0]).toLowerCase();
                     if (t[0] == "t" && tlen == 3) {
-                        m.translate(t[1], t[2]);
+                        if (absolute) {
+                            x2 = inver.x(t[1], t[2]);
+                            y2 = inver.y(t[1], t[2]);
+                            m.translate(x2 - x1, y2 - y1);
+                        } else {
+                            m.translate(t[1], t[2]);
+                        }
                     } else if (t[0] == "r") {
                         if (tlen == 2) {
                             bb = bb || el.getBBox(1);
                             m.rotate(t[1], bb.x + bb.width / 2, bb.y + bb.height / 2);
                             deg += t[1];
                         } else if (tlen == 4) {
-                            m.rotate(t[1], t[2], t[3]);
+                            if (absolute) {
+                                x2 = inver.x(t[2], t[3]);
+                                y2 = inver.y(t[2], t[3]);
+                                m.rotate(t[1], x2 - x1, y2 - y1);
+                            } else {
+                                m.rotate(t[1], t[2], t[3]);
+                            }
                             deg += t[1];
                         }
                     } else if (t[0] == "s") {
@@ -1581,7 +1603,13 @@
                             sx *= t[1];
                             sy *= t[tlen - 1];
                         } else if (tlen == 5) {
-                            m.scale(t[1], t[2], t[3], t[4]);
+                            if (absolute) {
+                                x2 = inver.x(t[3], t[4]);
+                                y2 = inver.y(t[3], t[4]);
+                                m.scale(t[1], t[2], x2 - x1, y2 - y1);
+                            } else {
+                                m.scale(t[1], t[2], t[3], t[4]);
+                            }
                             sx *= t[1];
                             sy *= t[2];
                         }
@@ -1609,20 +1637,21 @@
             }
         },
         getEmpty = function (item) {
-            switch (item[0]) {
-                case "t": return ["t", 0, 0];
-                case "m": return ["m", 1, 0, 0, 1, 0, 0];
+            var l = item[0];
+            switch (l.toLowerCase()) {
+                case "t": return [l, 0, 0];
+                case "m": return [l, 1, 0, 0, 1, 0, 0];
                 case "r": if (item.length == 4) {
-                    return ["r", 0, item[2], item[3]];
+                    return [l, 0, item[2], item[3]];
                 } else {
-                    return ["r", 0];
+                    return [l, 0];
                 }
                 case "s": if (item.length == 5) {
-                    return ["s", 1, 1, item[3], item[4]];
+                    return [l, 1, 1, item[3], item[4]];
                 } else if (item.length == 3) {
-                    return ["s", 1, 1];
+                    return [l, 1, 1];
                 } else {
-                    return ["s", 1];
+                    return [l, 1];
                 }
             }
         },
@@ -1639,8 +1668,8 @@
                 tt1 = t1[i] || getEmpty(t2[i]);
                 tt2 = t2[i] || getEmpty(tt1);
                 if ((tt1[0] != tt2[0]) ||
-                    (tt1[0] == "r" && (tt1[2] != tt2[2] || tt1[3] != tt2[3])) ||
-                    (tt1[0] == "s" && (tt1[3] != tt2[3] || tt1[4] != tt2[4]))
+                    (tt1[0].toLowerCase() == "r" && (tt1[2] != tt2[2] || tt1[3] != tt2[3])) ||
+                    (tt1[0].toLowerCase() == "s" && (tt1[3] != tt2[3] || tt1[4] != tt2[4]))
                     ) {
                     return;
                 }
@@ -1839,8 +1868,8 @@
             return out;
         };
         
-        matrixproto.toTransformString = function () {
-            var s = this.split();
+        matrixproto.toTransformString = function (shorter) {
+            var s = shorter || this.split();
             if (s.isSimple) {
                 return "t" + [s.dx, s.dy] + "s" + [s.scalex, s.scaley, 0, 0] + "r" + [s.rotate, 0, 0];
             } else {
