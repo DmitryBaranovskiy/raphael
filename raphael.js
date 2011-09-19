@@ -1569,12 +1569,15 @@
                         tlen = t.length,
                         absolute = t[0] != (t[0] = Str(t[0]).toLowerCase()),
                         inver = absolute ? m.invert() : 0,
-                        x1 = inver && inver.x(0, 0),
-                        y1 = inver && inver.y(0, 0),
-                        x2, y2,
+                        x1,
+                        y1,
+                        x2,
+                        y2,
                         bb;
                     if (t[0] == "t" && tlen == 3) {
                         if (absolute) {
+                            x1 = inver.x(0, 0),
+                            y1 = inver.y(0, 0),
                             x2 = inver.x(t[1], t[2]);
                             y2 = inver.y(t[1], t[2]);
                             m.translate(x2 - x1, y2 - y1);
@@ -1606,7 +1609,7 @@
                             if (absolute) {
                                 x2 = inver.x(t[3], t[4]);
                                 y2 = inver.y(t[3], t[4]);
-                                m.scale(t[1], t[2], x2 - x1, y2 - y1);
+                                m.scale(t[1], t[2], x2, y2);
                             } else {
                                 m.scale(t[1], t[2], t[3], t[4]);
                             }
@@ -3073,7 +3076,7 @@
     
     setproto.forEach = function (callback, thisArg) {
         for (var i = 0, ii = this.items.length; i < ii; i++) {
-            if (callback.call(thisArg, this.items[i]) === false) {
+            if (callback.call(thisArg, this.items[i], i) === false) {
                 return this;
             }
         }
@@ -3136,13 +3139,8 @@
     };
     
     setproto.exclude = function (el) {
-        for (var i = 0, ii = this.length, found; i < ii; i++) if (found || this[i] == el) {
-            this[i] = this[i + 1];
-            found = 1;
-        }
-        if (found) {
-            this.length--;
-            delete this[i];
+        for (var i = 0, ii = this.length; i < ii; i++) if (this[i] == el) {
+            this.splice(i, 1);
             return true;
         }
     };
@@ -4103,6 +4101,7 @@ window.Raphael.svg && function (R) {
         if (this.removed) {
             return;
         }
+        this.paper.__set__ && this.paper.__set__.exclude(this);
         eve.unbind("*.*." + this.id);
         R._tear(this, this.paper);
         this.node.parentNode.removeChild(this.node);
@@ -5036,6 +5035,7 @@ window.Raphael.vml && function (R) {
         if (this.removed) {
             return;
         }
+        this.paper.__set__ && this.paper.__set__.exclude(this);
         R.eve.unbind("*.*." + this.id);
         R._tear(this, this.paper);
         this.node.parentNode.removeChild(this.node);

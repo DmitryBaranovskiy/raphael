@@ -4190,7 +4190,7 @@
     \*/
     setproto.forEach = function (callback, thisArg) {
         for (var i = 0, ii = this.items.length; i < ii; i++) {
-            if (callback.call(thisArg, this.items[i]) === false) {
+            if (callback.call(thisArg, this.items[i], i) === false) {
                 return this;
             }
         }
@@ -4280,13 +4280,8 @@
      = (boolean) `true` if object was found & removed from the set
     \*/
     setproto.exclude = function (el) {
-        for (var i = 0, ii = this.length, found; i < ii; i++) if (found || this[i] == el) {
-            this[i] = this[i + 1];
-            found = 1;
-        }
-        if (found) {
-            this.length--;
-            delete this[i];
+        for (var i = 0, ii = this.length; i < ii; i++) if (this[i] == el) {
+            this.splice(i, 1);
             return true;
         }
     };

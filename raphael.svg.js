@@ -873,6 +873,7 @@ window.Raphael.svg && function (R) {
         if (this.removed) {
             return;
         }
+        this.paper.__set__ && this.paper.__set__.exclude(this);
         eve.unbind("*.*." + this.id);
         R._tear(this, this.paper);
         this.node.parentNode.removeChild(this.node);
