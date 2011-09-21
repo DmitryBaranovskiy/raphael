@@ -265,7 +265,8 @@
         },
         Paper = function () {
             
-            this.customAttributes = {};
+            
+            this.ca = this.customAttributes = {};
         },
         paperproto,
         appendChild = "appendChild",
@@ -276,7 +277,7 @@
         S = " ",
         Str = String,
         split = "split",
-        events = "click dblclick mousedown mousemove mouseout mouseover mouseup touchstart touchmove touchend touchcancel".split(S),
+        events = "click dblclick mousedown mousemove mouseout mouseover mouseup touchstart touchmove touchend touchcancel"[split](S),
         touchMap = {
             mousedown: "touchstart",
             mousemove: "touchmove",
@@ -814,7 +815,7 @@
                 red = toInt((t = rgb[3].charAt(1)) + t, 16);
             }
             if (rgb[4]) {
-                values = rgb[4].split(commaSpaces);
+                values = rgb[4][split](commaSpaces);
                 red = toFloat(values[0]);
                 values[0].slice(-1) == "%" && (red *= 2.55);
                 green = toFloat(values[1]);
@@ -825,7 +826,7 @@
                 values[3] && values[3].slice(-1) == "%" && (opacity /= 100);
             }
             if (rgb[5]) {
-                values = rgb[5].split(commaSpaces);
+                values = rgb[5][split](commaSpaces);
                 red = toFloat(values[0]);
                 values[0].slice(-1) == "%" && (red *= 2.55);
                 green = toFloat(values[1]);
@@ -838,7 +839,7 @@
                 return R.hsb2rgb(red, green, blue, opacity);
             }
             if (rgb[6]) {
-                values = rgb[6].split(commaSpaces);
+                values = rgb[6][split](commaSpaces);
                 red = toFloat(values[0]);
                 values[0].slice(-1) == "%" && (red *= 2.55);
                 green = toFloat(values[1]);
@@ -1315,7 +1316,7 @@
             if (recursive) {
                 return [m2, m3, m4][concat](res);
             } else {
-                res = [m2, m3, m4][concat](res).join().split(",");
+                res = [m2, m3, m4][concat](res).join()[split](",");
                 var newres = [];
                 for (var i = 0, ii = res.length; i < ii; i++) {
                     newres[i] = i % 2 ? rotate(res[i - 1], res[i], rad).y : rotate(res[i], res[i + 1], rad).x;
@@ -1567,24 +1568,25 @@
                 for (var i = 0, ii = tdata.length; i < ii; i++) {
                     var t = tdata[i],
                         tlen = t.length,
-                        absolute = t[0] != (t[0] = Str(t[0]).toLowerCase()),
+                        command = Str(t[0]).toLowerCase(),
+                        absolute = t[0] != command,
                         inver = absolute ? m.invert() : 0,
                         x1,
                         y1,
                         x2,
                         y2,
                         bb;
-                    if (t[0] == "t" && tlen == 3) {
+                    if (command == "t" && tlen == 3) {
                         if (absolute) {
-                            x1 = inver.x(0, 0),
-                            y1 = inver.y(0, 0),
+                            x1 = inver.x(0, 0);
+                            y1 = inver.y(0, 0);
                             x2 = inver.x(t[1], t[2]);
                             y2 = inver.y(t[1], t[2]);
                             m.translate(x2 - x1, y2 - y1);
                         } else {
                             m.translate(t[1], t[2]);
                         }
-                    } else if (t[0] == "r") {
+                    } else if (command == "r") {
                         if (tlen == 2) {
                             bb = bb || el.getBBox(1);
                             m.rotate(t[1], bb.x + bb.width / 2, bb.y + bb.height / 2);
@@ -1599,7 +1601,7 @@
                             }
                             deg += t[1];
                         }
-                    } else if (t[0] == "s") {
+                    } else if (command == "s") {
                         if (tlen == 2 || tlen == 3) {
                             bb = bb || el.getBBox(1);
                             m.scale(t[1], t[tlen - 1], bb.x + bb.width / 2, bb.y + bb.height / 2);
@@ -1616,7 +1618,7 @@
                             sx *= t[1];
                             sy *= t[2];
                         }
-                    } else if (t[0] == "m" && tlen == 7) {
+                    } else if (command == "m" && tlen == 7) {
                         m.add(t[1], t[2], t[3], t[4], t[5], t[6]);
                     }
                     _.dirtyT = 1;
@@ -1872,7 +1874,7 @@
         };
         
         matrixproto.toTransformString = function (shorter) {
-            var s = shorter || this.split();
+            var s = shorter || this[split]();
             if (s.isSimple) {
                 return "t" + [s.dx, s.dy] + "s" + [s.scalex, s.scaley, 0, 0] + "r" + [s.rotate, 0, 0];
             } else {
@@ -2595,7 +2597,7 @@
                                 }
                                 break;
                             default:
-                                var from2 = [].concat(from[attr]);
+                                var from2 = [][concat](from[attr]);
                                 now = [];
                                 i = that.paper.customAttributes[attr].length;
                                 while (i--) {
@@ -2856,8 +2858,8 @@
                             }
                             break;
                         case "csv":
-                            var values = Str(params[attr]).split(separator),
-                                from2 = Str(from[attr]).split(separator);
+                            var values = Str(params[attr])[split](separator),
+                                from2 = Str(from[attr])[split](separator);
                             if (attr == "clip-rect") {
                                 from[attr] = from2;
                                 diff[attr] = [];
@@ -2869,8 +2871,8 @@
                             to[attr] = values;
                             break;
                         default:
-                            values = [].concat(params[attr]);
-                            from2 = [].concat(from[attr]);
+                            values = [][concat](params[attr]);
+                            from2 = [][concat](from[attr]);
                             diff[attr] = [];
                             i = element.paper.customAttributes[attr].length;
                             while (i--) {
@@ -3278,14 +3280,14 @@
         origin = origin || "middle"; // baseline|middle
         letter_spacing = mmax(mmin(letter_spacing || 0, 1), -1);
         var out = this.set(),
-            letters = Str(string).split(E),
+            letters = Str(string)[split](E),
             shift = 0,
             path = E,
             scale;
         R.is(font, string) && (font = this.getFont(font));
         if (font) {
             scale = (size || 16) / font.face["units-per-em"];
-            var bb = font.face.bbox.split(separator),
+            var bb = font.face.bbox[split](separator),
                 top = +bb[0],
                 height = +bb[1] + (origin == "baseline" ? bb[3] - bb[1] + (+font.face.descent) : (bb[3] - bb[1]) / 2);
             for (var i = 0, ii = letters.length; i < ii; i++) {
