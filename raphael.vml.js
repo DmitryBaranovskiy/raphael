@@ -370,6 +370,7 @@ window.Raphael.vml && function (R) {
     addGradientFill = function (o, gradient, fill) {
         o.attrs = o.attrs || {};
         var attrs = o.attrs,
+            pow = Math.pow,
             opacity,
             oindex,
             type = "linear",
@@ -643,11 +644,11 @@ window.Raphael.vml && function (R) {
         }
         value == null && R.is(name, "object") && (params = name);
         for (var key in params) {
-            R.eve("attr." + key + "." + this.id, this, params[key]);
+            eve("attr." + key + "." + this.id, this, params[key]);
         }
         if (params) {
             for (key in this.paper.customAttributes) if (this.paper.customAttributes[has](key) && params[has](key) && R.is(this.paper.customAttributes[key], "function")) {
-                var par = this.paper.customAttributes[key].apply(this, [][concat](params[key]));
+                var par = this.paper.customAttributes[key].apply(this, [].concat(params[key]));
                 this.attrs[key] = params[key];
                 for (var subkey in par) if (par[has](subkey)) {
                     params[subkey] = par[subkey];

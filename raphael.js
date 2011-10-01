@@ -473,7 +473,7 @@
             return o instanceof Array;
         }
         return  (type == "null" && o === null) ||
-                (type == typeof o) ||
+                (type == typeof o && o !== null) ||
                 (type == "object" && o === Object(o)) ||
                 (type == "array" && Array.isArray && Array.isArray(o)) ||
                 objectToString.call(o).slice(8, -1).toLowerCase() == type;
@@ -2533,7 +2533,9 @@
                     t = e.t,
                     that = e.el,
                     set = {},
-                    now;
+                    now,
+                    init = {},
+                    key;
                 if (e.initstatus) {
                     time = (e.initstatus * e.anim.top - e.prev) / (e.percent - e.prev) * ms;
                     e.status = e.initstatus;
@@ -2624,6 +2626,10 @@
                     that.attr(to);
                     animationElements.splice(l--, 1);
                     if (e.repeat > 1 && !e.next) {
+                        for (key in to) if (to[has](key)) {
+                            init[key] = e.totalOrigin[key];
+                        }
+                        e.el.attr(init);
                         runAnimation(e.anim, e.el, e.anim.percents[0], null, e.totalOrigin, e.repeat - 1);
                     }
                     if (e.next && !e.stop) {
@@ -4176,7 +4182,10 @@ window.Raphael.svg && function (R) {
         } else if (name != null && R.is(name, "object")) {
             params = name;
         }
-        for (var key in this.paper.customAttributes) if (this.paper.customAttributes[has](key) && params[has](key) && R.is(this.paper.customAttributes[key], "function")) {
+        for (var key in params) {
+            eve("attr." + key + "." + this.id, this, params[key]);
+        }
+        for (key in this.paper.customAttributes) if (this.paper.customAttributes[has](key) && params[has](key) && R.is(this.paper.customAttributes[key], "function")) {
             var par = this.paper.customAttributes[key].apply(this, [].concat(params[key]));
             this.attrs[key] = params[key];
             for (var subkey in par) if (par[has](subkey)) {
@@ -4819,6 +4828,7 @@ window.Raphael.vml && function (R) {
     addGradientFill = function (o, gradient, fill) {
         o.attrs = o.attrs || {};
         var attrs = o.attrs,
+            pow = Math.pow,
             opacity,
             oindex,
             type = "linear",
@@ -5092,11 +5102,11 @@ window.Raphael.vml && function (R) {
         }
         value == null && R.is(name, "object") && (params = name);
         for (var key in params) {
-            R.eve("attr." + key + "." + this.id, this, params[key]);
+            eve("attr." + key + "." + this.id, this, params[key]);
         }
         if (params) {
             for (key in this.paper.customAttributes) if (this.paper.customAttributes[has](key) && params[has](key) && R.is(this.paper.customAttributes[key], "function")) {
-                var par = this.paper.customAttributes[key].apply(this, [][concat](params[key]));
+                var par = this.paper.customAttributes[key].apply(this, [].concat(params[key]));
                 this.attrs[key] = params[key];
                 for (var subkey in par) if (par[has](subkey)) {
                     params[subkey] = par[subkey];

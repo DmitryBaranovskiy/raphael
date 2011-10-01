@@ -1026,7 +1026,10 @@ window.Raphael.svg && function (R) {
         } else if (name != null && R.is(name, "object")) {
             params = name;
         }
-        for (var key in this.paper.customAttributes) if (this.paper.customAttributes[has](key) && params[has](key) && R.is(this.paper.customAttributes[key], "function")) {
+        for (var key in params) {
+            eve("attr." + key + "." + this.id, this, params[key]);
+        }
+        for (key in this.paper.customAttributes) if (this.paper.customAttributes[has](key) && params[has](key) && R.is(this.paper.customAttributes[key], "function")) {
             var par = this.paper.customAttributes[key].apply(this, [].concat(params[key]));
             this.attrs[key] = params[key];
             for (var subkey in par) if (par[has](subkey)) {

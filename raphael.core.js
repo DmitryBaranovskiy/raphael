@@ -387,7 +387,7 @@
             return o instanceof Array;
         }
         return  (type == "null" && o === null) ||
-                (type == typeof o) ||
+                (type == typeof o && o !== null) ||
                 (type == "object" && o === Object(o)) ||
                 (type == "array" && Array.isArray && Array.isArray(o)) ||
                 objectToString.call(o).slice(8, -1).toLowerCase() == type;
@@ -3483,7 +3483,9 @@
                     t = e.t,
                     that = e.el,
                     set = {},
-                    now;
+                    now,
+                    init = {},
+                    key;
                 if (e.initstatus) {
                     time = (e.initstatus * e.anim.top - e.prev) / (e.percent - e.prev) * ms;
                     e.status = e.initstatus;
@@ -3574,6 +3576,10 @@
                     that.attr(to);
                     animationElements.splice(l--, 1);
                     if (e.repeat > 1 && !e.next) {
+                        for (key in to) if (to[has](key)) {
+                            init[key] = e.totalOrigin[key];
+                        }
+                        e.el.attr(init);
                         runAnimation(e.anim, e.el, e.anim.percents[0], null, e.totalOrigin, e.repeat - 1);
                     }
                     if (e.next && !e.stop) {
