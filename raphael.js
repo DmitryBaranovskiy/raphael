@@ -2102,6 +2102,8 @@
         return this.unmouseover(f_in).unmouseout(f_out);
     };
     
+    var draggable = []
+    
     elproto.drag = function (onmove, onstart, onend, move_scope, start_scope, end_scope) {
         function start(e) {
             (e.originalEvent || e).preventDefault();
@@ -2118,6 +2120,7 @@
             eve("drag.start." + this.id, start_scope || move_scope || this, e.clientX + scrollX, e.clientY + scrollY, e);
         }
         this._drag = {};
+        draggable.push({el: this, start: start});
         this.mousedown(start);
         return this;
     };
@@ -2127,13 +2130,13 @@
     };
     
     elproto.undrag = function () {
-        var i = drag.length;
-        while (i--) if (drag[i].el == this) {
-            R.unmousedown(drag[i].start);
-            drag.splice(i++, 1);
+        var i = draggable.length;
+        while (i--) if (draggable[i].el == this) {
+            this.unmousedown(draggable[i].start);
+            draggable.splice(i, 1);
             eve.unbind("drag.*." + this.id);
         }
-        !drag.length && R.unmousemove(dragMove).unmouseup(dragUp);
+        !draggable.length && R.unmousemove(dragMove).unmouseup(dragUp);
     };
     
     paperproto.circle = function (x, y, r) {
