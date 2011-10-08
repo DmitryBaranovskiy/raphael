@@ -16,6 +16,7 @@ window.Raphael.vml && function (R) {
         mmax = math.max,
         mmin = math.min,
         abs = math.abs,
+        pow = math.pow,
         fillString = "fill",
         separator = /[, ]+/,
         eve = R.eve,
