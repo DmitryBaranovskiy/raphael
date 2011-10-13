@@ -4665,7 +4665,7 @@ window.Raphael.vml && function (R) {
                 }
             }
             if (!params["clip-rect"]) {
-                node.clipRect && (node.clipRect.style.clip = E);
+                node.clipRect && (node.clipRect.style.clip = "auto");
             }
         }
         if (o.textpath) {
