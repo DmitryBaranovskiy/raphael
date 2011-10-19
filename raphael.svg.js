@@ -1235,7 +1235,7 @@ window.Raphael.svg && function (R) {
         container.width = width;
         container.height = height;
         container.canvas = cnvs;
-        // plugins.call(container, container, R.fn);
+        R.plugins.call(container, container, R.fn);
         container.clear();
         container._left = container._top = 0;
         isFloating && (container.renderfix = function () {});

@@ -439,6 +439,27 @@
                 }
             }
             return path;
+        },
+        plugins = R.plugins = function (con, add) {
+            var that = this;
+            for (var prop in add) {
+	            if (add.hasOwnProperty(prop) && !(prop in con)) {
+	                switch (typeof add[prop]) {
+	                    case "function":
+	                        (function (f) {
+	                            con[prop] = con === that ? f : function () { return f.apply(that, arguments); };
+	                        })(add[prop]);
+	                    break;
+	                    case "object":
+	                        con[prop] = con[prop] || {};
+	                        plugins.call(this, con[prop], add[prop]);
+	                    break;
+	                    default:
+	                        con[prop] = add[prop];
+	                    break;
+	                }
+	           }
+           }
         };
 
     R._g = g;
@@ -460,7 +481,7 @@
     R.svg = !(R.vml = R.type == "VML");
     R._Paper = Paper;
     
-    R.fn = paperproto = Paper.prototype = R.prototype;
+    R.fn = paperproto = R.prototype;
     R._id = 0;
     R._oid = 0;
     
@@ -4367,7 +4388,7 @@ window.Raphael.svg && function (R) {
         container.width = width;
         container.height = height;
         container.canvas = cnvs;
-        // plugins.call(container, container, R.fn);
+        R.plugins.call(container, container, R.fn);
         container.clear();
         container._left = container._top = 0;
         isFloating && (container.renderfix = function () {});
@@ -5401,7 +5422,7 @@ window.Raphael.vml && function (R) {
                 container.appendChild(c);
             }
         }
-        // plugins.call(res, res, R.fn);
+        R.plugins.call(res, res, R.fn);
         res.renderfix = function () {};
         return res;
     };

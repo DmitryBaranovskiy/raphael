@@ -943,7 +943,7 @@ window.Raphael.vml && function (R) {
                 container.appendChild(c);
             }
         }
-        // plugins.call(res, res, R.fn);
+        R.plugins.call(res, res, R.fn);
         res.renderfix = function () {};
         return res;
     };
