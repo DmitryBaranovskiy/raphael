@@ -386,7 +386,7 @@
      | paper.mystuff.arrow();
      | paper.mystuff.star();
     \*/
-    R.fn = paperproto = Paper.prototype = R.prototype;
+    R.fn = paperproto = R.prototype;
     R._id = 0;
     R._oid = 0;
     /*\
