@@ -305,6 +305,27 @@
                 }
             }
             return path;
+        },
+        plugins = R.plugins = function (con, add) {
+            var that = this;
+            for (var prop in add) {
+	            if (add.hasOwnProperty(prop) && !(prop in con)) {
+	                switch (typeof add[prop]) {
+	                    case "function":
+	                        (function (f) {
+	                            con[prop] = con === that ? f : function () { return f.apply(that, arguments); };
+	                        })(add[prop]);
+	                    break;
+	                    case "object":
+	                        con[prop] = con[prop] || {};
+	                        plugins.call(this, con[prop], add[prop]);
+	                    break;
+	                    default:
+	                        con[prop] = add[prop];
+	                    break;
+	                }
+	           }
+           }
         };
 
     R._g = g;
@@ -365,7 +386,7 @@
      | paper.mystuff.arrow();
      | paper.mystuff.star();
     \*/
-    R.fn = paperproto = Paper.prototype = R.prototype;
+    R.fn = paperproto = R.prototype;
     R._id = 0;
     R._oid = 0;
     /*\
