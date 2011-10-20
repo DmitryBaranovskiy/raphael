@@ -1,0 +1,41 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+    <head>
+        <title>Raphael Tooltips</title>
+        <script src="../raphael.js" type="text/javascript"></script>
+        <script src="../plugins/raphael.tooltips.js" type="text/javascript"></script>
+        <script type="text/javascript">
+            window.onload = function () {
+                var r = Raphael("holder"),
+                    s = r.set();
+
+                (function (count) {
+                    var pattr = { stroke: "#c00", translation: [150.5, 100.5] },
+                        def = ["M30,150l", 50 * count, ",0"];
+
+                    for (var i = 1; i <= count; i++) {
+                        def.push("M", 50 * i, ",130l0,40");
+                    }
+
+                    r.path(def.join('')).attr({ stroke: '#c00', translation: [150.5, 100.5] });
+                })(7);
+
+                s.push(
+                    r.tag(50, 150, "$9.99", 130),
+                    r.tag(100, 150, "$9.99", 310),
+                    r.label(150, 150, "$9.99"),
+                    r.flag(200, 150, "$9.99", 60),
+                    r.flag(250, 150, "$9.99", 240),
+                    r.popup(300, 150, "$9.99"),
+                    r.popup(350, 150, "$9.99", 'down')
+//                    r.drop(250, 150, "$10"),
+//                    r.blob(300, 150, "$9.99", 30, 60)
+                );
+            };
+        </script>
+    </head>
+    <body class="raphael">
+        <div id="holder"></div>
+    </body>
+</html>
