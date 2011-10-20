@@ -22,11 +22,13 @@ Raphael.fn.tag = function (x, y, text, angle, r) {
     return res.update();
 };
 Raphael.fn.popup = function (x, y, text, dir, size) {
-    dir = dir == null ? 2 : dir > 3 ? 3 : dir;
-    size = size || 5;
+    //TODO: perhaps center the text in the middle of the main box?
+    //if size and font-size dont' get along, it can look a little wierd
     var res = this.set(),
-        mmax = Math.max,
-        d = 3;
+        dirs = {down: 0, left: 1, up: 2, right: 3},
+        mmax = Math.max;
+    dir = dir == null ? 2 : typeof dirs[dir] != 'undefined' ? dirs[dir] : 2;
+    size = size || 5;
     res.push(this.path().attr({fill: "#000", stroke: "#000"}));
     res.push(this.text(x, y, text).attr({fill: "#fff", font: "12px Arial, sans-serif", "font-family": "Helvetica, Arial"}));
     res.update = function (X, Y, withAnimation) {
