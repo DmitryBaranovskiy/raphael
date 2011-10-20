@@ -57,3 +57,35 @@ Raphael.fn.popup = function (x, y, text, dir, size) {
     };
     return res.update(x, y);
 };
+Raphael.fn.flag = function (x, y, text, angle) {
+    angle = angle || 0;
+    text = text || "$9.99";
+    var res = this.set(),
+        d = 3;
+    res.push(this.path().attr({fill: "#000", stroke: "#000"}));
+    res.push(this.text(x, y, text).attr({fill: "#fff", font: "12px Arial, sans-serif", "font-family": "Helvetica, Arial"}));
+    res.update = function (x, y) {
+        this.rotate(0, x, y);
+        var bb = this[1].getBBox(),
+            h = bb.height / 2;
+        this[0].attr({path: ["M", x, y, "l", h + d, -h - d, bb.width + 2 * d, 0, 0, bb.height + 2 * d, -bb.width - 2 * d, 0, "z"].join(",")});
+        this[1].attr({x: x + h + d + bb.width / 2, y: y});
+        angle = 360 - angle;
+        this.rotate(angle, x, y);
+        angle > 90 && angle < 270 && this[1].attr({x: x - r - d - bb.width / 2, y: y, rotation: [180 + angle, x, y]});
+        return this;
+    };
+    return res.update(x, y);
+};
+Raphael.fn.label = function (x, y, text) {
+    var res = this.set();
+    res.push(this.rect(x, y, 10, 10).attr({stroke: "none", fill: "#000"}));
+    res.push(this.text(x, y, text).attr({fill: "#fff", font: "12px Arial, sans-serif"}));
+    res.update = function () {
+        var bb = this[1].getBBox(),
+            r = Math.min(bb.width + 10, bb.height + 10) / 2;
+        this[0].attr({x: bb.x - r / 2, y: bb.y - r / 2, width: bb.width + r, height: bb.height + r, r: r});
+        return this;
+    };
+    return res.update();
+};
