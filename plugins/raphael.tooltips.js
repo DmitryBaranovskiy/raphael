@@ -16,7 +16,9 @@ Raphael.fn.tag = function (x, y, text, angle, r) {
             this[0].attr({path: ["M", x, y + r, "c", -R, 0, -r, R - r, -r, -r, 0, -R, r - R, -r, r, -r, R, 0, r, r - R, r, r, 0, R, R - r, r, -r, r, "M", x + dx, y - bb.height / 2 - d, "a", r + d, r + d, 0, 1, 0, 0, bb.height + 2 * d, "l", r + d - dx + bb.width + 2 * d, 0, 0, -bb.height - 2 * d, "L", x + dx, y - bb.height / 2 - d].join(",")});
         }
         this[1].attr({x: x + r + d + bb.width / 2, y: y});
+        angle = 360 - angle;
         this.rotate(angle, x, y);
+        angle > 90 && angle < 270 && this[1].attr({x: x - r - d - bb.width / 2, y: y}).rotate(180, x, y);
         return this;
     };
     return res.update();
@@ -69,7 +71,7 @@ Raphael.fn.flag = function (x, y, text, angle) {
         this[1].attr({x: x + h + d + bb.width / 2, y: y});
         angle = 360 - angle;
         this.rotate(angle, x, y);
-        angle > 90 && angle < 270 && this[1].attr({x: x - r - d - bb.width / 2, y: y, rotation: [180 + angle, x, y]});
+        angle > 90 && angle < 270 && this[1].attr({x: x - h - d - bb.width / 2, y: y}).rotate(180, x, y);
         return this;
     };
     return res.update(x, y);
