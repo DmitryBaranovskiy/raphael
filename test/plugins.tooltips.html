@@ -10,16 +10,6 @@
                 var r = Raphael("holder"),
                     s = r.set();
 
-                (function (count) {
-                    var def = ["M30,150l", 50 * count, ",0"];
-
-                    for (var i = 1; i <= count; i++) {
-                        def.push("M", 50 * i, ",130l0,40");
-                    }
-
-                    r.path(def.join('')).attr({ stroke: '#c00', translation: [150.5, 100.5] });
-                })(7);
-
                 s.push(
                     r.tag(50, 150, "$9.99", 130),
                     r.tag(100, 150, "$9.99", 310),
@@ -27,10 +17,22 @@
                     r.flag(200, 150, "$9.99", 60),
                     r.flag(250, 150, "$9.99", 240),
                     r.popup(300, 150, "$9.99"),
-                    r.popup(350, 150, "$9.99", 'down')
-//                    r.drop(250, 150, "$10"),
-//                    r.blob(300, 150, "$9.99", 30, 60)
+                    r.popup(350, 150, "$9.99", 'down'),
+                    r.drop(400, 150, "$10", 40, 60),
+                    r.drop(450, 150, "$10"),
+                    r.blob(500, 150, "$9.99", 16, 60),
+                    r.blob(550, 150, "$9.99", null, 270)
                 );
+
+                (function (count) {
+                    var def = ["M30,150l", 50 * count, ",0"];
+
+                    for (var i = 1; i <= count; i++) {
+                        def.push("M", 50 * i, ",130l0,40");
+                    }
+
+                    r.path(def.join('')).attr({ stroke: '#c00', translation: [150.5, 100.5] }).insertBefore(s[0]);
+                })(s.length);
             };
         </script>
     </head>

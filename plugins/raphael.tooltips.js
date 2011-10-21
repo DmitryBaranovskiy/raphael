@@ -92,7 +92,7 @@ Raphael.fn.drop = function (x, y, text, size, angle) {
     size = size || 30;
     angle = angle || 0;
     var res = this.set();
-    res.push(this.path(["M", x, y, "l", size, 0, "A", size * .4, size * .4, 0, 1, 0, x + size * .7, y - size * .7, "z"]).attr({fill: "#000", stroke: "none", rotation: [22.5 - angle, x, y]}));
+    res.push(this.path(["M", x, y, "l", size, 0, "A", size * .4, size * .4, 0, 1, 0, x + size * .7, y - size * .7, "z"]).attr({fill: "#000", stroke: "none"}).rotate(22.5 - angle, x, y));
     angle = (angle + 90) * Math.PI / 180;
     res.push(this.text(x + size * Math.sin(angle), y + size * Math.cos(angle), text).attr({font: "12px Arial, sans-serif", "font-size": size * 12 / 30, fill: "#fff"}));
     res.drop = res[0];
