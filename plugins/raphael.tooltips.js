@@ -8,9 +8,9 @@ Raphael.el.popup = function (x, y, dir, size) {
 
     dir = dir == null ? 2 : typeof dirs[dir] != 'undefined' ? dirs[dir] : 2;
     size = size || 5;
-    x = Math.round(x);
-    y = Math.round(y);
     bb = this.getBBox(),
+    x = Math.round(x) || Math.round(bb.x);
+    y = Math.round(y) || Math.round(bb.y);
     w = Math.round(bb.width / 2),
     h = Math.round(bb.height / 2),
     dx = [0, w + size * 2, 0, -w - size * 2],
@@ -42,16 +42,22 @@ Raphael.el.popup = function (x, y, dir, size) {
 Raphael.el.tag = function (x, y, angle, r) {
     var d = 3,
         p = this.paper.path().attr({ fill: '#000', stroke: '#000' }),
-        bb, dx, R;
+        bb = this.getBBox(),
+        dx, R, center, tmp;
 
+    switch (this.type) {
+        case 'text':
+        case 'circle':
+        case 'ellipse': center = true; break;
+        default: center = false;
+    }
+
+    //circle, ellipse, text
     angle = angle || 0;
+    x = x || (center ? bb.x + bb.width / 2 : bb.x);
+    y = y || (center ? bb.y + bb.height / 2 : bb.y);
     r = r == null ? 5 : r;
-    R = .5522 * r,
-
-    this.rotate(0, x, y);
-    p.rotate(0, x, y);
-
-    bb = this.getBBox();
+    R = .5522 * r;
 
     if (bb.height >= r * 2) {
         p.attr({
@@ -79,11 +85,11 @@ Raphael.el.tag = function (x, y, angle, r) {
         });
     }
 
-    this.attr({ x: x + r + d + bb.width / 2, y: y });
+    this.attr(this.attrs.x ? 'x' : 'cx', x + r + d + (!center ? this.type == 'text' ? bb.width : 0 : bb.width / 2)).attr('y', center ? y : y - bb.height / 2);
     angle = 360 - angle;
     this.rotate(angle, x, y);
     p.rotate(angle, x, y);
-    angle > 90 && angle < 270 && this.attr({ x: x - r - d - bb.width / 2, y: y }).rotate(180, x, y);
+    angle > 90 && angle < 270 && this.attr(this.attrs.x ? 'x' : 'cx', x - r - d - (!center ? bb.width : bb.width / 2)).rotate(180, x, y);
 
     return p.insertBefore(this.node ? this : this[0]);
 };

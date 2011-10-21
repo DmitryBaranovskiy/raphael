@@ -7,8 +7,20 @@
         <script src="../plugins/raphael.tooltips.js" type="text/javascript"></script>
         <script type="text/javascript">
             window.onload = function () {
-                var r = Raphael("holder"),
-                    s = r.set();
+                var r = Raphael("holder", 2000, 2000),
+                    s = r.set(),
+                    t = r.set();
+
+                function ref(count, y) {
+                    var def = ["M30,", y, "l", 50 * count, ",0"],
+                        end = "," + (y - 20) + "l0,40";
+
+                    for (var i = 1; i <= count; i++) {
+                        def.push("M", 50 * i, end);
+                    }
+
+                    r.path(def.join('')).attr({ stroke: '#c00', translation: [150.5, 100.5] }).insertBefore(s[0]);
+                }
 
                 s.push(
                     r.tag(50, 150, "$9.99", 130),
@@ -22,20 +34,22 @@
                     r.drop(450, 150, "$10"),
                     r.blob(500, 150, "$9.99", 16, 60),
                     r.blob(550, 150, "$9.99", null, 270),
-                    r.circle(600, 150, 15).attr({fill:'#ff0000'}).label(),
-                    r.circle(650, 150, 15).attr({fill:'#ff0000'}).popup(650, 150),
-                    r.circle(700, 150, 15).attr({fill:'#ff0000'}).popup(700, 150, 'down')
+                    r.circle(600, 150, 10).attr({fill:'#ff0000'}).label(),
+                    r.circle(650, 150, 10).attr({fill:'#ff0000'}).popup(), //can be used without x,y args
+                    r.circle(700, 150, 10).attr({fill:'#ff0000'}).popup(700, 150, 'down'),
+                    r.circle(800, 150, 10).attr({fill:'#ff0000'}).tag(750, 150, 130),
+                    r.circle(800, 150, 10).attr({fill:'#ff0000'}).tag()
                 );
 
-                (function (count) {
-                    var def = ["M30,150l", 50 * count, ",0"];
+                ref(s.length, 150);
 
-                    for (var i = 1; i <= count; i++) {
-                        def.push("M", 50 * i, ",130l0,40");
-                    }
+                for (var i = 0; i < 30; i++) {
+                    //t.push(r.text(800, 350, "$9.99").attr({fill:'#ff0000'}).tag(50 * (i + 1), 350, 360 / 30 * i));
+                    //t.push(r.circle(800, 350, 10).attr({fill:'90-#fff-#000'}).tag(50 * (i + 1), 350, 360 / 30 * i));
+                    t.push(r.rect(800, 350, 20, 20).attr({fill:'90-#ff0000-#0000ff'}).tag(50 * (i + 1), 350, 360 / 30 * i));
+                }
 
-                    r.path(def.join('')).attr({ stroke: '#c00', translation: [150.5, 100.5] }).insertBefore(s[0]);
-                })(s.length);
+                ref(t.length, 350);
             };
         </script>
     </head>
