@@ -1,3 +1,70 @@
+/*
+ * Tooltips on Element prototype
+ */
+Raphael.el.popup = function (x, y, dir, size) {
+    var dirs = { down: 0, left: 1, up: 2, right: 3 },
+        mmax = Math.max,
+        bb, w, h, dx, dy, p, xy;
+
+    dir = dir == null ? 2 : typeof dirs[dir] != 'undefined' ? dirs[dir] : 2;
+    size = size || 5;
+    x = Math.round(x);
+    y = Math.round(y);
+    bb = this.getBBox(),
+    w = Math.round(bb.width / 2),
+    h = Math.round(bb.height / 2),
+    dx = [0, w + size * 2, 0, -w - size * 2],
+    dy = [-h * 2 - size * 3, -h - size, 0, -h - size],
+    p = [
+        "M", x - dx[dir], y - dy[dir],
+        "l", -size, (dir == 2) * -size, -mmax(w - size, 0), 0,
+        "a", size, size, 0, 0, 1, -size, -size,
+        "l", 0, -mmax(h - size, 0), (dir == 3) * -size, -size, (dir == 3) * size, -size, 0, -mmax(h - size, 0),
+        "a", size, size, 0, 0, 1, size, -size,
+        "l", mmax(w - size, 0), 0, size, !dir * -size, size, !dir * size, mmax(w - size, 0), 0,
+        "a", size, size, 0, 0, 1, size, size,
+        "l", 0, mmax(h - size, 0), (dir == 1) * size, size, (dir == 1) * -size, size, 0, mmax(h - size, 0),
+        "a", size, size, 0, 0, 1, -size, size,
+        "l", -mmax(w - size, 0), 0,
+        "z"
+    ].join(","),
+    xy = [
+        { x: x, y: y + size * 2 + h },
+        { x: x - size * 2 - w, y: y },
+        { x: x, y: y - size * 2 - h },
+        { x: x + size * 2 + w, y: y }
+    ][dir];
+
+    this.translate(xy.x - w - bb.x, xy.y - h - bb.y);
+    return this.paper.path(p).attr({ fill: "#000", stroke: "none" }).insertBefore(this.node ? this : this[0]);
+};
+
+Raphael.el.label = function () {
+    var bb = this.getBBox(),
+        r = Math.min(20, bb.width + 10, bb.height + 10) / 2;
+
+    return this.paper.rect(bb.x - r / 2, bb.y - r / 2, bb.width + r, bb.height + r, r).attr({ stroke: 'none', fill: '#000' }).insertBefore(this.node ? this : this[0]);
+};
+
+/*
+ * Tooltips on Paper prototype
+ */
+//label alias on the paper instance to create an easy text label
+Raphael.fn.label = function (x, y, text) {
+    var set = this.set();
+
+    text = this.text(x, y, text).attr({ fill: '#fff', font: '12px Arial, sans-serif' });
+    return set.push(text.label(), text);
+};
+
+//Popup alias on the paper instance to create an easy text popup
+Raphael.fn.popup = function (x, y, text, dir, size) {
+    var set = this.set();
+
+    text = this.text(x, y, text).attr({ fill: '#fff', font: '12px Arial, sans-serif', 'font-family': 'Helvetica, Arial' });
+    return set.push(text.popup(x, y, dir, size), text);
+};
+
 Raphael.fn.tag = function (x, y, text, angle, r) {
     angle = angle || 0;
     r = r == null ? 5 : r;
@@ -23,40 +90,7 @@ Raphael.fn.tag = function (x, y, text, angle, r) {
     };
     return res.update();
 };
-Raphael.fn.popup = function (x, y, text, dir, size) {
-    //TODO: perhaps center the text in the middle of the main box?
-    //if size and font-size dont' get along, it can look a little wierd
-    var res = this.set(),
-        dirs = {down: 0, left: 1, up: 2, right: 3},
-        mmax = Math.max;
-    dir = dir == null ? 2 : typeof dirs[dir] != 'undefined' ? dirs[dir] : 2;
-    size = size || 5;
-    res.push(this.path().attr({fill: "#000", stroke: "#000"}));
-    res.push(this.text(x, y, text).attr({fill: "#fff", font: "12px Arial, sans-serif", "font-family": "Helvetica, Arial"}));
-    res.update = function (X, Y, withAnimation) {
-        X = X || x;
-        Y = Y || y;
-        var bb = this[1].getBBox(),
-            w = bb.width / 2,
-            h = bb.height / 2,
-            dx = [0, w + size * 2, 0, -w - size * 2],
-            dy = [-h * 2 - size * 3, -h - size, 0, -h - size],
-            p = ["M", X - dx[dir], Y - dy[dir], "l", -size, (dir == 2) * -size, -mmax(w - size, 0), 0, "a", size, size, 0, 0, 1, -size, -size,
-                "l", 0, -mmax(h - size, 0), (dir == 3) * -size, -size, (dir == 3) * size, -size, 0, -mmax(h - size, 0), "a", size, size, 0, 0, 1, size, -size,
-                "l", mmax(w - size, 0), 0, size, !dir * -size, size, !dir * size, mmax(w - size, 0), 0, "a", size, size, 0, 0, 1, size, size,
-                "l", 0, mmax(h - size, 0), (dir == 1) * size, size, (dir == 1) * -size, size, 0, mmax(h - size, 0), "a", size, size, 0, 0, 1, -size, size,
-                "l", -mmax(w - size, 0), 0, "z"].join(","),
-            xy = [{x: X, y: Y + size * 2 + h}, {x: X - size * 2 - w, y: Y}, {x: X, y: Y - size * 2 - h}, {x: X + size * 2 + w, y: Y}][dir];
-        xy.path = p;
-        if (withAnimation) {
-            this.animate(xy, 500, ">");
-        } else {
-            this.attr(xy);
-        }
-        return this;
-    };
-    return res.update(x, y);
-};
+
 Raphael.fn.flag = function (x, y, text, angle) {
     angle = angle || 0;
     var res = this.set(),
@@ -75,18 +109,6 @@ Raphael.fn.flag = function (x, y, text, angle) {
         return this;
     };
     return res.update(x, y);
-};
-Raphael.fn.label = function (x, y, text) {
-    var res = this.set();
-    res.push(this.rect(x, y, 10, 10).attr({stroke: "none", fill: "#000"}));
-    res.push(this.text(x, y, text).attr({fill: "#fff", font: "12px Arial, sans-serif"}));
-    res.update = function () {
-        var bb = this[1].getBBox(),
-            r = Math.min(bb.width + 10, bb.height + 10) / 2;
-        this[0].attr({x: bb.x - r / 2, y: bb.y - r / 2, width: bb.width + r, height: bb.height + r, r: r});
-        return this;
-    };
-    return res.update();
 };
 Raphael.fn.drop = function (x, y, text, size, angle) {
     size = size || 30;
