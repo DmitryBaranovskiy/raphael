@@ -154,6 +154,7 @@ Raphael.fn.popup = function (x, y, text, dir, size) {
     return set.push(text.popup(x, y, dir, size), text);
 };
 
+//tag alias on the paper instance to create an easy text tag
 Raphael.fn.tag = function (x, y, text, angle, r) {
     var set = this.set();
 
@@ -161,6 +162,7 @@ Raphael.fn.tag = function (x, y, text, angle, r) {
     return set.push(text.tag(x, y, angle, r), text);
 };
 
+//flag alias on the paper instance to create an easy text flag
 Raphael.fn.flag = function (x, y, text, angle) {
     var set = this.set();
 
@@ -168,7 +170,7 @@ Raphael.fn.flag = function (x, y, text, angle) {
     return set.push(text.flag(x, y, angle), text);
 };
 
-
+//drop tooltip. can only be done with text at the moment, just like old graphel
 Raphael.fn.drop = function (x, y, text, size, angle) {
     size = size || 30;
     angle = angle || 0;
@@ -180,6 +182,8 @@ Raphael.fn.drop = function (x, y, text, size, angle) {
     res.text = res[1];
     return res;
 };
+
+//blob tooltip. can only be done with text at the moment, just like old graphael
 Raphael.fn.blob = function (x, y, text, size, angle) {
     angle = (+angle + 1 ? angle : 45) + 90;
     size = size || 12;
