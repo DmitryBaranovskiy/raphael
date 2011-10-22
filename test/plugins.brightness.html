@@ -1,0 +1,26 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+    <head>
+        <title>Raphael Tooltips</title>
+        <script src="../raphael.js" type="text/javascript"></script>
+        <script src="../plugins/raphael.brightness.js" type="text/javascript"></script>
+        <style type="text/css">
+            body {
+                background-color: #222;
+            }
+        </style>
+        <script type="text/javascript">
+            window.onload = function () {
+                var r = Raphael("holder", 1200, 400);
+
+                r.circle(200, 200, 150).attr({ fill: '#ff0000' }).lighter(6);
+                r.circle(550, 200, 150).attr({ fill: '#ff0000' });
+                r.circle(900, 200, 150).attr({ fill: '#ff0000' }).darker(6);
+            };
+        </script>
+    </head>
+    <body class="raphael">
+        <div id="holder"></div>
+    </body>
+</html>
