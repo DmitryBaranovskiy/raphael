@@ -15,7 +15,7 @@
                 var r = Raphael("holder", 1200, 400);
 
                 r.circle(200, 200, 150).attr({ fill: '#ff0000' }).lighter(6);
-                r.circle(550, 200, 150).attr({ fill: '#ff0000' });
+                r.circle(550, 200, 150).attr({ fill: '#ff0000' }).lighter(6).resetBrightness();
                 r.circle(900, 200, 150).attr({ fill: '#ff0000' }).darker(6);
             };
         </script>

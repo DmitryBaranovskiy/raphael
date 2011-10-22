@@ -13,6 +13,7 @@ Raphael.el.lighter = function (times) {
     fs[1].s = fs[1].s / times;
 
     this.attr({fill: "hsb(" + [fs[0].h, fs[0].s, fs[0].b] + ")", stroke: "hsb(" + [fs[1].h, fs[1].s, fs[1].b] + ")"});
+    return this;
 };
 
 Raphael.el.darker = function (times) {
@@ -30,11 +31,13 @@ Raphael.el.darker = function (times) {
     fs[1].b = fs[1].b / times;
 
     this.attr({fill: "hsb(" + [fs[0].h, fs[0].s, fs[0].b] + ")", stroke: "hsb(" + [fs[1].h, fs[1].s, fs[1].b] + ")"});
+    return this;
 };
 
-Raphael.el.original = function () {
+Raphael.el.resetBrightness = function () {
     if (this.fs) {
         this.attr({ fill: this.fs[0], stroke: this.fs[1] });
         delete this.fs;
     }
+    return this;
 };
