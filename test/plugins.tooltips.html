@@ -49,7 +49,13 @@
                 u.push(
                     r.circle(100, 850, 10).attr({fill: '#00ff00'}),
                     r.circle(110, 800, 10).attr({fill: '#0000ff'})
-                ).popup();
+                ).tag(null, null, 130);
+
+                var a = r.set();
+                a.push(
+                    r.circle(200, 850, 10).attr({fill: '#00ff00'}),
+                    r.circle(210, 800, 10).attr({fill: '#0000ff'})
+                ).tag(null, null, 30);
 
                 ref(s.length, 150);
 
