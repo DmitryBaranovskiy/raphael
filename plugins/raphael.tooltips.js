@@ -170,17 +170,41 @@ Raphael.fn.flag = function (x, y, text, angle) {
     return set.push(text.flag(x, y, angle), text);
 };
 
+Raphael.fn.drop = function (x, y, text, angle) {
+    var set = this.set();
+
+    text = this.text(x, y, text).attr({ fill: '#fff', font: '12px Arial, sans-serif', 'font-family': 'Helvetica, Arial' });
+    return set.push(text.drop(x, y, angle), text);
+};
+
 //drop tooltip. can only be done with text at the moment, just like old graphel
-Raphael.fn.drop = function (x, y, text, size, angle) {
-    size = size || 30;
+Raphael.el.drop = function (x, y, angle) {
+    var bb = this.getBBox(),
+        center, size, p;
+
+    switch (this.type) {
+        case 'text':
+        case 'circle':
+        case 'ellipse': center = true; break;
+        default: center = false;
+    }
+
     angle = angle || 0;
-    var res = this.set();
-    res.push(this.path(["M", x, y, "l", size, 0, "A", size * .4, size * .4, 0, 1, 0, x + size * .7, y - size * .7, "z"]).attr({fill: "#000", stroke: "none"}).rotate(22.5 - angle, x, y));
+
+    x = x || bb.x;
+    y = y || bb.y;
+    size = Math.max(bb.width, bb.height) + Math.min(bb.width, bb.height),
+    p = this.paper.path([
+        "M", x, y,
+        "l", size, 0,
+        "A", size * .4, size * .4, 0, 1, 0, x + size * .7, y - size * .7,
+        "z"
+    ]).attr({fill: "#000", stroke: "none"}).rotate(22.5 - angle, x, y);
+
     angle = (angle + 90) * Math.PI / 180;
-    res.push(this.text(x + size * Math.sin(angle), y + size * Math.cos(angle), text).attr({font: "12px Arial, sans-serif", "font-size": size * 12 / 30, fill: "#fff"}));
-    res.drop = res[0];
-    res.text = res[1];
-    return res;
+    this.attr({ x: (x + size * Math.sin(angle)) - (center ? 0 : bb.width / 2), y: (y + size * Math.cos(angle)) - (center ? 0 : bb.height / 2) });
+
+    return p.insertBefore(this.node ? this : this[0]);
 };
 
 //blob tooltip. can only be done with text at the moment, just like old graphael
