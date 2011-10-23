@@ -104,7 +104,7 @@ Raphael.el.tag = function (x, y, angle, r) {
     }
 
     //sets
-    !this.attrs && this.translate((x + r + d + (this.type == 'text' ? bb.width : 0) - bb.x), (y - bb.height / 2) - bb.y);
+    !this.attrs && this.translate((x + r + d - bb.x), (y - bb.height / 2) - bb.y);
 
     return p.insertBefore(this.node ? this : this[0]);
 };
@@ -171,11 +171,19 @@ Raphael.el.flag = function (x, y, angle) {
         ].join(",")
     });
 
-    this.attr(this.attrs.x ? 'x' : 'cx', x + h + d + (!center ? this.type == 'text' ? bb.width : 0 : bb.width / 2)).attr('y', center ? y : y - bb.height / 2);
+    //non sets
+    this.attrs && this.attr(this.attrs.x ? 'x' : 'cx', x + h + d + (!center ? this.type == 'text' ? bb.width : 0 : bb.width / 2)).attr('y', center ? y : y - bb.height / 2);
+
     angle = 360 - angle;
     this.rotate(angle, x, y);
     p.rotate(angle, x, y);
-    angle > 90 && angle < 270 && this.attr(this.attrs.x ? 'x' : 'cx', x - h - d - (!center ? bb.width : bb.width / 2)).rotate(180, x, y);
+
+    if (angle > 90 && angle < 270) {
+        this.attrs && this.attr(this.attrs.x ? 'x' : 'cx', x - h - d - (!center ? bb.width : bb.width / 2)).rotate(180, x, y);
+        !this.attrs && this.rotate(180, x, y).translate(x - (2 * h) - (2 * d) - bb.width - bb.x, 0)
+    }
+
+    !this.attrs && this.translate(x + h + d - bb.x, (y - bb.height / 2) - bb.y);
 
     return p.insertBefore(this.node ? this : this[0]);
 };
