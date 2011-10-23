@@ -9,7 +9,9 @@
             window.onload = function () {
                 var r = Raphael("holder", 2000, 2000),
                     s = r.set(),
-                    t = r.set();
+                    t = r.set(),
+                    u = r.set(),
+                    v = r.set();
 
                 function ref(count, y) {
                     var def = ["M30,", y, "l", 50 * count, ",0"],
@@ -32,14 +34,22 @@
                     r.popup(350, 150, "$9.99", 'right'),
                     r.drop(400, 150, "$10", 60),
                     r.rect(450, 150, 15, 15).attr({fill:'90-#fff-#000'}).drop(),
-                    r.blob(500, 150, "$9.99", 16, 60),
-                    r.blob(550, 150, "$9.99", null, 270),
+                    r.blob(500, 150, "$9.99", 60),
+                    r.blob(550, 150, "$9.99", 270),
                     r.circle(600, 150, 10).attr({fill:'#ff0000'}).label(),
                     r.circle(650, 150, 10).attr({fill:'#ff0000'}).popup(), //can be used without x,y args
                     r.circle(700, 150, 10).attr({fill:'#ff0000'}).popup(700, 150, 'down'),
                     r.circle(800, 150, 10).attr({fill:'#ff0000'}).tag(750, 150, 130),
-                    r.circle(800, 150, 10).attr({fill:'#ff0000'}).tag()
+                    r.circle(800, 150, 10).attr({fill:'#ff0000'}).tag(),
+                    r.circle(900, 150, 10).attr({fill:'#ff0000'}).blob(),
+                    r.circle(800, 150, 10).attr({fill:'#ff0000'}).blob(850, 150, 270)
                 );
+
+                //test on sets
+                u.push(
+                    r.circle(100, 850, 10).attr({fill: '#00ff00'}),
+                    r.circle(110, 800, 10).attr({fill: '#0000ff'})
+                ).popup();
 
                 ref(s.length, 150);
 
@@ -50,6 +60,16 @@
                 }
 
                 ref(t.length, 350);
+
+                var v = r.set();
+
+                for (var i = 0; i < 30; i++) {
+                    //v.push(r.circle(0, 0, 10).attr({fill:'90-#fff-#000'}).blob(50 * (i + 1), 550, 360 / 30 * i));
+                    v.push(r.rect(0, 0, 20, 20).attr({fill:'90-#fff-#000'}).blob(50 * (i + 1), 550, 360 / 30 * i));
+                    //v.push(r.text(0, 0, 'Hello').attr({fill:'90-#fff-#000'}).blob(50 * (i + 1), 550, 360 / 30 * i));
+                }
+
+                ref(v.length, 550);
             };
         </script>
     </head>
