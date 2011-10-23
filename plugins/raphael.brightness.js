@@ -41,3 +41,20 @@ Raphael.el.resetBrightness = function () {
     }
     return this;
 };
+
+//alias to set prototype
+(function () {
+    var funcs = ['lighter', 'darker', 'resetBrightness'];
+
+    for (var f in funcs) (function (name) {
+        Raphael.st[name] = function () {
+            var args = arguments;
+
+            for (var i = 0; i < this.length; i++) {
+                this[i][name].apply(this[i], args);
+            }
+
+            return this;
+        };
+    })(funcs[f]);
+})();
