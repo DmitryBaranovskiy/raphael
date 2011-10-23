@@ -112,7 +112,7 @@ Raphael.el.tag = function (x, y, angle, r) {
 Raphael.el.drop = function (x, y, angle) {
     var bb = this.getBBox(),
         paper = this.paper || this[0].paper,
-        center, size, p;
+        center, size, p, dx, dy;
 
     if (!paper) return;
 
@@ -136,7 +136,12 @@ Raphael.el.drop = function (x, y, angle) {
     ]).attr({fill: "#000", stroke: "none"}).rotate(22.5 - angle, x, y);
 
     angle = (angle + 90) * Math.PI / 180;
-    this.attr({ x: (x + size * Math.sin(angle)) - (center ? 0 : bb.width / 2), y: (y + size * Math.cos(angle)) - (center ? 0 : bb.height / 2) });
+    dx = (x + size * Math.sin(angle)) - (center ? 0 : bb.width / 2);
+    dy = (y + size * Math.cos(angle)) - (center ? 0 : bb.height / 2);
+
+    this.attrs ?
+        this.attr(this.attrs.x ? 'x' : 'cx', dx).attr(this.attrs.y ? 'y' : 'cy', dy) :
+        this.translate(dx - bb.x, dy - bb.y);
 
     return p.insertBefore(this.node ? this : this[0]);
 };

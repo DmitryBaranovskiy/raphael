@@ -45,27 +45,28 @@
                     r.circle(800, 150, 10).attr({fill:'#ff0000'}).blob(850, 150, 270)
                 );
 
+                for (var i = 0; i < 30; i++) {
+                    //t.push(r.text(800, 350, "$9.99").attr({fill:'#ff0000'}).tag(50 * (i + 1), 350, 360 / 30 * i));
+                    //t.push(r.circle(800, 350, 10).attr({fill:'90-#fff-#000'}).drop(50 * (i + 1), 350, 360 / 30 * i));
+                    t.push(r.rect(800, 350, 20, 20).attr({fill:'90-#ff0000-#0000ff'}).drop(50 * (i + 1), 350, 360 / 30 * i));
+                }
+
+                ref(t.length, 350);
+
                 //test on sets
                 u.push(
                     r.circle(100, 850, 10).attr({fill: '#00ff00'}),
                     r.circle(110, 800, 10).attr({fill: '#0000ff'})
-                ).flag(null, null, 130);
+                ).drop(null, null, 130);
 
                 var a = r.set();
                 a.push(
                     r.circle(200, 850, 10).attr({fill: '#00ff00'}),
                     r.circle(210, 800, 10).attr({fill: '#0000ff'})
-                ).flag(null, null, 30);
+                ).drop(null, null, 30);
 
                 ref(s.length, 150);
 
-                for (var i = 0; i < 30; i++) {
-                    //t.push(r.text(800, 350, "$9.99").attr({fill:'#ff0000'}).tag(50 * (i + 1), 350, 360 / 30 * i));
-                    t.push(r.circle(800, 350, 10).attr({fill:'90-#fff-#000'}).tag(50 * (i + 1), 350, 360 / 30 * i));
-                    //t.push(r.rect(800, 350, 20, 20).attr({fill:'90-#ff0000-#0000ff'}).flag(50 * (i + 1), 350, 360 / 30 * i));
-                }
-
-                ref(t.length, 350);
 
                 var v = r.set();
 
