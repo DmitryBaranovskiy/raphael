@@ -260,6 +260,9 @@
         pipe = function (x) {
             return x;
         },
+        linePath = R._linePath = function (x1, y1, x2, y2) {
+            return [["M", x1, y1], ["l", x2 - x1, y2 - y1], ["z"]];
+        },
         rectPath = R._rectPath = function (x, y, w, h, r) {
             if (r) {
                 return [["M", x + r, y], ["l", w - r * 2, 0], ["a", r, r, 0, 0, 1, r, r], ["l", 0, h - r * 2], ["a", r, r, 0, 0, 1, -r, r], ["l", r * 2 - w, 0], ["a", r, r, 0, 0, 1, -r, -r], ["l", 0, r * 2 - h], ["a", r, r, 0, 0, 1, r, -r], ["z"]];
