@@ -1131,6 +1131,15 @@ window.Raphael.svg && function (R) {
             t.node.removeAttribute("filter");
         }
     };
+    R._engine.line = function (svg, x1, y1, x2, y2) {
+        var el = $("line");
+        svg.canvas && svg.canvas.appendChild(el);
+        var res = new Element(el, svg);
+        res.attrs = {x1: x1, y1: y1, x2: x2, y2: y2, stroke: "#000"};
+        res.type = "line";
+        $(el, res.attrs);
+        return res;
+    };
     R._engine.circle = function (svg, x, y, r) {
         var el = $("circle");
         svg.canvas && svg.canvas.appendChild(el);
