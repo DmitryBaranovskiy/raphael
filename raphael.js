@@ -3082,6 +3082,11 @@
         return this.items.pop();
     };
     
+    setproto.shuffle = function () {
+        for(var j, x, i = this.items.length; i; j = parseInt(Math.random() * i), x = this.items[--i], this.items[i] = this.items[j], this.items[j] = x);
+        return this;
+    };
+    
     setproto.forEach = function (callback, thisArg) {
         for (var i = 0, ii = this.items.length; i < ii; i++) {
             if (callback.call(thisArg, this.items[i], i) === false) {
