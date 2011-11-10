@@ -322,6 +322,7 @@
             "font-size": "10",
             "font-style": "normal",
             "font-weight": 400,
+			"letter-spacing": 0,
             gradient: 0,
             height: 0,
             href: "http://raphaeljs.com/",
