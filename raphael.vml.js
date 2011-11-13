@@ -116,7 +116,7 @@ window.Raphael.vml && function (R) {
     R.toString = function () {
         return  "Your browser doesn\u2019t support SVG. Falling down to VML.\nYou are running Rapha\xebl " + this.version;
     };
-    addArrow = function (o, value, isEnd) {
+    var addArrow = function (o, value, isEnd) {
         var values = Str(value).toLowerCase().split("-"),
             se = isEnd ? "end" : "start",
             i = values.length,
@@ -143,7 +143,7 @@ window.Raphael.vml && function (R) {
         stroke[se + "arrow"] = type;
         stroke[se + "arrowlength"] = w;
         stroke[se + "arrowwidth"] = h;
-    };
+    },
     setFillAndStroke = function (o, params) {
         // o.paper.canvas.style.display = "none";
         o.attrs = o.attrs || {};
@@ -366,7 +366,7 @@ window.Raphael.vml && function (R) {
             res.textpath.style["v-text-kern"] = true;
         }
         // res.paper.canvas.style.display = E;
-    };
+    },
     addGradientFill = function (o, gradient, fill) {
         o.attrs = o.attrs || {};
         var attrs = o.attrs,
@@ -424,7 +424,7 @@ window.Raphael.vml && function (R) {
             o.appendChild(fill);
         }
         return 1;
-    };
+    },
     Element = function (node, vml) {
         this[0] = this.node = node;
         node.raphael = true;
@@ -856,7 +856,7 @@ window.Raphael.vml && function (R) {
         cs.height = height;
         cs.clip = "rect(0 " + width + " " + height + " 0)";
         if (this._viewBox) {
-            setViewBox.apply(this, this._viewBox);
+            this.setViewBox.apply(this, this._viewBox);
         }
         return this;
     };

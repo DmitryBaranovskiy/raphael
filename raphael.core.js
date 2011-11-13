@@ -293,7 +293,7 @@
             if (!matrix) {
                 return path;
             }
-            var x, y, i, j, pathi;
+            var x, y, i, ii, j, jj, pathi;
             path = path2curve(path);
             for (i = 0, ii = path.length; i < ii; i++) {
                 pathi = path[i];
@@ -3615,7 +3615,7 @@
      = (object) original element
     \*/
     elproto.animateWith = function (element, anim, params, ms, easing, callback) {
-        var a = params ? R.animation(params, ms, easing, callback) : anim;
+        var a = params ? R.animation(params, ms, easing, callback) : anim,
             status = element.status(anim);
         return this.animate(a).status(a, status * anim.ms / a.ms);
     };
@@ -3776,7 +3776,7 @@
             return;
         }
         if (!isInAnim) {
-            for (attr in params) if (params[has](attr)) {
+            for (var attr in params) if (params[has](attr)) {
                 if (availableAnimAttrs[has](attr) || element.paper.customAttributes[has](attr)) {
                     from[attr] = element.attr(attr);
                     (from[attr] == null) && (from[attr] = availableAttrs[attr]);
