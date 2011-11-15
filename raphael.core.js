@@ -4524,7 +4524,7 @@
      |     width = 40,
      |     height = 50;
      | // this will draw a rectangular shape equivalent to "M10,20h40v50h-40z"
-     | paper.path(Raphael.format("M{1},{2}h{3}v{4}h{5}z", x, y, width, height, -width));
+     | paper.path(Raphael.format("M{0},{1}h{2}v{3}h{4}z", x, y, width, height, -width));
     \*/
     R.format = function (token, params) {
         var args = R.is(params, array) ? [0][concat](params) : arguments;
