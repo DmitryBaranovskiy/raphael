@@ -106,30 +106,35 @@ window.Raphael.svg && function (R) {
             if (!dots) {
                 return null;
             }
-            if (element.gradient) {
+
+            id = id.replace(/[\(\)\s,\xb0#]/g, "-");
+
+            if (element.gradient && id !== element.gradient.id) {
                 SVG.defs.removeChild(element.gradient);
                 delete element.gradient;
             }
-
-            id = id.replace(/[\(\)\s,\xb0#]/g, "-");
-            el = $(type + "Gradient", {id: id});
-            element.gradient = el;
-            $(el, type == "radial" ? {
-                fx: fx,
-                fy: fy
-            } : {
-                x1: vector[0],
-                y1: vector[1],
-                x2: vector[2],
-                y2: vector[3],
-                gradientTransform: element.matrix.invert()
-            });
-            SVG.defs.appendChild(el);
-            for (var i = 0, ii = dots.length; i < ii; i++) {
-                el.appendChild($("stop", {
-                    offset: dots[i].offset ? dots[i].offset : i ? "100%" : "0%",
-                    "stop-color": dots[i].color || "#fff"
-                }));
+            
+            if(!element.gradient)
+            {
+                el = $(type + "Gradient", {id: id});
+                element.gradient = el;
+                $(el, type == "radial" ? {
+                    fx: fx,
+                    fy: fy
+                } : {
+                    x1: vector[0],
+                    y1: vector[1],
+                    x2: vector[2],
+                    y2: vector[3],
+                    gradientTransform: element.matrix.invert()
+                });
+                SVG.defs.appendChild(el);
+                for (var i = 0, ii = dots.length; i < ii; i++) {
+                    el.appendChild($("stop", {
+                        offset: dots[i].offset ? dots[i].offset : i ? "100%" : "0%",
+                        "stop-color": dots[i].color || "#fff"
+                    }));
+                }
             }
         }
         $(o, {
@@ -876,6 +881,8 @@ window.Raphael.svg && function (R) {
         this.paper.__set__ && this.paper.__set__.exclude(this);
         eve.unbind("*.*." + this.id);
         R._tear(this, this.paper);
+        if(this.gradient)
+            removeGradientFill(this.node,this.paper);
         this.node.parentNode.removeChild(this.node);
         for (var i in this) {
             delete this[i];
