@@ -144,7 +144,7 @@
             this.docup && this.docup();
             this.winunload();
         }, t);
-        
+
         t.color(initcolor || "#f00");
         this.onchanged && this.onchanged(this.color());
     };

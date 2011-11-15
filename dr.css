@@ -370,9 +370,9 @@ p {
     width: 7px;
     height: 9px;
 }
-.dr-doc::-webkit-scrollbar-button:start:decrement, 
+.dr-doc::-webkit-scrollbar-button:start:decrement,
 .dr-doc::-webkit-scrollbar-button:end:increment,
-.dr-toc::-webkit-scrollbar-button:start:decrement, 
+.dr-toc::-webkit-scrollbar-button:start:decrement,
 .dr-toc::-webkit-scrollbar-button:end:increment {
     display: block;
     height: 0;

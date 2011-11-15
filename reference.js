@@ -1,5 +1,5 @@
 Raphael(function () {
-    
+
     // TOC
     (function (ol) {
         if (!ol) {
@@ -75,13 +75,13 @@ Raphael(function () {
             }
         };
     })(document.getElementById("dr-toc"));
-    
+
     function prepare(id) {
         var div = document.getElementById(id);
         div.style.cssText = "float:right;padding:10px;width:99px;height:99px;background:#2C53B0 url(http://raphaeljs.com/blueprint-min.png) no-repeat";
         return Raphael(div, 99, 99);
     }
-    
+
     var line = {
             stroke: "#fff",
             "stroke-width": 2,
@@ -108,7 +108,7 @@ Raphael(function () {
             opacity: 0
         };
     prepare("Paper.path-extra").path("M10,10R90,50 10,90").attr(line);
-    
+
     (function (r) {
         var there;
         r.circle(15, 15, 10).attr(fill).click(function () {
@@ -141,7 +141,7 @@ Raphael(function () {
             x = this.attr("cx");
             y = this.attr("cy");
         });
-        
+
     })(prepare("Element.drag-extra"));
 
     (function (r) {

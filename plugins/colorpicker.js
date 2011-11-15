@@ -5,7 +5,7 @@
  * Based on Color Wheel (http://jweir.github.com/colorwheel) by John Weir (http://famedriver.com)
  * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
  */
- 
+
  /*
   * Usage
   * var cp = Raphael.colorpicker(x, y, size, "#fff"); // #fff is optional init color
@@ -137,7 +137,7 @@
             style.unselectable = "on";
             style.MozUserSelect =  "none";
             style.WebkitUserSelect= "none";
-        
+
             t.bwidth = ~~(h / fi) / 2;
             t.minx = padding + t.bwidth;
             t.maxx = size - h / fi - padding + t.bwidth;

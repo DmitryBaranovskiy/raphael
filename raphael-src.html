@@ -390,7 +390,7 @@
 </code><code id="L388"><span class="ln">388</span>        }
 </code><code id="L389"><span class="ln">389</span>        <b>return</b> value;
 </code><code id="L390"><span class="ln">390</span>    };
-</code><code id="L391"><span class="ln">391</span>    
+</code><code id="L391"><span class="ln">391</span>
 </code><code id="L392"><span class="ln">392</span>    <b>var</b> createUUID<span class="s"> = </span>(<b>function</b> (uuidRegEx, uuidReplacer) {
 </code><code id="L393"><span class="ln">393</span>        <b>return</b> <b>function</b> () {
 </code><code id="L394"><span class="ln">394</span>            <b>return</b> <i>"xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx"</i>.replace(uuidRegEx, uuidReplacer).toUpperCase();
@@ -480,7 +480,7 @@
 </code><code id="L478"><span class="ln">478</span>            g /= <span class="d">255</span>;
 </code><code id="L479"><span class="ln">479</span>            b /= <span class="d">255</span>;
 </code><code id="L480"><span class="ln">480</span>        }
-</code><code id="L481"><span class="ln">481</span>        
+</code><code id="L481"><span class="ln">481</span>
 </code><code id="L482"><span class="ln">482</span>        <b>return</b> [r, g, b];
 </code><code id="L483"><span class="ln">483</span>    },
 </code><code id="L484"><span class="ln">484</span>    packageRGB<span class="s"> = </span><b>function</b> (r, g, b, o) {
@@ -987,7 +987,7 @@
 </code><code id="L985"><span class="ln">985</span>            <b>return</b> {x: <span class="d">0</span>, y: <span class="d">0</span>, width: <span class="d">0</span>, height: <span class="d">0</span>};
 </code><code id="L986"><span class="ln">986</span>        }
 </code><code id="L987"><span class="ln">987</span>        path<span class="s"> = </span>path2curve(path);
-</code><code id="L988"><span class="ln">988</span>        <b>var</b> x<span class="s"> = </span><span class="d">0</span>, 
+</code><code id="L988"><span class="ln">988</span>        <b>var</b> x<span class="s"> = </span><span class="d">0</span>,
 </code><code id="L989"><span class="ln">989</span>            y<span class="s"> = </span><span class="d">0</span>,
 </code><code id="L990"><span class="ln">990</span>            X<span class="s"> = </span>[],
 </code><code id="L991"><span class="ln">991</span>            Y<span class="s"> = </span>[],
@@ -2322,7 +2322,7 @@
 </code><code id="L2320"><span class="ln">2320</span>            <b>var</b> a<span class="s"> = </span>el.attrs,
 </code><code id="L2321"><span class="ln">2321</span>                node<span class="s"> = </span>el.node,
 </code><code id="L2322"><span class="ln">2322</span>                fontSize<span class="s"> = </span>node.firstChild ? toInt(g.doc.defaultView.getComputedStyle(node.firstChild, E).getPropertyValue(<i>"font-size"</i>), <span class="d">10</span>) : <span class="d">10</span>;
-</code><code id="L2323"><span class="ln">2323</span> 
+</code><code id="L2323"><span class="ln">2323</span>
 </code><code id="L2324"><span class="ln">2324</span>            <b>if</b> (params[has](<i>"text"</i>)) {
 </code><code id="L2325"><span class="ln">2325</span>                a.text<span class="s"> = </span>params.text;
 </code><code id="L2326"><span class="ln">2326</span>                <b>while</b> (node.firstChild) {
@@ -2383,7 +2383,7 @@
 </span></code><code id="L2381"><span class="ln">2381</span><span class="c">            <span class="s"> * </span>Element.id
 </span></code><code id="L2382"><span class="ln">2382</span><span class="c">             [ property (number) ]
 </span></code><code id="L2383"><span class="ln">2383</span><span class="c">             **
-</span></code><code id="L2384"><span class="ln">2384</span><span class="c">            <span class="s"> * </span>Unique id of the element. Especially usesful when you want to listen to events of the element, 
+</span></code><code id="L2384"><span class="ln">2384</span><span class="c">            <span class="s"> * </span>Unique id of the element. Especially usesful when you want to listen to events of the element,
 </span></code><code id="L2385"><span class="ln">2385</span><span class="c">            <span class="s"> * </span>because all events are fired <b>in</b> format `&lt;module>.&lt;action>.&lt;id>`. Also useful <b>for</b> @Paper.getById method.
 </span></code><code id="L2386"><span class="ln">2386</span><span class="c">            \*/</span>
 </code><code id="L2387"><span class="ln">2387</span>            <b>this</b>.id<span class="s"> = </span>R._oid++;
@@ -2568,7 +2568,7 @@
 </code><code id="L2566"><span class="ln">2566</span>            <span class="c">// <b>this</b>.gradient<span class="s"> &amp;&amp; </span>$(<b>this</b>.gradient, {gradientTransform: <b>this</b>.matrix.invert()});</span>
 </code><code id="L2567"><span class="ln">2567</span>            <b>this</b>.pattern<span class="s"> &amp;&amp; </span>updatePosition(<b>this</b>);
 </code><code id="L2568"><span class="ln">2568</span>            <b>this</b>.node<span class="s"> &amp;&amp; </span>$(<b>this</b>.node, {transform: <b>this</b>.matrix});
-</code><code id="L2569"><span class="ln">2569</span>            
+</code><code id="L2569"><span class="ln">2569</span>
 </code><code id="L2570"><span class="ln">2570</span>            <b>if</b> (_.sx != <span class="d">1</span><span class="s"> || </span>_.sy != <span class="d">1</span>) {
 </code><code id="L2571"><span class="ln">2571</span>                <b>var</b> sw<span class="s"> = </span><b>this</b>.attrs[has](<i>"stroke-width"</i>) ? <b>this</b>.attrs[<i>"stroke-width"</i>] : <span class="d">1</span>;
 </code><code id="L2572"><span class="ln">2572</span>                <b>this</b>.attr({<i>"stroke-width"</i>: sw});
@@ -3324,7 +3324,7 @@
 </code><code id="L3322"><span class="ln">3322</span>                params[<i>"stroke-width"</i>]<span class="s"> &amp;&amp; </span>(stroke.weight<span class="s"> = </span>width);
 </code><code id="L3323"><span class="ln">3323</span>                width<span class="s"> &amp;&amp; </span>width &lt; <span class="d">1</span><span class="s"> &amp;&amp; </span>(opacity *= width)<span class="s"> &amp;&amp; </span>(stroke.weight<span class="s"> = </span><span class="d">1</span>);
 </code><code id="L3324"><span class="ln">3324</span>                stroke.opacity<span class="s"> = </span>opacity;
-</code><code id="L3325"><span class="ln">3325</span>                
+</code><code id="L3325"><span class="ln">3325</span>
 </code><code id="L3326"><span class="ln">3326</span>                params[<i>"stroke-linejoin"</i>]<span class="s"> &amp;&amp; </span>(stroke.joinstyle<span class="s"> = </span>params[<i>"stroke-linejoin"</i>]<span class="s"> || </span><i>"miter"</i>);
 </code><code id="L3327"><span class="ln">3327</span>                stroke.miterlimit<span class="s"> = </span>params[<i>"stroke-miterlimit"</i>]<span class="s"> || </span><span class="d">8</span>;
 </code><code id="L3328"><span class="ln">3328</span>                params[<i>"stroke-linecap"</i>]<span class="s"> &amp;&amp; </span>(stroke.endcap<span class="s"> = </span>params[<i>"stroke-linecap"</i>]<span class="s"> == </span><i>"butt"</i> ? <i>"flat"</i> : params[<i>"stroke-linecap"</i>]<span class="s"> == </span><i>"square"</i> ? <i>"square"</i> : <i>"round"</i>);
@@ -3371,7 +3371,7 @@
 </code><code id="L3369"><span class="ln">3369</span>                    res._.dirty<span class="s"> = </span><span class="d">1</span>;
 </code><code id="L3370"><span class="ln">3370</span>                    <b>break</b>;
 </code><code id="L3371"><span class="ln">3371</span>                }
-</code><code id="L3372"><span class="ln">3372</span>                
+</code><code id="L3372"><span class="ln">3372</span>
 </code><code id="L3373"><span class="ln">3373</span>                <span class="c">// text-anchor emulation</span>
 </code><code id="L3374"><span class="ln">3374</span>                <b>switch</b> (a[<i>"text-anchor"</i>]) {
 </code><code id="L3375"><span class="ln">3375</span>                    <b>case</b> <i>"start"</i>:
@@ -3508,7 +3508,7 @@
 </code><code id="L3506"><span class="ln">3506</span>                <b>this</b>.node.style.filter<span class="s"> = </span>E;
 </code><code id="L3507"><span class="ln">3507</span>                skew.matrix<span class="s"> = </span>matrix;
 </code><code id="L3508"><span class="ln">3508</span>                skew.offset<span class="s"> = </span>matrix.offset();
-</code><code id="L3509"><span class="ln">3509</span>                
+</code><code id="L3509"><span class="ln">3509</span>
 </code><code id="L3510"><span class="ln">3510</span>                <span class="c">// <b>if</b> (<span class="d">0</span>&amp;&amp;angle) {</span>
 </code><code id="L3511"><span class="ln">3511</span>                <span class="c">//     angle<span class="s"> = </span>R.rad(<span class="d">270</span><span class="s"> - </span>angle);</span>
 </code><code id="L3512"><span class="ln">3512</span>                <span class="c">//     <b>var</b> dx<span class="s"> = </span><span class="d">100</span><span class="s"> * </span>math.cos(angle),</span>
@@ -3583,7 +3583,7 @@
 </code><code id="L3581"><span class="ln">3581</span>            }
 </code><code id="L3582"><span class="ln">3582</span>            cx<span class="s"> = </span>cx<span class="s"> == </span><b>null</b> ? bbox.x<span class="s"> + </span>bbox.width<span class="s"> / </span><span class="d">2</span> : cx;
 </code><code id="L3583"><span class="ln">3583</span>            cy<span class="s"> = </span>cy<span class="s"> == </span><b>null</b> ? bbox.y<span class="s"> + </span>bbox.height<span class="s"> / </span><span class="d">2</span> : cy;
-</code><code id="L3584"><span class="ln">3584</span>            
+</code><code id="L3584"><span class="ln">3584</span>
 </code><code id="L3585"><span class="ln">3585</span>            <b>this</b>.transform(<b>this</b>._.transform.concat([[<i>"s"</i>, sx, sy, cx, cy]]));
 </code><code id="L3586"><span class="ln">3586</span>            <b>this</b>._.dirtyT<span class="s"> = </span><span class="d">1</span>;
 </code><code id="L3587"><span class="ln">3587</span>            <b>return</b> <b>this</b>;
@@ -3972,7 +3972,7 @@
 </code><code id="L3970"><span class="ln">3970</span>            <b>return</b> <b>true</b>;
 </code><code id="L3971"><span class="ln">3971</span>        };
 </code><code id="L3972"><span class="ln">3972</span>    }
-</code><code id="L3973"><span class="ln">3973</span> 
+</code><code id="L3973"><span class="ln">3973</span>
 </code><code id="L3974"><span class="ln">3974</span>    <span class="c">// WebKit rendering bug workaround method</span>
 </code><code id="L3975"><span class="ln">3975</span>    <b>var</b> version<span class="s"> = </span>navigator.userAgent.match(/Version\/(.*?)\s/)<span class="s"> || </span>navigator.userAgent.match(/Chrome\/(\d+)/);
 </code><code id="L3976"><span class="ln">3976</span>    <b>if</b> ((navigator.vendor<span class="s"> == </span><i>"Apple Computer, Inc."</i>)<span class="s"> &amp;&amp; </span>(version<span class="s"> &amp;&amp; </span>version[<span class="d">1</span>] &lt; <span class="d">4</span><span class="s"> || </span>navigator.platform.slice(<span class="d">0</span>, <span class="d">2</span>)<span class="s"> == </span><i>"iP"</i>) ||
@@ -3992,7 +3992,7 @@
 </code><code id="L3990"><span class="ln">3990</span>    } <b>else</b> {
 </code><code id="L3991"><span class="ln">3991</span>        paperproto.safari<span class="s"> = </span>fun;
 </code><code id="L3992"><span class="ln">3992</span>    }
-</code><code id="L3993"><span class="ln">3993</span> 
+</code><code id="L3993"><span class="ln">3993</span>
 </code><code id="L3994"><span class="ln">3994</span>    <span class="c">// Events</span>
 </code><code id="L3995"><span class="ln">3995</span>    <b>var</b> preventDefault<span class="s"> = </span><b>function</b> () {
 </code><code id="L3996"><span class="ln">3996</span>        <b>this</b>.returnValue<span class="s"> = </span><b>false</b>;
@@ -4162,8 +4162,8 @@
 </span></code><code id="L4160"><span class="ln">4160</span><span class="c">    <span class="s"> - </span>mcontext (object) #optional context <b>for</b> moving handler
 </span></code><code id="L4161"><span class="ln">4161</span><span class="c">    <span class="s"> - </span>scontext (object) #optional context <b>for</b> drag start handler
 </span></code><code id="L4162"><span class="ln">4162</span><span class="c">    <span class="s"> - </span>econtext (object) #optional context <b>for</b> drag end handler
-</span></code><code id="L4163"><span class="ln">4163</span><span class="c">    <span class="s"> * </span>Additionaly following `drag` events will be triggered: `drag.start.&lt;id>` on start, 
-</span></code><code id="L4164"><span class="ln">4164</span><span class="c">    <span class="s"> * </span>`drag.end.&lt;id>` on end and `drag.move.&lt;id>` on every move. When element will be dragged over another element 
+</span></code><code id="L4163"><span class="ln">4163</span><span class="c">    <span class="s"> * </span>Additionaly following `drag` events will be triggered: `drag.start.&lt;id>` on start,
+</span></code><code id="L4164"><span class="ln">4164</span><span class="c">    <span class="s"> * </span>`drag.end.&lt;id>` on end and `drag.move.&lt;id>` on every move. When element will be dragged over another element
 </span></code><code id="L4165"><span class="ln">4165</span><span class="c">    <span class="s"> * </span>`drag.over.&lt;id>` will be fired as well.
 </span></code><code id="L4166"><span class="ln">4166</span><span class="c">     *
 </span></code><code id="L4167"><span class="ln">4167</span><span class="c">    <span class="s"> * </span>Start event and start handler will be called <b>in</b> specified context or <b>in</b> context of the element <b>with</b> following parameters:
@@ -4393,7 +4393,7 @@
 </span></code><code id="L4391"><span class="ln">4391</span><span class="c">    <span class="s"> * </span>Paper.setViewBox
 </span></code><code id="L4392"><span class="ln">4392</span><span class="c">     [ method ]
 </span></code><code id="L4393"><span class="ln">4393</span><span class="c">     **
-</span></code><code id="L4394"><span class="ln">4394</span><span class="c">    <span class="s"> * </span>Sets the view box of the paper. Practically it gives you ability to zoom and pan whole paper surface by 
+</span></code><code id="L4394"><span class="ln">4394</span><span class="c">    <span class="s"> * </span>Sets the view box of the paper. Practically it gives you ability to zoom and pan whole paper surface by
 </span></code><code id="L4395"><span class="ln">4395</span><span class="c">    <span class="s"> * </span>specifying <b>new</b> boundaries.
 </span></code><code id="L4396"><span class="ln">4396</span><span class="c">     **
 </span></code><code id="L4397"><span class="ln">4397</span><span class="c">     > Parameters
@@ -5163,7 +5163,7 @@
 </span></code><code id="L5161"><span class="ln">5161</span><span class="c">     **
 </span></code><code id="L5162"><span class="ln">5162</span><span class="c">    <span class="s"> = </span>(object) <b>new</b> altered Animation object
 </span></code><code id="L5163"><span class="ln">5163</span><span class="c">    \*/</span>
-</code><code id="L5164"><span class="ln">5164</span>    Animation.prototype.repeat<span class="s"> = </span><b>function</b> (times) { 
+</code><code id="L5164"><span class="ln">5164</span>    Animation.prototype.repeat<span class="s"> = </span><b>function</b> (times) {
 </code><code id="L5165"><span class="ln">5165</span>        <b>var</b> a<span class="s"> = </span><b>new</b> Animation(<b>this</b>.anim, <b>this</b>.ms);
 </code><code id="L5166"><span class="ln">5166</span>        a.del<span class="s"> = </span><b>this</b>.del;
 </code><code id="L5167"><span class="ln">5167</span>        a.times<span class="s"> = </span>math.floor(mmax(times, <span class="d">0</span>))<span class="s"> || </span><span class="d">1</span>;
