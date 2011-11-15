@@ -2575,6 +2575,8 @@
      = (object) @Element
      * or, if value is not specified:
      = (any) value
+     * or, if key and value are not specified:
+     = (object) Key/value pairs for all the data associated with the element.
      > Usage
      | for (var i = 0, i < 5, i++) {
      |     paper.circle(10 + 15 * i, 10, 10)
@@ -2587,6 +2589,9 @@
     \*/
     elproto.data = function (key, value) {
         var data = eldata[this.id] = eldata[this.id] || {};
+        if (arguments.length == 0) {
+            return data;
+        }
         if (arguments.length == 1) {
             if (R.is(key, "object")) {
                 for (var i in key) if (key[has](i)) {
