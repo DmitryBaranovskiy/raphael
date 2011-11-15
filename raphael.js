@@ -4200,7 +4200,12 @@ window.Raphael.svg && function (R) {
         if (this.removed) {
             return this;
         }
-        this.node.parentNode.appendChild(this.node);
+        if(this.node.parentNode.tagName.toLowerCase() == "a") {
+            this.node.parentNode.parentNode.appendChild(this.node.parentNode);
+        }
+        else {
+	        this.node.parentNode.appendChild(this.node);
+        }
         var svg = this.paper;
         svg.top != this && R._tofront(this, svg);
         return this;
@@ -4210,7 +4215,12 @@ window.Raphael.svg && function (R) {
         if (this.removed) {
             return this;
         }
-        if (this.node.parentNode.firstChild != this.node) {
+        if(this.node.parentNode.tagName.toLowerCase() == "a") {
+        	this.node.parentNode.parentNode.insertBefore(this.node.parentNode, this.node.parentNode.parentNode.firstChild); 
+            R._toback(this, this.paper);
+            var svg = this.paper;
+        }
+        else if (this.node.parentNode.firstChild != this.node) {
             this.node.parentNode.insertBefore(this.node, this.node.parentNode.firstChild);
             R._toback(this, this.paper);
             var svg = this.paper;
