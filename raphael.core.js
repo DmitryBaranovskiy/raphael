@@ -210,7 +210,11 @@
             transform: "",
             width: 0,
             x: 0,
-            y: 0
+            y: 0,
+            x1: 0,
+            y1: 0,
+            x2: 0,
+            y2: 0
         },
         availableAnimAttrs = R._availableAnimAttrs = {
             blur: nu,
@@ -232,7 +236,11 @@
             transform: "transform",
             width: nu,
             x: nu,
-            y: nu
+            y: nu,
+            x1: nu,
+            y1: nu,
+            x2: nu,
+            y2: nu
         },
         commaSpaces = /\s*,\s*/,
         hsrg = {hs: 1, rg: 1},
@@ -251,6 +259,9 @@
         fun = function () {},
         pipe = function (x) {
             return x;
+        },
+        linePath = R._linePath = function (x1, y1, x2, y2) {
+            return [["M", x1, y1], ["l", x2 - x1, y2 - y1], ["z"]];
         },
         rectPath = R._rectPath = function (x, y, w, h, r) {
             if (r) {
@@ -2723,6 +2734,28 @@
         }
         !drag.length && R.unmousemove(dragMove).unmouseup(dragUp);
     };
+    /*\
+     * Paper.line
+     [ method ]
+     **
+     * Draw a line.
+     **
+     > Parameters
+     **
+     - x1 (number) x coordinate of start point of the line
+     - y1 (number) y coordinate of start point of the line
+     - x2 (number) x coordinate of end point of the line
+     - y2 (number) y coordinate of end point of the line
+     = (object) Raphaël element object with type “line”
+     **
+     > Usage
+     | var c = paper.line(10, 10, 50, 50);
+    \*/
+    paperproto.line = function (x1, y1, x2, y2) {
+        var out = R._engine.line(this, x1 || 0, y1 || 0, x2 || 0, y2 || 0);
+        this.__set__ && this.__set__.push(out);
+        return out;
+    }
     /*\
      * Paper.circle
      [ method ]

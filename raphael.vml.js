@@ -28,7 +28,7 @@ window.Raphael.vml && function (R) {
         val = /-?[^,\s-]+/g,
         cssDot = "position:absolute;left:0;top:0;width:1px;height:1px",
         zoom = 21600,
-        pathTypes = {path: 1, rect: 1, image: 1},
+        pathTypes = {path: 1, line: 1, rect: 1, image: 1},
         ovalTypes = {circle: 1, ellipse: 1},
         path2vml = function (path) {
             var total =  /[ahqstv]/ig,
@@ -738,6 +738,18 @@ window.Raphael.vml && function (R) {
         p.skew = skew;
         p.transform(E);
         return p;
+    };
+    R._engine.line = function (vml, x1, y1, x2, y2) {
+        var path = R._linePath(x1, y1, x2, y2),
+            res = vml.path(path),
+            a = res.attrs;
+        res.X1 = a.x1 = x1;
+        res.Y1 = a.y1 = y1;
+        res.X2 = a.x2 = x2;
+        res.Y2 = a.y2 = y2;
+        a.path = path;
+        res.type = "line";
+        return res;
     };
     R._engine.rect = function (vml, x, y, w, h, r) {
         var path = R._rectPath(x, y, w, h, r),
