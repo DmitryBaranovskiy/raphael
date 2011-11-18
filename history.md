@@ -11,6 +11,7 @@
   * Fixed drag'n'drop
   * New method [Paper.add](http://raphaeljs.com/reference.html#Paper.add)
   * Fix for `clip-path`
+  * Doc update
 
 2.0.0 * 2011-10-03
 ------------------
