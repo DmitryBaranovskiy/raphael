@@ -1,5 +1,5 @@
 // ┌─────────────────────────────────────────────────────────────────────┐ \\
-// │ Raphaël 2.0 - JavaScript Vector Library                             │ \\
+// │ Raphaël 2.0.1 - JavaScript Vector Library                           │ \\
 // ├─────────────────────────────────────────────────────────────────────┤ \\
 // │ Copyright (c) 2008-2011 Dmitry Baranovskiy (http://raphaeljs.com)   │ \\
 // │ Copyright (c) 2008-2011 Sencha Labs (http://sencha.com)             │ \\
@@ -7,14 +7,14 @@
 // └─────────────────────────────────────────────────────────────────────┘ \\
 
 // ┌──────────────────────────────────────────────────────────────────────────────────────┐ \\
-// │ Eve 0.3.2 - JavaScript Events Library                                                │ \\
+// │ Eve 0.4.0 - JavaScript Events Library                                                │ \\
 // ├──────────────────────────────────────────────────────────────────────────────────────┤ \\
 // │ Copyright (c) 2008-2011 Dmitry Baranovskiy (http://dmitry.baranovskiy.com/)          │ \\
 // │ Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license. │ \\
 // └──────────────────────────────────────────────────────────────────────────────────────┘ \\
 
 (function (glob) {
-    var version = "0.3.2",
+    var version = "0.4.0",
         has = "hasOwnProperty",
         separator = /[\.\/]/,
         wildcard = "*",
@@ -157,9 +157,10 @@
             e,
             key,
             splice,
+            i, ii, j, jj,
             cur = [events];
-        for (var i = 0, ii = names.length; i < ii; i++) {
-            for (var j = 0; j < cur.length; j += splice.length - 2) {
+        for (i = 0, ii = names.length; i < ii; i++) {
+            for (j = 0; j < cur.length; j += splice.length - 2) {
                 splice = [j, 1];
                 e = cur[j].n;
                 if (names[i] != wildcard) {
@@ -204,6 +205,14 @@
         }
     };
     
+    eve.once = function (name, f) {
+        var f2 = function () {
+            f.apply(this, arguments);
+            eve.unbind(name, f2);
+        };
+        return eve.on(name, f2);
+    };
+    
     eve.version = version;
     eve.toString = function () {
         return "You are running Eve " + version;
@@ -212,7 +221,7 @@
 })(this);
 
 // ┌─────────────────────────────────────────────────────────────────────┐ \\
-// │ "Raphaël 2.0" - JavaScript Vector Library                           │ \\
+// │ "Raphaël 2.0.1" - JavaScript Vector Library                         │ \\
 // ├─────────────────────────────────────────────────────────────────────┤ \\
 // │ Copyright (c) 2008-2011 Dmitry Baranovskiy (http://raphaeljs.com)   │ \\
 // │ Copyright (c) 2008-2011 Sencha Labs (http://sencha.com)             │ \\
@@ -224,17 +233,7 @@
         if (R.is(first, "function")) {
             return loaded ? first() : eve.on("DOMload", first);
         } else if (R.is(first, array)) {
-            var a = first,
-                cnv = R._engine.create[apply](R, a.splice(0, 3 + R.is(a[0], nu))),
-                res = cnv.set(),
-                i = 0,
-                ii = a.length,
-                j;
-            for (; i < ii; i++) {
-                j = a[i] || {};
-                elements[has](j.type) && res.push(cnv[j.type]().attr(j));
-            }
-            return res;
+            return R._engine.create[apply](R, first.splice(0, 3 + R.is(first[0], nu))).add(first);
         } else {
             var args = Array.prototype.slice.call(arguments, 0);
             if (R.is(args[args.length - 1], "function")) {
@@ -247,7 +246,7 @@
             }
         }
     }
-    R.version = "2.0.0";
+    R.version = "2.0.1";
     R.eve = eve;
     var loaded,
         separator = /[, ]+/,
@@ -325,6 +324,7 @@
             gradient: 0,
             height: 0,
             href: "http://raphaeljs.com/",
+            "letter-spacing": 0,
             opacity: 1,
             path: "M0,0",
             r: 0,
@@ -427,7 +427,7 @@
             if (!matrix) {
                 return path;
             }
-            var x, y, i, j, pathi;
+            var x, y, i, j, ii, jj, pathi;
             path = path2curve(path);
             for (i = 0, ii = path.length; i < ii; i++) {
                 pathi = path[i];
@@ -536,8 +536,8 @@
         eve("setWindow", R, g.win, newwin);
         g.win = newwin;
         g.doc = g.win.document;
-        if (initWin) {
-            initWin(g.win);
+        if (R._engine.initWin) {
+            R._engine.initWin(g.win);
         }
     };
     var toHex = function (color) {
@@ -648,7 +648,7 @@
                 clr.v = rgb.b;
             } else {
                 clr = {hex: "none"};
-                crl.r = clr.g = clr.b = clr.h = clr.s = clr.v = clr.l = -1;
+                clr.r = clr.g = clr.b = clr.h = clr.s = clr.v = clr.l = -1;
             }
         }
         clr.toString = rgbtoString;
@@ -769,7 +769,7 @@
 
     var preload = R._preload = function (src, f) {
         var img = g.doc.createElement("img");
-        img.style.cssText = "position:absolute;left:-9999em;top-9999em";
+        img.style.cssText = "position:absolute;left:-9999em;top:-9999em";
         img.onload = function () {
             f.call(this);
             this.onload = null;
@@ -998,6 +998,11 @@
             start: {x: ax, y: ay},
             end: {x: cx, y: cy},
             alpha: alpha
+        };
+    };
+    R._removedFactory = function (methodname) {
+        return function () {
+            throw new Error("Rapha\xebl: you are calling to method \u201c" + methodname + "\u201d of removed object");
         };
     };
     var pathDimensions = cacher(function (path) {
@@ -1545,11 +1550,6 @@
             el2.prev = el;
             el.next = el2;
         },
-        removed = function (methodname) {
-            return function () {
-                throw new Error("Rapha\xebl: you are calling to method \u201c" + methodname + "\u201d of removed object");
-            };
-        },
         extractTransform = R._extractTransform = function (el, tstr) {
             if (tstr == null) {
                 return el._.transform;
@@ -1876,7 +1876,12 @@
         matrixproto.toTransformString = function (shorter) {
             var s = shorter || this[split]();
             if (s.isSimple) {
-                return "t" + [s.dx, s.dy] + "s" + [s.scalex, s.scaley, 0, 0] + "r" + [s.rotate, 0, 0];
+                s.scalex = +s.scalex.toFixed(4);
+                s.scaley = +s.scaley.toFixed(4);
+                s.rotate = +s.rotate.toFixed(4);
+                return  (s.dx && s.dy ? "t" + [s.dx, s.dy] : E) + 
+                        (s.scalex != 1 || s.scaley != 1 ? "s" + [s.scalex, s.scaley, 0, 0] : E) +
+                        (s.rotate ? "r" + [s.rotate, 0, 0] : E);
             } else {
                 return "m" + [this.get(0), this.get(1), this.get(2), this.get(3), this.get(4), this.get(5)];
             }
@@ -2101,6 +2106,7 @@
     elproto.unhover = function (f_in, f_out) {
         return this.unmouseover(f_in).unmouseout(f_out);
     };
+    var draggable = [];
     
     elproto.drag = function (onmove, onstart, onend, move_scope, start_scope, end_scope) {
         function start(e) {
@@ -2118,6 +2124,7 @@
             eve("drag.start." + this.id, start_scope || move_scope || this, e.clientX + scrollX, e.clientY + scrollY, e);
         }
         this._drag = {};
+        draggable.push({el: this, start: start});
         this.mousedown(start);
         return this;
     };
@@ -2127,13 +2134,13 @@
     };
     
     elproto.undrag = function () {
-        var i = drag.length;
-        while (i--) if (drag[i].el == this) {
-            R.unmousedown(drag[i].start);
-            drag.splice(i++, 1);
+        var i = draggable.length;
+        while (i--) if (draggable[i].el == this) {
+            this.unmousedown(draggable[i].start);
+            draggable.splice(i, 1);
             eve.unbind("drag.*." + this.id);
         }
-        !drag.length && R.unmousemove(dragMove).unmouseup(dragUp);
+        !draggable.length && R.unmousemove(dragMove).unmouseup(dragUp);
     };
     
     paperproto.circle = function (x, y, r) {
@@ -2645,7 +2652,7 @@
         };
     
     elproto.animateWith = function (element, anim, params, ms, easing, callback) {
-        var a = params ? R.animation(params, ms, easing, callback) : anim;
+        var a = params ? R.animation(params, ms, easing, callback) : anim,
             status = element.status(anim);
         return this.animate(a).status(a, status * anim.ms / a.ms);
     };
@@ -2781,7 +2788,7 @@
             return;
         }
         if (!isInAnim) {
-            for (attr in params) if (params[has](attr)) {
+            for (var attr in params) if (params[has](attr)) {
                 if (availableAnimAttrs[has](attr) || element.paper.customAttributes[has](attr)) {
                     from[attr] = element.attr(attr);
                     (from[attr] == null) && (from[attr] = availableAttrs[attr]);
@@ -3312,6 +3319,21 @@
     };
 
     
+    paperproto.add = function (json) {
+        if (R.is(json, "array")) {
+            var res = this.set(),
+                i = 0,
+                ii = json.length,
+                j;
+            for (; i < ii; i++) {
+                j = json[i] || {};
+                elements[has](j.type) && res.push(this[j.type]().attr(j));
+            }
+        }
+        return res;
+    };
+
+    
     R.format = function (token, params) {
         var args = R.is(params, array) ? [0][concat](params) : arguments;
         token && R.is(token, string) && args.length - 1 && (token = token.replace(formatrg, function (str, i) {
@@ -3373,7 +3395,7 @@
 })();
 
 // ┌─────────────────────────────────────────────────────────────────────┐ \\
-// │ Raphaël 2 - JavaScript Vector Library                               │ \\
+// │ Raphaël - JavaScript Vector Library                                 │ \\
 // ├─────────────────────────────────────────────────────────────────────┤ \\
 // │ SVG Module                                                          │ \\
 // ├─────────────────────────────────────────────────────────────────────┤ \\
@@ -3424,16 +3446,6 @@ window.Raphael.svg && function (R) {
         }
         return el;
     },
-    gradients = {},
-    rgGrad = /^url\(#(.*)\)$/,
-    removeGradientFill = function (node, paper) {
-        var oid = node.getAttribute("fill");
-        oid = oid && oid.match(rgGrad);
-        if (oid && !--gradients[oid[1]]) {
-            delete gradients[oid[1]];
-            paper.defs.removeChild(R._g.doc.getElementById(oid[1]));
-        }
-    },
     addGradientFill = function (element, gradient) {
         var type = "linear",
             id = element.id + gradient,
@@ -3480,30 +3492,33 @@ window.Raphael.svg && function (R) {
             if (!dots) {
                 return null;
             }
-            if (element.gradient) {
+            id = id.replace(/[\(\)\s,\xb0#]/g, "_");
+            
+            if (element.gradient && id != element.gradient.id) {
                 SVG.defs.removeChild(element.gradient);
                 delete element.gradient;
             }
 
-            id = id.replace(/[\(\)\s,\xb0#]/g, "-");
-            el = $(type + "Gradient", {id: id});
-            element.gradient = el;
-            $(el, type == "radial" ? {
-                fx: fx,
-                fy: fy
-            } : {
-                x1: vector[0],
-                y1: vector[1],
-                x2: vector[2],
-                y2: vector[3],
-                gradientTransform: element.matrix.invert()
-            });
-            SVG.defs.appendChild(el);
-            for (var i = 0, ii = dots.length; i < ii; i++) {
-                el.appendChild($("stop", {
-                    offset: dots[i].offset ? dots[i].offset : i ? "100%" : "0%",
-                    "stop-color": dots[i].color || "#fff"
-                }));
+            if (!element.gradient) {
+                el = $(type + "Gradient", {id: id});
+                element.gradient = el;
+                $(el, type == "radial" ? {
+                    fx: fx,
+                    fy: fy
+                } : {
+                    x1: vector[0],
+                    y1: vector[1],
+                    x2: vector[2],
+                    y2: vector[3],
+                    gradientTransform: element.matrix.invert()
+                });
+                SVG.defs.appendChild(el);
+                for (var i = 0, ii = dots.length; i < ii; i++) {
+                    el.appendChild($("stop", {
+                        offset: dots[i].offset ? dots[i].offset : i ? "100%" : "0%",
+                        "stop-color": dots[i].color || "#fff"
+                    }));
+                }
             }
         }
         $(o, {
@@ -3749,10 +3764,13 @@ window.Raphael.svg && function (R) {
                             o.clip = rc;
                         }
                         if (!value) {
-                            var clip = R._g.doc.getElementById(node.getAttribute("clip-path").replace(/(^url\(#|\)$)/g, E));
-                            clip && clip.parentNode.removeChild(clip);
-                            $(node, {"clip-path": E});
-                            delete o.clip;
+                            var path = node.getAttribute("clip-path");
+                            if (path) {
+                                var clip = R._g.doc.getElementById(path.replace(/(^url\(#|\)$)/g, E));
+                                clip && clip.parentNode.removeChild(clip);
+                                $(node, {"clip-path": E});
+                                delete o.clip;
+                            }
                         }
                     break;
                     case "path":
@@ -4109,12 +4127,16 @@ window.Raphael.svg && function (R) {
         if (this.removed) {
             return;
         }
-        this.paper.__set__ && this.paper.__set__.exclude(this);
+        var paper = this.paper;
+        paper.__set__ && paper.__set__.exclude(this);
         eve.unbind("*.*." + this.id);
-        R._tear(this, this.paper);
+        if (this.gradient) {
+            paper.defs.removeChild(this.gradient);
+        }
+        R._tear(this, paper);
         this.node.parentNode.removeChild(this.node);
         for (var i in this) {
-            delete this[i];
+            this[i] = typeof this[i] == "function" ? R._removedFactory(i) : null;
         }
         this.removed = true;
     };
@@ -4200,7 +4222,11 @@ window.Raphael.svg && function (R) {
         if (this.removed) {
             return this;
         }
-        this.node.parentNode.appendChild(this.node);
+        if (this.node.parentNode.tagName.toLowerCase() == "a") {
+            this.node.parentNode.parentNode.appendChild(this.node.parentNode);
+        } else {
+            this.node.parentNode.appendChild(this.node);
+        }
         var svg = this.paper;
         svg.top != this && R._tofront(this, svg);
         return this;
@@ -4210,11 +4236,14 @@ window.Raphael.svg && function (R) {
         if (this.removed) {
             return this;
         }
-        if (this.node.parentNode.firstChild != this.node) {
-            this.node.parentNode.insertBefore(this.node, this.node.parentNode.firstChild);
-            R._toback(this, this.paper);
-            var svg = this.paper;
+        var parent = this.node.parentNode;
+        if (parent.tagName.toLowerCase() == "a") {
+            parent.parentNode.insertBefore(this.node.parentNode, this.node.parentNode.parentNode.firstChild); 
+        } else if (parent.firstChild != this.node) {
+            parent.insertBefore(this.node, this.node.parentNode.firstChild);
         }
+        R._toback(this, this.paper);
+        var svg = this.paper;
         return this;
     };
     
@@ -4440,7 +4469,7 @@ window.Raphael.svg && function (R) {
         eve("remove", this);
         this.canvas.parentNode && this.canvas.parentNode.removeChild(this.canvas);
         for (var i in this) {
-            this[i] = removed(i);
+            this[i] = typeof this[i] == "function" ? R._removedFactory(i) : null;
         }
     };
     var setproto = R.st;
@@ -4457,7 +4486,7 @@ window.Raphael.svg && function (R) {
 }(window.Raphael);
 
 // ┌─────────────────────────────────────────────────────────────────────┐ \\
-// │ Raphaël 2 - JavaScript Vector Library                               │ \\
+// │ Raphaël - JavaScript Vector Library                                 │ \\
 // ├─────────────────────────────────────────────────────────────────────┤ \\
 // │ VML Module                                                          │ \\
 // ├─────────────────────────────────────────────────────────────────────┤ \\
@@ -4574,7 +4603,7 @@ window.Raphael.vml && function (R) {
     R.toString = function () {
         return  "Your browser doesn\u2019t support SVG. Falling down to VML.\nYou are running Rapha\xebl " + this.version;
     };
-    addArrow = function (o, value, isEnd) {
+    var addArrow = function (o, value, isEnd) {
         var values = Str(value).toLowerCase().split("-"),
             se = isEnd ? "end" : "start",
             i = values.length,
@@ -4601,7 +4630,7 @@ window.Raphael.vml && function (R) {
         stroke[se + "arrow"] = type;
         stroke[se + "arrowlength"] = w;
         stroke[se + "arrowwidth"] = h;
-    };
+    },
     setFillAndStroke = function (o, params) {
         // o.paper.canvas.style.display = "none";
         o.attrs = o.attrs || {};
@@ -4662,7 +4691,7 @@ window.Raphael.vml && function (R) {
                 }
             }
             if (!params["clip-rect"]) {
-                node.clipRect && (node.clipRect.style.clip = E);
+                node.clipRect && (node.clipRect.style.clip = "auto");
             }
         }
         if (o.textpath) {
@@ -4789,7 +4818,7 @@ window.Raphael.vml && function (R) {
             a["font-family"] && (s.fontFamily = a["font-family"]);
             a["font-weight"] && (s.fontWeight = a["font-weight"]);
             a["font-style"] && (s.fontStyle = a["font-style"]);
-            fontSize = toFloat(fontSize ? fontSize[0] : a["font-size"]);
+            fontSize = toFloat(a["font-size"] || fontSize && fontSize[0]) || 10;
             s.fontSize = fontSize * m + "px";
             res.textpath.string && (span.innerHTML = Str(res.textpath.string).replace(/</g, "&#60;").replace(/&/g, "&#38;").replace(/\n/g, "<br>"));
             var brect = span.getBoundingClientRect();
@@ -4824,7 +4853,7 @@ window.Raphael.vml && function (R) {
             res.textpath.style["v-text-kern"] = true;
         }
         // res.paper.canvas.style.display = E;
-    };
+    },
     addGradientFill = function (o, gradient, fill) {
         o.attrs = o.attrs || {};
         var attrs = o.attrs,
@@ -4882,7 +4911,7 @@ window.Raphael.vml && function (R) {
             o.appendChild(fill);
         }
         return 1;
-    };
+    },
     Element = function (node, vml) {
         this[0] = this.node = node;
         node.raphael = true;
@@ -5032,16 +5061,12 @@ window.Raphael.vml && function (R) {
         if (this.removed) {
             return {};
         }
-        if (this.type == "text") {
-            return {
-                x: this.X + (this.bbx || 0) - this.W / 2,
-                y: this.Y - this.H,
-                width: this.W,
-                height: this.H
-            };
-        } else {
-            return pathDimensions(this.attrs.path);
-        }
+        return {
+            x: this.X + (this.bbx || 0) - this.W / 2,
+            y: this.Y - this.H,
+            width: this.W,
+            height: this.H
+        };
     };
     elproto.remove = function () {
         if (this.removed) {
@@ -5053,7 +5078,7 @@ window.Raphael.vml && function (R) {
         this.node.parentNode.removeChild(this.node);
         this.shape && this.shape.parentNode.removeChild(this.shape);
         for (var i in this) {
-            delete this[i];
+            this[i] = typeof this[i] == "function" ? R._removedFactory(i) : null;
         }
         this.removed = true;
     };
@@ -5314,7 +5339,7 @@ window.Raphael.vml && function (R) {
         cs.height = height;
         cs.clip = "rect(0 " + width + " " + height + " 0)";
         if (this._viewBox) {
-            setViewBox.apply(this, this._viewBox);
+            R._engine.setViewBox.apply(this, this._viewBox);
         }
         return this;
     };
@@ -5345,8 +5370,8 @@ window.Raphael.vml && function (R) {
         });
         return this;
     };
-    var createNode,
-        initWin = function (win) {
+    var createNode;
+    R._engine.initWin = function (win) {
             var doc = win.document;
             doc.createStyleSheet().addRule(".rvml", "behavior:url(#default#VML)");
             try {
@@ -5360,7 +5385,7 @@ window.Raphael.vml && function (R) {
                 };
             }
         };
-    initWin(R._g.win);
+    R._engine.initWin(R._g.win);
     R._engine.create = function () {
         var con = R._getContainer.apply(0, arguments),
             container = con.container,
@@ -5417,7 +5442,7 @@ window.Raphael.vml && function (R) {
         R.eve("remove", this);
         this.canvas.parentNode.removeChild(this.canvas);
         for (var i in this) {
-            this[i] = removed(i);
+            this[i] = typeof this[i] == "function" ? R._removedFactory(i) : null;
         }
         return true;
     };

@@ -1,5 +1,5 @@
 // ┌─────────────────────────────────────────────────────────────────────┐ \\
-// │ Raphaël 2 - JavaScript Vector Library                               │ \\
+// │ Raphaël - JavaScript Vector Library                                 │ \\
 // ├─────────────────────────────────────────────────────────────────────┤ \\
 // │ VML Module                                                          │ \\
 // ├─────────────────────────────────────────────────────────────────────┤ \\
@@ -116,7 +116,7 @@ window.Raphael.vml && function (R) {
     R.toString = function () {
         return  "Your browser doesn\u2019t support SVG. Falling down to VML.\nYou are running Rapha\xebl " + this.version;
     };
-    addArrow = function (o, value, isEnd) {
+    var addArrow = function (o, value, isEnd) {
         var values = Str(value).toLowerCase().split("-"),
             se = isEnd ? "end" : "start",
             i = values.length,
@@ -143,7 +143,7 @@ window.Raphael.vml && function (R) {
         stroke[se + "arrow"] = type;
         stroke[se + "arrowlength"] = w;
         stroke[se + "arrowwidth"] = h;
-    };
+    },
     setFillAndStroke = function (o, params) {
         // o.paper.canvas.style.display = "none";
         o.attrs = o.attrs || {};
@@ -204,7 +204,7 @@ window.Raphael.vml && function (R) {
                 }
             }
             if (!params["clip-rect"]) {
-                node.clipRect && (node.clipRect.style.clip = E);
+                node.clipRect && (node.clipRect.style.clip = "auto");
             }
         }
         if (o.textpath) {
@@ -331,7 +331,7 @@ window.Raphael.vml && function (R) {
             a["font-family"] && (s.fontFamily = a["font-family"]);
             a["font-weight"] && (s.fontWeight = a["font-weight"]);
             a["font-style"] && (s.fontStyle = a["font-style"]);
-            fontSize = toFloat(fontSize ? fontSize[0] : a["font-size"]);
+            fontSize = toFloat(a["font-size"] || fontSize && fontSize[0]) || 10;
             s.fontSize = fontSize * m + "px";
             res.textpath.string && (span.innerHTML = Str(res.textpath.string).replace(/</g, "&#60;").replace(/&/g, "&#38;").replace(/\n/g, "<br>"));
             var brect = span.getBoundingClientRect();
@@ -366,7 +366,7 @@ window.Raphael.vml && function (R) {
             res.textpath.style["v-text-kern"] = true;
         }
         // res.paper.canvas.style.display = E;
-    };
+    },
     addGradientFill = function (o, gradient, fill) {
         o.attrs = o.attrs || {};
         var attrs = o.attrs,
@@ -424,7 +424,7 @@ window.Raphael.vml && function (R) {
             o.appendChild(fill);
         }
         return 1;
-    };
+    },
     Element = function (node, vml) {
         this[0] = this.node = node;
         node.raphael = true;
@@ -574,16 +574,12 @@ window.Raphael.vml && function (R) {
         if (this.removed) {
             return {};
         }
-        if (this.type == "text") {
-            return {
-                x: this.X + (this.bbx || 0) - this.W / 2,
-                y: this.Y - this.H,
-                width: this.W,
-                height: this.H
-            };
-        } else {
-            return pathDimensions(this.attrs.path);
-        }
+        return {
+            x: this.X + (this.bbx || 0) - this.W / 2,
+            y: this.Y - this.H,
+            width: this.W,
+            height: this.H
+        };
     };
     elproto.remove = function () {
         if (this.removed) {
@@ -595,7 +591,7 @@ window.Raphael.vml && function (R) {
         this.node.parentNode.removeChild(this.node);
         this.shape && this.shape.parentNode.removeChild(this.shape);
         for (var i in this) {
-            delete this[i];
+            this[i] = typeof this[i] == "function" ? R._removedFactory(i) : null;
         }
         this.removed = true;
     };
@@ -856,7 +852,7 @@ window.Raphael.vml && function (R) {
         cs.height = height;
         cs.clip = "rect(0 " + width + " " + height + " 0)";
         if (this._viewBox) {
-            setViewBox.apply(this, this._viewBox);
+            R._engine.setViewBox.apply(this, this._viewBox);
         }
         return this;
     };
@@ -887,8 +883,8 @@ window.Raphael.vml && function (R) {
         });
         return this;
     };
-    var createNode,
-        initWin = function (win) {
+    var createNode;
+    R._engine.initWin = function (win) {
             var doc = win.document;
             doc.createStyleSheet().addRule(".rvml", "behavior:url(#default#VML)");
             try {
@@ -902,7 +898,7 @@ window.Raphael.vml && function (R) {
                 };
             }
         };
-    initWin(R._g.win);
+    R._engine.initWin(R._g.win);
     R._engine.create = function () {
         var con = R._getContainer.apply(0, arguments),
             container = con.container,
@@ -959,7 +955,7 @@ window.Raphael.vml && function (R) {
         R.eve("remove", this);
         this.canvas.parentNode.removeChild(this.canvas);
         for (var i in this) {
-            this[i] = removed(i);
+            this[i] = typeof this[i] == "function" ? R._removedFactory(i) : null;
         }
         return true;
     };

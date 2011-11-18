@@ -1,5 +1,5 @@
 // ┌─────────────────────────────────────────────────────────────────────┐ \\
-// │ Raphaël 2 - JavaScript Vector Library                               │ \\
+// │ Raphaël - JavaScript Vector Library                                 │ \\
 // ├─────────────────────────────────────────────────────────────────────┤ \\
 // │ SVG Module                                                          │ \\
 // ├─────────────────────────────────────────────────────────────────────┤ \\
@@ -50,16 +50,6 @@ window.Raphael.svg && function (R) {
         }
         return el;
     },
-    gradients = {},
-    rgGrad = /^url\(#(.*)\)$/,
-    removeGradientFill = function (node, paper) {
-        var oid = node.getAttribute("fill");
-        oid = oid && oid.match(rgGrad);
-        if (oid && !--gradients[oid[1]]) {
-            delete gradients[oid[1]];
-            paper.defs.removeChild(R._g.doc.getElementById(oid[1]));
-        }
-    },
     addGradientFill = function (element, gradient) {
         var type = "linear",
             id = element.id + gradient,
@@ -106,30 +96,33 @@ window.Raphael.svg && function (R) {
             if (!dots) {
                 return null;
             }
-            if (element.gradient) {
+            id = id.replace(/[\(\)\s,\xb0#]/g, "_");
+            
+            if (element.gradient && id != element.gradient.id) {
                 SVG.defs.removeChild(element.gradient);
                 delete element.gradient;
             }
 
-            id = id.replace(/[\(\)\s,\xb0#]/g, "-");
-            el = $(type + "Gradient", {id: id});
-            element.gradient = el;
-            $(el, type == "radial" ? {
-                fx: fx,
-                fy: fy
-            } : {
-                x1: vector[0],
-                y1: vector[1],
-                x2: vector[2],
-                y2: vector[3],
-                gradientTransform: element.matrix.invert()
-            });
-            SVG.defs.appendChild(el);
-            for (var i = 0, ii = dots.length; i < ii; i++) {
-                el.appendChild($("stop", {
-                    offset: dots[i].offset ? dots[i].offset : i ? "100%" : "0%",
-                    "stop-color": dots[i].color || "#fff"
-                }));
+            if (!element.gradient) {
+                el = $(type + "Gradient", {id: id});
+                element.gradient = el;
+                $(el, type == "radial" ? {
+                    fx: fx,
+                    fy: fy
+                } : {
+                    x1: vector[0],
+                    y1: vector[1],
+                    x2: vector[2],
+                    y2: vector[3],
+                    gradientTransform: element.matrix.invert()
+                });
+                SVG.defs.appendChild(el);
+                for (var i = 0, ii = dots.length; i < ii; i++) {
+                    el.appendChild($("stop", {
+                        offset: dots[i].offset ? dots[i].offset : i ? "100%" : "0%",
+                        "stop-color": dots[i].color || "#fff"
+                    }));
+                }
             }
         }
         $(o, {
@@ -375,10 +368,13 @@ window.Raphael.svg && function (R) {
                             o.clip = rc;
                         }
                         if (!value) {
-                            var clip = R._g.doc.getElementById(node.getAttribute("clip-path").replace(/(^url\(#|\)$)/g, E));
-                            clip && clip.parentNode.removeChild(clip);
-                            $(node, {"clip-path": E});
-                            delete o.clip;
+                            var path = node.getAttribute("clip-path");
+                            if (path) {
+                                var clip = R._g.doc.getElementById(path.replace(/(^url\(#|\)$)/g, E));
+                                clip && clip.parentNode.removeChild(clip);
+                                $(node, {"clip-path": E});
+                                delete o.clip;
+                            }
                         }
                     break;
                     case "path":
@@ -873,12 +869,16 @@ window.Raphael.svg && function (R) {
         if (this.removed) {
             return;
         }
-        this.paper.__set__ && this.paper.__set__.exclude(this);
+        var paper = this.paper;
+        paper.__set__ && paper.__set__.exclude(this);
         eve.unbind("*.*." + this.id);
-        R._tear(this, this.paper);
+        if (this.gradient) {
+            paper.defs.removeChild(this.gradient);
+        }
+        R._tear(this, paper);
         this.node.parentNode.removeChild(this.node);
         for (var i in this) {
-            delete this[i];
+            this[i] = typeof this[i] == "function" ? R._removedFactory(i) : null;
         }
         this.removed = true;
     };
@@ -921,8 +921,8 @@ window.Raphael.svg && function (R) {
      o arrow-end (string) arrowhead on the end of the path. The format for string is `<type>[-<width>[-<length>]]`. Possible types: `classic`, `block`, `open`, `oval`, `diamond`, `none`, width: `wide`, `narrow`, `midium`, length: `long`, `short`, `midium`.
      o clip-rect (string) comma or space separated values: x, y, width and height
      o cursor (string) CSS type of the cursor
-     o cx (number)
-     o cy (number)
+     o cx (number) the x-axis coordinate of the center of the circle, or ellipse
+     o cy (number) the y-axis coordinate of the center of the circle, or ellipse
      o fill (string) colour, gradient or image
      o fill-opacity (number)
      o font (string)
@@ -933,9 +933,9 @@ window.Raphael.svg && function (R) {
      o href (string) URL, if specified element behaves as hyperlink
      o opacity (number)
      o path (string) SVG path string format
-     o r (number)
-     o rx (number)
-     o ry (number)
+     o r (number) radius of the circle, ellipse or rounded corner on the rect
+     o rx (number) horisontal radius of the ellipse
+     o ry (number) vertical radius of the ellipse
      o src (string) image URL, only works for @Element.image element
      o stroke (string) stroke colour
      o stroke-dasharray (string) [“”, “`-`”, “`.`”, “`-.`”, “`-..`”, “`. `”, “`- `”, “`--`”, “`- .`”, “`--.`”, “`--..`”]
@@ -1050,7 +1050,11 @@ window.Raphael.svg && function (R) {
         if (this.removed) {
             return this;
         }
-        this.node.parentNode.appendChild(this.node);
+        if (this.node.parentNode.tagName.toLowerCase() == "a") {
+            this.node.parentNode.parentNode.appendChild(this.node.parentNode);
+        } else {
+            this.node.parentNode.appendChild(this.node);
+        }
         var svg = this.paper;
         svg.top != this && R._tofront(this, svg);
         return this;
@@ -1066,11 +1070,14 @@ window.Raphael.svg && function (R) {
         if (this.removed) {
             return this;
         }
-        if (this.node.parentNode.firstChild != this.node) {
-            this.node.parentNode.insertBefore(this.node, this.node.parentNode.firstChild);
-            R._toback(this, this.paper);
-            var svg = this.paper;
+        var parent = this.node.parentNode;
+        if (parent.tagName.toLowerCase() == "a") {
+            parent.parentNode.insertBefore(this.node.parentNode, this.node.parentNode.parentNode.firstChild); 
+        } else if (parent.firstChild != this.node) {
+            parent.insertBefore(this.node, this.node.parentNode.firstChild);
         }
+        R._toback(this, this.paper);
+        var svg = this.paper;
         return this;
     };
     /*\
@@ -1327,7 +1334,7 @@ window.Raphael.svg && function (R) {
         eve("remove", this);
         this.canvas.parentNode && this.canvas.parentNode.removeChild(this.canvas);
         for (var i in this) {
-            this[i] = removed(i);
+            this[i] = typeof this[i] == "function" ? R._removedFactory(i) : null;
         }
     };
     var setproto = R.st;

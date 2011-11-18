@@ -1,5 +1,5 @@
 // ┌─────────────────────────────────────────────────────────────────────┐ \\
-// │ "Raphaël 2.0" - JavaScript Vector Library                           │ \\
+// │ "Raphaël 2.0.1" - JavaScript Vector Library                         │ \\
 // ├─────────────────────────────────────────────────────────────────────┤ \\
 // │ Copyright (c) 2008-2011 Dmitry Baranovskiy (http://raphaeljs.com)   │ \\
 // │ Copyright (c) 2008-2011 Sencha Labs (http://sencha.com)             │ \\
@@ -26,7 +26,7 @@
      - height (number)
      - callback (function) #optional callback function which is going to be executed in the context of newly created paper
      * or
-     - all (array) (first 3 or 4 elements in the array are equal to [containerID, width, height] or [x, y, width, height]. The rest are element descriptions in format {type: type, <attributes>})
+     - all (array) (first 3 or 4 elements in the array are equal to [containerID, width, height] or [x, y, width, height]. The rest are element descriptions in format {type: type, <attributes>}). See @Paper.add.
      - callback (function) #optional callback function which is going to be executed in the context of newly created paper
      * or
      - onReadyCallback (function) function that is going to be called on DOM ready event. You can also subscribe to this event via Eve’s “DOMLoad” event. In this case method returns `undefined`.
@@ -60,17 +60,7 @@
         if (R.is(first, "function")) {
             return loaded ? first() : eve.on("DOMload", first);
         } else if (R.is(first, array)) {
-            var a = first,
-                cnv = R._engine.create[apply](R, a.splice(0, 3 + R.is(a[0], nu))),
-                res = cnv.set(),
-                i = 0,
-                ii = a.length,
-                j;
-            for (; i < ii; i++) {
-                j = a[i] || {};
-                elements[has](j.type) && res.push(cnv[j.type]().attr(j));
-            }
-            return res;
+            return R._engine.create[apply](R, first.splice(0, 3 + R.is(first[0], nu))).add(first);
         } else {
             var args = Array.prototype.slice.call(arguments, 0);
             if (R.is(args[args.length - 1], "function")) {
@@ -83,7 +73,7 @@
             }
         }
     }
-    R.version = "2.0.0";
+    R.version = "2.0.1";
     R.eve = eve;
     var loaded,
         separator = /[, ]+/,
@@ -191,6 +181,7 @@
             gradient: 0,
             height: 0,
             href: "http://raphaeljs.com/",
+            "letter-spacing": 0,
             opacity: 1,
             path: "M0,0",
             r: 0,
@@ -293,7 +284,7 @@
             if (!matrix) {
                 return path;
             }
-            var x, y, i, j, pathi;
+            var x, y, i, j, ii, jj, pathi;
             path = path2curve(path);
             for (i = 0, ii = path.length; i < ii; i++) {
                 pathi = path[i];
@@ -501,8 +492,8 @@
         eve("setWindow", R, g.win, newwin);
         g.win = newwin;
         g.doc = g.win.document;
-        if (initWin) {
-            initWin(g.win);
+        if (R._engine.initWin) {
+            R._engine.initWin(g.win);
         }
     };
     var toHex = function (color) {
@@ -632,7 +623,7 @@
                 clr.v = rgb.b;
             } else {
                 clr = {hex: "none"};
-                crl.r = clr.g = clr.b = clr.h = clr.s = clr.v = clr.l = -1;
+                clr.r = clr.g = clr.b = clr.h = clr.s = clr.v = clr.l = -1;
             }
         }
         clr.toString = rgbtoString;
@@ -815,7 +806,7 @@
 
     var preload = R._preload = function (src, f) {
         var img = g.doc.createElement("img");
-        img.style.cssText = "position:absolute;left:-9999em;top-9999em";
+        img.style.cssText = "position:absolute;left:-9999em;top:-9999em";
         img.onload = function () {
             f.call(this);
             this.onload = null;
@@ -1172,6 +1163,11 @@
             start: {x: ax, y: ay},
             end: {x: cx, y: cy},
             alpha: alpha
+        };
+    };
+    R._removedFactory = function (methodname) {
+        return function () {
+            throw new Error("Rapha\xebl: you are calling to method \u201c" + methodname + "\u201d of removed object");
         };
     };
     var pathDimensions = cacher(function (path) {
@@ -1719,11 +1715,6 @@
             el2.prev = el;
             el.next = el2;
         },
-        removed = function (methodname) {
-            return function () {
-                throw new Error("Rapha\xebl: you are calling to method \u201c" + methodname + "\u201d of removed object");
-            };
-        },
         extractTransform = R._extractTransform = function (el, tstr) {
             if (tstr == null) {
                 return el._.transform;
@@ -2175,7 +2166,12 @@
         matrixproto.toTransformString = function (shorter) {
             var s = shorter || this[split]();
             if (s.isSimple) {
-                return "t" + [s.dx, s.dy] + "s" + [s.scalex, s.scaley, 0, 0] + "r" + [s.rotate, 0, 0];
+                s.scalex = +s.scalex.toFixed(4);
+                s.scaley = +s.scaley.toFixed(4);
+                s.rotate = +s.rotate.toFixed(4);
+                return  (s.dx && s.dy ? "t" + [s.dx, s.dy] : E) + 
+                        (s.scalex != 1 || s.scaley != 1 ? "s" + [s.scalex, s.scaley, 0, 0] : E) +
+                        (s.rotate ? "r" + [s.rotate, 0, 0] : E);
             } else {
                 return "m" + [this.get(0), this.get(1), this.get(2), this.get(3), this.get(4), this.get(5)];
             }
@@ -2647,6 +2643,7 @@
     elproto.unhover = function (f_in, f_out) {
         return this.unmouseover(f_in).unmouseout(f_out);
     };
+    var draggable = [];
     /*\
      * Element.drag
      [ method ]
@@ -2693,6 +2690,7 @@
             eve("drag.start." + this.id, start_scope || move_scope || this, e.clientX + scrollX, e.clientY + scrollY, e);
         }
         this._drag = {};
+        draggable.push({el: this, start: start});
         this.mousedown(start);
         return this;
     };
@@ -2714,13 +2712,13 @@
      * Removes all drag event handlers from given element.
     \*/
     elproto.undrag = function () {
-        var i = drag.length;
-        while (i--) if (drag[i].el == this) {
-            R.unmousedown(drag[i].start);
-            drag.splice(i++, 1);
+        var i = draggable.length;
+        while (i--) if (draggable[i].el == this) {
+            this.unmousedown(draggable[i].start);
+            draggable.splice(i, 1);
             eve.unbind("drag.*." + this.id);
         }
-        !drag.length && R.unmousemove(dragMove).unmouseup(dragUp);
+        !draggable.length && R.unmousemove(dragMove).unmouseup(dragUp);
     };
     /*\
      * Paper.circle
@@ -3615,7 +3613,7 @@
      = (object) original element
     \*/
     elproto.animateWith = function (element, anim, params, ms, easing, callback) {
-        var a = params ? R.animation(params, ms, easing, callback) : anim;
+        var a = params ? R.animation(params, ms, easing, callback) : anim,
             status = element.status(anim);
         return this.animate(a).status(a, status * anim.ms / a.ms);
     };
@@ -3776,7 +3774,7 @@
             return;
         }
         if (!isInAnim) {
-            for (attr in params) if (params[has](attr)) {
+            for (var attr in params) if (params[has](attr)) {
                 if (availableAnimAttrs[has](attr) || element.paper.customAttributes[has](attr)) {
                     from[attr] = element.attr(attr);
                     (from[attr] == null) && (from[attr] = availableAttrs[attr]);
@@ -4505,6 +4503,48 @@
             out.transform(["...s", scale, scale, top, height, "t", (x - top) / scale, (y - height) / scale]);
         }
         return out;
+    };
+
+    /*\
+     * Paper.add
+     [ method ]
+     **
+     * Imports elements in JSON array in format `{type: type, <attributes>}`
+     **
+     > Parameters
+     **
+     - json (array)
+     = (object) resulting set of imported elements
+     > Usage
+     | paper.import([
+     |     {
+     |         type: "circle",
+     |         cx: 10,
+     |         cy: 10,
+     |         r: 5
+     |     },
+     |     {
+     |         type: "rect",
+     |         x: 10,
+     |         y: 10,
+     |         width: 10,
+     |         height: 10,
+     |         fill: "#fc0"
+     |     }
+     | ]);
+    \*/
+    paperproto.add = function (json) {
+        if (R.is(json, "array")) {
+            var res = this.set(),
+                i = 0,
+                ii = json.length,
+                j;
+            for (; i < ii; i++) {
+                j = json[i] || {};
+                elements[has](j.type) && res.push(this[j.type]().attr(j));
+            }
+        }
+        return res;
     };
 
     /*\
