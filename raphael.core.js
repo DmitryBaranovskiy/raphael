@@ -337,9 +337,10 @@
      **
      * You can add your own method to the canvas. For example if you want to draw a pie chart,
      * you can create your own pie chart function and ship it as a Raphaël plugin. To do this
-     * you need to extend the `Raphael.fn` object. Please note that you can create your own namespaces
-     * inside the `fn` object — methods will be run in the context of canvas anyway. You should alter
-     * the `fn` object before a Raphaël instance is created, otherwise it will take no effect.
+     * you need to extend the `Raphael.fn` object. You should modify the `fn` object before a
+     * Raphaël instance is created, otherwise it will take no effect. Please note that the
+     * ability for namespaced plugins was removed in Raphael 2.0. It is up to the plugin to
+     * ensure any namespacing ensures proper context.
      > Usage
      | Raphael.fn.arrow = function (x1, y1, x2, y2, size) {
      |     return this.path( ... );
@@ -4564,7 +4565,7 @@
      |     width = 40,
      |     height = 50;
      | // this will draw a rectangular shape equivalent to "M10,20h40v50h-40z"
-     | paper.path(Raphael.format("M{1},{2}h{3}v{4}h{5}z", x, y, width, height, -width));
+     | paper.path(Raphael.format("M{0},{1}h{2}v{3}h{4}z", x, y, width, height, -width));
     \*/
     R.format = function (token, params) {
         var args = R.is(params, array) ? [0][concat](params) : arguments;
