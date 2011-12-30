@@ -5,7 +5,7 @@
  * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
  */
 
-(function () {
+(function (doc) {
     if (Raphael.vml) {
         var reg = / progid:\S+Blur\([^\)]+\)/g;
         Raphael.el.blur = function (size) {
@@ -50,4 +50,4 @@
             }
         };
     }
-})();
+})(document);
