@@ -4438,9 +4438,15 @@ window.Raphael.svg && function (R) {
     
     R.prototype.renderfix = function () {
         var cnvs = this.canvas,
-            s = cnvs.style,
-            pos = cnvs.getScreenCTM() || cnvs.createSVGMatrix(),
-            left = -pos.e % 1,
+            s = cnvs.style;
+            var pos;
+            try {
+                // IE9 throws an exception
+                pos = cnvs.getScreenCTM() || cnvs.createSVGMatrix();
+            } catch(err) {
+                pos = cnvs.createSVGMatrix();
+            }
+            var left = -pos.e % 1,
             top = -pos.f % 1;
         if (left || top) {
             if (left) {
