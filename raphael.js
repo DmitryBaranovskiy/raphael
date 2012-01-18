@@ -1879,7 +1879,7 @@
                 s.scalex = +s.scalex.toFixed(4);
                 s.scaley = +s.scaley.toFixed(4);
                 s.rotate = +s.rotate.toFixed(4);
-                return  (s.dx && s.dy ? "t" + [s.dx, s.dy] : E) + 
+                return  (s.dx || s.dy ? "t" + [s.dx, s.dy] : E) + 
                         (s.scalex != 1 || s.scaley != 1 ? "s" + [s.scalex, s.scaley, 0, 0] : E) +
                         (s.rotate ? "r" + [s.rotate, 0, 0] : E);
             } else {
