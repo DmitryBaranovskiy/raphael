@@ -3721,7 +3721,7 @@ window.Raphael.svg && function (R) {
                     case "href":
                     case "title":
                         var t = $('title');
-                        t.nodeValue = value;
+                        t.appendChild(R._g.doc.createTextNode(value));
                         node.appendChild(t);
                         // fall through...
                     case "target":
