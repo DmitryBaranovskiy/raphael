@@ -3720,6 +3720,10 @@ window.Raphael.svg && function (R) {
                         break;
                     case "href":
                     case "title":
+                        var t = $('title');
+                        t.nodeValue = value;
+                        node.appendChild(t);
+                        // fall through...
                     case "target":
                         var pn = node.parentNode;
                         if (pn.tagName.toLowerCase() != "a") {
