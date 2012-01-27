@@ -2249,6 +2249,18 @@
         return target;
     };
     
+     paperproto.getElementsByPoint = function(x,y){
+        var hits=[],
+    		paper=this;	
+    	paper.forEach(function(e){
+    		if (e.attr("x")<=x && (e.attr("x")+e.attr("width"))>=x && e.attr("y")<=y && (e.attr("y")+e.attr("height"))>=y){
+    			hits.push(e);
+    		}
+    	},this);
+    	return hits;
+    };
+    
+    
     paperproto.getById = function (id) {
         var bot = this.bottom;
         while (bot) {
