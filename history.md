@@ -1,4 +1,4 @@
-2.0.2 * 2011-11-18
+2.0.2 * 2012-02-08
 ------------------
 
   * Removing of linked element now removes `<a>` as well
