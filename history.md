@@ -1,3 +1,15 @@
+2.0.2 * 2011-11-18
+------------------
+
+  * Removing of linked element now removes `<a>` as well
+  * Fixed white space recognition in passed strings
+  * Added special case for path that has only one Catmull-Rom curve
+  * Fixed toTransformString method
+  * Fixed animateWith method
+  * Fixed “target” attribute clearing
+  * Fixed bug with changing fill from image to solid colour
+  * fixed renderfix method
+
 2.0.1 * 2011-11-18
 ------------------
 

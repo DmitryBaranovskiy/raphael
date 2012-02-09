@@ -227,8 +227,8 @@ window.Raphael.svg && function (R) {
                     });
                     use = $($("use"), {
                         "xlink:href": "#" + pathId,
-                        transform: (isEnd ? " rotate(180 " + w / 2 + " " + h / 2 + ") " : S) + "scale(" + w / t + "," + h / t + ")",
-                        "stroke-width": 1 / ((w / t + h / t) / 2)
+                        transform: (isEnd ? "rotate(180 " + w / 2 + " " + h / 2 + ") " : E) + "scale(" + w / t + "," + h / t + ")",
+                        "stroke-width": (1 / ((w / t + h / t) / 2)).toFixed(4)
                     });
                     marker.appendChild(use);
                     p.defs.appendChild(marker);
@@ -331,8 +331,8 @@ window.Raphael.svg && function (R) {
                             hl.appendChild(node);
                             pn = hl;
                         }
-                        if (att == "target" && value == "blank") {
-                            pn.setAttributeNS(xlink, "show", "new");
+                        if (att == "target") {
+                            pn.setAttributeNS(xlink, "show", value == "blank" ? "new" : value);
                         } else {
                             pn.setAttributeNS(xlink, att, value);
                         }
@@ -483,7 +483,6 @@ window.Raphael.svg && function (R) {
                                 });
                             })(el);
                             o.paper.defs.appendChild(el);
-                            node.style.fill = "url(#" + el.id + ")";
                             $(node, {fill: "url(#" + el.id + ")"});
                             o.pattern = el;
                             o.pattern && updatePosition(o);
@@ -876,7 +875,11 @@ window.Raphael.svg && function (R) {
             paper.defs.removeChild(this.gradient);
         }
         R._tear(this, paper);
-        this.node.parentNode.removeChild(this.node);
+        if (this.node.parentNode.tagName.toLowerCase() == "a") {
+            this.node.parentNode.parentNode.removeChild(this.node.parentNode);
+        } else {
+            this.node.parentNode.removeChild(this.node);
+        }
         for (var i in this) {
             this[i] = typeof this[i] == "function" ? R._removedFactory(i) : null;
         }
@@ -1177,7 +1180,6 @@ window.Raphael.svg && function (R) {
     };
     R._engine.text = function (svg, x, y, text) {
         var el = $("text");
-        // $(el, {x: x, y: y, "text-anchor": "middle"});
         svg.canvas && svg.canvas.appendChild(el);
         var res = new Element(el, svg);
         res.attrs = {
@@ -1242,7 +1244,6 @@ window.Raphael.svg && function (R) {
         container.width = width;
         container.height = height;
         container.canvas = cnvs;
-        // plugins.call(container, container, R.fn);
         container.clear();
         container._left = container._top = 0;
         isFloating && (container.renderfix = function () {});
@@ -1293,8 +1294,13 @@ window.Raphael.svg && function (R) {
     R.prototype.renderfix = function () {
         var cnvs = this.canvas,
             s = cnvs.style,
-            pos = cnvs.getScreenCTM() || cnvs.createSVGMatrix(),
-            left = -pos.e % 1,
+            pos;
+        try {
+            pos = cnvs.getScreenCTM() || cnvs.createSVGMatrix();
+        } catch (e) {
+            pos = cnvs.createSVGMatrix();
+        }
+        var left = -pos.e % 1,
             top = -pos.f % 1;
         if (left || top) {
             if (left) {

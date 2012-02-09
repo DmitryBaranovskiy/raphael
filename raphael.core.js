@@ -1,5 +1,5 @@
 // ┌─────────────────────────────────────────────────────────────────────┐ \\
-// │ "Raphaël 2.0.1" - JavaScript Vector Library                         │ \\
+// │ "Raphaël 2.0.2" - JavaScript Vector Library                         │ \\
 // ├─────────────────────────────────────────────────────────────────────┤ \\
 // │ Copyright (c) 2008-2011 Dmitry Baranovskiy (http://raphaeljs.com)   │ \\
 // │ Copyright (c) 2008-2011 Sencha Labs (http://sencha.com)             │ \\
@@ -73,7 +73,7 @@
             }
         }
     }
-    R.version = "2.0.1";
+    R.version = "2.0.2";
     R.eve = eve;
     var loaded,
         separator = /[, ]+/,
@@ -225,13 +225,14 @@
             x: nu,
             y: nu
         },
-        commaSpaces = /\s*,\s*/,
+        whitespace = /[\x09\x0a\x0b\x0c\x0d\x20\xa0\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u202f\u205f\u3000\u2028\u2029]/g,
+        commaSpaces = /[\x09\x0a\x0b\x0c\x0d\x20\xa0\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u202f\u205f\u3000\u2028\u2029]*,[\x09\x0a\x0b\x0c\x0d\x20\xa0\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u202f\u205f\u3000\u2028\u2029]*/,
         hsrg = {hs: 1, rg: 1},
         p2s = /,?([achlmqrstvxz]),?/gi,
-        pathCommand = /([achlmrqstvz])[\s,]*((-?\d*\.?\d*(?:e[\-+]?\d+)?\s*,?\s*)+)/ig,
-        tCommand = /([rstm])[\s,]*((-?\d*\.?\d*(?:e[\-+]?\d+)?\s*,?\s*)+)/ig,
-        pathValues = /(-?\d*\.?\d*(?:e[\-+]?\d+)?)\s*,?\s*/ig,
-        radial_gradient = R._radial_gradient = /^r(?:\(([^,]+?)\s*,\s*([^\)]+?)\))?/,
+        pathCommand = /([achlmrqstvz])[\x09\x0a\x0b\x0c\x0d\x20\xa0\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u202f\u205f\u3000\u2028\u2029,]*((-?\d*\.?\d*(?:e[\-+]?\d+)?[\x09\x0a\x0b\x0c\x0d\x20\xa0\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u202f\u205f\u3000\u2028\u2029]*,?[\x09\x0a\x0b\x0c\x0d\x20\xa0\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u202f\u205f\u3000\u2028\u2029]*)+)/ig,
+        tCommand = /([rstm])[\x09\x0a\x0b\x0c\x0d\x20\xa0\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u202f\u205f\u3000\u2028\u2029,]*((-?\d*\.?\d*(?:e[\-+]?\d+)?[\x09\x0a\x0b\x0c\x0d\x20\xa0\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u202f\u205f\u3000\u2028\u2029]*,?[\x09\x0a\x0b\x0c\x0d\x20\xa0\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u202f\u205f\u3000\u2028\u2029]*)+)/ig,
+        pathValues = /(-?\d*\.?\d*(?:e[\-+]?\d+)?)[\x09\x0a\x0b\x0c\x0d\x20\xa0\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u202f\u205f\u3000\u2028\u2029]*,?[\x09\x0a\x0b\x0c\x0d\x20\xa0\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u202f\u205f\u3000\u2028\u2029]*/ig,
+        radial_gradient = R._radial_gradient = /^r(?:\(([^,]+?)[\x09\x0a\x0b\x0c\x0d\x20\xa0\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u202f\u205f\u3000\u2028\u2029]*,[\x09\x0a\x0b\x0c\x0d\x20\xa0\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u202f\u205f\u3000\u2028\u2029]*([^\)]+?)\))?/,
         eldata = {},
         sortByKey = function (a, b) {
             return a.key - b.key;
@@ -995,31 +996,43 @@
     };
 
     // http://schepers.cc/getting-to-the-point
-    function catmullRom2bezier(crp) {
+    function catmullRom2bezier(crp, z) {
         var d = [];
-        for (var i = 0, iLen = crp.length; iLen - 2 > i; i += 2) {
-            var p = [{x: +crp[i],     y: +crp[i + 1]},
-                     {x: +crp[i],     y: +crp[i + 1]},
-                     {x: +crp[i + 2], y: +crp[i + 3]},
-                     {x: +crp[i + 4], y: +crp[i + 5]}];
-            if (iLen - 4 == i) {
-                p[0] = {x: +crp[i - 2], y: +crp[i - 1]};
-                p[3] = p[2];
-            } else if (i) {
-                p[0] = {x: +crp[i - 2], y: +crp[i - 1]};
+        for (var i = 0, iLen = crp.length; iLen - 2 * !z > i; i += 2) {
+            var p = [
+                        {x: +crp[i - 2], y: +crp[i - 1]},
+                        {x: +crp[i],     y: +crp[i + 1]},
+                        {x: +crp[i + 2], y: +crp[i + 3]},
+                        {x: +crp[i + 4], y: +crp[i + 5]}
+                    ];
+            if (z) {
+                if (!i) {
+                    p[0] = {x: +crp[iLen - 2], y: +crp[iLen - 1]};
+                } else if (iLen - 4 == i) {
+                    p[3] = {x: +crp[0], y: +crp[1]};
+                } else if (iLen - 2 == i) {
+                    p[2] = {x: +crp[0], y: +crp[1]};
+                    p[3] = {x: +crp[2], y: +crp[3]};
+                }
+            } else {
+                if (iLen - 4 == i) {
+                    p[3] = p[2];
+                } else if (!i) {
+                    p[0] = {x: +crp[i], y: +crp[i + 1]};
+                }
             }
             d.push(["C",
-                (-p[0].x + 6 * p[1].x + p[2].x) / 6,
-                (-p[0].y + 6 * p[1].y + p[2].y) / 6,
-                (p[1].x + 6 * p[2].x - p[3].x) / 6,
-                (p[1].y + 6*p[2].y - p[3].y) / 6,
-                p[2].x,
-                p[2].y
+                  (-p[0].x + 6 * p[1].x + p[2].x) / 6,
+                  (-p[0].y + 6 * p[1].y + p[2].y) / 6,
+                  (p[1].x + 6 * p[2].x - p[3].x) / 6,
+                  (p[1].y + 6*p[2].y - p[3].y) / 6,
+                  p[2].x,
+                  p[2].y
             ]);
         }
 
-        return d;
-    }
+          return d;
+      }
     /*\
      * Raphael.parsePathString
      [ method ]
@@ -1321,6 +1334,7 @@
                 start++;
                 res[0] = ["M", x, y];
             }
+            var crz = pathArray.length == 3 && pathArray[0][0] == "M" && pathArray[1][0].toUpperCase() == "R" && pathArray[2][0].toUpperCase() == "Z";
             for (var r, pa, i = start, ii = pathArray.length; i < ii; i++) {
                 res.push(r = []);
                 pa = pathArray[i];
@@ -1349,7 +1363,7 @@
                                 dots[++j] = +dots[j] + y;
                             }
                             res.pop();
-                            res = res[concat](catmullRom2bezier(dots));
+                            res = res[concat](catmullRom2bezier(dots, crz));
                             break;
                         case "M":
                             mx = +pa[1] + x;
@@ -1362,7 +1376,7 @@
                 } else if (pa[0] == "R") {
                     dots = [x, y][concat](pa.slice(1));
                     res.pop();
-                    res = res[concat](catmullRom2bezier(dots));
+                    res = res[concat](catmullRom2bezier(dots, crz));
                     r = ["R"][concat](pa.slice(-2));
                 } else {
                     for (var k = 0, kk = pa.length; k < kk; k++) {
@@ -2170,7 +2184,7 @@
                 s.scalex = +s.scalex.toFixed(4);
                 s.scaley = +s.scaley.toFixed(4);
                 s.rotate = +s.rotate.toFixed(4);
-                return  (s.dx && s.dy ? "t" + [s.dx, s.dy] : E) + 
+                return  (s.dx || s.dy ? "t" + [s.dx, s.dy] : E) + 
                         (s.scalex != 1 || s.scaley != 1 ? "s" + [s.scalex, s.scaley, 0, 0] : E) +
                         (s.rotate ? "r" + [s.rotate, 0, 0] : E);
             } else {
@@ -2546,7 +2560,7 @@
                 return this;
             };
             R["un" + eventName] = elproto["un" + eventName] = function (fn) {
-                var events = this.events,
+                var events = this.events || [],
                     l = events.length;
                 while (l--) if (events[l].name == eventName && events[l].f == fn) {
                     events[l].unbind();
@@ -2815,10 +2829,12 @@
      # <tr><td>A</td><td>elliptical arc</td><td>(rx ry x-axis-rotation large-arc-flag sweep-flag x y)+</td></tr>
      # <tr><td>R</td><td><a href="http://en.wikipedia.org/wiki/Catmull–Rom_spline#Catmull.E2.80.93Rom_spline">Catmull-Rom curveto</a>*</td><td>x1 y1 (x y)+</td></tr></tbody></table>
      * * “Catmull-Rom curveto” is a not standard SVG command and added in 2.0 to make life easier.
+     * Note: there is a special case when path consist of just three commands: “M10,10R…z”. In this case path will smoothly connects to its beginning.
      > Usage
      | var c = paper.path("M10 10L90 90");
      | // draw a diagonal line:
      | // move to 10,10, line to 90,90
+     * For example of path strings, check out these icons: http://raphaeljs.com/icons/
     \*/
     paperproto.path = function (pathString) {
         pathString && !R.is(pathString, string) && !R.is(pathString[0], array) && (pathString += E);
@@ -2933,13 +2949,6 @@
      **
      - width (number) new width of the canvas
      - height (number) new height of the canvas
-     > Usage
-     | var st = paper.set();
-     | st.push(
-     |     paper.circle(10, 10, 5),
-     |     paper.circle(30, 10, 5)
-     | );
-     | st.attr({fill: "red"});
     \*/
     paperproto.setSize = function (width, height) {
         return R._engine.setSize.call(this, width, height);
@@ -3068,6 +3077,10 @@
      - callback (function) function to run
      - thisArg (object) context object for the callback
      = (object) Paper object
+     > Usage
+     | paper.forEach(function (el) {
+     |     el.attr({ stroke: "blue" });
+     | });
     \*/
     paperproto.forEach = function (callback, thisArg) {
         var bot = this.bottom;
@@ -3600,7 +3613,7 @@
      **
      > Parameters
      **
-     - element (object) element to sync with
+     - el (object) element to sync with
      - anim (object) animation to sync with
      - params (object) #optional final attributes for the element, see also @Element.attr
      - ms (number) #optional number of milliseconds for animation to run
@@ -3613,10 +3626,27 @@
      **
      = (object) original element
     \*/
-    elproto.animateWith = function (element, anim, params, ms, easing, callback) {
-        var a = params ? R.animation(params, ms, easing, callback) : anim,
-            status = element.status(anim);
-        return this.animate(a).status(a, status * anim.ms / a.ms);
+    elproto.animateWith = function (el, anim, params, ms, easing, callback) {
+        var element = this;
+        if (element.removed) {
+            callback && callback.call(element);
+            return element;
+        }
+        var a = params instanceof Animation ? params : R.animation(params, ms, easing, callback),
+            x, y;
+        runAnimation(a, element, a.percents[0], null, element.attr());
+        for (var i = 0, ii = animationElements.length; i < ii; i++) {
+            if (animationElements[i].anim == anim && animationElements[i].el == el) {
+                animationElements[ii - 1].start = animationElements[i].start;
+                break;
+            }
+        }
+        return element;
+        // 
+        // 
+        // var a = params ? R.animation(params, ms, easing, callback) : anim,
+        //     status = element.status(anim);
+        // return this.animate(a).status(a, status * anim.ms / a.ms);
     };
     function CubicBezierAtTime(t, p1x, p1y, p2x, p2y, duration) {
         var cx = 3 * p1x,
@@ -4314,7 +4344,7 @@
         var anim = R.animation(params, ms, easing, collector);
         item = this.items[--i].animate(anim);
         while (i--) {
-            this.items[i] && !this.items[i].removed && this.items[i].animateWith(item, anim);
+            this.items[i] && !this.items[i].removed && this.items[i].animateWith(item, anim, anim);
         }
         return this;
     };
@@ -4517,7 +4547,7 @@
      - json (array)
      = (object) resulting set of imported elements
      > Usage
-     | paper.import([
+     | paper.add([
      |     {
      |         type: "circle",
      |         cx: 10,
@@ -4651,8 +4681,8 @@
      |     this.attr({fill: "#f00"});
      | };
      | Raphael.st.red = function () {
-     |     this.forEach(function () {
-     |         this.red();
+     |     this.forEach(function (el) {
+     |         el.red();
      |     });
      | };
      | // then use it
