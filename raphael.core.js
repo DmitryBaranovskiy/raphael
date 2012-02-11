@@ -3873,7 +3873,7 @@
                                     (to2.matrix.c - m.c) / ms,
                                     (to2.matrix.d - m.d) / ms,
                                     (to2.matrix.e - m.e) / ms,
-                                    (to2.matrix.e - m.f) / ms
+                                    (to2.matrix.f - m.f) / ms
                                 ];
                                 // from[attr] = [_.sx, _.sy, _.deg, _.dx, _.dy];
                                 // var to2 = {_:{}, getBBox: function () { return element.getBBox(); }};
