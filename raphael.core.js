@@ -4345,6 +4345,7 @@
         item = this.items[--i].animate(anim);
         while (i--) {
             this.items[i] && !this.items[i].removed && this.items[i].animateWith(item, anim, anim);
+            (this.items[i] && !this.items[i].removed) || len--;
         }
         return this;
     };
