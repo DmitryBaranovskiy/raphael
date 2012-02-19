@@ -1,0 +1,18 @@
+Make has been replaced with r.js. To build the project, you'll need:
+
+- r.js (npm install requirejs)
+- almond.js (copy it from https://github.com/jrburke/almond to the root directory)
+- eve.js (copy it from https://github.com/DmitryBaranovskiy/eve to the root directory)
+
+Then run:
+
+    r.js -o r.build.js
+    
+This will compile everything to raphael.js, and it should work the same as before. There's
+no need to use RequireJS or another AMD loader to load Raphael.       
+
+However, if you want to use AMD:
+
+1. Use the module defined in raphael.amd.js instead of raphael.js.
+2. You'll need to have eve.js in the root of your project (or somewhere else, with a path mapping for 'eve').
+
