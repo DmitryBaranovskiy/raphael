@@ -879,7 +879,7 @@
                 green = toInt((t = rgb[3].charAt(2)) + t, 16);
                 red = toInt((t = rgb[3].charAt(1)) + t, 16);
             }
-            if (rgb[4]) {
+            if (rgb[4]) { // matched rgb(...) or rgba(...)
                 values = rgb[4][split](commaSpaces);
                 red = toFloat(values[0]);
                 values[0].slice(-1) == "%" && (red *= 2.55);
@@ -1660,6 +1660,7 @@
                 if (dot.color.error) {
                     return null;
                 }
+                dot.color.hasOwnProperty('opacity') && (dot.opacity = dot.color.opacity);
                 dot.color = dot.color.hex;
                 par[2] && (dot.offset = par[2] + "%");
                 dots.push(dot);

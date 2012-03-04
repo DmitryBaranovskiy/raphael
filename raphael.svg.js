@@ -120,7 +120,8 @@ window.Raphael.svg && function (R) {
                 for (var i = 0, ii = dots.length; i < ii; i++) {
                     el.appendChild($("stop", {
                         offset: dots[i].offset ? dots[i].offset : i ? "100%" : "0%",
-                        "stop-color": dots[i].color || "#fff"
+                        "stop-color": dots[i].color || "#fff",
+                        "stop-opacity" : dots[i].hasOwnProperty('opacity') ? dots[i].opacity : 1
                     }));
                 }
             }
