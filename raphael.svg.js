@@ -695,6 +695,7 @@ window.Raphael.svg && function (R) {
      * Element.rotate
      [ method ]
      **
+     * Deprecated! Use @Element.transform instead.
      * Adds rotation by given angle around given point to the list of
      * transformations of the element.
      > Parameters
@@ -727,6 +728,7 @@ window.Raphael.svg && function (R) {
      * Element.scale
      [ method ]
      **
+     * Deprecated! Use @Element.transform instead.
      * Adds scale by given amount relative to given point to the list of
      * transformations of the element.
      > Parameters
@@ -762,6 +764,7 @@ window.Raphael.svg && function (R) {
      * Element.translate
      [ method ]
      **
+     * Deprecated! Use @Element.transform instead.
      * Adds translation by given amount to the list of transformations of the element.
      > Parameters
      - dx (number) horisontal shift
@@ -865,12 +868,12 @@ window.Raphael.svg && function (R) {
      * Removes element form the paper.
     \*/
     elproto.remove = function () {
-        if (this.removed) {
+        if (this.removed || !this.node.parentNode) {
             return;
         }
         var paper = this.paper;
         paper.__set__ && paper.__set__.exclude(this);
-        eve.unbind("*.*." + this.id);
+        eve.unbind("raphael.*.*." + this.id);
         if (this.gradient) {
             paper.defs.removeChild(this.gradient);
         }
@@ -1030,7 +1033,7 @@ window.Raphael.svg && function (R) {
             params = name;
         }
         for (var key in params) {
-            eve("attr." + key + "." + this.id, this, params[key]);
+            eve("raphael.attr." + key + "." + this.id, this, params[key]);
         }
         for (key in this.paper.customAttributes) if (this.paper.customAttributes[has](key) && params[has](key) && R.is(this.paper.customAttributes[key], "function")) {
             var par = this.paper.customAttributes[key].apply(this, [].concat(params[key]));
@@ -1251,7 +1254,7 @@ window.Raphael.svg && function (R) {
         return container;
     };
     R._engine.setViewBox = function (x, y, w, h, fit) {
-        eve("setViewBox", this, this._viewBox, [x, y, w, h, fit]);
+        eve("raphael.setViewBox", this, this._viewBox, [x, y, w, h, fit]);
         var size = mmax(w / this.width, h / this.height),
             top = this.top,
             aspectRatio = fit ? "meet" : "xMinYMin",
@@ -1320,7 +1323,7 @@ window.Raphael.svg && function (R) {
      * Clears the paper, i.e. removes all the elements.
     \*/
     R.prototype.clear = function () {
-        R.eve("clear", this);
+        R.eve("raphael.clear", this);
         var c = this.canvas;
         while (c.firstChild) {
             c.removeChild(c.firstChild);
@@ -1337,7 +1340,7 @@ window.Raphael.svg && function (R) {
      * Removes the paper from the DOM.
     \*/
     R.prototype.remove = function () {
-        eve("remove", this);
+        eve("raphael.remove", this);
         this.canvas.parentNode && this.canvas.parentNode.removeChild(this.canvas);
         for (var i in this) {
             this[i] = typeof this[i] == "function" ? R._removedFactory(i) : null;
