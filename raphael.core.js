@@ -662,12 +662,14 @@
      - h (number) hue
      - s (number) saturation
      - v (number) value or brightness
+     - o (number) opacity (optional)
      = (object) RGB object in format:
      o {
      o     r (number) red,
      o     g (number) green,
      o     b (number) blue,
      o     hex (string) color in HTML/CSS format: #••••••
+     o     opacity (number) opacity (optional)
      o }
     \*/
     R.hsb2rgb = function (h, s, v, o) {
@@ -860,6 +862,8 @@
      #     <li>#•••••• — full length HTML colour: (“<code>#000000</code>”, “<code>#bd2300</code>”)</li>
      #     <li>rgb(•••, •••, •••) — red, green and blue channels’ values: (“<code>rgb(200,&nbsp;100,&nbsp;0)</code>”)</li>
      #     <li>rgb(•••%, •••%, •••%) — same as above, but in %: (“<code>rgb(100%,&nbsp;175%,&nbsp;0%)</code>”)</li>
+     #     <li>rgba(•••, •••, •••, •••) — red, green, blue and alpha channels’ values: (“<code>rgba(200,&nbsp;100,&nbsp;0,&nbsp;0.5)</code>”)</li>
+     #     <li>rgba(•••%, •••%, •••%, •••%) — same as above, but in %: (“<code>rgba(100%,&nbsp;175%,&nbsp;0%,&nbsp;50%)</code>”)</li>
      #     <li>hsb(•••, •••, •••) — hue, saturation and brightness values: (“<code>hsb(0.5,&nbsp;0.25,&nbsp;1)</code>”)</li>
      #     <li>hsb(•••%, •••%, •••%) — same as above, but in %</li>
      #     <li>hsl(•••, •••, •••) — same as hsb</li>
@@ -871,6 +875,7 @@
      o     g (number) green,
      o     b (number) blue
      o     hex (string) color in HTML/CSS format: #••••••,
+     o     opacity (number) opacity if given
      o     error (boolean) true if string can’t be parsed
      o }
     \*/
@@ -891,17 +896,17 @@
             values,
             rgb = colour.match(colourRegExp);
         if (rgb) {
-            if (rgb[2]) {
+            if (rgb[2]) { // #rrggbb
                 blue = toInt(rgb[2].substring(5), 16);
                 green = toInt(rgb[2].substring(3, 5), 16);
                 red = toInt(rgb[2].substring(1, 3), 16);
             }
-            if (rgb[3]) {
+            if (rgb[3]) { // #rgb
                 blue = toInt((t = rgb[3].charAt(3)) + t, 16);
                 green = toInt((t = rgb[3].charAt(2)) + t, 16);
                 red = toInt((t = rgb[3].charAt(1)) + t, 16);
             }
-            if (rgb[4]) { // matched rgb(...) or rgba(...)
+            if (rgb[4]) { // rgb(...) or rgba(...)
                 values = rgb[4][split](commaSpaces);
                 red = toFloat(values[0]);
                 values[0].slice(-1) == "%" && (red *= 2.55);
@@ -912,7 +917,7 @@
                 rgb[1].toLowerCase().slice(0, 4) == "rgba" && (opacity = toFloat(values[3]));
                 values[3] && values[3].slice(-1) == "%" && (opacity /= 100);
             }
-            if (rgb[5]) {
+            if (rgb[5]) { // hsb() or hsba()
                 values = rgb[5][split](commaSpaces);
                 red = toFloat(values[0]);
                 values[0].slice(-1) == "%" && (red *= 2.55);
@@ -925,7 +930,7 @@
                 values[3] && values[3].slice(-1) == "%" && (opacity /= 100);
                 return R.hsb2rgb(red, green, blue, opacity);
             }
-            if (rgb[6]) {
+            if (rgb[6]) { // hsl() or hsla()
                 values = rgb[6][split](commaSpaces);
                 red = toFloat(values[0]);
                 values[0].slice(-1) == "%" && (red *= 2.55);
