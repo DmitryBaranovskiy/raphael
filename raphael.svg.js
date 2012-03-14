@@ -121,7 +121,7 @@ window.Raphael.svg && function (R) {
                     el.appendChild($("stop", {
                         offset: dots[i].offset ? dots[i].offset : i ? "100%" : "0%",
                         "stop-color": dots[i].color || "#fff",
-                        "stop-opacity" : dots[i].hasOwnProperty('opacity') ? dots[i].opacity : 1
+                        "stop-opacity" : "opacity" in dots[i] ? dots[i].opacity : 1
                     }));
                 }
             }
