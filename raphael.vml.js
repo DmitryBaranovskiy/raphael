@@ -848,8 +848,12 @@ window.Raphael.vml && function (R) {
         this.height = height;
         width == +width && (width += "px");
         height == +height && (height += "px");
-        cs.width = width;
-        cs.height = height;
+        if(width[0] !== '-') {
+            cs.width = width;
+        }
+        if(height[0] !== '-') {
+            cs.height = height;
+        }
         cs.clip = "rect(0 " + width + " " + height + " 0)";
         if (this._viewBox) {
             R._engine.setViewBox.apply(this, this._viewBox);
