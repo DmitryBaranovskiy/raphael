@@ -4211,23 +4211,33 @@ window.Raphael.svg && function (R) {
                     case "fill":
                         var isURL = Str(value).match(R._ISURL);
                         if (isURL) {
-                            el = $("pattern");
-                            var ig = $("image");
-                            el.id = R.createUUID();
-                            $(el, {x: 0, y: 0, patternUnits: "userSpaceOnUse", height: 1, width: 1});
-                            $(ig, {x: 0, y: 0, "xlink:href": isURL[1]});
-                            el.appendChild(ig);
+                            var existingImages = o.paper.defs.getElementsByTagName("image");
+                            for(var i=0; i< existingImages.length; i++){
+                               if(existingImages[i].href.baseVal === isURL[1]){
+                                 el = existingImages[i].parentNode;
+                               }
+                            }
+                            if(!el){
+                                el = $("pattern");
+                                var ig = $("image");
+                                el.id = R.createUUID();
+                                $(el, {x: 0, y: 0, patternUnits: "userSpaceOnUse", height: 1, width: 1});
+                                $(ig, {x: 0, y: 0, "xlink:href": isURL[1]});
+                                el.appendChild(ig);
 
-                            (function (el) {
-                                R._preload(isURL[1], function () {
-                                    var w = this.offsetWidth,
-                                        h = this.offsetHeight;
-                                    $(el, {width: w, height: h});
-                                    $(ig, {width: w, height: h});
-                                    o.paper.safari();
-                                });
-                            })(el);
-                            o.paper.defs.appendChild(el);
+                                (function (el) {
+                                    R._preload(isURL[1], function () {
+                                        var w = this.offsetWidth,
+                                            h = this.offsetHeight;
+                                        $(el, {width: w, height: h});
+                                        $(ig, {width: w, height: h});
+                                        o.paper.safari();
+                                    });
+                                })(el);
+
+                                o.paper.defs.appendChild(el);
+                            }
+           
                             $(node, {fill: "url(#" + el.id + ")"});
                             o.pattern = el;
                             o.pattern && updatePosition(o);
