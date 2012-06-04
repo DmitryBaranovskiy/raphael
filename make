@@ -4,7 +4,7 @@ var setup = {
             core: "raphael.core.js",
             svg: "raphael.svg.js",
             vml: "raphael.vml.js",
-            eve: "../mywork/eve/eve.js",
+            eve: "eve/eve.js",
             copy: "copy.js"
         },
         output: {
@@ -19,10 +19,10 @@ var setup = {
             },
             "raphael.pro.js": function () {
                 return this.copy + "\n" + this.eve + "\n\n" + this.core + "\n\n" + this.svg ;
-            },
+            }
         }
     },
-    ujs = require("/Users/dmitry/Sites/UglifyJS/uglify-js.js"),
+    ujs = require("uglify-js"),
     jsp = ujs.parser,
     pro = ujs.uglify,
     fs = require("fs"),
