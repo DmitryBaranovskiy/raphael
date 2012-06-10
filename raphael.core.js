@@ -3488,6 +3488,30 @@
         return target;
     };
     /*\
+     * Paper.getElementsByPoint
+     [ method ]
+     **
+     * Returns you an array of elements under given point.
+     **
+     = (array) Raphaël element objects
+     > Parameters
+     **
+     - x (number) x coordinate from the top left corner of the window
+     - y (number) y coordinate from the top left corner of the window
+     > Usage
+     | var list = paper.getElementsByPoint(mouseX, mouseY);
+    \*/
+    paperproto.getElementsByPoint = function(x,y){
+        var hits=[],
+    		paper=this;	
+    	paper.forEach(function(e){
+    		if (e.attr("x")<=x && (e.attr("x")+e.attr("width"))>=x && e.attr("y")<=y && (e.attr("y")+e.attr("height"))>=y){
+    			hits.push(e);
+    		}
+    	},this);
+    	return hits;
+    };
+    /*\
      * Paper.getById
      [ method ]
      **
