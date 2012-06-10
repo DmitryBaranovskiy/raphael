@@ -7,7 +7,11 @@
 // │ Copyright (c) 2008-2011 Sencha Labs (http://sencha.com)             │ \\
 // │ Licensed under the MIT (http://raphaeljs.com/license.html) license. │ \\
 // └─────────────────────────────────────────────────────────────────────┘ \\
-window.Raphael.svg && function (R) {
+
+
+define(['./raphael.core'], function (R) {  
+    if (!R.svg) return;
+    
     var has = "hasOwnProperty",
         Str = String,
         toFloat = parseFloat,
@@ -1356,5 +1360,7 @@ window.Raphael.svg && function (R) {
                 });
             };
         })(method);
-    }
-}(window.Raphael);
+    }       
+    
+    return R;
+});
