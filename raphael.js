@@ -1286,7 +1286,7 @@
     R.isPointInsidePath = function (path, x, y) {
         var bbox = R.pathBBox(path);
         return R.isPointInsideBBox(bbox, x, y) &&
-               interPathHelper(path, [["M", x, y], ["H", bbox.x2 + 10]], 1) % 2 == 1;
+               interPathHelper(path, [["M", x - .5, y - .5], ["L", x + 5, y + .5]], 1) % 2 == 1;
     };
     R._removedFactory = function (methodname) {
         return function () {
