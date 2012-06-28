@@ -3576,7 +3576,7 @@
      = (boolean) `true` if point inside the shape
     \*/
     elproto.isPointInside = function (x, y) {
-        var rp = this.realPath = this.realPath || getPath[this.type](this);
+        var rp = this.realPath = getPath[this.type](this);
         return R.isPointInsidePath(rp, x, y);
     };
     /*\
