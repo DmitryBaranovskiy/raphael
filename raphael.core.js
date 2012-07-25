@@ -3172,6 +3172,7 @@
     \*/
     elproto.undrag = function () {
         var i = draggable.length;
+        drag = [];
         while (i--) if (draggable[i].el == this) {
             this.unmousedown(draggable[i].start);
             draggable.splice(i, 1);

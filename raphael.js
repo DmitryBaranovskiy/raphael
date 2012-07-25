@@ -6,7 +6,6 @@
 // ├────────────────────────────────────────────────────────────────────┤ \\
 // │ Licensed under the MIT (http://raphaeljs.com/license.html) license.│ \\
 // └────────────────────────────────────────────────────────────────────┘ \\
-
 // ┌──────────────────────────────────────────────────────────────────────────────────────┐ \\
 // │ Eve 0.3.4 - JavaScript Events Library                                                │ \\
 // ├──────────────────────────────────────────────────────────────────────────────────────┤ \\
@@ -221,7 +220,6 @@
     };
     (typeof module != "undefined" && module.exports) ? (module.exports = eve) : (typeof define != "undefined" ? (define("eve", [], function() { return eve; })) : (glob.eve = eve));
 })(this);
-
 
 // ┌─────────────────────────────────────────────────────────────────────┐ \\
 // │ "Raphaël 2.1.0" - JavaScript Vector Library                         │ \\
@@ -2455,6 +2453,7 @@
     
     elproto.undrag = function () {
         var i = draggable.length;
+        drag = [];
         while (i--) if (draggable[i].el == this) {
             this.unmousedown(draggable[i].start);
             draggable.splice(i, 1);
