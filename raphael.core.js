@@ -1574,7 +1574,7 @@
     var pathDimensions = R.pathBBox = function (path) {
         var pth = paths(path);
         if (pth.bbox) {
-            return pth.bbox;
+            return clone(pth.bbox);
         }
         if (!path) {
             return {x: 0, y: 0, width: 0, height: 0, x2: 0, y2: 0};
@@ -3172,6 +3172,7 @@
     \*/
     elproto.undrag = function () {
         var i = draggable.length;
+        drag = [];
         while (i--) if (draggable[i].el == this) {
             this.unmousedown(draggable[i].start);
             draggable.splice(i, 1);
