@@ -219,6 +219,7 @@
     eve.toString = function () {
         return "You are running Eve " + version;
     };
+    glob.eve = eve;
     (typeof module != "undefined" && module.exports) ? (module.exports = eve) : (typeof define != "undefined" ? (define("eve", [], function() { return eve; })) : (glob.eve = eve));
 })(this);
 
