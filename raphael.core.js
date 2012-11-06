@@ -3557,6 +3557,26 @@
         });
         return set;
     };
+    /*\
+     * Paper.getElementsByBBox
+     [ method ]
+     **
+     * Returns set of elements that have an intersecting bounding box
+     **
+     > Parameters
+     **
+     - bbox (string) bbox to check with
+     = (object) @Set
+    \*/
+    paperproto.getElementsByBBox = function (bbox) {
+        var set = this.set();
+        this.forEach(function (el) {
+            if (Raphael.isBBoxIntersect(el.getBBox(), bbox)) {
+                set.push(el);
+            }
+        });
+        return set;
+    };
     function x_y() {
         return this.x + S + this.y;
     }
