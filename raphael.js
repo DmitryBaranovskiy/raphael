@@ -3858,8 +3858,8 @@ window.Raphael.svg && function (R) {
                     x1: vector[0],
                     y1: vector[1],
                     x2: vector[2],
-                    y2: vector[3],
-                    gradientTransform: element.matrix.invert()
+                    y2: vector[3],                    
+                    gradientUnits:"objectBoundingBox"
                 });
                 SVG.defs.appendChild(el);
                 for (var i = 0, ii = dots.length; i < ii; i++) {
