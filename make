@@ -1,10 +1,11 @@
 #!/usr/bin/env node
+
 var setup = {
         input: {
             core: "raphael.core.js",
             svg: "raphael.svg.js",
             vml: "raphael.vml.js",
-            eve: "../mywork/eve/eve.js",
+            eve: "../eve/eve.js",
             copy: "copy.js"
         },
         output: {
@@ -22,14 +23,18 @@ var setup = {
             },
         }
     },
-    ujs = require("/Users/dmitry/Sites/UglifyJS/uglify-js.js"),
+    ujs = require("uglify-js"),
     jsp = ujs.parser,
     pro = ujs.uglify,
     fs = require("fs"),
     rxdr = /\/\*\\[\s\S]+?\\\*\//g;
 
 function minify(code) {
-    return pro.gen_code(pro.ast_squeeze(pro.ast_mangle(jsp.parse(code))));
+    ast = ujs.parse(code);
+    ast.figure_out_scope();
+    ast.compute_char_frequency();
+    ast.mangle_names();
+    return ast.print_to_string();
 }
 
 var files = {};
