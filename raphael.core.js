@@ -3049,11 +3049,11 @@
                 }
                 return this;
             }
-            eve("raphael.data.get." + this.id, this, data[key], key);
+            eve("raphael.data.get." + this.id + '.' + key, this, data[key], key);
             return data[key];
         }
         data[key] = value;
-        eve("raphael.data.set." + this.id, this, value, key);
+        eve("raphael.data.set." + this.id + '.' + key, this, value, key);
         return this;
     };
     /*\
@@ -3105,7 +3105,7 @@
         } else {
             eldata[this.id] && delete eldata[this.id][key];
         }
-        eve("raphael.data.removeData." + this.id, this, key);
+        eve("raphael.data.removeData." + this.id + '.' + key, this, key);
         return this;
     };
     /*\
