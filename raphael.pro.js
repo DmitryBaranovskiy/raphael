@@ -2426,10 +2426,10 @@
     	if (arguments.length > 0) {
     		var filteredData = {};
     		for (key in dataset) {
-    			if (dataset[key] != undefined)
+    			if (!Array.isArray(dataset))
     				this.data(key, dataset[key]);
     			else
-    				filteredData[key] = data[key];
+    				filteredData[dataset[key]] = data[dataset[key]];
     		}
     		if (filteredData.length > 0) {
     			eve("raphael.data.dataget." + this.id, this, filteredData);

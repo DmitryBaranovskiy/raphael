@@ -3062,10 +3062,10 @@
      **
      * Returns an Object with all key:value pairings for Element.
      > Parameters
-     - dataset (object) #optional dataset
-     * Either a list of keys for desired data or key value pairings
-     * to set multiple values at once if no dataset object is passed
-     * then this function returns all data associated with the element
+     - dataset (object/array) #optional dataset
+     * Either an array of keys for desired data or an object with key value
+     * pairings to set multiple values at once if no dataset object is
+     * passed then this function returns all data associated with the element
      = (object) @Element
     \*/
     elproto.dataset = function (dataset) {
@@ -3073,10 +3073,10 @@
     	if (arguments.length > 0) {
     		var filteredData = {};
     		for (key in dataset) {
-    			if (dataset[key] != undefined)
+    			if (!Array.isArray(dataset))
     				this.data(key, dataset[key]);
     			else
-    				filteredData[key] = data[key];
+    				filteredData[dataset[key]] = data[dataset[key]];
     		}
     		if (filteredData.length > 0) {
     			eve("raphael.data.dataget." + this.id, this, filteredData);
