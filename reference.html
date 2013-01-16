@@ -1277,7 +1277,7 @@ Note: there is a special case when path consist of just three commands: “M10,1
 </code></pre>
 <p>For example of path strings, check out these icons: <a href="http://raphaeljs.com/icons/" rel="external">http://raphaeljs.com/icons/</a>
 </p>
-</div><div class="Paper-print-section"><h3 id="Paper.print" class="dr-method"><i class="dr-trixie">&#160;</i>Paper.print(x, y, string, font, [size], [origin], [letter_spacing])<a href="#Paper.print" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 4977 in the source" href="https://github.com/DmitryBaranovskiy/raphael/blob/master/raphael.core.js#L4977">&#x27ad;</a></h3>
+</div><div class="Paper-print-section"><h3 id="Paper.print" class="dr-method"><i class="dr-trixie">&#160;</i>Paper.print(x, y, string, font, [size], [origin], [letter_spacing], [line_spacing])<a href="#Paper.print" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 4977 in the source" href="https://github.com/DmitryBaranovskiy/raphael/blob/master/raphael.core.js#L4977">&#x27ad;</a></h3>
 <div class="extra" id="Paper.print-extra"></div></div><div class="dr-method"><p>Creates path that represent given text written using given font at given position with given size.
 Result of the method is path element that contains whole text as a separate path.
 </p>
@@ -1307,6 +1307,10 @@ Result of the method is path element that contains whole text as a separate path
 <dd class="dr-optional">optional</dd>
 <dd class="dr-type"><em class="dr-type-number">number</em></dd>
 <dd class="dr-description">number in range <code>-1..1</code>, default is <code>0</code></dd>
+<dt class="dr-param optional">line_spacing</dt>
+<dd class="dr-optional">optional</dd>
+<dd class="dr-type"><em class="dr-type-number">number</em></dd>
+<dd class="dr-description">number in range <code>1..3</code>, default is <code>1</code></dd>
 </dl>
 <p class="dr-returns"><strong class="dr-title">Returns:</strong> <em class="dr-type-object">object</em> <span class="dr-description">resulting path element, which consist of all letters</span></p>
 <p class="header">Usage
