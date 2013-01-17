@@ -2431,7 +2431,14 @@
     			else
     				filteredData[dataset[key]] = data[dataset[key]];
     		}
-    		if (filteredData.length > 0) {
+    		var lengthOfObject = function(obj){
+    			var key, length = 0;
+    			for (objKey in obj){
+    				length += Number( obj.hasOwnProperty(objKey) );
+    			}
+    			return length;
+    		}
+    		if (lengthOfObject(filteredData) > 0) {
     			eve("raphael.data.dataget." + this.id, this, filteredData);
     			return filteredData;
     		} else {
