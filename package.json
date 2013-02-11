@@ -1,0 +1,20 @@
+{
+  "name": "raphael",
+  "version": "2.1.0",
+  "description": "JavaScript Vector Library",
+  "main": "raphael.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/DmitryBaranovskiy/raphael.git"
+  },
+  "author": "Dmitry Baranovskiy",
+  "license": "MIT",
+  "readmeFilename": "README.markdown",
+  "gitHead": "52bff469f60988f1391e8b3d7cb5349163df8ba1",
+  "devDependencies": {
+    "uglify-js": "~2.2.3"
+  }
+}
