@@ -425,6 +425,10 @@
             text: function (el) {
                 var bbox = el._getBBox();
                 return rectPath(bbox.x, bbox.y, bbox.width, bbox.height);
+            },
+            set : function(el) {
+                var bbox = el._getBBox();
+                return rectPath(bbox.x, bbox.y, bbox.width, bbox.height);
             }
         },
         
@@ -1297,7 +1301,7 @@
     var pathDimensions = R.pathBBox = function (path) {
         var pth = paths(path);
         if (pth.bbox) {
-            return pth.bbox;
+            return clone(pth.bbox);
         }
         if (!path) {
             return {x: 0, y: 0, width: 0, height: 0, x2: 0, y2: 0};
@@ -2504,6 +2508,8 @@
         !R.is(itemsArray, "array") && (itemsArray = Array.prototype.splice.call(arguments, 0, arguments.length));
         var out = new Set(itemsArray);
         this.__set__ && this.__set__.push(out);
+        out["paper"] = this;
+        out["type"] = "set";
         return out;
     };
     
@@ -3547,7 +3553,7 @@
         };
     };
     setproto.clone = function (s) {
-        s = new Set;
+        s = this.paper.set();
         for (var i = 0, ii = this.items.length; i < ii; i++) {
             s.push(this.items[i].clone());
         }
@@ -3557,7 +3563,19 @@
         return "Rapha\xebl\u2018s set";
     };
 
-    
+    setproto.glow = function(glowConfig) {
+        var ret = this.paper.set();
+        this.forEach(function(shape, index){
+            var g = shape.glow(glowConfig);
+            if(g != null){
+                g.forEach(function(shape2, index2){
+                    ret.push(shape2);
+                });
+            }
+        });
+        return ret;
+    };
+
     R.registerFont = function (font) {
         if (!font.face) {
             return font;
