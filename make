@@ -1,10 +1,18 @@
 #!/usr/bin/env node
+
+/*
+To use this script, must have: 
+- uglify.js (npm install uglify)
+- eve/eve.js (get it from https://github.com/DmitryBaranovskiy/eve) 
+*/
+
+
 var setup = {
         input: {
             core: "raphael.core.js",
             svg: "raphael.svg.js",
             vml: "raphael.vml.js",
-            eve: "../mywork/eve/eve.js",
+            eve: "eve/eve.js",
             copy: "copy.js"
         },
         output: {
@@ -22,7 +30,7 @@ var setup = {
             },
         }
     },
-    ujs = require("/Users/dmitry/Sites/UglifyJS/uglify-js.js"),
+    ujs = require("uglify-js"),
     jsp = ujs.parser,
     pro = ujs.uglify,
     fs = require("fs"),
