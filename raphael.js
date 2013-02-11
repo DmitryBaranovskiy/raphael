@@ -3563,6 +3563,18 @@
         return "Rapha\xebl\u2018s set";
     };
 
+    setproto.glow = function(glowConfig) {
+        var ret = this.paper.set();
+        this.forEach(function(shape, index){
+            var g = shape.glow(glowConfig);
+            if(g != null){
+                g.forEach(function(shape2, index2){
+                    ret.push(shape2);
+                });
+            }
+        });
+        return ret;
+    };
 
     R.registerFont = function (font) {
         if (!font.face) {
