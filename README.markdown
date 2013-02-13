@@ -34,6 +34,19 @@ All changes in code must go to `raphael.core`, `raphael.svg` or `raphael.vml`. `
 
 After adding your changes, execute `./make`, the minified version will be created, commit and you are ready to make a pull request!
 
+## Found an issue?
+
+First search for similar issues to make sure you don't repeat an existing one.
+
+Then please create a fiddle ([boilerplate](http://jsfiddle.net/SSJJT/)) recreating the bug so we can find out what the problem is more easily (or be a hero and find it yourself and send a pull request!). You can also use the [raphael playground](http://raphaeljs.com/playground.html) to reproduce your issues.
+
+Remember to add all the info that can be useful such as
+
+* error details
+* steps to reproduce
+* browser and its version
+* any suggestion of what do you think the problem could be
+
 ## Collaborators
 
 * [tomasAlabes](https://github.com/tomasAlabes)
