@@ -576,6 +576,7 @@
             "stroke-width": 1,
             target: "_blank",
             "text-anchor": "middle",
+            "text-decoration": "none",
             title: "Raphael",
             transform: "",
             width: 0,
