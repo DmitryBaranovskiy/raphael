@@ -3192,6 +3192,7 @@
             eve.unbind("raphael.drag.*." + this.id);
         }
         !draggable.length && R.unmousemove(dragMove).unmouseup(dragUp);
+        drag = [];
     };
     /*\
      * Paper.circle
