@@ -7,7 +7,7 @@
 // │ Copyright (c) 2008-2011 Sencha Labs (http://sencha.com)             │ \\
 // │ Licensed under the MIT (http://raphaeljs.com/license.html) license. │ \\
 // └─────────────────────────────────────────────────────────────────────┘ \\
-window.Raphael.vml && function (R) {
+window.Raphael && window.Raphael.vml && function (R) {
     var has = "hasOwnProperty",
         Str = String,
         toFloat = parseFloat,
