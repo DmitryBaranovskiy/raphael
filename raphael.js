@@ -377,6 +377,7 @@
     };
     (typeof module != "undefined" && module.exports) ? (module.exports = eve) : (typeof define != "undefined" ? (define("eve", [], function() { return eve; })) : (glob.eve = eve));
 })(this);
+
 // ┌─────────────────────────────────────────────────────────────────────┐ \\
 // │ "Raphaël 2.1.0" - JavaScript Vector Library                         │ \\
 // ├─────────────────────────────────────────────────────────────────────┤ \\
@@ -3457,6 +3458,16 @@
         }
         return this;
     };
+     /*\
+     * Element.getData
+     [ method ]
+     **
+     * Retrieves the element data
+     = (object) data
+    \*/
+    elproto.getData = function () {
+        return eldata[this.id] || {};
+    };
     /*\
      * Element.hover
      [ method ]
@@ -5572,6 +5583,7 @@
         loaded = true;
     });
 })();
+
 // ┌─────────────────────────────────────────────────────────────────────┐ \\
 // │ Raphaël - JavaScript Vector Library                                 │ \\
 // ├─────────────────────────────────────────────────────────────────────┤ \\
@@ -6931,7 +6943,8 @@ window.Raphael.svg && function (R) {
             };
         })(method);
     }
-}(window.Raphael);// ┌─────────────────────────────────────────────────────────────────────┐ \\
+}(window.Raphael);
+// ┌─────────────────────────────────────────────────────────────────────┐ \\
 // │ Raphaël - JavaScript Vector Library                                 │ \\
 // ├─────────────────────────────────────────────────────────────────────┤ \\
 // │ VML Module                                                          │ \\
