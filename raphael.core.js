@@ -3078,6 +3078,16 @@
         }
         return this;
     };
+     /*\
+     * Element.getData
+     [ method ]
+     **
+     * Retrieves the element data
+     = (object) data
+    \*/
+    elproto.getData = function () {
+        return eldata[this.id] || {};
+    };
     /*\
      * Element.hover
      [ method ]
