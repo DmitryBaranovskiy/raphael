@@ -10,15 +10,13 @@ var ujs = require('uglify-js'),
 	},
 	output = {
 		'raphael-min.js'     : ['eve', 'core', 'svg', 'vml'],
-		'raphael.js'         : ['eve', 'core', 'svg', 'vml'],
-		'raphael.pro-min.js' : ['eve', 'core', 'svg'],
-		'raphael.pro.js'     : ['eve', 'core', 'svg'],
+                'raphael.js'         : ['eve', 'core', 'svg', 'vml']
 	};
 
 for (var file in input) {
 	input[file] = fs.readFileSync(input[file], 'utf8');
 }
-for (var file in output) {
+for (file in output) {
 	var out = '';
 	if (file.indexOf('min') !== -1) {
 		console.log('Compressing ' + file);
@@ -30,7 +28,7 @@ for (var file in output) {
 		}
 	} else {
 		console.log('Concatinating ' + file);
-		for (var i = 0, l = output[file].length; i < l; i++) {
+                for (i = 0, l = output[file].length; i < l; i++) {
 			out += input[output[file][i]] + '\n';
 		}
 	}
