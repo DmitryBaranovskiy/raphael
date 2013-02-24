@@ -113,7 +113,7 @@
              | var c = paper.circle(10, 10, 10).attr({hue: .45});
              | // or even like this:
              | c.animate({hue: 1}, 1e3);
-             | 
+             |
              | // You could also create custom attribute
              | // with multiple parameters:
              | paper.customAttributes.hsb = function (h, s, b) {
@@ -491,7 +491,7 @@
         }
         return value;
     };
-    
+
     /*\
      * Raphael.createUUID
      [ method ]
@@ -586,7 +586,7 @@
             g /= 255;
             b /= 255;
         }
-        
+
         return [r, g, b];
     },
     packageRGB = function (r, g, b, o) {
@@ -603,7 +603,7 @@
         R.is(o, "finite") && (rgb.opacity = o);
         return rgb;
     };
-    
+
     /*\
      * Raphael.color
      [ method ]
@@ -846,7 +846,7 @@
         g.doc.body.appendChild(img);
         img.src = src;
     };
-    
+
     function clrToString() {
         return this.hex;
     }
@@ -1078,7 +1078,7 @@
         if (pth.arr) {
             return pathClone(pth.arr);
         }
-        
+
         var paramCounts = {a: 7, c: 6, h: 1, l: 2, m: 2, r: 4, q: 4, s: 4, t: 2, v: 1, z: 0},
             data = [];
         if (R.is(pathString, array) && R.is(pathString[0], array)) { // rough assumption
@@ -1584,7 +1584,7 @@
             return {x: 0, y: 0, width: 0, height: 0, x2: 0, y2: 0};
         }
         path = path2curve(path);
-        var x = 0, 
+        var x = 0,
             y = 0,
             X = [],
             Y = [],
@@ -1608,13 +1608,17 @@
             ymin = mmin[apply](0, Y),
             xmax = mmax[apply](0, X),
             ymax = mmax[apply](0, Y),
+            width = xmax - xmin,
+            height = ymax - ymin,
             bb = {
                 x: xmin,
                 y: ymin,
                 x2: xmax,
                 y2: ymax,
-                width: xmax - xmin,
-                height: ymax - ymin
+                width: width,
+                height: height,
+                cx: xmin + width / 2,
+                cy: ymin + height / 2
             };
         pth.bbox = clone(bb);
         return bb;
@@ -2632,7 +2636,7 @@
                 s.scalex = +s.scalex.toFixed(4);
                 s.scaley = +s.scaley.toFixed(4);
                 s.rotate = +s.rotate.toFixed(4);
-                return  (s.dx || s.dy ? "t" + [s.dx, s.dy] : E) + 
+                return  (s.dx || s.dy ? "t" + [s.dx, s.dy] : E) +
                         (s.scalex != 1 || s.scaley != 1 ? "s" + [s.scalex, s.scaley, 0, 0] : E) +
                         (s.rotate ? "r" + [s.rotate, 0, 0] : E);
             } else {
@@ -2660,7 +2664,7 @@
     } else {
         paperproto.safari = fun;
     }
- 
+
     var preventDefault = function () {
         this.returnValue = false;
     },
@@ -2808,7 +2812,7 @@
      - handler (function) handler for the event
      = (object) @Element
     \*/
-    
+
     /*\
      * Element.dblclick
      [ method ]
@@ -2827,7 +2831,7 @@
      - handler (function) handler for the event
      = (object) @Element
     \*/
-    
+
     /*\
      * Element.mousedown
      [ method ]
@@ -2846,7 +2850,7 @@
      - handler (function) handler for the event
      = (object) @Element
     \*/
-    
+
     /*\
      * Element.mousemove
      [ method ]
@@ -2865,7 +2869,7 @@
      - handler (function) handler for the event
      = (object) @Element
     \*/
-    
+
     /*\
      * Element.mouseout
      [ method ]
@@ -2884,7 +2888,7 @@
      - handler (function) handler for the event
      = (object) @Element
     \*/
-    
+
     /*\
      * Element.mouseover
      [ method ]
@@ -2903,7 +2907,7 @@
      - handler (function) handler for the event
      = (object) @Element
     \*/
-    
+
     /*\
      * Element.mouseup
      [ method ]
@@ -2922,7 +2926,7 @@
      - handler (function) handler for the event
      = (object) @Element
     \*/
-    
+
     /*\
      * Element.touchstart
      [ method ]
@@ -2941,7 +2945,7 @@
      - handler (function) handler for the event
      = (object) @Element
     \*/
-    
+
     /*\
      * Element.touchmove
      [ method ]
@@ -2960,7 +2964,7 @@
      - handler (function) handler for the event
      = (object) @Element
     \*/
-    
+
     /*\
      * Element.touchend
      [ method ]
@@ -2979,7 +2983,7 @@
      - handler (function) handler for the event
      = (object) @Element
     \*/
-    
+
     /*\
      * Element.touchcancel
      [ method ]
@@ -3020,13 +3024,13 @@
             };
         })(events[i]);
     }
-    
+
     /*\
      * Element.data
      [ method ]
      **
      * Adds or retrieves given value asociated with given key.
-     ** 
+     **
      * See also @Element.removeData
      > Parameters
      - key (string) key to store data
@@ -3129,8 +3133,8 @@
      - mcontext (object) #optional context for moving handler
      - scontext (object) #optional context for drag start handler
      - econtext (object) #optional context for drag end handler
-     * Additionaly following `drag` events will be triggered: `drag.start.<id>` on start, 
-     * `drag.end.<id>` on end and `drag.move.<id>` on every move. When element will be dragged over another element 
+     * Additionaly following `drag` events will be triggered: `drag.start.<id>` on start,
+     * `drag.end.<id>` on end and `drag.move.<id>` on every move. When element will be dragged over another element
      * `drag.over.<id>` will be fired as well.
      *
      * Start event and start handler will be called in specified context or in context of the element with following parameters:
@@ -3418,7 +3422,7 @@
      * Paper.setViewBox
      [ method ]
      **
-     * Sets the view box of the paper. Practically it gives you ability to zoom and pan whole paper surface by 
+     * Sets the view box of the paper. Practically it gives you ability to zoom and pan whole paper surface by
      * specifying new boundaries.
      **
      > Parameters
@@ -3633,6 +3637,8 @@
      o     y: (number) top left corner y
      o     x2: (number) bottom right corner x
      o     y2: (number) bottom right corner y
+     o     cx: (number) midpoint x
+     o     cy: (number) midpoint y
      o     width: (number) width
      o     height: (number) height
      o }
@@ -3662,6 +3668,7 @@
         }
         return _.bbox;
     };
+
     /*\
      * Element.clone
      [ method ]
@@ -4139,8 +4146,8 @@
             }
         }
         return element;
-        // 
-        // 
+        //
+        //
         // var a = params ? R.animation(params, ms, easing, callback) : anim,
         //     status = element.status(anim);
         // return this.animate(a).status(a, status * anim.ms / a.ms);
@@ -4250,7 +4257,7 @@
      **
      = (object) new altered Animation object
     \*/
-    Animation.prototype.repeat = function (times) { 
+    Animation.prototype.repeat = function (times) {
         var a = new Animation(this.anim, this.ms);
         a.del = this.del;
         a.times = math.floor(mmax(times, 0)) || 1;
@@ -5234,7 +5241,7 @@
     })(document, "DOMContentLoaded");
 
     oldRaphael.was ? (g.win.Raphael = R) : (Raphael = R);
-    
+
     eve.on("raphael.DOMload", function () {
         loaded = true;
     });
