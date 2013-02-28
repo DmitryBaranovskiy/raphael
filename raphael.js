@@ -378,6 +378,25 @@
     (typeof module != "undefined" && module.exports) ? (module.exports = eve) : (typeof define != "undefined" ? (define("eve", [], function() { return eve; })) : (glob.eve = eve));
 })(this);
 
+/* This is a fake, local version of AMD's define function. It makes files
+ built with the make script work without requiring a full AMD loader. If
+ you're using an AMD loader in your project, don't require the built files
+ (raphel.js and raphel.min.js). Use raphael.amd.js instead. */
+
+/*global Raphael*/
+
+var glob = (function () { return this; }());
+
+var define = glob.define || function (name, deps, factory) {
+    if(name === 'eve') return;
+
+    if (name === 'raphael.core') {
+        return factory(glob.eve);
+    }
+
+    return factory(Raphael);
+
+};
 // ┌─────────────────────────────────────────────────────────────────────┐ \\
 // │ "Raphaël 2.1.0" - JavaScript Vector Library                         │ \\
 // ├─────────────────────────────────────────────────────────────────────┤ \\
@@ -385,7 +404,7 @@
 // │ Copyright (c) 2008-2011 Sencha Labs (http://sencha.com)             │ \\
 // │ Licensed under the MIT (http://raphaeljs.com/license.html) license. │ \\
 // └─────────────────────────────────────────────────────────────────────┘ \\
-(function () {
+define('raphael.core', ['eve'], function (eve) {
     /*\
      * Raphael
      [ method ]
@@ -3466,7 +3485,7 @@
      = (object) data
     \*/
     elproto.getData = function () {
-        return eldata[this.id] || {};
+        return clone(eldata[this.id] || {});
     };
     /*\
      * Element.hover
@@ -3893,13 +3912,13 @@
      **
      > Parameters
      **
-     - bbox (string) bbox to check with
+     - bbox (object) bbox to check with
      = (object) @Set
      \*/
     paperproto.getElementsByBBox = function (bbox) {
         var set = this.set();
         this.forEach(function (el) {
-            if (Raphael.isBBoxIntersect(el.getBBox(), bbox)) {
+            if (R.isBBoxIntersect(el.getBBox(), bbox)) {
                 set.push(el);
             }
         });
@@ -5618,7 +5637,9 @@
     eve.on("raphael.DOMload", function () {
         loaded = true;
     });
-})();
+
+    return R;
+});
 
 // ┌─────────────────────────────────────────────────────────────────────┐ \\
 // │ Raphaël - JavaScript Vector Library                                 │ \\
@@ -5629,7 +5650,9 @@
 // │ Copyright (c) 2008-2011 Sencha Labs (http://sencha.com)             │ \\
 // │ Licensed under the MIT (http://raphaeljs.com/license.html) license. │ \\
 // └─────────────────────────────────────────────────────────────────────┘ \\
-window.Raphael && window.Raphael.svg && function (R) {
+define('raphael.svg', ['raphael.core'], function (R) {
+    if (!R.svg) return;
+
     var has = "hasOwnProperty",
         Str = String,
         toFloat = parseFloat,
@@ -6979,7 +7002,8 @@ window.Raphael && window.Raphael.svg && function (R) {
             };
         })(method);
     }
-}(window.Raphael);
+    return R;
+});
 // ┌─────────────────────────────────────────────────────────────────────┐ \\
 // │ Raphaël - JavaScript Vector Library                                 │ \\
 // ├─────────────────────────────────────────────────────────────────────┤ \\
@@ -6989,7 +7013,9 @@ window.Raphael && window.Raphael.svg && function (R) {
 // │ Copyright (c) 2008-2011 Sencha Labs (http://sencha.com)             │ \\
 // │ Licensed under the MIT (http://raphaeljs.com/license.html) license. │ \\
 // └─────────────────────────────────────────────────────────────────────┘ \\
-window.Raphael && window.Raphael.vml && function (R) {
+define('raphael.vml', ['raphael.core'], function (R) {
+    if (!R.vml) return;
+
     var has = "hasOwnProperty",
         Str = String,
         toFloat = parseFloat,
@@ -7952,4 +7978,6 @@ window.Raphael && window.Raphael.vml && function (R) {
             };
         })(method);
     }
-}(window.Raphael);
+
+    return R;
+});

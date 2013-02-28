@@ -7,7 +7,9 @@
 // │ Copyright (c) 2008-2011 Sencha Labs (http://sencha.com)             │ \\
 // │ Licensed under the MIT (http://raphaeljs.com/license.html) license. │ \\
 // └─────────────────────────────────────────────────────────────────────┘ \\
-window.Raphael && window.Raphael.vml && function (R) {
+define('raphael.vml', ['raphael.core'], function (R) {
+    if (!R.vml) return;
+
     var has = "hasOwnProperty",
         Str = String,
         toFloat = parseFloat,
@@ -970,4 +972,6 @@ window.Raphael && window.Raphael.vml && function (R) {
             };
         })(method);
     }
-}(window.Raphael);
+
+    return R;
+});
