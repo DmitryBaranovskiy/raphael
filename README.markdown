@@ -8,11 +8,18 @@ Visit the library website for more information: [http://raphaeljs.com](http://ra
 * `git submodule init && git submodule update && npm install`
 (thank you [Wes Tood](https://github.com/wesleytodd))
 
+### Using AMD? Here is what you need to do
+
+* Copy `raphael.core.js`, `eve.js`, `raphael.svg.js`, `raphael.vml.js` and `raphael.amd.js` to your project. All in the same level.
+* Reference in the modules you want to use raphael the `raphael.amd.js` module. That's it.
+
+## Development
+
 ### Dependencies
 * [uglifyjs](https://github.com/mishoo/UglifyJS)
 * [eve](https://github.com/adobe-webplatform/eve)
 
-## Development
+## Plan
 
 At the moment we have 4 milestones:
 

@@ -6,11 +6,13 @@ var ujs = require('uglify-js'),
 		svg  : 'raphael.svg.js',
 		vml  : 'raphael.vml.js',
 		eve  : './eve/eve.js',
-		copy : 'copy.js'
+		copy : 'copy.js',
+		fakedefine: 'fakedefine.js'
 	},
 	output = {
-		'raphael-min.js'     : ['eve', 'core', 'svg', 'vml'],
-                'raphael.js'         : ['eve', 'core', 'svg', 'vml']
+		// it is important to leave eve as the first one, as it doesn't use the fakedefine
+		'raphael-min.js'     : ['eve', 'fakedefine', 'core', 'svg', 'vml'],
+        'raphael.js'         : ['eve', 'fakedefine', 'core', 'svg', 'vml']
 	};
 
 for (var file in input) {
