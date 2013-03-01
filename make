@@ -3,15 +3,26 @@ var ujs = require('uglify-js'),
     fs = require('fs'),
 	input = {
 		core : 'raphael.core.js',
-		svg  : 'raphael.svg.js',
-		vml  : 'raphael.vml.js',
-		eve  : './eve/eve.js',
-		copy : 'copy.js'
-	},
-	output = {
-		'raphael-min.js'     : ['eve', 'core', 'svg', 'vml'],
-		'raphael.js'         : ['eve', 'core', 'svg', 'vml']
-	};
+                svg  : 'raphael.svg.js',
+                vml  : 'raphael.vml.js',
+                eve  : './eve/eve.js',
+',
+                eve  : './eve/eve.js',
+',
+                eve  : './eve/e'
+        },
+        output = {
+         eve  : './eve/e'
+        },
+        output = {
+irst one, as it doesn't use the fakedefine
+  output = {
+irst one, as it doesn't use the fakedefine
+ne', 'core', 'svg', 'vml'],
+ doesn't use the fakedefine
+ne', 'core', 'svg', 'vml'],
+re', 'svg', 'vml']
+        };
 
 for (var file in input) {
 	input[file] = fs.readFileSync(input[file], 'utf8');
