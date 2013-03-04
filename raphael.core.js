@@ -1620,7 +1620,12 @@
         return bb;
     },
         pathClone = function (pathArray) {
-            var res = clone(pathArray);
+            //var res = clone(pathArray);
+            // Array.slice() is faster then clone(pathArray).
+            var res = pathArray.slice(0);
+            for (var i = 0, ii = pathArray.length; i < ii; ++i)
+                res[i] = pathArray[i].slice(0);
+
             res.toString = R._path2string;
             return res;
         },
