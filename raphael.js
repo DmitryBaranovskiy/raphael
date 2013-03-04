@@ -2000,7 +2000,12 @@
         return bb;
     },
         pathClone = function (pathArray) {
-            var res = clone(pathArray);
+            //var res = clone(pathArray);
+            // Array.slice() is faster then clone(pathArray).
+            var res = pathArray.slice(0);
+            for (var i = 0, ii = pathArray.length; i < ii; ++i)
+                res[i] = pathArray[i].slice(0);
+
             res.toString = R._path2string;
             return res;
         },
@@ -3466,7 +3471,7 @@
      = (object) data
     \*/
     elproto.getData = function () {
-        return eldata[this.id] || {};
+        return clone(eldata[this.id] || {});
     };
     /*\
      * Element.hover
@@ -3893,13 +3898,13 @@
      **
      > Parameters
      **
-     - bbox (string) bbox to check with
+     - bbox (object) bbox to check with
      = (object) @Set
      \*/
     paperproto.getElementsByBBox = function (bbox) {
         var set = this.set();
         this.forEach(function (el) {
-            if (Raphael.isBBoxIntersect(el.getBBox(), bbox)) {
+            if (R.isBBoxIntersect(el.getBBox(), bbox)) {
                 set.push(el);
             }
         });
