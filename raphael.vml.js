@@ -593,6 +593,15 @@ window.Raphael && window.Raphael.vml && function (R) {
         for (var i in this) {
             this[i] = typeof this[i] == "function" ? R._removedFactory(i) : null;
         }
+
+        try {
+		eldata[this.id] = null;
+        	delete eldata[this.id];
+        }
+        catch(err){
+        	
+        }
+
         this.removed = true;
     };
     elproto.attr = function (name, value) {

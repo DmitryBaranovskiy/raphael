@@ -3072,7 +3072,13 @@
     \*/
     elproto.removeData = function (key) {
         if (key == null) {
-            eldata[this.id] = {};
+        try {
+		eldata[this.id] = null;
+        	delete eldata[this.id];
+        }
+        catch(err){
+        	
+        }
         } else {
             eldata[this.id] && delete eldata[this.id][key];
         }
