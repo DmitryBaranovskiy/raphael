@@ -5034,7 +5034,7 @@
             notfirst = 0,
             path = E,
             scale;
-        R.is(font, string) && (font = this.getFont(font));
+        R.is(font, "string") && (font = this.getFont(font));
         if (font) {
             scale = (size || 16) / font.face["units-per-em"];
             var bb = font.face.bbox[split](separator),
