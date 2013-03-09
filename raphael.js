@@ -3466,7 +3466,7 @@
      = (object) data
     \*/
     elproto.getData = function () {
-        return eldata[this.id] || {};
+        return clone(eldata[this.id] || {});
     };
     /*\
      * Element.hover
@@ -3893,13 +3893,13 @@
      **
      > Parameters
      **
-     - bbox (string) bbox to check with
+     - bbox (object) bbox to check with
      = (object) @Set
      \*/
     paperproto.getElementsByBBox = function (bbox) {
         var set = this.set();
         this.forEach(function (el) {
-            if (Raphael.isBBoxIntersect(el.getBBox(), bbox)) {
+            if (R.isBBoxIntersect(el.getBBox(), bbox)) {
                 set.push(el);
             }
         });
@@ -5414,7 +5414,7 @@
             notfirst = 0,
             path = E,
             scale;
-        R.is(font, string) && (font = this.getFont(font));
+        R.is(font, "string") && (font = this.getFont(font));
         if (font) {
             scale = (size || 16) / font.face["units-per-em"];
             var bb = font.face.bbox[split](separator),
