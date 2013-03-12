@@ -1953,6 +1953,8 @@
      o     y2: (number) y coordinate of the right bottom point of the box
      o     width: (number) width of the box
      o     height: (number) height of the box
+     o     cx: (number) x coordinate of the center of the box
+     o     cy: (number) y coordinate of the center of the box
      o }
     \*/
     var pathDimensions = R.pathBBox = function (path) {
@@ -1988,13 +1990,17 @@
             ymin = mmin[apply](0, Y),
             xmax = mmax[apply](0, X),
             ymax = mmax[apply](0, Y),
-            bb = {
+            width = xmax - xmin,
+            height = ymax - ymin,
+                bb = {
                 x: xmin,
                 y: ymin,
                 x2: xmax,
                 y2: ymax,
-                width: xmax - xmin,
-                height: ymax - ymin
+                width: width,
+                height: height,
+                cx: xmin + width / 2,
+                cy: ymin + height / 2
             };
         pth.bbox = clone(bb);
         return bb;
@@ -3466,7 +3472,7 @@
      = (object) data
     \*/
     elproto.getData = function () {
-        return eldata[this.id] || {};
+        return clone(eldata[this.id] || {});
     };
     /*\
      * Element.hover
@@ -3893,13 +3899,13 @@
      **
      > Parameters
      **
-     - bbox (string) bbox to check with
+     - bbox (object) bbox to check with
      = (object) @Set
      \*/
     paperproto.getElementsByBBox = function (bbox) {
         var set = this.set();
         this.forEach(function (el) {
-            if (Raphael.isBBoxIntersect(el.getBBox(), bbox)) {
+            if (R.isBBoxIntersect(el.getBBox(), bbox)) {
                 set.push(el);
             }
         });
