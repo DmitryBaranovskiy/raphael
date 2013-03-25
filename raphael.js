@@ -385,7 +385,19 @@
 // │ Copyright (c) 2008-2011 Sencha Labs (http://sencha.com)             │ \\
 // │ Licensed under the MIT (http://raphaeljs.com/license.html) license. │ \\
 // └─────────────────────────────────────────────────────────────────────┘ \\
-(function () {
+(function (glob, factory) {
+    // AMD support
+    if (typeof define === "function" && define.amd) {
+        // Define as named module for the sake of raphael.svg.js and raphael.vml.js
+        // Adjust AMD paths if needed
+        // example:
+        // require.config({ paths: { raphael: "libs/raphael" } });
+        define("raphael", ["eve"], factory);
+    } else {
+        // Browser globals (glob is window)
+        glob.Raphael = factory(glob.eve);
+    }
+}(this, function (eve) {
     /*\
      * Raphael
      [ method ]
@@ -5624,7 +5636,9 @@
     eve.on("raphael.DOMload", function () {
         loaded = true;
     });
-})();
+
+    return R;
+}));
 
 // ┌─────────────────────────────────────────────────────────────────────┐ \\
 // │ Raphaël - JavaScript Vector Library                                 │ \\
@@ -5635,7 +5649,19 @@
 // │ Copyright (c) 2008-2011 Sencha Labs (http://sencha.com)             │ \\
 // │ Licensed under the MIT (http://raphaeljs.com/license.html) license. │ \\
 // └─────────────────────────────────────────────────────────────────────┘ \\
-window.Raphael && window.Raphael.svg && function (R) {
+(function (glob, factory) {
+    // AMD support
+    if (typeof define === "function" && define.amd && require) {
+        // Require Raphael
+        require(["raphael"], factory);
+    } else if ( glob.Raphael ) {
+        // Browser globals (glob is window)
+        factory( glob.Raphael );
+    }
+}(this, function (R) {
+    if ( !R.svg ) {
+        return;
+    }
     var has = "hasOwnProperty",
         Str = String,
         toFloat = parseFloat,
@@ -6985,7 +7011,8 @@ window.Raphael && window.Raphael.svg && function (R) {
             };
         })(method);
     }
-}(window.Raphael);
+}));
+
 // ┌─────────────────────────────────────────────────────────────────────┐ \\
 // │ Raphaël - JavaScript Vector Library                                 │ \\
 // ├─────────────────────────────────────────────────────────────────────┤ \\
@@ -6995,7 +7022,19 @@ window.Raphael && window.Raphael.svg && function (R) {
 // │ Copyright (c) 2008-2011 Sencha Labs (http://sencha.com)             │ \\
 // │ Licensed under the MIT (http://raphaeljs.com/license.html) license. │ \\
 // └─────────────────────────────────────────────────────────────────────┘ \\
-window.Raphael && window.Raphael.vml && function (R) {
+(function (glob, factory) {
+    // AMD support
+    if (typeof define === "function" && define.amd && require) {
+        // Require Raphael
+        require(["raphael"], factory);
+    } else if ( glob.Raphael ) {
+        // Browser globals (glob is window)
+        factory( glob.Raphael );
+    }
+}(this, function (R) {
+    if ( !R.vml ) {
+        return;
+    }
     var has = "hasOwnProperty",
         Str = String,
         toFloat = parseFloat,
@@ -7958,4 +7997,4 @@ window.Raphael && window.Raphael.vml && function (R) {
             };
         })(method);
     }
-}(window.Raphael);
+}));
