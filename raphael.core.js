@@ -5,7 +5,19 @@
 // │ Copyright (c) 2008-2011 Sencha Labs (http://sencha.com)             │ \\
 // │ Licensed under the MIT (http://raphaeljs.com/license.html) license. │ \\
 // └─────────────────────────────────────────────────────────────────────┘ \\
-(function () {
+(function (glob, factory) {
+    // AMD support
+    if (typeof define === "function" && define.amd) {
+        // Define as named module for the sake of raphael.svg.js and raphael.vml.js
+        // Adjust AMD paths if needed
+        // example:
+        // require.config({ paths: { raphael: "libs/raphael" } });
+        define("raphael", ["eve"], factory);
+    } else {
+        // Browser globals (glob is window)
+        glob.Raphael = factory(glob.eve);
+    }
+}(this, function (eve) {
     /*\
      * Raphael
      [ method ]
@@ -5244,4 +5256,6 @@
     eve.on("raphael.DOMload", function () {
         loaded = true;
     });
-})();
+
+    return R;
+}));
