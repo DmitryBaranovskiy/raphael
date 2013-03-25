@@ -9,15 +9,15 @@
 // └─────────────────────────────────────────────────────────────────────┘ \\
 (function (glob, factory) {
     // AMD support
-    if (typeof define === "function" && define.amd && require) {
+    if (typeof define === "function" && define.amd) {
         // Require Raphael
         require(["raphael"], factory);
-    } else if ( glob.Raphael ) {
+    } else if (glob.Raphael) {
         // Browser globals (glob is window)
-        factory( glob.Raphael );
+        factory(glob.Raphael);
     }
 }(this, function (R) {
-    if ( !R.vml ) {
+    if (!R.vml) {
         return;
     }
     var has = "hasOwnProperty",
