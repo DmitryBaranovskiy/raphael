@@ -8,9 +8,29 @@ Visit the library website for more information: [http://raphaeljs.com](http://ra
 * `git submodule init && git submodule update && npm install`
 (thank you [Wes Tood](https://github.com/wesleytodd))
 
-### Dependencies
+## Dependencies
 * [uglifyjs](https://github.com/mishoo/UglifyJS)
 * [eve](https://github.com/adobe-webplatform/eve)
+
+## Loading
+Raphael can be loaded in a script tag or with AMD:
+
+```js
+define([ "raphael" ], function( Raphael ) {
+  console.log( Raphael );
+});
+```
+
+To place raphael in a directory that is not your AMD's loader's base URL, adjust the path to raphael.
+
+```js
+// requirejs syntax
+require.config({
+  paths: {
+    raphael: "libs/raphael"
+  }
+});
+```
 
 ## Development
 
