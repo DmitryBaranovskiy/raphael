@@ -9,12 +9,15 @@
     // AMD support
     if (typeof define === "function" && define.amd) {
         // Define as an anonymous module
-        define(["eve"], factory);
+        define(["eve"], function( eve ) {
+            return factory(glob, eve);
+        });
     } else {
         // Browser globals (glob is window)
-        glob.Raphael = factory(glob.eve);
+        // Raphael adds itself to window
+        factory(glob, glob.eve);
     }
-}(this, function (eve) {
+}(this, function (window, eve) {
     /*\
      * Raphael
      [ method ]
@@ -5248,12 +5251,14 @@
         isLoaded();
     })(document, "DOMContentLoaded");
 
-    // Even with AMD, Raphael should be defined globally
-    oldRaphael.was ? (g.win.Raphael = R) : (Raphael = R);
-
     eve.on("raphael.DOMload", function () {
         loaded = true;
     });
+
+    // EXPOSE
+    // SVG and VML are appended just before the EXPOSE line
+    // Even with AMD, Raphael should be defined globally
+    oldRaphael.was ? (g.win.Raphael = R) : (Raphael = R);
 
     return R;
 }));

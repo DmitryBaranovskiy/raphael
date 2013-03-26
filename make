@@ -37,7 +37,7 @@ for (var i = 0, l = output.raphael.length; i < l; i++) {
 	file = output.raphael[i];
 	// Append svg and vml output before core's return statement
 	if ( file === 'svg' || file === 'vml' ) {
-		out = out.replace(/(\s*return\s*R\;\n\}\)\);)/, '\n\n' + input[file] + '$1');
+		out = out.replace(/(\n\s*\/\/\s*EXPOSE(?:\n|.)*\}\)\);)/, '\n\n' + input[file] + '$1');
 	} else {
 		out += input[file] + '\n';
 	}
