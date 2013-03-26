@@ -7,19 +7,8 @@
 // │ Copyright (c) 2008-2011 Sencha Labs (http://sencha.com)             │ \\
 // │ Licensed under the MIT (http://raphaeljs.com/license.html) license. │ \\
 // └─────────────────────────────────────────────────────────────────────┘ \\
-(function (glob, factory) {
-    // AMD support
-    if (typeof define === "function" && define.amd) {
-        // Require Raphael
-        require(["raphael"], factory);
-    } else if (glob.Raphael) {
-        // Browser globals (glob is window)
-        factory(glob.Raphael);
-    }
-}(this, function (R) {
-    if (!R.vml) {
-        return;
-    }
+
+window.Raphael && window.Raphael.vml && function(R) {
     var has = "hasOwnProperty",
         Str = String,
         toFloat = parseFloat,
@@ -982,4 +971,4 @@
             };
         })(method);
     }
-}));
+}(window.Raphael);
