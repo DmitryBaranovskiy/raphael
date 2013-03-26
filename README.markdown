@@ -16,19 +16,8 @@ Visit the library website for more information: [http://raphaeljs.com](http://ra
 Raphael can be loaded in a script tag or with AMD:
 
 ```js
-define([ "raphael" ], function( Raphael ) {
+define([ "path/to/raphael" ], function( Raphael ) {
   console.log( Raphael );
-});
-```
-
-To place raphael in a directory that is not your AMD's loader's base URL, adjust the path to raphael.
-
-```js
-// requirejs syntax
-require.config({
-  paths: {
-    raphael: "libs/raphael"
-  }
 });
 ```
 

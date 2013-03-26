@@ -8,11 +8,9 @@
 (function (glob, factory) {
     // AMD support
     if (typeof define === "function" && define.amd) {
-        // Define as named module for the sake of raphael.svg.js and raphael.vml.js
-        // Adjust AMD paths if needed
-        // example:
-        // require.config({ paths: { raphael: "libs/raphael" } });
-        define("raphael", ["eve"], factory);
+        // Define as an anonymous module
+        // See ./make for how this is handled by raphael.svg.js and raphael.vml.js
+        define(["eve"], factory);
     } else {
         // Browser globals (glob is window)
         glob.Raphael = factory(glob.eve);
@@ -5251,8 +5249,9 @@
         isLoaded();
     })(document, "DOMContentLoaded");
 
+    // Even with AMD, Raphael should be defined globally
     oldRaphael.was ? (g.win.Raphael = R) : (Raphael = R);
-    
+
     eve.on("raphael.DOMload", function () {
         loaded = true;
     });
