@@ -9,7 +9,6 @@
     // AMD support
     if (typeof define === "function" && define.amd) {
         // Define as an anonymous module
-        // See ./make for how this is handled by raphael.svg.js and raphael.vml.js
         define(["eve"], factory);
     } else {
         // Browser globals (glob is window)
