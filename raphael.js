@@ -5903,7 +5903,7 @@
                 attr = {};
                 attr["marker-" + se] = "url(#" + markerId + ")";
                 if (to || from) {
-                    attr.d = Raphael.getSubpath(attrs.path, from, to);
+                    attr.d = R.getSubpath(attrs.path, from, to);
                 }
                 $(node, attr);
                 o._.arrows[se + "Path"] = pathId;
@@ -5919,7 +5919,7 @@
                     from = 0;
                     to = R.getTotalLength(attrs.path) - (o._.arrows.enddx * stroke || 0);
                 }
-                o._.arrows[se + "Path"] && $(node, {d: Raphael.getSubpath(attrs.path, from, to)});
+                o._.arrows[se + "Path"] && $(node, {d: R.getSubpath(attrs.path, from, to)});
                 delete o._.arrows[se + "Path"];
                 delete o._.arrows[se + "Marker"];
                 delete o._.arrows[se + "dx"];
