@@ -4284,6 +4284,7 @@
             prev,
             timestamp,
             ms = anim.ms,
+            del = anim.del || 0,
             from = {},
             to = {},
             diff = {};
@@ -4311,6 +4312,7 @@
                 ms = ms / anim.top * (percent - prev);
                 next = anim.percents[i + 1];
                 params = anim.anim[percent];
+                i > 0 && (del = 0);
                 break;
             } else if (status) {
                 element.attr(anim.anim[anim.percents[i]]);
@@ -4445,7 +4447,7 @@
                 anim: anim,
                 percent: percent,
                 timestamp: timestamp,
-                start: timestamp + (anim.del || 0),
+                start: timestamp + del,
                 status: 0,
                 initstatus: status || 0,
                 stop: false,
