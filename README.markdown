@@ -9,6 +9,7 @@ Visit the library website for more information: [http://raphaeljs.com](http://ra
 (thank you [Wes Tood](https://github.com/wesleytodd))
 
 ## Dependencies
+* [grunt](https://github.com/gruntjs/grunt)
 * [uglifyjs](https://github.com/mishoo/UglifyJS)
 * [eve](https://github.com/adobe-webplatform/eve)
 
@@ -52,7 +53,7 @@ We are organizing the current issues between this milestones, setting the ground
 
 All changes in code must go to `raphael.core`, `raphael.svg` or `raphael.vml`. `raphael.js` is a generated file.
 
-After adding your changes, execute `./make`, the minified version will be created, commit and you are ready to make a pull request!
+After adding your changes, execute `grunt`, the minified version will be created, commit and you are ready to make a pull request!
 
 ## Found an issue?
 
