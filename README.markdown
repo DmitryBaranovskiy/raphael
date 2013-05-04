@@ -9,27 +9,15 @@ Visit the library website for more information: [http://raphaeljs.com](http://ra
 (thank you [Wes Tood](https://github.com/wesleytodd))
 
 ## Dependencies
-* [grunt](https://github.com/gruntjs/grunt)
-* [uglifyjs](https://github.com/mishoo/UglifyJS)
 * [eve](https://github.com/adobe-webplatform/eve)
+* [grunt](https://github.com/gruntjs/grunt)
 
 ## Loading
 Raphael can be loaded in a script tag or with AMD:
 
 ```js
-define([ "raphael" ], function( Raphael ) {
+define([ "path/to/raphael" ], function( Raphael ) {
   console.log( Raphael );
-});
-```
-
-To place raphael in a directory that is not your AMD's loader's base URL, adjust the path to raphael.
-
-```js
-// requirejs syntax
-require.config({
-  paths: {
-    raphael: "libs/raphael"
-  }
 });
 ```
 

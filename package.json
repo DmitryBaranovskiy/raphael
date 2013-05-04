@@ -15,9 +15,7 @@
   "readmeFilename": "README.markdown",
   "gitHead": "52bff469f60988f1391e8b3d7cb5349163df8ba1",
   "devDependencies": {
-    "grunt-cli": "~0.1.7",
     "grunt": "~0.4.1",
-    "grunt-contrib-uglify": "~0.2.0",
-    "grunt-contrib-concat": "~0.3.0"
+    "grunt-contrib-uglify": "~0.2.0"
   }
 }
