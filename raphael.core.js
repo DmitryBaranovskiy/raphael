@@ -819,7 +819,9 @@
         return {h: H, s: S, l: L, toString: hsltoString};
     };
     R._path2string = function () {
-        return this.join(",").replace(p2s, "$1");
+        if( this.length ){
+            return this.join(",").replace(p2s, "$1");
+        }
     };
     function repush(array, item) {
         for (var i = 0, ii = array.length; i < ii; i++) if (array[i] === item) {
