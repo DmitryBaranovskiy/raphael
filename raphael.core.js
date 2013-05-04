@@ -3028,7 +3028,7 @@
             R["un" + eventName] = elproto["un" + eventName] = function (fn) {
                 var events = this.events || [],
                     l = events.length;
-                while (l--) if (events[l].name == eventName && events[l].f == fn) {
+                while (l--) if (events[l].name == eventName && (typeof fn === 'undefined' || events[l].f == fn)) {
                     events[l].unbind();
                     events.splice(l, 1);
                     !events.length && delete this.events;
