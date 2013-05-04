@@ -2823,7 +2823,7 @@
      **
      * Removes event handler for click for the element.
      > Parameters
-     - handler (function) handler for the event
+     - handler (function) #optional handler for the event
      = (object) @Element
     \*/
     
@@ -2842,7 +2842,7 @@
      **
      * Removes event handler for double click for the element.
      > Parameters
-     - handler (function) handler for the event
+     - handler (function) #optional handler for the event
      = (object) @Element
     \*/
     
@@ -2861,7 +2861,7 @@
      **
      * Removes event handler for mousedown for the element.
      > Parameters
-     - handler (function) handler for the event
+     - handler (function) #optional handler for the event
      = (object) @Element
     \*/
     
@@ -2880,7 +2880,7 @@
      **
      * Removes event handler for mousemove for the element.
      > Parameters
-     - handler (function) handler for the event
+     - handler (function) #optional handler for the event
      = (object) @Element
     \*/
     
@@ -2899,7 +2899,7 @@
      **
      * Removes event handler for mouseout for the element.
      > Parameters
-     - handler (function) handler for the event
+     - handler (function) #optional handler for the event
      = (object) @Element
     \*/
     
@@ -2918,7 +2918,7 @@
      **
      * Removes event handler for mouseover for the element.
      > Parameters
-     - handler (function) handler for the event
+     - handler (function) #optional handler for the event
      = (object) @Element
     \*/
     
@@ -2937,7 +2937,7 @@
      **
      * Removes event handler for mouseup for the element.
      > Parameters
-     - handler (function) handler for the event
+     - handler (function) #optional handler for the event
      = (object) @Element
     \*/
     
@@ -2956,7 +2956,7 @@
      **
      * Removes event handler for touchstart for the element.
      > Parameters
-     - handler (function) handler for the event
+     - handler (function) #optional handler for the event
      = (object) @Element
     \*/
     
@@ -2975,7 +2975,7 @@
      **
      * Removes event handler for touchmove for the element.
      > Parameters
-     - handler (function) handler for the event
+     - handler (function) #optional handler for the event
      = (object) @Element
     \*/
     
@@ -2994,7 +2994,7 @@
      **
      * Removes event handler for touchend for the element.
      > Parameters
-     - handler (function) handler for the event
+     - handler (function) #optional handler for the event
      = (object) @Element
     \*/
     
@@ -3013,7 +3013,7 @@
      **
      * Removes event handler for touchcancel for the element.
      > Parameters
-     - handler (function) handler for the event
+     - handler (function) #optional handler for the event
      = (object) @Element
     \*/
     for (var i = events.length; i--;) {
