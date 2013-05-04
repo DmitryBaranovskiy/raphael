@@ -3028,11 +3028,12 @@
             R["un" + eventName] = elproto["un" + eventName] = function (fn) {
                 var events = this.events || [],
                     l = events.length;
-                while (l--) if (events[l].name == eventName && events[l].f == fn) {
-                    events[l].unbind();
-                    events.splice(l, 1);
-                    !events.length && delete this.events;
-                    return this;
+                while (l--){
+                    if (events[l].name == eventName && (R.is(fn, "undefined") || events[l].f == fn)) {
+                        events[l].unbind();
+                        events.splice(l, 1);
+                        !events.length && delete this.events;
+                    }
                 }
                 return this;
             };
