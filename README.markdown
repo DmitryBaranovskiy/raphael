@@ -9,26 +9,15 @@ Visit the library website for more information: [http://raphaeljs.com](http://ra
 (thank you [Wes Tood](https://github.com/wesleytodd))
 
 ## Dependencies
-* [uglifyjs](https://github.com/mishoo/UglifyJS)
 * [eve](https://github.com/adobe-webplatform/eve)
+* [grunt](https://github.com/gruntjs/grunt)
 
 ## Loading
 Raphael can be loaded in a script tag or with AMD:
 
 ```js
-define([ "raphael" ], function( Raphael ) {
+define([ "path/to/raphael" ], function( Raphael ) {
   console.log( Raphael );
-});
-```
-
-To place raphael in a directory that is not your AMD's loader's base URL, adjust the path to raphael.
-
-```js
-// requirejs syntax
-require.config({
-  paths: {
-    raphael: "libs/raphael"
-  }
 });
 ```
 
@@ -52,7 +41,7 @@ We are organizing the current issues between this milestones, setting the ground
 
 All changes in code must go to `raphael.core`, `raphael.svg` or `raphael.vml`. `raphael.js` is a generated file.
 
-After adding your changes, execute `./make`, the minified version will be created, commit and you are ready to make a pull request!
+After adding your changes, execute `grunt`, the minified version will be created, commit and you are ready to make a pull request!
 
 ## Found an issue?
 
