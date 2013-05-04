@@ -5040,13 +5040,15 @@
      - size (number) #optional size of the font, default is `16`
      - origin (string) #optional could be `"baseline"` or `"middle"`, default is `"middle"`
      - letter_spacing (number) #optional number in range `-1..1`, default is `0`
+     - line_spacing (number) #optional number in range `1..3`, default is `1`
      = (object) resulting path element, which consist of all letters
      > Usage
      | var txt = r.print(10, 50, "print", r.getFont("Museo"), 30).attr({fill: "#fff"});
     \*/
-    paperproto.print = function (x, y, string, font, size, origin, letter_spacing) {
+    paperproto.print = function (x, y, string, font, size, origin, letter_spacing, line_spacing) {
         origin = origin || "middle"; // baseline|middle
         letter_spacing = mmax(mmin(letter_spacing || 0, 1), -1);
+        line_spacing = mmax(mmin(line_spacing || 1, 3), 1);
         var letters = Str(string)[split](E),
             shift = 0,
             notfirst = 0,
@@ -5065,7 +5067,7 @@
                     shift = 0;
                     curr = 0;
                     notfirst = 0;
-                    shifty += lineHeight;
+                    shifty += lineHeight * line_spacing;
                 } else {
                     var prev = notfirst && font.glyphs[letters[i - 1]] || {},
                         curr = font.glyphs[letters[i]];
