@@ -1,50 +1,44 @@
 #!/usr/bin/env node
+var ujs = require('uglify-js'),
+    fs = require('fs'),
+	input = {
+		core : 'raphael.core.js',
+		svg  : 'raphael.svg.js',
+		vml  : 'raphael.vml.js',
+		eve  : './eve/eve.js',
+		copy : 'copy.js'
+	},
+	output = {
+		'raphael-min.js'     : ['eve', 'core', 'svg', 'vml'],
+		'raphael.js'         : ['eve', 'core', 'svg', 'vml']
+	};
 
-var setup = {
-        input: {
-            core: "raphael.core.js",
-            svg: "raphael.svg.js",
-            vml: "raphael.vml.js",
-            eve: "../eve/eve.js",
-            copy: "copy.js"
-        },
-        output: {
-            "raphael-min.js": function () {
-                return this.copy + "\n" + minify(this.eve + this.core + this.svg + this.vml);
-            },
-            "raphael.js": function () {
-                return this.copy + "\n" + this.eve + "\n\n" + this.core + "\n\n" + this.svg + "\n\n" + this.vml;
-            },
-            "raphael.pro-min.js": function () {
-                return this.copy + "\n" + minify(this.eve + this.core + this.svg);
-            },
-            "raphael.pro.js": function () {
-                return this.copy + "\n" + this.eve + "\n\n" + this.core + "\n\n" + this.svg ;
-            },
-        }
-    },
-    ujs = require("uglify-js"),
-    jsp = ujs.parser,
-    pro = ujs.uglify,
-    fs = require("fs"),
-    rxdr = /\/\*\\[\s\S]+?\\\*\//g;
-
-function minify(code) {
-    ast = ujs.parse(code);
-    ast.figure_out_scope();
-    ast.compute_char_frequency();
-    ast.mangle_names();
-    return ast.print_to_string();
+for (var file in input) {
+	input[file] = fs.readFileSync(input[file], 'utf8');
 }
-
-var files = {};
-for (var file in setup.input) {
-    files[file] = String(fs.readFileSync(setup.input[file], "utf8")).replace(rxdr, "");
-}
-for (file in setup.output) {
-    (function (file) {
-        fs.writeFile(file, setup.output[file].call(files), function () {
-            console.log("Saved to \033[32m" + file + "\033[0m\n");
-        });
-    })(file);
+for (file in output) {
+	var out = '';
+	if (file.indexOf('min') !== -1) {
+		console.log('Compressing ' + file);
+		for (var i = 0, l = output[file].length; i < l; i++) {
+			var o = ujs.minify(input[output[file][i]], {
+				fromString : true
+			});
+			out += o.code;
+		}
+	} else {
+		console.log('Concatinating ' + file);
+		for (i = 0, l = output[file].length; i < l; i++) {
+			out += input[output[file][i]] + '\n';
+		}
+	}
+	(function(f, code){
+		fs.writeFile(f, input.copy + '\n' + code, function(err) {
+			if (err) {
+				console.log(err);
+			} else {
+				console.log('Saved to \033[32m' + f + '\033[0m\n');
+			}
+		});
+	})(file, out);
 }

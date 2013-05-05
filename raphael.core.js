@@ -5,7 +5,19 @@
 // │ Copyright (c) 2008-2011 Sencha Labs (http://sencha.com)             │ \\
 // │ Licensed under the MIT (http://raphaeljs.com/license.html) license. │ \\
 // └─────────────────────────────────────────────────────────────────────┘ \\
-(function () {
+(function (glob, factory) {
+    // AMD support
+    if (typeof define === "function" && define.amd) {
+        // Define as named module for the sake of raphael.svg.js and raphael.vml.js
+        // Adjust AMD paths if needed
+        // example:
+        // require.config({ paths: { raphael: "libs/raphael" } });
+        define("raphael", ["eve"], factory);
+    } else {
+        // Browser globals (glob is window)
+        glob.Raphael = factory(glob.eve);
+    }
+}(this, function (eve) {
     /*\
      * Raphael
      [ method ]
@@ -113,7 +125,7 @@
              | var c = paper.circle(10, 10, 10).attr({hue: .45});
              | // or even like this:
              | c.animate({hue: 1}, 1e3);
-             |
+             | 
              | // You could also create custom attribute
              | // with multiple parameters:
              | paper.customAttributes.hsb = function (h, s, b) {
@@ -128,7 +140,7 @@
         appendChild = "appendChild",
         apply = "apply",
         concat = "concat",
-        supportsTouch = "createTouch" in g.doc,
+        supportsTouch = ('ontouchstart' in g.win) || g.win.DocumentTouch && g.doc instanceof DocumentTouch, //taken from Modernizr touch test
         E = "",
         S = " ",
         Str = String,
@@ -277,6 +289,10 @@
                 return rectPath(a.x, a.y, a.width, a.height);
             },
             text: function (el) {
+                var bbox = el._getBBox();
+                return rectPath(bbox.x, bbox.y, bbox.width, bbox.height);
+            },
+            set : function(el) {
                 var bbox = el._getBBox();
                 return rectPath(bbox.x, bbox.y, bbox.width, bbox.height);
             }
@@ -487,7 +503,7 @@
         }
         return value;
     };
-
+    
     /*\
      * Raphael.createUUID
      [ method ]
@@ -582,7 +598,7 @@
             g /= 255;
             b /= 255;
         }
-
+        
         return [r, g, b];
     },
     packageRGB = function (r, g, b, o) {
@@ -599,7 +615,7 @@
         R.is(o, "finite") && (rgb.opacity = o);
         return rgb;
     };
-
+    
     /*\
      * Raphael.color
      [ method ]
@@ -842,7 +858,7 @@
         g.doc.body.appendChild(img);
         img.src = src;
     };
-
+    
     function clrToString() {
         return this.hex;
     }
@@ -1074,7 +1090,7 @@
         if (pth.arr) {
             return pathClone(pth.arr);
         }
-
+        
         var paramCounts = {a: 7, c: 6, h: 1, l: 2, m: 2, r: 4, q: 4, s: 4, t: 2, v: 1, z: 0},
             data = [];
         if (R.is(pathString, array) && R.is(pathString[0], array)) { // rough assumption
@@ -1569,18 +1585,20 @@
      o     y2: (number) y coordinate of the right bottom point of the box
      o     width: (number) width of the box
      o     height: (number) height of the box
+     o     cx: (number) x coordinate of the center of the box
+     o     cy: (number) y coordinate of the center of the box
      o }
     \*/
     var pathDimensions = R.pathBBox = function (path) {
         var pth = paths(path);
         if (pth.bbox) {
-            return pth.bbox;
+            return clone(pth.bbox);
         }
         if (!path) {
             return {x: 0, y: 0, width: 0, height: 0, x2: 0, y2: 0};
         }
         path = path2curve(path);
-        var x = 0,
+        var x = 0, 
             y = 0,
             X = [],
             Y = [],
@@ -1604,13 +1622,17 @@
             ymin = mmin[apply](0, Y),
             xmax = mmax[apply](0, X),
             ymax = mmax[apply](0, Y),
-            bb = {
+            width = xmax - xmin,
+            height = ymax - ymin,
+                bb = {
                 x: xmin,
                 y: ymin,
                 x2: xmax,
                 y2: ymax,
-                width: xmax - xmin,
-                height: ymax - ymin
+                width: width,
+                height: height,
+                cx: xmin + width / 2,
+                cy: ymin + height / 2
             };
         pth.bbox = clone(bb);
         return bb;
@@ -2628,7 +2650,7 @@
                 s.scalex = +s.scalex.toFixed(4);
                 s.scaley = +s.scaley.toFixed(4);
                 s.rotate = +s.rotate.toFixed(4);
-                return  (s.dx || s.dy ? "t" + [s.dx, s.dy] : E) +
+                return  (s.dx || s.dy ? "t" + [s.dx, s.dy] : E) + 
                         (s.scalex != 1 || s.scaley != 1 ? "s" + [s.scalex, s.scaley, 0, 0] : E) +
                         (s.rotate ? "r" + [s.rotate, 0, 0] : E);
             } else {
@@ -2656,7 +2678,7 @@
     } else {
         paperproto.safari = fun;
     }
-
+ 
     var preventDefault = function () {
         this.returnValue = false;
     },
@@ -2801,10 +2823,10 @@
      **
      * Removes event handler for click for the element.
      > Parameters
-     - handler (function) handler for the event
+     - handler (function) #optional handler for the event
      = (object) @Element
     \*/
-
+    
     /*\
      * Element.dblclick
      [ method ]
@@ -2820,10 +2842,10 @@
      **
      * Removes event handler for double click for the element.
      > Parameters
-     - handler (function) handler for the event
+     - handler (function) #optional handler for the event
      = (object) @Element
     \*/
-
+    
     /*\
      * Element.mousedown
      [ method ]
@@ -2839,10 +2861,10 @@
      **
      * Removes event handler for mousedown for the element.
      > Parameters
-     - handler (function) handler for the event
+     - handler (function) #optional handler for the event
      = (object) @Element
     \*/
-
+    
     /*\
      * Element.mousemove
      [ method ]
@@ -2858,10 +2880,10 @@
      **
      * Removes event handler for mousemove for the element.
      > Parameters
-     - handler (function) handler for the event
+     - handler (function) #optional handler for the event
      = (object) @Element
     \*/
-
+    
     /*\
      * Element.mouseout
      [ method ]
@@ -2877,10 +2899,10 @@
      **
      * Removes event handler for mouseout for the element.
      > Parameters
-     - handler (function) handler for the event
+     - handler (function) #optional handler for the event
      = (object) @Element
     \*/
-
+    
     /*\
      * Element.mouseover
      [ method ]
@@ -2896,10 +2918,10 @@
      **
      * Removes event handler for mouseover for the element.
      > Parameters
-     - handler (function) handler for the event
+     - handler (function) #optional handler for the event
      = (object) @Element
     \*/
-
+    
     /*\
      * Element.mouseup
      [ method ]
@@ -2915,10 +2937,10 @@
      **
      * Removes event handler for mouseup for the element.
      > Parameters
-     - handler (function) handler for the event
+     - handler (function) #optional handler for the event
      = (object) @Element
     \*/
-
+    
     /*\
      * Element.touchstart
      [ method ]
@@ -2934,10 +2956,10 @@
      **
      * Removes event handler for touchstart for the element.
      > Parameters
-     - handler (function) handler for the event
+     - handler (function) #optional handler for the event
      = (object) @Element
     \*/
-
+    
     /*\
      * Element.touchmove
      [ method ]
@@ -2953,10 +2975,10 @@
      **
      * Removes event handler for touchmove for the element.
      > Parameters
-     - handler (function) handler for the event
+     - handler (function) #optional handler for the event
      = (object) @Element
     \*/
-
+    
     /*\
      * Element.touchend
      [ method ]
@@ -2972,10 +2994,10 @@
      **
      * Removes event handler for touchend for the element.
      > Parameters
-     - handler (function) handler for the event
+     - handler (function) #optional handler for the event
      = (object) @Element
     \*/
-
+    
     /*\
      * Element.touchcancel
      [ method ]
@@ -2991,7 +3013,7 @@
      **
      * Removes event handler for touchcancel for the element.
      > Parameters
-     - handler (function) handler for the event
+     - handler (function) #optional handler for the event
      = (object) @Element
     \*/
     for (var i = events.length; i--;) {
@@ -3006,23 +3028,24 @@
             R["un" + eventName] = elproto["un" + eventName] = function (fn) {
                 var events = this.events || [],
                     l = events.length;
-                while (l--) if (events[l].name == eventName && events[l].f == fn) {
-                    events[l].unbind();
-                    events.splice(l, 1);
-                    !events.length && delete this.events;
-                    return this;
+                while (l--){
+                    if (events[l].name == eventName && (R.is(fn, "undefined") || events[l].f == fn)) {
+                        events[l].unbind();
+                        events.splice(l, 1);
+                        !events.length && delete this.events;
+                    }
                 }
                 return this;
             };
         })(events[i]);
     }
-
+    
     /*\
      * Element.data
      [ method ]
      **
      * Adds or retrieves given value asociated with given key.
-     **
+     ** 
      * See also @Element.removeData
      > Parameters
      - key (string) key to store data
@@ -3049,52 +3072,12 @@
                 }
                 return this;
             }
-            eve("raphael.data.get." + this.id + '.' + key, this, data[key], key);
+            eve("raphael.data.get." + this.id, this, data[key], key);
             return data[key];
         }
         data[key] = value;
-        eve("raphael.data.set." + this.id + '.' + key, this, value, key);
+        eve("raphael.data.set." + this.id, this, value, key);
         return this;
-    };
-    /*\
-     * Element.dataset
-     [ method ]
-     **
-     * Returns an Object with all key:value pairings for Element.
-     > Parameters
-     - dataset (object/array) #optional dataset
-     * Either an array of keys for desired data or an object with key value
-     * pairings to set multiple values at once if no dataset object is
-     * passed then this function returns all data associated with the element
-     = (object) @Element
-    \*/
-    elproto.dataset = function (dataset) {
-    	var data = eldata[this.id] = eldata[this.id] || {};
-    	if (arguments.length > 0) {
-    		var filteredData = {};
-    		for (key in dataset) {
-    			if (!Array.isArray(dataset))
-    				this.data(key, dataset[key]);
-    			else
-    				filteredData[dataset[key]] = data[dataset[key]];
-    		}
-    		var lengthOfObject = function(obj){
-    			var key, length = 0;
-    			for (objKey in obj){
-    				length += Number( obj.hasOwnProperty(objKey) );
-    			}
-    			return length;
-    		}
-    		if (lengthOfObject(filteredData) > 0) {
-    			eve("raphael.data.dataget." + this.id, this, filteredData);
-    			return filteredData;
-    		} else {
-    			eve("raphael.data.dataset." + this.id, this, dataset);
-    			return this;
-    		}
-    	}
-    	eve("raphael.data.dataget." + this.id, this, data);
-    	return data;
     };
     /*\
      * Element.removeData
@@ -3112,8 +3095,17 @@
         } else {
             eldata[this.id] && delete eldata[this.id][key];
         }
-        eve("raphael.data.removeData." + this.id + '.' + key, this, key);
         return this;
+    };
+     /*\
+     * Element.getData
+     [ method ]
+     **
+     * Retrieves the element data
+     = (object) data
+    \*/
+    elproto.getData = function () {
+        return clone(eldata[this.id] || {});
     };
     /*\
      * Element.hover
@@ -3156,8 +3148,8 @@
      - mcontext (object) #optional context for moving handler
      - scontext (object) #optional context for drag start handler
      - econtext (object) #optional context for drag end handler
-     * Additionaly following `drag` events will be triggered: `drag.start.<id>` on start,
-     * `drag.end.<id>` on end and `drag.move.<id>` on every move. When element will be dragged over another element
+     * Additionaly following `drag` events will be triggered: `drag.start.<id>` on start, 
+     * `drag.end.<id>` on end and `drag.move.<id>` on every move. When element will be dragged over another element 
      * `drag.over.<id>` will be fired as well.
      *
      * Start event and start handler will be called in specified context or in context of the element with following parameters:
@@ -3219,6 +3211,7 @@
             eve.unbind("raphael.drag.*." + this.id);
         }
         !draggable.length && R.unmousemove(dragMove).unmouseup(dragUp);
+        drag = [];
     };
     /*\
      * Paper.circle
@@ -3392,6 +3385,8 @@
         !R.is(itemsArray, "array") && (itemsArray = Array.prototype.splice.call(arguments, 0, arguments.length));
         var out = new Set(itemsArray);
         this.__set__ && this.__set__.push(out);
+        out["paper"] = this;
+        out["type"] = "set";
         return out;
     };
     /*\
@@ -3442,7 +3437,7 @@
      * Paper.setViewBox
      [ method ]
      **
-     * Sets the view box of the paper. Practically it gives you ability to zoom and pan whole paper surface by
+     * Sets the view box of the paper. Practically it gives you ability to zoom and pan whole paper surface by 
      * specifying new boundaries.
      **
      > Parameters
@@ -3528,6 +3523,28 @@
         target = target && target.raphael ? paper.getById(target.raphaelid) : null;
         return target;
     };
+
+    /*\
+     * Paper.getElementsByBBox
+     [ method ]
+     **
+     * Returns set of elements that have an intersecting bounding box
+     **
+     > Parameters
+     **
+     - bbox (object) bbox to check with
+     = (object) @Set
+     \*/
+    paperproto.getElementsByBBox = function (bbox) {
+        var set = this.set();
+        this.forEach(function (el) {
+            if (R.isBBoxIntersect(el.getBBox(), bbox)) {
+                set.push(el);
+            }
+        });
+        return set;
+    };
+
     /*\
      * Paper.getById
      [ method ]
@@ -4141,8 +4158,8 @@
             }
         }
         return element;
-        //
-        //
+        // 
+        // 
         // var a = params ? R.animation(params, ms, easing, callback) : anim,
         //     status = element.status(anim);
         // return this.animate(a).status(a, status * anim.ms / a.ms);
@@ -4252,7 +4269,7 @@
      **
      = (object) new altered Animation object
     \*/
-    Animation.prototype.repeat = function (times) {
+    Animation.prototype.repeat = function (times) { 
         var a = new Animation(this.anim, this.ms);
         a.del = this.del;
         a.times = math.floor(mmax(times, 0)) || 1;
@@ -4887,7 +4904,7 @@
         };
     };
     setproto.clone = function (s) {
-        s = new Set;
+        s = this.paper.set();
         for (var i = 0, ii = this.items.length; i < ii; i++) {
             s.push(this.items[i].clone());
         }
@@ -4895,6 +4912,19 @@
     };
     setproto.toString = function () {
         return "Rapha\xebl\u2018s set";
+    };
+
+    setproto.glow = function(glowConfig) {
+        var ret = this.paper.set();
+        this.forEach(function(shape, index){
+            var g = shape.glow(glowConfig);
+            if(g != null){
+                g.forEach(function(shape2, index2){
+                    ret.push(shape2);
+                });
+            }
+        });
+        return ret;
     };
 
     /*\
@@ -5011,19 +5041,21 @@
      - size (number) #optional size of the font, default is `16`
      - origin (string) #optional could be `"baseline"` or `"middle"`, default is `"middle"`
      - letter_spacing (number) #optional number in range `-1..1`, default is `0`
+     - line_spacing (number) #optional number in range `1..3`, default is `1`
      = (object) resulting path element, which consist of all letters
      > Usage
      | var txt = r.print(10, 50, "print", r.getFont("Museo"), 30).attr({fill: "#fff"});
     \*/
-    paperproto.print = function (x, y, string, font, size, origin, letter_spacing) {
+    paperproto.print = function (x, y, string, font, size, origin, letter_spacing, line_spacing) {
         origin = origin || "middle"; // baseline|middle
         letter_spacing = mmax(mmin(letter_spacing || 0, 1), -1);
+        line_spacing = mmax(mmin(line_spacing || 1, 3), 1);
         var letters = Str(string)[split](E),
             shift = 0,
             notfirst = 0,
             path = E,
             scale;
-        R.is(font, string) && (font = this.getFont(font));
+        R.is(font, "string") && (font = this.getFont(font));
         if (font) {
             scale = (size || 16) / font.face["units-per-em"];
             var bb = font.face.bbox[split](separator),
@@ -5036,7 +5068,7 @@
                     shift = 0;
                     curr = 0;
                     notfirst = 0;
-                    shifty += lineHeight;
+                    shifty += lineHeight * line_spacing;
                 } else {
                     var prev = notfirst && font.glyphs[letters[i - 1]] || {},
                         curr = font.glyphs[letters[i]];
@@ -5223,8 +5255,10 @@
     })(document, "DOMContentLoaded");
 
     oldRaphael.was ? (g.win.Raphael = R) : (Raphael = R);
-
+    
     eve.on("raphael.DOMload", function () {
         loaded = true;
     });
-})();
+
+    return R;
+}));
