@@ -377,7 +377,6 @@
     };
     (typeof module != "undefined" && module.exports) ? (module.exports = eve) : (typeof define != "undefined" ? (define("eve", [], function() { return eve; })) : (glob.eve = eve));
 })(this);
-
 // ┌─────────────────────────────────────────────────────────────────────┐ \\
 // │ "Raphaël 2.1.0" - JavaScript Vector Library                         │ \\
 // ├─────────────────────────────────────────────────────────────────────┤ \\
@@ -388,16 +387,16 @@
 (function (glob, factory) {
     // AMD support
     if (typeof define === "function" && define.amd) {
-        // Define as named module for the sake of raphael.svg.js and raphael.vml.js
-        // Adjust AMD paths if needed
-        // example:
-        // require.config({ paths: { raphael: "libs/raphael" } });
-        define("raphael", ["eve"], factory);
+        // Define as an anonymous module
+        define(["eve"], function( eve ) {
+            return factory(glob, eve);
+        });
     } else {
         // Browser globals (glob is window)
-        glob.Raphael = factory(glob.eve);
+        // Raphael adds itself to window
+        factory(glob, glob.eve);
     }
-}(this, function (eve) {
+}(this, function (window, eve) {
     /*\
      * Raphael
      [ method ]
@@ -5634,14 +5633,9 @@
         isLoaded();
     })(document, "DOMContentLoaded");
 
-    oldRaphael.was ? (g.win.Raphael = R) : (Raphael = R);
-    
     eve.on("raphael.DOMload", function () {
         loaded = true;
     });
-
-    return R;
-}));
 
 // ┌─────────────────────────────────────────────────────────────────────┐ \\
 // │ Raphaël - JavaScript Vector Library                                 │ \\
@@ -5652,16 +5646,8 @@
 // │ Copyright (c) 2008-2011 Sencha Labs (http://sencha.com)             │ \\
 // │ Licensed under the MIT (http://raphaeljs.com/license.html) license. │ \\
 // └─────────────────────────────────────────────────────────────────────┘ \\
-(function (glob, factory) {
-    // AMD support
-    if (typeof define === "function" && define.amd) {
-        // Require Raphael
-        require(["raphael"], factory);
-    } else if (glob.Raphael) {
-        // Browser globals (glob is window)
-        factory(glob.Raphael);
-    }
-}(this, function (R) {
+
+(function(){
     if (!R.svg) {
         return;
     }
@@ -7014,7 +7000,7 @@
             };
         })(method);
     }
-}));
+})();
 
 // ┌─────────────────────────────────────────────────────────────────────┐ \\
 // │ Raphaël - JavaScript Vector Library                                 │ \\
@@ -7025,16 +7011,8 @@
 // │ Copyright (c) 2008-2011 Sencha Labs (http://sencha.com)             │ \\
 // │ Licensed under the MIT (http://raphaeljs.com/license.html) license. │ \\
 // └─────────────────────────────────────────────────────────────────────┘ \\
-(function (glob, factory) {
-    // AMD support
-    if (typeof define === "function" && define.amd) {
-        // Require Raphael
-        require(["raphael"], factory);
-    } else if (glob.Raphael) {
-        // Browser globals (glob is window)
-        factory(glob.Raphael);
-    }
-}(this, function (R) {
+
+(function(){
     if (!R.vml) {
         return;
     }
@@ -8000,4 +7978,12 @@
             };
         })(method);
     }
+})();
+
+    // EXPOSE
+    // SVG and VML are appended just before the EXPOSE line
+    // Even with AMD, Raphael should be defined globally
+    oldRaphael.was ? (g.win.Raphael = R) : (Raphael = R);
+
+    return R;
 }));
