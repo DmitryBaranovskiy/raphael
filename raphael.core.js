@@ -140,7 +140,7 @@
         appendChild = "appendChild",
         apply = "apply",
         concat = "concat",
-        supportsTouch = ('ontouchstart' in g.win) || g.win.DocumentTouch && g.doc instanceof DocumentTouch, //taken from Modernizr touch test
+        supportsTouch = ("createTouch" in g.doc && "ongesturestart" in window),
         E = "",
         S = " ",
         Str = String,
