@@ -6,13 +6,14 @@ Visit the library website for more information: [http://raphaeljs.com](http://ra
 
 * `git clone https://github.com/DmitryBaranovskiy/raphael.git`
 * `git submodule init && git submodule update && npm install`
-(thank you [Wes Tood](https://github.com/wesleytodd))
 
 ## Dependencies
 * [eve](https://github.com/adobe-webplatform/eve)
 * [grunt](https://github.com/gruntjs/grunt)
 
 ## Loading
+Check [Raphael-boilerplate](https://github.com/tomasAlabes/raphael-boilerplate) to see examples of loading.
+
 Raphael can be loaded in a script tag or with AMD:
 
 ```js
