@@ -5306,6 +5306,17 @@
         return ret;
     };
 
+    setproto.isPointInside = function(x, y) {  
+        var ipi = false;
+        this.forEach(function(el) {
+            if (!ipi && el.isPointInside(x, y)) {
+                ipi = true;
+                return false; // stop loop 
+            }
+        });
+        return ipi;
+    };
+    
     /*\
      * Raphael.registerFont
      [ method ]
@@ -7191,6 +7202,7 @@
                 rx = +a.rx || +a.r || 0,
                 ry = +a.ry || +a.r || 0;
             node.path = R.format("ar{0},{1},{2},{3},{4},{1},{4},{1}x", round((cx - rx) * zoom), round((cy - ry) * zoom), round((cx + rx) * zoom), round((cy + ry) * zoom), round(cx * zoom));
+            o._.dirty = 1;
         }
         if ("clip-rect" in params) {
             var rect = Str(params["clip-rect"]).split(separator);
