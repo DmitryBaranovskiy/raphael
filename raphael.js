@@ -5306,7 +5306,7 @@
         return ret;
     };
 
-    setproto.isPointInside = function(x, y) {  //sgurin - fix for issue https://github.com/DmitryBaranovskiy/raphael/issues/587
+    setproto.isPointInside = function(x, y) {  
         var ipi = false;
         this.forEach(function(el) {
             if (!ipi && el.isPointInside(x, y)) {
@@ -7202,7 +7202,7 @@
                 rx = +a.rx || +a.r || 0,
                 ry = +a.ry || +a.r || 0;
             node.path = R.format("ar{0},{1},{2},{3},{4},{1},{4},{1}x", round((cx - rx) * zoom), round((cy - ry) * zoom), round((cx + rx) * zoom), round((cy + ry) * zoom), round(cx * zoom));
-            o._.dirty = 1;// sgurin - dirty flag should be reseted - https://github.com/DmitryBaranovskiy/raphael/issues/319
+            o._.dirty = 1;
         }
         if ("clip-rect" in params) {
             var rect = Str(params["clip-rect"]).split(separator);
