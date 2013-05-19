@@ -715,6 +715,7 @@ window.Raphael && window.Raphael.vml && function(R) {
             s.margin = 0;
             delete this.attrs.blur;
         }
+        return this;
     };
 
     R._engine.path = function (pathString, vml) {

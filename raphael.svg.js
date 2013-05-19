@@ -1144,6 +1144,7 @@ window.Raphael && window.Raphael.svg && function(R) {
             }
             t.node.removeAttribute("filter");
         }
+        return t;
     };
     R._engine.circle = function (svg, x, y, r) {
         var el = $("circle");

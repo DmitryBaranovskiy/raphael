@@ -6817,6 +6817,7 @@
             }
             t.node.removeAttribute("filter");
         }
+        return t;
     };
     R._engine.circle = function (svg, x, y, r) {
         var el = $("circle");
@@ -7753,6 +7754,7 @@
             s.margin = 0;
             delete this.attrs.blur;
         }
+        return this;
     };
 
     R._engine.path = function (pathString, vml) {
