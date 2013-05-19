@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<head>
+        <title>Raphael Dev testing html</title>
+
+        <!-- HTML to try new developments in Raphael -->
+
+        <!-- Global use -->
+
+        <!-- Remember to run to pull the eve submodule -->
+        <!-- To work with concatenated version -->
+        <!--<script type="text/javascript" src="../raphael.js"></script>-->
+
+        <!-- To work with minified version -->
+        <!--<script type="text/javascript" src="../raphael-min.js"></script>-->
+
+        <!-- To work with dev versions -->
+        <script type="text/javascript" src=" ./eve/eve.js"></script>
+        <script type="text/javascript" src="raphael.core.js"></script>
+        <script type="text/javascript" src="raphael.svg.js"></script>
+
+        <script type="text/javascript">
+                // Initialize container when document is loaded
+                window.onload = function(){
+                        paper = Raphael(0, 0, 640, 720, "container");
+                };
+                //Work here, in a separate script file or via command line
+        </script>
+
+        <!-- AMD use -->
+        <!--<script data-main="test" src="require.js"></script>-->
+
+</head>
+<body>
+        <!-- Container for svg/vml root element -->
+    <div id="container"></div>
+</body>
+</html>
