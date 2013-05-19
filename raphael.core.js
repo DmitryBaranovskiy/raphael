@@ -4927,6 +4927,31 @@
         return ret;
     };
 
+
+    /*\
+     * Set.isPointInside
+     [ method ]
+     **
+     * Determine if given point is inside this set’s elements
+     **
+     > Parameters
+     **
+     - x (number) x coordinate of the point
+     - y (number) y coordinate of the point
+     = (boolean) `true` if point is inside any of the set's elements
+     \*/
+    setproto.isPointInside = function (x, y) {
+        var isPointInside = false;
+        this.forEach(function (el) {
+            if (el.isPointInside(x, y)) {
+                console.log('runned');
+                isPointInside = true;
+                return false; // stop loop
+            }
+        });
+        return isPointInside;
+    };
+
     /*\
      * Raphael.registerFont
      [ method ]

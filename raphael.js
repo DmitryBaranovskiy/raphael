@@ -5306,6 +5306,31 @@
         return ret;
     };
 
+
+    /*\
+     * Set.isPointInside
+     [ method ]
+     **
+     * Determine if given point is inside this set’s elements
+     **
+     > Parameters
+     **
+     - x (number) x coordinate of the point
+     - y (number) y coordinate of the point
+     = (boolean) `true` if point is inside any of the set's elements
+     \*/
+    setproto.isPointInside = function (x, y) {
+        var isPointInside = false;
+        this.forEach(function (el) {
+            if (el.isPointInside(x, y)) {
+                console.log('runned');
+                isPointInside = true;
+                return false; // stop loop
+            }
+        });
+        return isPointInside;
+    };
+
     /*\
      * Raphael.registerFont
      [ method ]
@@ -7191,6 +7216,7 @@
                 rx = +a.rx || +a.r || 0,
                 ry = +a.ry || +a.r || 0;
             node.path = R.format("ar{0},{1},{2},{3},{4},{1},{4},{1}x", round((cx - rx) * zoom), round((cy - ry) * zoom), round((cx + rx) * zoom), round((cy + ry) * zoom), round(cx * zoom));
+            o._.dirty = 1;
         }
         if ("clip-rect" in params) {
             var rect = Str(params["clip-rect"]).split(separator);
