@@ -503,7 +503,7 @@
         }
         return value;
     };
-    
+
     /*\
      * Raphael.createUUID
      [ method ]
@@ -598,7 +598,7 @@
             g /= 255;
             b /= 255;
         }
-        
+
         return [r, g, b];
     },
     packageRGB = function (r, g, b, o) {
@@ -615,7 +615,7 @@
         R.is(o, "finite") && (rgb.opacity = o);
         return rgb;
     };
-    
+
     /*\
      * Raphael.color
      [ method ]
@@ -858,7 +858,7 @@
         g.doc.body.appendChild(img);
         img.src = src;
     };
-    
+
     function clrToString() {
         return this.hex;
     }
@@ -1090,7 +1090,7 @@
         if (pth.arr) {
             return pathClone(pth.arr);
         }
-        
+
         var paramCounts = {a: 7, c: 6, h: 1, l: 2, m: 2, r: 4, q: 4, s: 4, t: 2, v: 1, z: 0},
             data = [];
         if (R.is(pathString, array) && R.is(pathString[0], array)) { // rough assumption
@@ -1598,7 +1598,7 @@
             return {x: 0, y: 0, width: 0, height: 0, x2: 0, y2: 0};
         }
         path = path2curve(path);
-        var x = 0, 
+        var x = 0,
             y = 0,
             X = [],
             Y = [],
@@ -2650,7 +2650,7 @@
                 s.scalex = +s.scalex.toFixed(4);
                 s.scaley = +s.scaley.toFixed(4);
                 s.rotate = +s.rotate.toFixed(4);
-                return  (s.dx || s.dy ? "t" + [s.dx, s.dy] : E) + 
+                return  (s.dx || s.dy ? "t" + [s.dx, s.dy] : E) +
                         (s.scalex != 1 || s.scaley != 1 ? "s" + [s.scalex, s.scaley, 0, 0] : E) +
                         (s.rotate ? "r" + [s.rotate, 0, 0] : E);
             } else {
@@ -2678,7 +2678,7 @@
     } else {
         paperproto.safari = fun;
     }
- 
+
     var preventDefault = function () {
         this.returnValue = false;
     },
@@ -2826,7 +2826,7 @@
      - handler (function) #optional handler for the event
      = (object) @Element
     \*/
-    
+
     /*\
      * Element.dblclick
      [ method ]
@@ -2845,7 +2845,7 @@
      - handler (function) #optional handler for the event
      = (object) @Element
     \*/
-    
+
     /*\
      * Element.mousedown
      [ method ]
@@ -2864,7 +2864,7 @@
      - handler (function) #optional handler for the event
      = (object) @Element
     \*/
-    
+
     /*\
      * Element.mousemove
      [ method ]
@@ -2883,7 +2883,7 @@
      - handler (function) #optional handler for the event
      = (object) @Element
     \*/
-    
+
     /*\
      * Element.mouseout
      [ method ]
@@ -2902,7 +2902,7 @@
      - handler (function) #optional handler for the event
      = (object) @Element
     \*/
-    
+
     /*\
      * Element.mouseover
      [ method ]
@@ -2921,7 +2921,7 @@
      - handler (function) #optional handler for the event
      = (object) @Element
     \*/
-    
+
     /*\
      * Element.mouseup
      [ method ]
@@ -2940,7 +2940,7 @@
      - handler (function) #optional handler for the event
      = (object) @Element
     \*/
-    
+
     /*\
      * Element.touchstart
      [ method ]
@@ -2959,7 +2959,7 @@
      - handler (function) #optional handler for the event
      = (object) @Element
     \*/
-    
+
     /*\
      * Element.touchmove
      [ method ]
@@ -2978,7 +2978,7 @@
      - handler (function) #optional handler for the event
      = (object) @Element
     \*/
-    
+
     /*\
      * Element.touchend
      [ method ]
@@ -2997,7 +2997,7 @@
      - handler (function) #optional handler for the event
      = (object) @Element
     \*/
-    
+
     /*\
      * Element.touchcancel
      [ method ]
@@ -3039,7 +3039,7 @@
             };
         })(events[i]);
     }
-    
+
     /*\
      * Element.data
      [ method ]
@@ -3053,6 +3053,8 @@
      = (object) @Element
      * or, if value is not specified:
      = (any) value
+     * or, if key and value are not specified:
+     = (object) Key/value pairs for all the data associated with the element.
      > Usage
      | for (var i = 0, i < 5, i++) {
      |     paper.circle(10 + 15 * i, 10, 10)
@@ -3065,6 +3067,9 @@
     \*/
     elproto.data = function (key, value) {
         var data = eldata[this.id] = eldata[this.id] || {};
+        if (arguments.length == 0) {
+            return data;
+        }
         if (arguments.length == 1) {
             if (R.is(key, "object")) {
                 for (var i in key) if (key[has](i)) {
@@ -4269,7 +4274,7 @@
      **
      = (object) new altered Animation object
     \*/
-    Animation.prototype.repeat = function (times) { 
+    Animation.prototype.repeat = function (times) {
         var a = new Animation(this.anim, this.ms);
         a.del = this.del;
         a.times = math.floor(mmax(times, 0)) || 1;
