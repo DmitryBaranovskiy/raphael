@@ -593,8 +593,6 @@ window.Raphael && window.Raphael.svg && function(R) {
         dif && R.is(dif, "finite") && $(tspans[0], {dy: dif});
     },
     Element = function (node, svg) {
-        var X = 0,
-            Y = 0;
         /*\
          * Element.node
          [ property (object) ]
@@ -1084,7 +1082,7 @@ window.Raphael && window.Raphael.svg && function(R) {
             parent.insertBefore(this.node, this.node.parentNode.firstChild);
         }
         R._toback(this, this.paper);
-        var svg = this.paper;
+
         return this;
     };
     /*\
