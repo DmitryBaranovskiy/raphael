@@ -6267,8 +6267,6 @@
         dif && R.is(dif, "finite") && $(tspans[0], {dy: dif});
     },
     Element = function (node, svg) {
-        var X = 0,
-            Y = 0;
         /*\
          * Element.node
          [ property (object) ]
@@ -6758,7 +6756,7 @@
             parent.insertBefore(this.node, this.node.parentNode.firstChild);
         }
         R._toback(this, this.paper);
-        var svg = this.paper;
+
         return this;
     };
     /*\
@@ -7121,7 +7119,6 @@
                 s = o.style,
                 y = 1,
                 flip = "",
-                dxdy,
                 kx = zoom / sx,
                 ky = zoom / sy;
             s.visibility = "hidden";
@@ -7191,7 +7188,6 @@
         var node = o.node,
             a = o.attrs,
             s = node.style,
-            xy,
             newpath = pathTypes[o.type] && (params.x != a.x || params.y != a.y || params.width != a.width || params.height != a.height || params.cx != a.cx || params.cy != a.cy || params.rx != a.rx || params.ry != a.ry || params.r != a.r),
             isOval = ovalTypes[o.type] && (a.cx != params.cx || a.cy != params.cy || a.r != params.r || a.rx != params.rx || a.ry != params.ry),
             res = o;
@@ -7411,10 +7407,7 @@
     },
     addGradientFill = function (o, gradient, fill) {
         o.attrs = o.attrs || {};
-        var attrs = o.attrs,
-            pow = Math.pow,
-            opacity,
-            oindex,
+        var pow = Math.pow,
             type = "linear",
             fxfy = ".5 .5";
         o.attrs.gradient = gradient;
@@ -7792,8 +7785,7 @@
         return res;
     };
     R._engine.ellipse = function (vml, x, y, rx, ry) {
-        var res = vml.path(),
-            a = res.attrs;
+        var res = vml.path();
         res.X = x - rx;
         res.Y = y - ry;
         res.W = rx * 2;
@@ -7808,8 +7800,7 @@
         return res;
     };
     R._engine.circle = function (vml, x, y, r) {
-        var res = vml.path(),
-            a = res.attrs;
+        var res = vml.path();
         res.X = x - r;
         res.Y = y - r;
         res.W = res.H = r * 2;
@@ -7946,7 +7937,6 @@
         var con = R._getContainer.apply(0, arguments),
             container = con.container,
             height = con.height,
-            s,
             width = con.width,
             x = con.x,
             y = con.y;
