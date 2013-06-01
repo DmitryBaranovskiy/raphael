@@ -2692,19 +2692,31 @@
     stopTouch = function () {
         return this.originalEvent.stopPropagation();
     },
+    getEventPosition = function (e) {
+        var scrollY = g.doc.documentElement.scrollTop || g.doc.body.scrollTop,
+            scrollX = g.doc.documentElement.scrollLeft || g.doc.body.scrollLeft;
+
+        return {
+            x: e.clientX + scrollX,
+            y: e.clientY + scrollY
+        };
+    },
     addEvent = (function () {
         if (g.doc.addEventListener) {
             return function (obj, type, fn, element) {
-                var realName = supportsTouch && touchMap[type] ? touchMap[type] : type,
-                    f = function (e) {
-                        var scrollY = g.doc.documentElement.scrollTop || g.doc.body.scrollTop,
-                            scrollX = g.doc.documentElement.scrollLeft || g.doc.body.scrollLeft,
-                            x = e.clientX + scrollX,
-                            y = e.clientY + scrollY;
-                    if (supportsTouch && touchMap[has](type)) {
+                var f = function (e) {
+                    var pos = getEventPosition(e);
+                    return fn.call(element, e, pos.x, pos.y);
+                };
+                obj.addEventListener(type, f, false);
+
+                if (supportsTouch && touchMap[type]) {
+                    var _f = function (e) {
+                        var pos = getEventPosition(e),
+                            olde = e;
+
                         for (var i = 0, ii = e.targetTouches && e.targetTouches.length; i < ii; i++) {
                             if (e.targetTouches[i].target == obj) {
-                                var olde = e;
                                 e = e.targetTouches[i];
                                 e.originalEvent = olde;
                                 e.preventDefault = preventTouch;
@@ -2712,12 +2724,19 @@
                                 break;
                             }
                         }
-                    }
-                    return fn.call(element, e, x, y);
-                };
-                obj.addEventListener(realName, f, false);
+
+                        return fn.call(element, e, pos.x, pos.y);
+                    };
+
+                    obj.addEventListener(touchMap[type], _f, false);
+                }
+
                 return function () {
-                    obj.removeEventListener(realName, f, false);
+                    obj.removeEventListener(type, f, false);
+
+                    if (supportsTouch && touchMap[type])
+                        obj.removeEventListener(touchMap[type], f, false);
+
                     return true;
                 };
             };
