@@ -3641,6 +3641,9 @@
     \*/
     elproto.isPointInside = function (x, y) {
         var rp = this.realPath = this.realPath || getPath[this.type](this);
+        if (this.attr('transform') && this.attr('transform').length) {
+            rp = R.transformPath(rp, this.attr('transform'));
+        }
         return R.isPointInsidePath(rp, x, y);
     };
     /*\
