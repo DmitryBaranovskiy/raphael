@@ -2771,7 +2771,7 @@
             j = drag.length;
         while (j--) {
             dragi = drag[j];
-            if (supportsTouch) {
+            if (supportsTouch && e.touches) {
                 var i = e.touches.length,
                     touch;
                 while (i--) {
