@@ -3866,7 +3866,10 @@
      = (number) length.
     \*/
     elproto.getTotalLength = function () {
-        var path = this.getPath(); if(!path){ return; }
+        var path = this.getPath();
+        if (!path) {
+            return;
+        }
 
         if (this.node.getTotalLength) {
             return this.node.getTotalLength();
@@ -3892,7 +3895,10 @@
      o }
     \*/
     elproto.getPointAtLength = function (length) {
-        var path = this.getPath(); if(!path){ return; }
+        var path = this.getPath();
+        if (!path) {
+            return;
+        }
 
         return getPointAtLength(path, length);
     };
@@ -3900,18 +3906,20 @@
      * Element.getPath
      [ method ]
      **
-     * Return path of element. Only works for element of "path" type and simple elements like "circle".
+     * Returns path of the element. Only works for elements of “path” type and simple elements like circle.
+     = (object) path
      **
     \*/
-    elproto.getPath = function() {
-        var path;
+    elproto.getPath = function () {
+        var path,
+            getPath = R._getPath[this.type];
+        
+        if (this.type == "text" || this.type == "set") {
+            return;
+        }
 
-        if (this.type === "path") {
-            path = this.attrs.path
-
-        } else if(R._getPath[this.type] instanceof Function) {
-            path = R._getPath[this.type](this);
-
+        if (getPath) {
+            path = getPath(this);
         }
 
         return path;
@@ -3930,7 +3938,10 @@
      = (string) pathstring for the segment
     \*/
     elproto.getSubpath = function (from, to) {
-        var path = this.getPath(); if(!path){ return; }
+        var path = this.getPath();
+        if (!path) {
+            return;
+        }
 
         return R.getSubpath(path, from, to);
     };
