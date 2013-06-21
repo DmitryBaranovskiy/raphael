@@ -3866,11 +3866,13 @@
      = (number) length.
     \*/
     elproto.getTotalLength = function () {
-        if (this.type != "path") {return;}
+        var path = this.getPath(); if(!path){ return; }
+
         if (this.node.getTotalLength) {
             return this.node.getTotalLength();
         }
-        return getTotalLength(this.attrs.path);
+
+        return getTotalLength(path);
     };
     /*\
      * Element.getPointAtLength
@@ -3890,8 +3892,29 @@
      o }
     \*/
     elproto.getPointAtLength = function (length) {
-        if (this.type != "path") {return;}
-        return getPointAtLength(this.attrs.path, length);
+        var path = this.getPath(); if(!path){ return; }
+
+        return getPointAtLength(path, length);
+    };
+    /*\
+     * Element.getPath
+     [ method ]
+     **
+     * Return path of element. Only works for element of "path" type and simple elements like "circle".
+     **
+    \*/
+    elproto.getPath = function() {
+        var path;
+
+        if (this.type === "path") {
+            path = this.attrs.path
+
+        } else if(R._getPath[this.type] instanceof Function) {
+            path = R._getPath[this.type](this);
+
+        }
+
+        return path;
     };
     /*\
      * Element.getSubpath
@@ -3907,8 +3930,9 @@
      = (string) pathstring for the segment
     \*/
     elproto.getSubpath = function (from, to) {
-        if (this.type != "path") {return;}
-        return R.getSubpath(this.attrs.path, from, to);
+        var path = this.getPath(); if(!path){ return; }
+
+        return R.getSubpath(path, from, to);
     };
     /*\
      * Raphael.easing_formulas
