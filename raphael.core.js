@@ -2704,19 +2704,31 @@
     stopTouch = function () {
         return this.originalEvent.stopPropagation();
     },
+    getEventPosition = function (e) {
+        var scrollY = g.doc.documentElement.scrollTop || g.doc.body.scrollTop,
+            scrollX = g.doc.documentElement.scrollLeft || g.doc.body.scrollLeft;
+
+        return {
+            x: e.clientX + scrollX,
+            y: e.clientY + scrollY
+        };
+    },
     addEvent = (function () {
         if (g.doc.addEventListener) {
             return function (obj, type, fn, element) {
-                var realName = supportsTouch && touchMap[type] ? touchMap[type] : type,
-                    f = function (e) {
-                        var scrollY = g.doc.documentElement.scrollTop || g.doc.body.scrollTop,
-                            scrollX = g.doc.documentElement.scrollLeft || g.doc.body.scrollLeft,
-                            x = e.clientX + scrollX,
-                            y = e.clientY + scrollY;
-                    if (supportsTouch && touchMap[has](type)) {
+                var f = function (e) {
+                    var pos = getEventPosition(e);
+                    return fn.call(element, e, pos.x, pos.y);
+                };
+                obj.addEventListener(type, f, false);
+
+                if (supportsTouch && touchMap[type]) {
+                    var _f = function (e) {
+                        var pos = getEventPosition(e),
+                            olde = e;
+
                         for (var i = 0, ii = e.targetTouches && e.targetTouches.length; i < ii; i++) {
                             if (e.targetTouches[i].target == obj) {
-                                var olde = e;
                                 e = e.targetTouches[i];
                                 e.originalEvent = olde;
                                 e.preventDefault = preventTouch;
@@ -2724,12 +2736,18 @@
                                 break;
                             }
                         }
-                    }
-                    return fn.call(element, e, x, y);
-                };
-                obj.addEventListener(realName, f, false);
+
+                        return fn.call(element, e, pos.x, pos.y);
+                    };
+                    obj.addEventListener(touchMap[type], _f, false);
+                }
+
                 return function () {
-                    obj.removeEventListener(realName, f, false);
+                    obj.removeEventListener(type, f, false);
+
+                    if (supportsTouch && touchMap[type])
+                        obj.removeEventListener(touchMap[type], f, false);
+
                     return true;
                 };
             };
@@ -2764,7 +2782,7 @@
             j = drag.length;
         while (j--) {
             dragi = drag[j];
-            if (supportsTouch) {
+            if (supportsTouch && e.touches) {
                 var i = e.touches.length,
                     touch;
                 while (i--) {
@@ -3881,11 +3899,16 @@
      = (number) length.
     \*/
     elproto.getTotalLength = function () {
-        if (this.type != "path") {return;}
+        var path = this.getPath();
+        if (!path) {
+            return;
+        }
+
         if (this.node.getTotalLength) {
             return this.node.getTotalLength();
         }
-        return getTotalLength(this.attrs.path);
+
+        return getTotalLength(path);
     };
     /*\
      * Element.getPointAtLength
@@ -3905,8 +3928,34 @@
      o }
     \*/
     elproto.getPointAtLength = function (length) {
-        if (this.type != "path") {return;}
-        return getPointAtLength(this.attrs.path, length);
+        var path = this.getPath();
+        if (!path) {
+            return;
+        }
+
+        return getPointAtLength(path, length);
+    };
+    /*\
+     * Element.getPath
+     [ method ]
+     **
+     * Returns path of the element. Only works for elements of “path” type and simple elements like circle.
+     = (object) path
+     **
+    \*/
+    elproto.getPath = function () {
+        var path,
+            getPath = R._getPath[this.type];
+        
+        if (this.type == "text" || this.type == "set") {
+            return;
+        }
+
+        if (getPath) {
+            path = getPath(this);
+        }
+
+        return path;
     };
     /*\
      * Element.getSubpath
@@ -3922,8 +3971,12 @@
      = (string) pathstring for the segment
     \*/
     elproto.getSubpath = function (from, to) {
-        if (this.type != "path") {return;}
-        return R.getSubpath(this.attrs.path, from, to);
+        var path = this.getPath();
+        if (!path) {
+            return;
+        }
+
+        return R.getSubpath(path, from, to);
     };
     /*\
      * Raphael.easing_formulas
