@@ -6052,6 +6052,10 @@
                         break;
                     case "href":
                     case "title":
+                        var t = $('title');
+                        t.appendChild(R._g.doc.createTextNode(value));
+                        node.appendChild(t);
+                        // fall through...
                     case "target":
                         var pn = node.parentNode;
                         if (pn.tagName.toLowerCase() != "a") {
