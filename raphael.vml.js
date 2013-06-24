@@ -886,6 +886,8 @@ window.Raphael && window.Raphael.vml && function(R) {
         });
         return this;
     };
+    R._engine.groupStart = function() { throw new Error("not implemented for vml"); };
+    R._engine.groupFinish = function() { throw new Error("not implemented for vml"); };
     var createNode;
     R._engine.initWin = function (win) {
             var doc = win.document;

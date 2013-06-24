@@ -3475,6 +3475,14 @@
     paperproto.setViewBox = function (x, y, w, h, fit) {
         return R._engine.setViewBox.call(this, x, y, w, h, fit);
     };
+    paperproto.groupStart = function () {
+      "use strict";
+      R._engine.groupStart(this);
+    };
+    paperproto.groupFinish = function () {
+      "use strict";
+      return R._engine.groupFinish(this);
+    };
     /*\
      * Paper.top
      [ property ]
