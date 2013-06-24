@@ -682,7 +682,8 @@ window.Raphael && window.Raphael.svg && function(R) {
 
     R._engine.path = function (pathString, SVG) {
         var el = $("path");
-        SVG.canvas && SVG.canvas.appendChild(el);
+        if (SVG.__group__) SVG.__group__[0].appendChild(el);
+        else SVG.canvas && SVG.canvas.appendChild(el);
         var p = new Element(el, SVG);
         p.type = "path";
         setFillAndStroke(p, {
@@ -1148,7 +1149,8 @@ window.Raphael && window.Raphael.svg && function(R) {
     };
     R._engine.circle = function (svg, x, y, r) {
         var el = $("circle");
-        svg.canvas && svg.canvas.appendChild(el);
+        if (svg.__group__) svg.__group__[0].appendChild(el);
+        else svg.canvas && svg.canvas.appendChild(el);
         var res = new Element(el, svg);
         res.attrs = {cx: x, cy: y, r: r, fill: "none", stroke: "#000"};
         res.type = "circle";
@@ -1157,7 +1159,8 @@ window.Raphael && window.Raphael.svg && function(R) {
     };
     R._engine.rect = function (svg, x, y, w, h, r) {
         var el = $("rect");
-        svg.canvas && svg.canvas.appendChild(el);
+        if (svg.__group__) svg.__group__[0].appendChild(el);
+        else svg.canvas && svg.canvas.appendChild(el);
         var res = new Element(el, svg);
         res.attrs = {x: x, y: y, width: w, height: h, r: r || 0, rx: r || 0, ry: r || 0, fill: "none", stroke: "#000"};
         res.type = "rect";
@@ -1166,7 +1169,8 @@ window.Raphael && window.Raphael.svg && function(R) {
     };
     R._engine.ellipse = function (svg, x, y, rx, ry) {
         var el = $("ellipse");
-        svg.canvas && svg.canvas.appendChild(el);
+        if (svg.__group__) svg.__group__[0].appendChild(el);
+        else svg.canvas && svg.canvas.appendChild(el);
         var res = new Element(el, svg);
         res.attrs = {cx: x, cy: y, rx: rx, ry: ry, fill: "none", stroke: "#000"};
         res.type = "ellipse";
@@ -1177,7 +1181,8 @@ window.Raphael && window.Raphael.svg && function(R) {
         var el = $("image");
         $(el, {x: x, y: y, width: w, height: h, preserveAspectRatio: "none"});
         el.setAttributeNS(xlink, "href", src);
-        svg.canvas && svg.canvas.appendChild(el);
+        if (svg.__group__) svg.__group__[0].appendChild(el);
+        else svg.canvas && svg.canvas.appendChild(el);
         var res = new Element(el, svg);
         res.attrs = {x: x, y: y, width: w, height: h, src: src};
         res.type = "image";
@@ -1185,7 +1190,8 @@ window.Raphael && window.Raphael.svg && function(R) {
     };
     R._engine.text = function (svg, x, y, text) {
         var el = $("text");
-        svg.canvas && svg.canvas.appendChild(el);
+        if (svg.__group__) svg.__group__[0].appendChild(el);
+        else svg.canvas && svg.canvas.appendChild(el);
         var res = new Element(el, svg);
         res.attrs = {
             x: x,
@@ -1285,6 +1291,21 @@ window.Raphael && window.Raphael.svg && function(R) {
         }
         this._viewBox = [x, y, w, h, !!fit];
         return this;
+    };
+    R._engine.groupStart = function (svg) {
+      "use strict";
+      var el = $("g");
+      var res = new Element(el, svg);
+      $(el, res.attrs);
+      svg.__group__ = res;
+      return res;
+    };
+    R._engine.groupFinish = function (svg) {
+      "use strict";
+      var res = svg.__group__;
+      svg.__group__ = undefined;
+      svg.canvas && svg.canvas.appendChild(res[0]);
+      return res;
     };
     /*\
      * Paper.renderfix
