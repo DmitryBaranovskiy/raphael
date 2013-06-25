@@ -1173,6 +1173,15 @@ window.Raphael && window.Raphael.svg && function(R) {
         $(el, res.attrs);
         return res;
     };
+    R._engine.line = function (svg, x1, y1, x2, y2) {
+        var el = $("line");
+        svg.canvas && svg.canvas.appendChild(el);
+        var res = new Element(el, svg);
+        res.attrs = {x1: x1, y1: y1, x2: x2, y2: y2, fill: "none", stroke: "#000"};
+        res.type = "line";
+        $(el, res.attrs);
+        return res;
+    };
     R._engine.image = function (svg, src, x, y, w, h) {
         var el = $("image");
         $(el, {x: x, y: y, width: w, height: h, preserveAspectRatio: "none"});
