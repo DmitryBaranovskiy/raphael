@@ -3307,6 +3307,28 @@
         return out;
     };
     /*\
+     * Paper.Line
+     [ method ]
+     **
+     * Draws a Line.
+     **
+     > Parameters
+     **
+     - x1 (number) x coordinate of the start of the line
+     - y1 (number) y coordinate of the start of the line
+     - x2 (number) x coordinate of the end of the line
+     - y2 (number) y coordinate of the end of the line
+     = (object) Raphaël element object with type “line”
+     **
+     > Usage
+     | var l = paper.line(10, 20, 30, 40);
+     || 0\*/
+    paperproto.line = function (x1, y1, x2, y2) {
+        var out = R._engine.line(this, x1 || 0, y1 || 0, x2 || 0, y2 || 0);
+        this.__set__ && this.__set__.push(out);
+        return out;
+    };
+    /*\
      * Paper.path
      [ method ]
      **
