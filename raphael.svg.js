@@ -563,6 +563,7 @@ window.Raphael && window.Raphael.svg && function(R) {
             node = el.node,
             fontSize = node.firstChild ? toInt(R._g.doc.defaultView.getComputedStyle(node.firstChild, E).getPropertyValue("font-size"), 10) : 10;
 
+        if (isNaN(fontSize)) fontSize = toInt(a['font-size'], 10);
         if (params[has]("text")) {
             a.text = params.text;
             while (node.firstChild) {
