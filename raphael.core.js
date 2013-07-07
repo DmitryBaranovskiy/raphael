@@ -2096,7 +2096,7 @@
                         }
                     }
                     if (!end) {
-                        end = 100;
+                        end = dots[dots.length - 1].offset || 100;
                         j = ii;
                     }
                     end = toFloat(end);
