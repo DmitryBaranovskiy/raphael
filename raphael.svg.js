@@ -467,15 +467,23 @@ window.Raphael && window.Raphael.svg && function(R) {
                     case "fill":
                         var isURL = Str(value).match(R._ISURL);
                         if (isURL) {
+                            var url = isURL[1],
+                                uuid = R._patternCache[url]
+                                ;
+                            if (uuid) {
+                                $(node, {fill: "url(#" + uuid + ")"});
+                                break;
+                            }
                             el = $("pattern");
                             var ig = $("image");
                             el.id = R.createUUID();
+                            R._patternCache[url] = el.id;
                             $(el, {x: 0, y: 0, patternUnits: "userSpaceOnUse", height: 1, width: 1});
-                            $(ig, {x: 0, y: 0, "xlink:href": isURL[1]});
+                            $(ig, {x: 0, y: 0, "xlink:href": url});
                             el.appendChild(ig);
 
                             (function (el) {
-                                R._preload(isURL[1], function () {
+                                R._preload(url, function () {
                                     var w = this.offsetWidth,
                                         h = this.offsetHeight;
                                     $(el, {width: w, height: h});
