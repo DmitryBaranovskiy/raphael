@@ -414,10 +414,16 @@
     };
 
     function clone(obj) {
-        if (Object(obj) !== obj) {
+        var res;
+
+        if ("function" === typeof(obj)) {
+            res = function() { obj.apply(this, arguments); };
+        } else if (Object(obj) === obj) {
+            res = new obj.constructor;
+        } else {
             return obj;
         }
-        var res = new obj.constructor;
+
         for (var key in obj) if (obj[has](key)) {
             res[key] = clone(obj[key]);
         }
