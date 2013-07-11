@@ -3106,7 +3106,6 @@
 
                         return fn.call(element, e, pos.x, pos.y);
                     };
-
                     obj.addEventListener(touchMap[type], _f, false);
                 }
 
@@ -3476,12 +3475,52 @@
                 }
                 return this;
             }
-            eve("raphael.data.get." + this.id, this, data[key], key);
+            eve("raphael.data.get." + this.id + '.' + key, this, data[key], key);
             return data[key];
         }
         data[key] = value;
-        eve("raphael.data.set." + this.id, this, value, key);
+        eve("raphael.data.set." + this.id + '.' + key, this, value, key);
         return this;
+    };
+    /*\
+     * Element.dataset
+     [ method ]
+     **
+     * Returns an Object with all key:value pairings for Element.
+     > Parameters
+     - dataset (object/array) #optional dataset
+     * Either an array of keys for desired data or an object with key value
+     * pairings to set multiple values at once if no dataset object is
+     * passed then this function returns all data associated with the element
+     = (object) @Element
+    \*/
+    elproto.dataset = function (dataset) {
+    	var data = eldata[this.id] = eldata[this.id] || {};
+    	if (arguments.length > 0) {
+    		var filteredData = {};
+    		for (key in dataset) {
+    			if (!Array.isArray(dataset))
+    				this.data(key, dataset[key]);
+    			else
+    				filteredData[dataset[key]] = data[dataset[key]];
+    		}
+    		var lengthOfObject = function(obj){
+    			var key, length = 0;
+    			for (objKey in obj){
+    				length += Number( obj.hasOwnProperty(objKey) );
+    			}
+    			return length;
+    		}
+    		if (lengthOfObject(filteredData) > 0) {
+    			eve("raphael.data.dataget." + this.id, this, filteredData);
+    			return filteredData;
+    		} else {
+    			eve("raphael.data.dataset." + this.id, this, dataset);
+    			return this;
+    		}
+    	}
+    	eve("raphael.data.dataget." + this.id, this, data);
+    	return data;
     };
     /*\
      * Element.removeData
