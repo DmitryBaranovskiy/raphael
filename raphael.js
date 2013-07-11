@@ -3106,7 +3106,6 @@
 
                         return fn.call(element, e, pos.x, pos.y);
                     };
-
                     obj.addEventListener(touchMap[type], _f, false);
                 }
 
