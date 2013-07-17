@@ -3526,7 +3526,7 @@
         var paper = this,
             svg = paper.canvas,
             target = g.doc.elementFromPoint(x, y);
-        if (g.win.opera && target.tagName == "svg") {
+        if (g.win.opera && target && target.tagName == "svg") {
             var so = getOffset(svg),
                 sr = svg.createSVGRect();
             sr.x = x - so.x;
