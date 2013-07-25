@@ -1,0 +1,19 @@
+{
+  "name": "raphael",
+  "version": "2.1.0",
+  "main": "raphael.js",
+  "ignore": [
+    "eve",
+    "**/.*",
+    "*.html",
+    "*.json",
+    "*.markdown",
+    "*.md",
+    "copy.js",
+    "Gruntfile.js",
+    "raphael.core.js",
+    "raphael.svg.js",
+    "raphael.vml.js",
+    "reference.js"
+  ]
+}
