@@ -389,7 +389,7 @@
     // AMD support
     if (typeof define === "function" && define.amd) {
         // Define as an anonymous module
-        define(["eve"], function( eve ) {
+        define(["."], function( eve ) {
             return factory(glob, eve);
         });
     } else {
