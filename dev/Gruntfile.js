@@ -16,7 +16,7 @@ module.exports = function(grunt) {
             },
             dist: {
                 src: "<%= build.dist.dest %>",
-                dest: "<%= pkg.name %>-min.js"
+                dest: "../raphael-min.js"
             }
         },
         build: {
@@ -24,9 +24,9 @@ module.exports = function(grunt) {
                 banner: "<%= banner %>"
             },
             dist: {
-                dest: "raphael.js",
+                dest: "../raphael.js",
                 src: [
-                    "./eve/eve.js",
+                    "../eve/eve.js",
                     "raphael.core.js",
                     "raphael.svg.js",
                     "raphael.vml.js"

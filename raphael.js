@@ -1,5 +1,5 @@
 // ┌────────────────────────────────────────────────────────────────────┐ \\
-// │ Raphaël 2.1.0 - JavaScript Vector Library                          │ \\
+// │ Raphaël 2.1.1 - JavaScript Vector Library                          │ \\
 // ├────────────────────────────────────────────────────────────────────┤ \\
 // │ Copyright © 2008-2012 Dmitry Baranovskiy (http://raphaeljs.com)    │ \\
 // │ Copyright © 2008-2012 Sencha Labs (http://sencha.com)              │ \\
@@ -389,7 +389,7 @@
     // AMD support
     if (typeof define === "function" && define.amd) {
         // Define as an anonymous module
-        define(["eve"], function( eve ) {
+        define(["."], function( eve ) {
             return factory(glob, eve);
         });
     } else {
@@ -2376,13 +2376,25 @@
                             path = ["C"][concat](a2c[apply](0, [d.x, d.y][concat](path.slice(1))));
                             break;
                         case "S":
-                            nx = d.x + (d.x - (d.bx || d.x));
-                            ny = d.y + (d.y - (d.by || d.y));
+                            if (pcom == "C" || pcom == "S") { // In "S" case we have to take into account, if the previous command is C/S.
+                                nx = d.x * 2 - d.bx;          // And reflect the previous
+                                ny = d.y * 2 - d.by;          // command's control point relative to the current point.
+                            }
+                            else {                            // or some else or nothing
+                                nx = d.x;
+                                ny = d.y;
+                            }
                             path = ["C", nx, ny][concat](path.slice(1));
                             break;
                         case "T":
-                            d.qx = d.x + (d.x - (d.qx || d.x));
-                            d.qy = d.y + (d.y - (d.qy || d.y));
+                            if (pcom == "Q" || pcom == "T") { // In "T" case we have to take into account, if the previous command is Q/T.
+                                d.qx = d.x * 2 - d.qx;        // And make a reflection similar
+                                d.qy = d.y * 2 - d.qy;        // to case "S".
+                            }
+                            else {                            // or something else or nothing
+                                d.qx = d.x;
+                                d.qy = d.y;
+                            }
                             path = ["C"][concat](q2c(d.x, d.y, d.qx, d.qy, path[1], path[2]));
                             break;
                         case "Q":
@@ -3106,7 +3118,6 @@
 
                         return fn.call(element, e, pos.x, pos.y);
                     };
-
                     obj.addEventListener(touchMap[type], _f, false);
                 }
 
@@ -3573,11 +3584,25 @@
     elproto.drag = function (onmove, onstart, onend, move_scope, start_scope, end_scope) {
         function start(e) {
             (e.originalEvent || e).preventDefault();
-            var scrollY = g.doc.documentElement.scrollTop || g.doc.body.scrollTop,
+            var x = e.clientX,
+                y = e.clientY,
+                scrollY = g.doc.documentElement.scrollTop || g.doc.body.scrollTop,
                 scrollX = g.doc.documentElement.scrollLeft || g.doc.body.scrollLeft;
-            this._drag.x = e.clientX + scrollX;
-            this._drag.y = e.clientY + scrollY;
             this._drag.id = e.identifier;
+            if (supportsTouch && e.touches) {
+                var i = e.touches.length, touch;
+                while (i--) {
+                    touch = e.touches[i];
+                    this._drag.id = touch.identifier;
+                    if (touch.identifier == this._drag.id) {
+                        x = touch.clientX;
+                        y = touch.clientY;
+                        break;
+                    }
+                }
+            }
+            this._drag.x = x + scrollX;
+            this._drag.y = y + scrollY;
             !drag.length && R.mousemove(dragMove).mouseup(dragUp);
             drag.push({el: this, move_scope: move_scope, start_scope: start_scope, end_scope: end_scope});
             onstart && eve.on("raphael.drag.start." + this.id, onstart);
@@ -4038,7 +4063,10 @@
      = (boolean) `true` if point inside the shape
     \*/
     elproto.isPointInside = function (x, y) {
-        var rp = this.realPath = this.realPath || getPath[this.type](this);
+        var rp = this.realPath = getPath[this.type](this);
+        if (this.attr('transform') && this.attr('transform').length) {
+            rp = R.transformPath(rp, this.attr('transform'));
+        }
         return R.isPointInsidePath(rp, x, y);
     };
     /*\
@@ -6052,6 +6080,11 @@
                         break;
                     case "href":
                     case "title":
+                        var hl = $("title");
+                        var val = R._g.doc.createTextNode(value);
+                        hl.appendChild(val);
+                        node.appendChild(hl);
+                        break;
                     case "target":
                         var pn = node.parentNode;
                         if (pn.tagName.toLowerCase() != "a") {
@@ -7568,7 +7601,7 @@
             split,
             isGrad = ~Str(this.attrs.fill).indexOf("-"),
             isPatt = !Str(this.attrs.fill).indexOf("url(");
-        matrix.translate(-.5, -.5);
+        matrix.translate(1, 1);
         if (isPatt || isGrad || this.type == "image") {
             skew.matrix = "1 0 0 1";
             skew.offset = "0 0";
