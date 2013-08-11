@@ -3205,11 +3205,25 @@
     elproto.drag = function (onmove, onstart, onend, move_scope, start_scope, end_scope) {
         function start(e) {
             (e.originalEvent || e).preventDefault();
-            var scrollY = g.doc.documentElement.scrollTop || g.doc.body.scrollTop,
+            var x = e.clientX,
+                y = e.clientY,
+                scrollY = g.doc.documentElement.scrollTop || g.doc.body.scrollTop,
                 scrollX = g.doc.documentElement.scrollLeft || g.doc.body.scrollLeft;
-            this._drag.x = e.clientX + scrollX;
-            this._drag.y = e.clientY + scrollY;
             this._drag.id = e.identifier;
+            if (supportsTouch && e.touches) {
+                var i = e.touches.length, touch;
+                while (i--) {
+                    touch = e.touches[i];
+                    this._drag.id = touch.identifier;
+                    if (touch.identifier == this._drag.id) {
+                        x = touch.clientX;
+                        y = touch.clientY;
+                        break;
+                    }
+                }
+            }
+            this._drag.x = x + scrollX;
+            this._drag.y = y + scrollY;
             !drag.length && R.mousemove(dragMove).mouseup(dragUp);
             drag.push({el: this, move_scope: move_scope, start_scope: start_scope, end_scope: end_scope});
             onstart && eve.on("raphael.drag.start." + this.id, onstart);
