@@ -26,8 +26,6 @@ define([ "path/to/raphael" ], function( Raphael ) {
 
 At the moment we have 4 milestones:
 
-### v2.1.1
-Milestone for bug fixes contributed by the community.
 ### v2.2.0
 Milestone for enhancements from contributors pull requests.
 ### v2.2.1
