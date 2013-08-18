@@ -62,6 +62,12 @@ Remember to add all the info that can be useful such as
 
 * [tomasAlabes](https://github.com/tomasAlabes)
 
+## Books
+
+* [Learning Raphael JS Vector Graphics](http://shop.oreilly.com/product/9781782169161.do)
+* [RaphaelJS](http://shop.oreilly.com/product/0636920029601.do)
+* [Instant RaphaelJS Starter](http://shop.oreilly.com/product/9781782169857.do)
+
 ## Copyright and license
 
 Copyright © 2008-2012 Dmitry Baranovskiy (http://raphaeljs.com) 
