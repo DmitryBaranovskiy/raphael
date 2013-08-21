@@ -414,7 +414,7 @@
     };
 
     function clone(obj) {
-        if (Object(obj) !== obj) {
+        if (typeof obj == "function" || Object(obj) !== obj) {
             return obj;
         }
         var res = new obj.constructor;
