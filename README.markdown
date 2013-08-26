@@ -70,8 +70,8 @@ Remember to add all the info that can be useful such as
 
 ## Copyright and license
 
-Copyright © 2008-2012 Dmitry Baranovskiy (http://raphaeljs.com) 
+Copyright © 2008-2013 Dmitry Baranovskiy (http://raphaeljs.com) 
 
-Copyright © 2008-2012 Sencha Labs (http://sencha.com)  
+Copyright © 2008-2013 Sencha Labs (http://sencha.com)  
 
 Licensed under the **MIT** (http://raphaeljs.com/license.html) license.

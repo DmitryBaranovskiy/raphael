@@ -1,6 +1,6 @@
 {
   "name": "raphael",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "JavaScript Vector Library",
   "main": "raphael.js",
   "scripts": {

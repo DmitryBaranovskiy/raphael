@@ -1795,8 +1795,8 @@
         }
         var l1 = bezlen.apply(0, bez1),
             l2 = bezlen.apply(0, bez2),
-            n1 = ~~(l1 / 5),
-            n2 = ~~(l2 / 5),
+            n1 = mmax(~~(l1 / 5), 1),
+            n2 = mmax(~~(l2 / 5), 1),
             dots1 = [],
             dots2 = [],
             xy = {},
@@ -1825,15 +1825,15 @@
                     xy[is.x.toFixed(4)] = is.y.toFixed(4);
                     var t1 = di.t + abs((is[ci] - di[ci]) / (di1[ci] - di[ci])) * (di1.t - di.t),
                         t2 = dj.t + abs((is[cj] - dj[cj]) / (dj1[cj] - dj[cj])) * (dj1.t - dj.t);
-                    if (t1 >= 0 && t1 <= 1 && t2 >= 0 && t2 <= 1) {
+                    if (t1 >= 0 && t1 <= 1.001 && t2 >= 0 && t2 <= 1.001) {
                         if (justCount) {
                             res++;
                         } else {
                             res.push({
                                 x: is.x,
                                 y: is.y,
-                                t1: t1,
-                                t2: t2
+                                t1: mmin(t1, 1),
+                                t2: mmin(t2, 1)
                             });
                         }
                     }
