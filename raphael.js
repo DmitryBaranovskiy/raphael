@@ -3125,7 +3125,7 @@
                     obj.removeEventListener(type, f, false);
 
                     if (supportsTouch && touchMap[type])
-                        obj.removeEventListener(touchMap[type], f, false);
+                        obj.removeEventListener(touchMap[type], _f, false);
 
                     return true;
                 };
@@ -7298,6 +7298,7 @@
         "blur" in params && o.blur(params.blur);
         if (params.path && o.type == "path" || newpath) {
             node.path = path2vml(~Str(a.path).toLowerCase().indexOf("r") ? R._pathToAbsolute(a.path) : a.path);
+            o._.dirty = 1;
             if (o.type == "image") {
                 o._.fillpos = [a.x, a.y];
                 o._.fillsize = [a.width, a.height];
