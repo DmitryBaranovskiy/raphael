@@ -4982,6 +4982,23 @@
             p[attr] = params[attr];
         }
         if (!json) {
+
+            // if percent-like syntax is used and end-of-all animation callback used
+            if(callback){
+                // find the last one
+                var lastKey = 0;
+
+                for(var i in params){
+                    var percent = parseInt(i);
+                    if(params.hasOwnProperty(i) && percent>lastKey){
+                        lastKey = i;
+                    }
+                }
+                
+                // if already defined callback in the last keyframe, skip
+                !params[lastKey].callback && (params[lastKey].callback = callback);
+            }
+
             return new Animation(params, ms);
         } else {
             easing && (p.easing = easing);
