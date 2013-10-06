@@ -62,6 +62,14 @@ Remember to add all the info that can be useful such as
 
 * [tomasAlabes](https://github.com/tomasAlabes)
 
+## Related
+
+* [graphael](https://github.com/DmitryBaranovskiy/g.raphael/tree/master)
+* [raphael.boilerplate](https://github.com/tomasAlabes/raphael-boilerplate)
+* [backbone.raphael](https://github.com/tomasAlabes/backbone.raphael)
+* [mapael](https://github.com/neveldo/jQuery-Mapael)
+
+
 ## Books
 
 * [Learning Raphael JS Vector Graphics](http://shop.oreilly.com/product/9781782169161.do)
