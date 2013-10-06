@@ -62,7 +62,7 @@ Remember to add all the info that can be useful such as
 
 * [tomasAlabes](https://github.com/tomasAlabes)
 
-## Related
+## Related Projects
 
 * [graphael](https://github.com/DmitryBaranovskiy/g.raphael/tree/master)
 * [raphael.boilerplate](https://github.com/tomasAlabes/raphael-boilerplate)
