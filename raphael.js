@@ -3125,7 +3125,7 @@
                     obj.removeEventListener(type, f, false);
 
                     if (supportsTouch && touchMap[type])
-                        obj.removeEventListener(touchMap[type], f, false);
+                        obj.removeEventListener(touchMap[type], _f, false);
 
                     return true;
                 };
