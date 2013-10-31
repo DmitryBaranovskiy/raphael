@@ -5442,7 +5442,6 @@
         var isPointInside = false;
         this.forEach(function (el) {
             if (el.isPointInside(x, y)) {
-                console.log('runned');
                 isPointInside = true;
                 return false; // stop loop
             }
@@ -6109,10 +6108,17 @@
                         o.blur(value);
                         break;
                     case "title":
-                        var hl = $("title");
-                        var val = R._g.doc.createTextNode(value);
-                        hl.appendChild(val);
-                        node.appendChild(hl);
+                        var title = node.getElementsByTagName("title");
+
+                        // Use the existing <title>.
+                        if (title.length && (title = title[0])) {
+                          title.firstChild.nodeValue = value;
+                        } else {
+                          title = $("title");
+                          var val = R._g.doc.createTextNode(value);
+                          title.appendChild(val);
+                          node.appendChild(title);
+                        }
                         break;
                     case "href":
                     case "target":
@@ -7733,24 +7739,23 @@
     // Needed to fix the vml setViewBox issues
     elproto.auxGetBBox = R.el.getBBox;
     elproto.getBBox = function(){
-        var b = this.auxGetBBox();
-        if (this.paper && this.paper._viewBoxShift)
-        {
-          var c = {};
-          var z = 1/this.paper._viewBoxShift.scale;
-          c.x = b.x - this.paper._viewBoxShift.dx;
-          c.x *= z;
-          c.y = b.y - this.paper._viewBoxShift.dy;
-          c.y *= z;
-          c.width  = b.width  * z;
-          c.height = b.height * z;
-          c.x2 = c.x + c.width;
-          c.y2 = c.y + c.height;
-          return c;
-        }
-        return b;
-      };
-
+      var b = this.auxGetBBox();
+      if (this.paper && this.paper._viewBoxShift)
+      {
+        var c = {};
+        var z = 1/this.paper._viewBoxShift.scale;
+        c.x = b.x - this.paper._viewBoxShift.dx;
+        c.x *= z;
+        c.y = b.y - this.paper._viewBoxShift.dy;
+        c.y *= z;
+        c.width  = b.width  * z;
+        c.height = b.height * z;
+        c.x2 = c.x + c.width;
+        c.y2 = c.y + c.height;
+        return c;
+      }
+      return b;
+    };
     elproto._getBBox = function () {
         if (this.removed) {
             return {};
