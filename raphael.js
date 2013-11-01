@@ -7056,7 +7056,7 @@
         eve("raphael.setViewBox", this, this._viewBox, [x, y, w, h, fit]);
         var size = mmax(w / this.width, h / this.height),
             top = this.top,
-            aspectRatio = fit ? "meet" : "xMinYMin",
+            aspectRatio = fit ? "xMidYMid meet" : "xMinYMin",
             vb,
             sw;
         if (x == null) {
