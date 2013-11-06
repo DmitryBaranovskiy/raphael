@@ -5,7 +5,7 @@ Visit the library website for more information: [http://raphaeljs.com](http://ra
 ## Quickstart guide
 
 * `git clone https://github.com/DmitryBaranovskiy/raphael.git`
-* `git submodule init && git submodule update && npm install`
+* `git submodule init && git submodule update && cd dev && npm install`
 
 ## Dependencies
 * [eve](https://github.com/adobe-webplatform/eve)
