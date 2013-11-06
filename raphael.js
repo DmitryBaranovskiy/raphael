@@ -6389,6 +6389,13 @@
             dif = a.y - (bb.y + bb.height / 2);
         dif && R.is(dif, "finite") && $(tspans[0], {dy: dif});
     },
+    getRealNode = function (node) {
+        if (node.parentNode && node.parentNode.tagName.toLowerCase() === "a") {
+            return node.parentNode;
+        } else {
+            return node;
+        }
+    }
     Element = function (node, svg) {
         var X = 0,
             Y = 0;
@@ -6666,7 +6673,8 @@
      * Removes element from the paper.
     \*/
     elproto.remove = function () {
-        if (this.removed || !this.node.parentNode) {
+        var node = getRealNode(this.node);
+        if (this.removed || !node.parentNode) {
             return;
         }
         var paper = this.paper;
@@ -6676,11 +6684,7 @@
             paper.defs.removeChild(this.gradient);
         }
         R._tear(this, paper);
-        if (this.node.parentNode.tagName.toLowerCase() == "a") {
-            this.node.parentNode.parentNode.removeChild(this.node.parentNode);
-        } else {
-            this.node.parentNode.removeChild(this.node);
-        }
+        node.parentNode.removeChild(node);
         for (var i in this) {
             this[i] = typeof this[i] == "function" ? R._removedFactory(i) : null;
         }
@@ -6854,11 +6858,8 @@
         if (this.removed) {
             return this;
         }
-        if (this.node.parentNode.tagName.toLowerCase() == "a") {
-            this.node.parentNode.parentNode.appendChild(this.node.parentNode);
-        } else {
-            this.node.parentNode.appendChild(this.node);
-        }
+        var node = getRealNode(this.node);
+        node.parentNode.appendChild(node);
         var svg = this.paper;
         svg.top != this && R._tofront(this, svg);
         return this;
@@ -6874,12 +6875,9 @@
         if (this.removed) {
             return this;
         }
-        var parent = this.node.parentNode;
-        if (parent.tagName.toLowerCase() == "a") {
-            parent.parentNode.insertBefore(this.node.parentNode, this.node.parentNode.parentNode.firstChild); 
-        } else if (parent.firstChild != this.node) {
-            parent.insertBefore(this.node, this.node.parentNode.firstChild);
-        }
+        var node = getRealNode(this.node);
+        var parentNode = node.parentNode;
+        parentNode.insertBefore(node, parentNode.firstChild);
         R._toback(this, this.paper);
         var svg = this.paper;
         return this;
@@ -6892,14 +6890,16 @@
      = (object) @Element
     \*/
     elproto.insertAfter = function (element) {
-        if (this.removed) {
+        if (this.removed || !element) {
             return this;
         }
-        var node = element.node || element[element.length - 1].node;
-        if (node.nextSibling) {
-            node.parentNode.insertBefore(this.node, node.nextSibling);
+
+        var node = getRealNode(this.node);
+        var afterNode = getRealNode(element.node || element[element.length - 1].node);
+        if (afterNode.nextSibling) {
+            afterNode.parentNode.insertBefore(node, afterNode.nextSibling);
         } else {
-            node.parentNode.appendChild(this.node);
+            afterNode.parentNode.appendChild(node);
         }
         R._insertafter(this, element, this.paper);
         return this;
@@ -6912,11 +6912,13 @@
      = (object) @Element
     \*/
     elproto.insertBefore = function (element) {
-        if (this.removed) {
+        if (this.removed || !element) {
             return this;
         }
-        var node = element.node || element[0].node;
-        node.parentNode.insertBefore(this.node, node);
+
+        var node = getRealNode(this.node);
+        var beforeNode = getRealNode(element.node || element[0].node);
+        beforeNode.parentNode.insertBefore(node, beforeNode);
         R._insertbefore(this, element, this.paper);
         return this;
     };
