@@ -4633,7 +4633,21 @@
             p[attr] = params[attr];
         }
         if (!json) {
-            return new Animation(params, ms);
+            // if percent-like syntax is used and end-of-all animation callback used
+            if(callback){
+                // find the last one
+                var lastKey = 0;
+                for(var i in params){
+                    var percent = toInt(i);
+                    if(params[has](i) && percent > lastKey){
+                        lastKey = percent;
+                    }
+                }
+                lastKey += '%';
+                // if already defined callback in the last keyframe, skip
+                !params[lastKey].callback && (params[lastKey].callback = callback);
+            }
+          return new Animation(params, ms);
         } else {
             easing && (p.easing = easing);
             callback && (p.callback = callback);
@@ -5384,7 +5398,7 @@
     R.st = setproto;
 
     eve.on("raphael.DOMload", function () {
-      loaded = true;
+        loaded = true;
     });
 
     // Firefox <3.6 fix: http://webreflection.blogspot.com/2009/11/195-chars-to-help-lazy-loading.html

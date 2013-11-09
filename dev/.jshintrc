@@ -4,6 +4,7 @@
   "eqeqeq": true,
   "undef": true,
   "indent": 4,
+  "unused": true,
   "globals": {
     "eve": true
   }

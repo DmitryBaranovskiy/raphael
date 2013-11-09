@@ -5012,7 +5012,21 @@
             p[attr] = params[attr];
         }
         if (!json) {
-            return new Animation(params, ms);
+            // if percent-like syntax is used and end-of-all animation callback used
+            if(callback){
+                // find the last one
+                var lastKey = 0;
+                for(var i in params){
+                    var percent = toInt(i);
+                    if(params[has](i) && percent > lastKey){
+                        lastKey = percent;
+                    }
+                }
+                lastKey += '%';
+                // if already defined callback in the last keyframe, skip
+                !params[lastKey].callback && (params[lastKey].callback = callback);
+            }
+          return new Animation(params, ms);
         } else {
             easing && (p.easing = easing);
             callback && (p.callback = callback);
@@ -5763,7 +5777,7 @@
     R.st = setproto;
 
     eve.on("raphael.DOMload", function () {
-      loaded = true;
+        loaded = true;
     });
 
     // Firefox <3.6 fix: http://webreflection.blogspot.com/2009/11/195-chars-to-help-lazy-loading.html
@@ -5913,7 +5927,7 @@
             }
         }
         $(o, {
-            fill: "url(#" + id + ")",
+            fill: "url(" + document.location + "#" + id + ")",
             opacity: 1,
             "fill-opacity": 1
         });
@@ -6246,9 +6260,6 @@
                     case "stroke-width":
                         if (o._.sx != 1 || o._.sy != 1) {
                             value /= mmax(abs(o._.sx), abs(o._.sy)) || 1;
-                        }
-                        if (o.paper._vbSize) {
-                            value *= o.paper._vbSize;
                         }
                         node.setAttribute(att, value);
                         if (attrs["stroke-dasharray"]) {
@@ -8085,7 +8096,13 @@
     var createNode;
     R._engine.initWin = function (win) {
             var doc = win.document;
-            doc.createStyleSheet().addRule(".rvml", "behavior:url(#default#VML)");
+            if (doc.styleSheets.length < 31) {
+                doc.createStyleSheet().addRule(".rvml", "behavior:url(#default#VML)");
+            } else {
+                // no more room, add to the existing one
+                // http://msdn.microsoft.com/en-us/library/ms531194%28VS.85%29.aspx
+                doc.styleSheets[0].addRule(".rvml", "behavior:url(#default#VML)");
+            }
             try {
                 !doc.namespaces.rvml && doc.namespaces.add("rvml", "urn:schemas-microsoft-com:vml");
                 createNode = function (tagName) {
