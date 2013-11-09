@@ -910,6 +910,12 @@ window.Raphael && window.Raphael.svg && function(R) {
             this.show();
             var hide = true;
         }
+        var canvasHidden = false,
+            containerStyle = this.paper.canvas.parentElement.style;
+        if(containerStyle.display == "none"){
+            canvasHidden = true;
+            containerStyle.display = "";
+        }
         var bbox = {};
         try {
             bbox = this.node.getBBox();
@@ -917,6 +923,9 @@ window.Raphael && window.Raphael.svg && function(R) {
             // Firefox 3.0.x plays badly here
         } finally {
             bbox = bbox || {};
+            if(canvasHidden){
+              containerStyle.display = "none";
+            }
         }
         hide && this.hide();
         return bbox;

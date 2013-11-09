@@ -1,0 +1,10 @@
+{
+  "curly": true,
+  "eqnull": true,
+  "eqeqeq": true,
+  "undef": true,
+  "indent": 4,
+  "globals": {
+    "eve": true
+  }
+}

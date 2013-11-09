@@ -16,6 +16,7 @@
   "gitHead": "52bff469f60988f1391e8b3d7cb5349163df8ba1",
   "devDependencies": {
     "grunt": "~0.4.1",
-    "grunt-contrib-uglify": "~0.2.0"
+    "grunt-contrib-uglify": "~0.2.0",
+    "grunt-contrib-jshint": "~0.7.1"
   }
 }

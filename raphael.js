@@ -5761,6 +5761,11 @@
      | paper.set(paper.circle(100, 100, 20), paper.circle(110, 100, 20)).red();
     \*/
     R.st = setproto;
+
+    eve.on("raphael.DOMload", function () {
+      loaded = true;
+    });
+
     // Firefox <3.6 fix: http://webreflection.blogspot.com/2009/11/195-chars-to-help-lazy-loading.html
     (function (doc, loaded, f) {
         if (doc.readyState == null && doc.addEventListener){
@@ -5775,10 +5780,6 @@
         }
         isLoaded();
     })(document, "DOMContentLoaded");
-
-    eve.on("raphael.DOMload", function () {
-        loaded = true;
-    });
 
 // ┌─────────────────────────────────────────────────────────────────────┐ \\
 // │ Raphaël - JavaScript Vector Library                                 │ \\
@@ -6695,6 +6696,12 @@
             this.show();
             var hide = true;
         }
+        var canvasHidden = false,
+            containerStyle = this.paper.canvas.parentElement.style;
+        if(containerStyle.display == "none"){
+            canvasHidden = true;
+            containerStyle.display = "";
+        }
         var bbox = {};
         try {
             bbox = this.node.getBBox();
@@ -6702,6 +6709,9 @@
             // Firefox 3.0.x plays badly here
         } finally {
             bbox = bbox || {};
+            if(canvasHidden){
+              containerStyle.display = "none";
+            }
         }
         hide && this.hide();
         return bbox;
@@ -7192,7 +7202,7 @@
         bites = /([clmz]),?([^clmz]*)/gi,
         blurregexp = / progid:\S+Blur\([^\)]+\)/g,
         val = /-?[^,\s-]+/g,
-        cssDot = "position:absolute;left:0;top:0;width:1px;height:1px",
+        cssDot = "position:absolute;left:0;top:0;width:1px;height:1px;behavior:url(#default#VML)",
         zoom = 21600,
         pathTypes = {path: 1, rect: 1, image: 1},
         ovalTypes = {circle: 1, ellipse: 1},

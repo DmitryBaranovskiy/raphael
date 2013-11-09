@@ -5382,6 +5382,11 @@
      | paper.set(paper.circle(100, 100, 20), paper.circle(110, 100, 20)).red();
     \*/
     R.st = setproto;
+
+    eve.on("raphael.DOMload", function () {
+      loaded = true;
+    });
+
     // Firefox <3.6 fix: http://webreflection.blogspot.com/2009/11/195-chars-to-help-lazy-loading.html
     (function (doc, loaded, f) {
         if (doc.readyState == null && doc.addEventListener){
@@ -5396,10 +5401,6 @@
         }
         isLoaded();
     })(document, "DOMContentLoaded");
-
-    eve.on("raphael.DOMload", function () {
-        loaded = true;
-    });
 
     // EXPOSE
     // SVG and VML are appended just before the EXPOSE line
