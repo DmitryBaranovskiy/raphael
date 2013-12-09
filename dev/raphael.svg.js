@@ -917,7 +917,13 @@ window.Raphael && window.Raphael.svg && function(R) {
         try {
             bbox = this.node.getBBox();
         } catch(e) {
-            // Firefox 3.0.x plays badly here
+            // Firefox 3.0.x, 25.0.1 (probably more versions affected) play badly here - possible fix
+            bbox = {
+                x: this.node.clientLeft,
+                y: this.node.clientTop,
+                width: this.node.clientWidth,
+                height: this.node.clientHeight
+            }
         } finally {
             bbox = bbox || {};
             if(canvasHidden){
