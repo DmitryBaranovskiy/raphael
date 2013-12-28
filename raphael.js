@@ -376,7 +376,7 @@
         return "You are running Eve " + version;
     };
     (typeof module != "undefined" && module.exports) ? (module.exports = eve) : (typeof define != "undefined" ? (define("eve", [], function() { return eve; })) : (glob.eve = eve));
-})(this);
+})(window || this);
 // ┌─────────────────────────────────────────────────────────────────────┐ \\
 // │ "Raphaël 2.1.0" - JavaScript Vector Library                         │ \\
 // ├─────────────────────────────────────────────────────────────────────┤ \\
@@ -6708,10 +6708,17 @@
             var hide = true;
         }
         var canvasHidden = false,
-            containerStyle = this.paper.canvas.parentElement.style;
-        if(containerStyle.display == "none"){
-            canvasHidden = true;
-            containerStyle.display = "";
+            containerStyle;
+        if (this.paper.canvas.parentElement) {
+          containerStyle = this.paper.canvas.parentElement.style;
+        } //IE10+ can't find parentElement
+        else if (this.paper.canvas.parentNode) {
+          containerStyle = this.paper.canvas.parentNode.style;
+        }
+
+        if(containerStyle && containerStyle.display == "none") {
+          canvasHidden = true;
+          containerStyle.display = "";
         }
         var bbox = {};
         try {
