@@ -3075,8 +3075,8 @@
             return function (obj, type, fn, element) {
                 var realName = supportsTouch && touchMap[type] ? touchMap[type] : type,
                     f = function (e) {
-                        var scrollY = g.doc.documentElement.scrollTop || g.doc.body.scrollTop,
-                            scrollX = g.doc.documentElement.scrollLeft || g.doc.body.scrollLeft,
+                        var scrollY = typeof g.doc.documentElement.scrollTop === 'number' ? g.doc.documentElement.scrollTop : g.doc.body.scrollTop,
+                            scrollX = typeof g.doc.documentElement.scrollLeft === 'number' ? g.doc.documentElement.scrollLeft : g.doc.body.scrollLeft,
                             x = e.clientX + scrollX,
                             y = e.clientY + scrollY;
                     if (supportsTouch && touchMap[has](type)) {
@@ -3103,8 +3103,8 @@
             return function (obj, type, fn, element) {
                 var f = function (e) {
                     e = e || g.win.event;
-                    var scrollY = g.doc.documentElement.scrollTop || g.doc.body.scrollTop,
-                        scrollX = g.doc.documentElement.scrollLeft || g.doc.body.scrollLeft,
+                    var scrollY = typeof g.doc.documentElement.scrollTop === 'number' ? g.doc.documentElement.scrollTop : g.doc.body.scrollTop,,
+                        scrollX = typeof g.doc.documentElement.scrollLeft === 'number' ? g.doc.documentElement.scrollLeft : g.doc.body.scrollLeft,
                         x = e.clientX + scrollX,
                         y = e.clientY + scrollY;
                     e.preventDefault = e.preventDefault || preventDefault;
@@ -3124,8 +3124,8 @@
     dragMove = function (e) {
         var x = e.clientX,
             y = e.clientY,
-            scrollY = g.doc.documentElement.scrollTop || g.doc.body.scrollTop,
-            scrollX = g.doc.documentElement.scrollLeft || g.doc.body.scrollLeft,
+            scrollY = typeof g.doc.documentElement.scrollTop === 'number' ? g.doc.documentElement.scrollTop : g.doc.body.scrollTop,,
+            scrollX = typeof g.doc.documentElement.scrollLeft === 'number' ? g.doc.documentElement.scrollLeft : g.doc.body.scrollLeft,
             dragi,
             j = drag.length;
         while (j--) {
@@ -3548,8 +3548,8 @@
     elproto.drag = function (onmove, onstart, onend, move_scope, start_scope, end_scope) {
         function start(e) {
             (e.originalEvent || e).preventDefault();
-            var scrollY = g.doc.documentElement.scrollTop || g.doc.body.scrollTop,
-                scrollX = g.doc.documentElement.scrollLeft || g.doc.body.scrollLeft;
+            var scrollY = typeof g.doc.documentElement.scrollTop === 'number' ? g.doc.documentElement.scrollTop : g.doc.body.scrollTop,,
+                scrollX = typeof g.doc.documentElement.scrollLeft === 'number' ? g.doc.documentElement.scrollLeft : g.doc.body.scrollLeft;
             this._drag.x = e.clientX + scrollX;
             this._drag.y = e.clientY + scrollY;
             this._drag.id = e.identifier;
