@@ -376,7 +376,7 @@
         return "You are running Eve " + version;
     };
     (typeof module != "undefined" && module.exports) ? (module.exports = eve) : (typeof define != "undefined" ? (define("eve", [], function() { return eve; })) : (glob.eve = eve));
-})(this);
+})(window || this);
 // ┌─────────────────────────────────────────────────────────────────────┐ \\
 // │ "Raphaël 2.1.2" - JavaScript Vector Library                         │ \\
 // ├─────────────────────────────────────────────────────────────────────┤ \\
@@ -6080,10 +6080,17 @@
                         break;
                     case "href":
                     case "title":
-                        var hl = $("title");
-                        var val = R._g.doc.createTextNode(value);
-                        hl.appendChild(val);
-                        node.appendChild(hl);
+                    	if(o._.title) {
+                    		// we only need to set the nodeValue
+                    		o._.titleText.nodeValue = value;
+                    	} else {
+                    		// retain the title element for reuse
+                            o._.title = $("title");
+                            // retain the new textnode
+                            o._.titleText = R._g.doc.createTextNode(value);
+                    	}
+                        o._.title.appendChild(o._.titleText);
+                        node.appendChild(o._.title);
                         break;
                     case "target":
                         var pn = node.parentNode;
