@@ -6327,19 +6327,21 @@
         if (el.type != "text" || !(params[has]("text") || params[has]("font") || params[has]("font-size") || params[has]("x") || params[has]("y"))) {
             return;
         }
-        var a = el.attrs,
+        var i, ii,
+        	a = el.attrs,
             node = el.node,
             fontSize = node.firstChild ? toInt(R._g.doc.defaultView.getComputedStyle(node.firstChild, E).getPropertyValue("font-size"), 10) : 10;
 
         if (params[has]("text")) {
             a.text = params.text;
-            while (node.firstChild) {
-                node.removeChild(node.firstChild);
+            var tspans = node.getElementsByTagName('tspan');
+            for (i = 0, ii = tspans.length; i < ii; i++) {
+                node.removeChild(tspans[i]);
             }
             var texts = Str(params.text).split("\n"),
                 tspans = [],
                 tspan;
-            for (var i = 0, ii = texts.length; i < ii; i++) {
+            for (i = 0, ii = texts.length; i < ii; i++) {
                 tspan = $("tspan");
                 i && $(tspan, {dy: fontSize * leading, x: a.x});
                 tspan.appendChild(R._g.doc.createTextNode(texts[i]));
