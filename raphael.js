@@ -3084,7 +3084,7 @@
         return this.originalEvent.stopPropagation();
     },
     getEventPosition = function (e) {
-        var scrollY = typeof g.doc.documentElement.scrollTop === 'number' ? g.doc.documentElement.scrollTop : g.doc.body.scrollTop,,
+        var scrollY = typeof g.doc.documentElement.scrollTop === 'number' ? g.doc.documentElement.scrollTop : g.doc.body.scrollTop,
             scrollX = typeof g.doc.documentElement.scrollLeft === 'number' ? g.doc.documentElement.scrollLeft : g.doc.body.scrollLeft;
 
         return {
@@ -3134,7 +3134,7 @@
             return function (obj, type, fn, element) {
                 var f = function (e) {
                     e = e || g.win.event;
-                    var scrollY = typeof g.doc.documentElement.scrollTop === 'number' ? g.doc.documentElement.scrollTop : g.doc.body.scrollTop,,
+                    var scrollY = typeof g.doc.documentElement.scrollTop === 'number' ? g.doc.documentElement.scrollTop : g.doc.body.scrollTop,
                         scrollX = typeof g.doc.documentElement.scrollLeft === 'number' ? g.doc.documentElement.scrollLeft : g.doc.body.scrollLeft,
                         x = e.clientX + scrollX,
                         y = e.clientY + scrollY;
@@ -3155,7 +3155,7 @@
     dragMove = function (e) {
         var x = e.clientX,
             y = e.clientY,
-            scrollY = typeof g.doc.documentElement.scrollTop === 'number' ? g.doc.documentElement.scrollTop : g.doc.body.scrollTop,,
+            scrollY = typeof g.doc.documentElement.scrollTop === 'number' ? g.doc.documentElement.scrollTop : g.doc.body.scrollTop,
             scrollX = typeof g.doc.documentElement.scrollLeft === 'number' ? g.doc.documentElement.scrollLeft : g.doc.body.scrollLeft,
             dragi,
             j = drag.length;
@@ -3586,7 +3586,7 @@
             (e.originalEvent || e).preventDefault();
             var x = e.clientX,
                 y = e.clientY,
-                scrollY = typeof g.doc.documentElement.scrollTop === 'number' ? g.doc.documentElement.scrollTop : g.doc.body.scrollTop,,
+                scrollY = typeof g.doc.documentElement.scrollTop === 'number' ? g.doc.documentElement.scrollTop : g.doc.body.scrollTop,
                 scrollX = typeof g.doc.documentElement.scrollLeft === 'number' ? g.doc.documentElement.scrollLeft : g.doc.body.scrollLeft;
             this._drag.id = e.identifier;
             if (supportsTouch && e.touches) {
