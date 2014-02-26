@@ -1,4 +1,4 @@
-// ┌────────────────────────────────────────────────────────────────────┐ \\
+﻿// ┌────────────────────────────────────────────────────────────────────┐ \\
 // │ Raphaël 2.1.2 - JavaScript Vector Library                          │ \\
 // ├────────────────────────────────────────────────────────────────────┤ \\
 // │ Copyright © 2008-2012 Dmitry Baranovskiy (http://raphaeljs.com)    │ \\
@@ -570,6 +570,7 @@
             "font-size": "10",
             "font-style": "normal",
             "font-weight": 400,
+	    "text-decoration": "none",
             gradient: 0,
             height: 0,
             href: "http://raphaeljs.com/",
@@ -6299,6 +6300,11 @@
                             }
                             break;
                         }
+		    case "text-decoration":
+                        node.style['text-decoration'] = value;
+                        o._.dirty = 1;
+                        node.setAttribute('text-decoration', value);
+                        break;
                     default:
                         att == "font-size" && (value = toInt(value, 10) + "px");
                         var cssrule = att.replace(/(\-.)/g, function (w) {
