@@ -3849,6 +3849,21 @@
         return out;
     };
     /*\
+     * Paper.getSize
+     [ method ]
+     **
+     * Obtains current paper actual size.
+     **
+     = (object)
+     \*/
+    paperproto.getSize = function () {
+        var container = this.canvas.parentNode;
+        return {
+            width: container.offsetWidth,
+            height: container.offsetHeight
+        };
+    };    
+	/*\
      * Paper.setSize
      [ method ]
      **
@@ -7018,7 +7033,8 @@
     };
     R._engine.setViewBox = function (x, y, w, h, fit) {
         eve("raphael.setViewBox", this, this._viewBox, [x, y, w, h, fit]);
-        var size = mmax(w / this.width, h / this.height),
+        var paperSize = this.getSize(),
+            size = mmax(w / paperSize.width, h / paperSize.height),
             top = this.top,
             aspectRatio = fit ? "meet" : "xMinYMin",
             vb,
@@ -7623,7 +7639,10 @@
             skew.matrix = Str(matrix);
             skew.offset = matrix.offset();
         }
-        oldt && (this._.transform = oldt);
+        if (oldt != null) { // empty string value is truely as wlll 
+            this._.transform = oldt;
+            R._extractTransform(this, oldt);
+        }
         return this;
     };
     elproto.rotate = function (deg, cx, cy) {
@@ -7988,8 +8007,9 @@
     };
     R._engine.setViewBox = function (x, y, w, h, fit) {
         R.eve("raphael.setViewBox", this, this._viewBox, [x, y, w, h, fit]);
-        var width = this.width,
-            height = this.height,
+        var paperSize = this.getSize(),
+            width = paperSize.width,
+            height = paperSize.height,
             size = 1 / mmax(w / width, h / height),
             H, W;
         if (fit) {
