@@ -7639,7 +7639,10 @@
             skew.matrix = Str(matrix);
             skew.offset = matrix.offset();
         }
-        oldt && (this._.transform = oldt);
+        if (oldt != null) { // empty string value is truely as wlll 
+            this._.transform = oldt;
+            R._extractTransform(this, oldt);
+        }
         return this;
     };
     elproto.rotate = function (deg, cx, cy) {
