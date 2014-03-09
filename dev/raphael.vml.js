@@ -864,9 +864,8 @@ window.Raphael && window.Raphael.vml && function(R) {
     };
     R._engine.setViewBox = function (x, y, w, h, fit) {
         R.eve("raphael.setViewBox", this, this._viewBox, [x, y, w, h, fit]);
-        var paperSize = this.getSize(),
-            width = paperSize.width,
-            height = paperSize.height,
+        var width = this.width,
+            height = this.height,
             size = 1 / mmax(w / width, h / height),
             H, W;
         if (fit) {

@@ -3470,21 +3470,6 @@
         return out;
     };
     /*\
-     * Paper.getSize
-     [ method ]
-     **
-     * Obtains current paper actual size.
-     **
-     = (object)
-     \*/
-    paperproto.getSize = function () {
-        var container = this.canvas.parentNode;
-        return {
-            width: container.offsetWidth,
-            height: container.offsetHeight
-        };
-    };    
-    /*\
      * Paper.setSize
      [ method ]
      **

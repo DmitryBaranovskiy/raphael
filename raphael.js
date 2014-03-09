@@ -3849,21 +3849,6 @@
         return out;
     };
     /*\
-     * Paper.getSize
-     [ method ]
-     **
-     * Obtains current paper actual size.
-     **
-     = (object)
-     \*/
-    paperproto.getSize = function () {
-        var container = this.canvas.parentNode;
-        return {
-            width: container.offsetWidth,
-            height: container.offsetHeight
-        };
-    };    
-    /*\
      * Paper.setSize
      [ method ]
      **
@@ -7033,8 +7018,7 @@
     };
     R._engine.setViewBox = function (x, y, w, h, fit) {
         eve("raphael.setViewBox", this, this._viewBox, [x, y, w, h, fit]);
-        var paperSize = this.getSize(),
-            size = mmax(w / paperSize.width, h / paperSize.height),
+        var size = mmax(w / this.width, h / this.height),
             top = this.top,
             aspectRatio = fit ? "meet" : "xMinYMin",
             vb,
@@ -8007,9 +7991,8 @@
     };
     R._engine.setViewBox = function (x, y, w, h, fit) {
         R.eve("raphael.setViewBox", this, this._viewBox, [x, y, w, h, fit]);
-        var paperSize = this.getSize(),
-            width = paperSize.width,
-            height = paperSize.height,
+        var width = this.width,
+            height = this.height,
             size = 1 / mmax(w / width, h / height),
             H, W;
         if (fit) {
