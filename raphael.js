@@ -6078,13 +6078,13 @@
                     case "blur":
                         o.blur(value);
                         break;
-                    case "href":
                     case "title":
                         var hl = $("title");
                         var val = R._g.doc.createTextNode(value);
                         hl.appendChild(val);
                         node.appendChild(hl);
                         break;
+                    case "href":
                     case "target":
                         var pn = node.parentNode;
                         if (pn.tagName.toLowerCase() != "a") {
