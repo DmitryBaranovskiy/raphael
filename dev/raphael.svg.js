@@ -1290,7 +1290,8 @@ window.Raphael && window.Raphael.svg && function(R) {
     };
     R._engine.setViewBox = function (x, y, w, h, fit) {
         eve("raphael.setViewBox", this, this._viewBox, [x, y, w, h, fit]);
-        var size = mmax(w / this.width, h / this.height),
+        var paperSize = this.getSize(),
+            size = mmax(w / paperSize.width, h / paperSize.height),
             top = this.top,
             aspectRatio = fit ? "xMidYMid meet" : "xMinYMin",
             vb,
