@@ -299,7 +299,7 @@ window.Raphael && window.Raphael.svg && function(R) {
             var width = o.attrs["stroke-width"] || "1",
                 butt = {round: width, square: width, butt: 0}[o.attrs["stroke-linecap"] || params["stroke-linecap"]] || 0,
                 dashes = [],
-                i = value.length;
+                i = mmax(2,value.length);
             while (i--) {
                 dashes[i] = value[i] * width + ((i % 2) ? 1 : -1) * butt;
             }
