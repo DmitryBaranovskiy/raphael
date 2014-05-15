@@ -296,6 +296,10 @@
             set : function(el) {
                 var bbox = el._getBBox();
                 return rectPath(bbox.x, bbox.y, bbox.width, bbox.height);
+            },
+            g: function (el) {
+                var bbox = el._getBBox();
+                return rectPath(bbox.x, bbox.y, bbox.width, bbox.height);
             }
         },
         /*\
@@ -3307,6 +3311,18 @@
     \*/
     paperproto.rect = function (x, y, w, h, r) {
         var out = R._engine.rect(this, x || 0, y || 0, w || 0, h || 0, r || 0);
+        this.__set__ && this.__set__.push(out);
+        return out;
+    };
+    /*\
+     * Paper.g
+     [ method ]
+     *
+     * Draws a svg group (g) element.
+     **
+    \*/
+    paperproto.g = function () {
+        var out = R._engine.g(this);
         this.__set__ && this.__set__.push(out);
         return out;
     };
