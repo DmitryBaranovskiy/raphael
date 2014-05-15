@@ -675,6 +675,10 @@
             set : function(el) {
                 var bbox = el._getBBox();
                 return rectPath(bbox.x, bbox.y, bbox.width, bbox.height);
+            },
+            g: function (el) {
+                var bbox = el._getBBox();
+                return rectPath(bbox.x, bbox.y, bbox.width, bbox.height);
             }
         },
         /*\
@@ -3686,6 +3690,18 @@
     \*/
     paperproto.rect = function (x, y, w, h, r) {
         var out = R._engine.rect(this, x || 0, y || 0, w || 0, h || 0, r || 0);
+        this.__set__ && this.__set__.push(out);
+        return out;
+    };
+    /*\
+     * Paper.g
+     [ method ]
+     *
+     * Draws a svg group (g) element.
+     **
+    \*/
+    paperproto.g = function () {
+        var out = R._engine.g(this);
         this.__set__ && this.__set__.push(out);
         return out;
     };
@@ -6928,6 +6944,26 @@
         var res = new Element(el, svg);
         res.attrs = {x: x, y: y, width: w, height: h, r: r || 0, rx: r || 0, ry: r || 0, fill: "none", stroke: "#000"};
         res.type = "rect";
+        $(el, res.attrs);
+        return res;
+    };
+    R._engine.g = function (svg) {
+        var el = $("g");
+        svg.canvas && svg.canvas.appendChild(el);
+        var res = new Element(el, svg);
+        res.type = "g";
+        res.canvas = res.node;
+        //adding support for adding elements inside <g>
+        var elements = ['circle' ,'rect' ,'ellipse' ,'image' ,'text' ,'g'];
+        elements.forEach(function(element){
+            res[element] = function(){
+                var args = [res];
+                for(var i=0; i<arguments.length; i++)
+                    args.push(arguments[i]);
+                var out = R._engine[element].apply(this, args);
+                return out;
+            }
+        });
         $(el, res.attrs);
         return res;
     };
