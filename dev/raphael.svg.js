@@ -304,7 +304,8 @@ window.Raphael && window.Raphael.svg && function(R) {
                 dashes[i] = nvalue[i] * width + ((i % 2) ? 1 : -1) * butt;
             }
             $(o.node, {"stroke-dasharray": dashes.join(",")});
-        } else {
+            // checks if stroke-dasharray string is space-separated integers
+        } else if ( parseInt(Str(value).split(' ')[0]) !== Number.NaN) {
             $(o.node, {"stroke-dasharray": Str(value).toLowerCase()});
         }
     },
