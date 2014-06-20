@@ -294,16 +294,18 @@ window.Raphael && window.Raphael.svg && function(R) {
         "--..": [8, 3, 1, 3, 1, 3]
     },
     addDashes = function (o, value, params) {
-        value = dasharray[Str(value).toLowerCase()];
-        if (value) {
+        var nvalue = dasharray[Str(value).toLowerCase()];
+        if (nvalue!==undefined) {
             var width = o.attrs["stroke-width"] || "1",
                 butt = {round: width, square: width, butt: 0}[o.attrs["stroke-linecap"] || params["stroke-linecap"]] || 0,
                 dashes = [],
-                i = value.length;
+                i = nvalue.length;
             while (i--) {
-                dashes[i] = value[i] * width + ((i % 2) ? 1 : -1) * butt;
+                dashes[i] = nvalue[i] * width + ((i % 2) ? 1 : -1) * butt;
             }
             $(o.node, {"stroke-dasharray": dashes.join(",")});
+        } else {
+            $(o.node, {"stroke-dasharray": Str(value).toLowerCase()});
         }
     },
     setFillAndStroke = function (o, params) {
