@@ -1,0 +1,23 @@
+{
+  "name": "raphael",
+  "version": "2.1.2",
+  "description": "JavaScript Vector Library",
+  "main": "./dev",
+  "repository": "git://github.com/DmitryBaranovskiy/raphael.git",
+  "keywords": [
+    "vector",
+    "canvas",
+    "visualization"
+  ],
+  "license": "MIT",
+  "author": {
+    "name": "Dmitry Baranovskiy"
+  },
+  "bugs": {
+    "url": "http://github.com/DmitryBaranovskiy/raphael/issues"
+  },
+  "homepage": "http://raphaeljs.com/",
+  "dependencies" : {
+    "eve":"^0.5.0"
+  }
+}
