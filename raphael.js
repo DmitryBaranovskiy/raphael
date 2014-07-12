@@ -3092,6 +3092,7 @@
             y: e.clientY + scrollY
         };
     },
+    touchable = [],
     addEvent = (function () {
         if (g.doc.addEventListener) {
             return function (obj, type, fn, element) {
@@ -3101,8 +3102,9 @@
                 };
                 obj.addEventListener(type, f, false);
 
+		var _f;
                 if (supportsTouch && touchMap[type]) {
-                    var _f = function (e) {
+                    _f = function (e) {
                         var pos = getEventPosition(e),
                             olde = e;
 
@@ -3118,6 +3120,7 @@
 
                         return fn.call(element, e, pos.x, pos.y);
                     };
+                    touchable.push({ el: obj, start: _f });
                     obj.addEventListener(touchMap[type], _f, false);
                 }
 
@@ -3125,7 +3128,7 @@
                     obj.removeEventListener(type, f, false);
 
                     if (supportsTouch && touchMap[type])
-                        obj.removeEventListener(touchMap[type], f, false);
+                        obj.removeEventListener(touchMap[type], _f, false);
 
                     return true;
                 };
@@ -3637,6 +3640,10 @@
         while (i--) if (draggable[i].el == this) {
             this.unmousedown(draggable[i].start);
             draggable.splice(i, 1);
+            if (touchable[i]) {
+                touchable[i].el.removeEventListener("touchstart", touchable[i].start, false);
+                touchable.splice(i, 1);
+            }
             eve.unbind("raphael.drag.*." + this.id);
         }
         !draggable.length && R.unmousemove(dragMove).unmouseup(dragUp);
