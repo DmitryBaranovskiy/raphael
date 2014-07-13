@@ -822,7 +822,8 @@ window.Raphael && window.Raphael.vml && function(R) {
             attr = {
                 fill: "#000",
                 stroke: "none",
-                font: R._availableAttrs.font,
+                "font-family": R._availableAttrs["font-family"],
+                "font-size": R._availableAttrs["font-size"],
                 text: text
             };
         p.shape = el;

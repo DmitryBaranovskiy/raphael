@@ -565,7 +565,6 @@
             cy: 0,
             fill: "#fff",
             "fill-opacity": 1,
-            font: '10px "Arial"',
             "font-family": '"Arial"',
             "font-size": "10",
             "font-style": "normal",
@@ -6959,7 +6958,8 @@
             y: y,
             "text-anchor": "middle",
             text: text,
-            font: R._availableAttrs.font,
+            "font-family": R._availableAttrs["font-family"],
+            "font-size": R._availableAttrs["font-size"],
             stroke: "none",
             fill: "#000"
         };
@@ -7955,7 +7955,8 @@
             attr = {
                 fill: "#000",
                 stroke: "none",
-                font: R._availableAttrs.font,
+                "font-family": R._availableAttrs["font-family"],
+                "font-size": R._availableAttrs["font-size"],
                 text: text
             };
         p.shape = el;
