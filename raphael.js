@@ -5808,7 +5808,7 @@
     },
     addGradientFill = function (element, gradient) {
         var type = "linear",
-            id = element.id + gradient,
+            id = "grad:" + element.id + gradient,
             fx = .5, fy = .5,
             o = element.node,
             SVG = element.paper,
