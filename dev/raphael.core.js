@@ -186,7 +186,6 @@
             cy: 0,
             fill: "#fff",
             "fill-opacity": 1,
-            font: '10px "Arial"',
             "font-family": '"Arial"',
             "font-size": "10",
             "font-style": "normal",
