@@ -6926,7 +6926,7 @@
         var el = $("rect");
         svg.canvas && svg.canvas.appendChild(el);
         var res = new Element(el, svg);
-        res.attrs = {x: x, y: y, width: w, height: h, r: r || 0, rx: r || 0, ry: r || 0, fill: "none", stroke: "#000"};
+        res.attrs = {x: x, y: y, width: w, height: h, rx: r || 0, ry: r || 0, fill: "none", stroke: "#000"};
         res.type = "rect";
         $(el, res.attrs);
         return res;
