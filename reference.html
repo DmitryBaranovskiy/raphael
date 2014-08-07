@@ -1380,16 +1380,16 @@ st.attr({fill: <i>"red"</i>}); <span class="c">// changes the fill of both circl
 </p>
 <p class="dr-returns"><strong class="dr-title">Returns:</strong> <em class="dr-type-object">object</em> <span class="dr-description">set</span></p>
 </div><div class="Paper-setSize-section"><h3 id="Paper.setSize" class="dr-method"><i class="dr-trixie">&#160;</i>Paper.setSize(width, height)<a href="#Paper.setSize" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 3397 in the source" href="https://github.com/DmitryBaranovskiy/raphael/blob/master/raphael.core.js#L3397">&#x27ad;</a></h3>
-<div class="extra" id="Paper.setSize-extra"></div></div><div class="dr-method"><p>If you need to change dimensions of the canvas call this method
+<div class="extra" id="Paper.setSize-extra"></div></div><div class="dr-method"><p>If you need to change dimensions of the paper, call this method
 </p>
 <p class="header">Parameters
 </p>
 <dl class="dr-parameters"><dt class="dr-param">width</dt>
 <dd class="dr-type"><em class="dr-type-number">number</em></dd>
-<dd class="dr-description">new width of the canvas</dd>
+<dd class="dr-description">new width of the paper</dd>
 <dt class="dr-param">height</dt>
 <dd class="dr-type"><em class="dr-type-number">number</em></dd>
-<dd class="dr-description">new height of the canvas</dd>
+<dd class="dr-description">new height of the paper</dd>
 </dl>
 </div><div class="Paper-setStart-section"><h3 id="Paper.setStart" class="dr-method"><i class="dr-trixie">&#160;</i>Paper.setStart()<a href="#Paper.setStart" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 3370 in the source" href="https://github.com/DmitryBaranovskiy/raphael/blob/master/raphael.core.js#L3370">&#x27ad;</a></h3>
 <div class="extra" id="Paper.setStart-extra"></div></div><div class="dr-method"><p>Creates <a href="#Paper.set" class="dr-link">Paper.set</a>. All elements that will be created after calling this method and before calling
@@ -1417,10 +1417,10 @@ specifying new boundaries.
 <dd class="dr-description">new y position, default is <code>0</code></dd>
 <dt class="dr-param">w</dt>
 <dd class="dr-type"><em class="dr-type-number">number</em></dd>
-<dd class="dr-description">new width of the canvas</dd>
+<dd class="dr-description">new width of the paper</dd>
 <dt class="dr-param">h</dt>
 <dd class="dr-type"><em class="dr-type-number">number</em></dd>
-<dd class="dr-description">new height of the canvas</dd>
+<dd class="dr-description">new height of the paper</dd>
 <dt class="dr-param">fit</dt>
 <dd class="dr-type"><em class="dr-type-boolean">boolean</em></dd>
 <dd class="dr-description"><code>true</code> if you want graphics to fit into new boundary box</dd>
@@ -1449,15 +1449,15 @@ specifying new boundaries.
 <div class="extra" id="Paper.top-extra"></div></div><div class="dr-property"><p>Points to the topmost element on the paper
 </p>
 </div><div class="Raphael-section"><h2 id="Raphael" class="dr-method"><i class="dr-trixie">&#160;</i>Raphael(…)<a href="#Raphael" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 59 in the source" href="https://github.com/DmitryBaranovskiy/raphael/blob/master/raphael.core.js#L59">&#x27ad;</a></h2>
-<div class="extra" id="Raphael-extra"></div></div><div class="dr-method"><p>Creates a canvas object on which to draw.
+<div class="extra" id="Raphael-extra"></div></div><div class="dr-method"><p>Creates a Raphael object on which to draw.
 You must do this first, as all future calls to drawing methods
-from this instance will be bound to this canvas.
+from this instance will be bound to this object.
 </p>
 <p class="header">Parameters
 </p>
 <dl class="dr-parameters"><dt class="dr-param">container</dt>
 <dd class="dr-type"><em class="dr-type-HTMLElement">HTMLElement</em> <em class="dr-type-string">string</em></dd>
-<dd class="dr-description">DOM element or its ID which is going to be a parent for drawing surface</dd>
+<dd class="dr-description">DOM element or its ID, which is going to be a parent for the Raphael object</dd>
 <dt class="dr-param">width</dt>
 <dd class="dr-type"><em class="dr-type-number">number</em></dd>
 <dd class="dr-description">&#160;</dd>
@@ -1486,7 +1486,7 @@ from this instance will be bound to this canvas.
 <dt class="dr-param optional">callback</dt>
 <dd class="dr-optional">optional</dd>
 <dd class="dr-type"><em class="dr-type-function">function</em></dd>
-<dd class="dr-description">callback function which is going to be executed in the context of newly created paper</dd>
+<dd class="dr-description">callback function which is going to be executed in the context of the newly created paper</dd>
 </dl>
 <p>or
 </p>
@@ -1496,7 +1496,7 @@ from this instance will be bound to this canvas.
 <dt class="dr-param optional">callback</dt>
 <dd class="dr-optional">optional</dd>
 <dd class="dr-type"><em class="dr-type-function">function</em></dd>
-<dd class="dr-description">callback function which is going to be executed in the context of newly created paper</dd>
+<dd class="dr-description">callback function which is going to be executed in the context of the newly created paper</dd>
 </dl>
 <p>or
 </p>
@@ -1507,11 +1507,11 @@ from this instance will be bound to this canvas.
 <p class="dr-returns"><strong class="dr-title">Returns:</strong> <em class="dr-type-object">object</em> <span class="dr-description"><a href="#Paper" class="dr-link">Paper</a></span></p>
 <p class="header">Usage
 </p>
-<pre class="javascript code"><code><span class="c">// Each of the following examples create a canvas</span>
+<pre class="javascript code"><code><span class="c">// Each of the following examples creates a Raphael object</span>
 <span class="c">// that is 320px wide by 200px high.</span>
-<span class="c">// Canvas is created at the viewport’s <span class="d">10</span>,<span class="d">50</span> coordinate.</span>
+<span class="c">// The object is created at the viewport’s <span class="d">10</span>,<span class="d">50</span> coordinate.</span>
 <b>var</b> paper<span class="s"> = </span>Raphael(<span class="d">10</span>, <span class="d">50</span>, <span class="d">320</span>, <span class="d">200</span>);
-<span class="c">// Canvas is created at the top left corner of the #notepad element</span>
+<span class="c">// The object is created at the top left corner of the #notepad element</span>
 <span class="c">// (or its top right corner <b>in</b> dir=<i>"rtl"</i> elements)</span>
 <b>var</b> paper<span class="s"> = </span>Raphael(document.getElementById(<i>"notepad"</i>), <span class="d">320</span>, <span class="d">200</span>);
 <span class="c">// Same as above</span>
@@ -1672,8 +1672,8 @@ Return bounding box of a given cubic bezier curve
 <p>See also <a href="http://raphaeljs.com/easing.html">Easing demo</a>.</p>
 </div><div class="Raphael-el-section"><h3 id="Raphael.el" class="dr-property"><i class="dr-trixie">&#160;</i>Raphael.el<a href="#Raphael.el" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 2788 in the source" href="https://github.com/DmitryBaranovskiy/raphael/blob/master/raphael.core.js#L2788">&#x27ad;</a></h3>
 <div class="extra" id="Raphael.el-extra"></div></div><div class="dr-property"><em class="dr-type dr-type-object">object</em><p>You can add your own method to elements. This is usefull when you want to hack default functionality or
-want to wrap some common transformation or attributes in one method. In difference to canvas methods,
-you can redefine element method at any time. Expending element methods wouldn’t affect set.
+want to wrap some common transformation or attributes in one method. In contrast to the paper's methods,
+you can redefine an element method at any time. Expending element methods wouldn’t affect set.
 </p>
 <p class="header">Usage
 </p>
@@ -1731,7 +1731,7 @@ Find dot coordinates on the given cubic bezier curve at the given t.
 </ol></li><li>    }</li><li><span class="dr-json-key">alpha:</span><span class="dr-type"><em class="dr-type-number">number</em></span><span class="dr-json-description">angle of the curve derivative at the point</span>
 </ol></li><li>}</li></ol>
 </div><div class="Raphael-fn-section"><h3 id="Raphael.fn" class="dr-property"><i class="dr-trixie">&#160;</i>Raphael.fn<a href="#Raphael.fn" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 371 in the source" href="https://github.com/DmitryBaranovskiy/raphael/blob/master/raphael.core.js#L371">&#x27ad;</a></h3>
-<div class="extra" id="Raphael.fn-extra"></div></div><div class="dr-property"><em class="dr-type dr-type-object">object</em><p>You can add your own method to the canvas. For example if you want to draw a pie chart,
+<div class="extra" id="Raphael.fn-extra"></div></div><div class="dr-property"><em class="dr-type dr-type-object">object</em><p>You can add your own method to the paper. For example if you want to draw a pie chart,
 you can create your own pie chart function and ship it as a Raphaël plugin. To do this
 you need to extend the <code>Raphael.fn</code> object. You should modify the <code>fn</code> object before a
 Raphaël instance is created, otherwise it will take no effect. Please note that the
