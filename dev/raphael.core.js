@@ -5128,10 +5128,12 @@
             }
         }
         var thefont;
+        vat thefontstyle;
         if (font) {
             for (var i = 0, ii = font.length; i < ii; i++) {
                 thefont = font[i];
-                if (thefont.face["font-weight"] == weight && (thefont.face["font-style"] == style || !thefont.face["font-style"]) && thefont.face["font-stretch"] == stretch) {
+                thefontstyle = thefont.face["font-style"] || "normal";
+                if (thefont.face["font-weight"] == weight && thefontstyle == style && thefont.face["font-stretch"] == stretch) {
                     break;
                 }
             }
