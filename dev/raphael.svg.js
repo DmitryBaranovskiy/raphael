@@ -1243,7 +1243,8 @@ window.Raphael && window.Raphael.svg && function(R) {
             height: height,
             version: 1.1,
             width: width,
-            xmlns: "http://www.w3.org/2000/svg"
+            xmlns: "http://www.w3.org/2000/svg",
+            "xmlns:xlink": "http://www.w3.org/1999/xlink"
         });
         if (container == 1) {
             cnvs.style.cssText = css + "position:absolute;left:" + x + "px;top:" + y + "px";
