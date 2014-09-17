@@ -691,8 +691,8 @@
         if (this.is(h, "object") && "h" in h && "s" in h && "b" in h) {
             v = h.b;
             s = h.s;
-            h = h.h;
             o = h.o;
+            h = h.h;
         }
         h *= 360;
         var R, G, B, X, C;
