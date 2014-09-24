@@ -882,7 +882,7 @@ window.Raphael && window.Raphael.vml && function(R) {
             scale: size
         };
         this.forEach(function (el) {
-            el.transform("...");
+            el.transform("");
         });
         return this;
     };
