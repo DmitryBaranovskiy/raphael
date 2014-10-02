@@ -567,8 +567,10 @@
             i.style.display = "none";
             g.doc.body.appendChild(i);
             toHex = cacher(function (color) {
+                var computedStyle;
                 i.style.color = color;
-                return g.doc.defaultView.getComputedStyle(i, E).getPropertyValue("color");
+                computedStyle = g.doc.defaultView.getComputedStyle(i, E);
+                return computedStyle ? computedStyle.getPropertyValue("color") : color;
             });
         }
         return toHex(color);

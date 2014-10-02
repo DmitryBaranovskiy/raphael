@@ -395,7 +395,7 @@
     } else {
         // Browser globals (glob is window)
         // Raphael adds itself to window
-        factory(glob, glob.eve);
+        factory(glob, glob.eve || (typeof require == "function" && require('eve')) );
     }
 }(this, function (window, eve) {
     /*\
@@ -946,8 +946,10 @@
             i.style.display = "none";
             g.doc.body.appendChild(i);
             toHex = cacher(function (color) {
+                var computedStyle;
                 i.style.color = color;
-                return g.doc.defaultView.getComputedStyle(i, E).getPropertyValue("color");
+                computedStyle = g.doc.defaultView.getComputedStyle(i, E);
+                return computedStyle ? computedStyle.getPropertyValue("color") : color;
             });
         }
         return toHex(color);
@@ -6328,7 +6330,9 @@
         }
         var a = el.attrs,
             node = el.node,
-            fontSize = node.firstChild ? toInt(R._g.doc.defaultView.getComputedStyle(node.firstChild, E).getPropertyValue("font-size"), 10) : 10;
+            computedStyle = node.firstChild ? R._g.doc.defaultView.getComputedStyle(node.firstChild, E) : undefined,
+            fontSize = computedStyle ? toInt(computedStyle.getPropertyValue("font-size"), 10) : 10;
+        
 
         if (params[has]("text")) {
             a.text = params.text;
@@ -8113,5 +8117,8 @@
     // Even with AMD, Raphael should be defined globally
     oldRaphael.was ? (g.win.Raphael = R) : (Raphael = R);
 
+    if(typeof exports == "object"){
+        module.exports = R;
+    }
     return R;
 }));
