@@ -395,7 +395,7 @@
     } else {
         // Browser globals (glob is window)
         // Raphael adds itself to window
-        factory(glob, glob.eve);
+        factory(glob, glob.eve || (typeof require == "function" && require('eve')) );
     }
 }(this, function (window, eve) {
     /*\
@@ -430,7 +430,7 @@
      | var paper = Raphael(10, 50, 320, 200);
      | // Canvas is created at the top left corner of the #notepad element
      | // (or its top right corner in dir="rtl" elements)
-     | var paper = Raphael(document.getElementById("notepad"), 320, 200);
+     | var paper = Raphael(document.querySelector("notepad"), 320, 200);
      | // Same as above
      | var paper = Raphael("notepad", 320, 200);
      | // Image dump
@@ -2730,7 +2730,7 @@
         };
     R._getContainer = function (x, y, w, h) {
         var container;
-        container = h == null && !R.is(x, "object") ? g.doc.getElementById(x) : x;
+        container = h == null && !R.is(x, "object") ? g.doc.querySelector(x) : x;
         if (container == null) {
             return;
         }
@@ -5813,7 +5813,7 @@
             o = element.node,
             SVG = element.paper,
             s = o.style,
-            el = R._g.doc.getElementById(id);
+            el = R._g.doc.querySelector(id);
         if (!el) {
             gradient = Str(gradient).replace(R._radial_gradient, function (all, _fx, _fy) {
                 type = "radial";
@@ -5960,7 +5960,7 @@
             if (type != "none") {
                 var pathId = "raphael-marker-" + type,
                     markerId = "raphael-marker-" + se + type + w + h;
-                if (!R._g.doc.getElementById(pathId)) {
+                if (!R._g.doc.querySelector(pathId)) {
                     p.defs.appendChild($($("path"), {
                         "stroke-linecap": "round",
                         d: markers[type],
@@ -5970,7 +5970,7 @@
                 } else {
                     markerCounter[pathId]++;
                 }
-                var marker = R._g.doc.getElementById(markerId),
+                var marker = R._g.doc.querySelector(markerId),
                     use;
                 if (!marker) {
                     marker = $($("marker"), {
@@ -6029,7 +6029,7 @@
                 delete o._.arrows[se + "String"];
             }
             for (attr in markerCounter) if (markerCounter[has](attr) && !markerCounter[attr]) {
-                var item = R._g.doc.getElementById(attr);
+                var item = R._g.doc.querySelector(attr);
                 item && item.parentNode.removeChild(item);
             }
         }
@@ -6138,7 +6138,7 @@
                         if (!value) {
                             var path = node.getAttribute("clip-path");
                             if (path) {
-                                var clip = R._g.doc.getElementById(path.replace(/(^url\(#|\)$)/g, E));
+                                var clip = R._g.doc.querySelector(path.replace(/(^url\(#|\)$)/g, E));
                                 clip && clip.parentNode.removeChild(clip);
                                 $(node, {"clip-path": E});
                                 delete o.clip;
@@ -6268,7 +6268,7 @@
                                 $(node, {"fill-opacity": attrs["fill-opacity"]});
                         } else if ((o.type == "circle" || o.type == "ellipse" || Str(value).charAt() != "r") && addGradientFill(o, value)) {
                             if ("opacity" in attrs || "fill-opacity" in attrs) {
-                                var gradient = R._g.doc.getElementById(node.getAttribute("fill").replace(/^url\(#|\)$/g, E));
+                                var gradient = R._g.doc.querySelector(node.getAttribute("fill").replace(/^url\(#|\)$/g, E));
                                 if (gradient) {
                                     var stops = gradient.getElementsByTagName("stop");
                                     $(stops[stops.length - 1], {"stop-opacity": ("opacity" in attrs ? attrs.opacity : 1) * ("fill-opacity" in attrs ? attrs["fill-opacity"] : 1)});
@@ -6298,7 +6298,7 @@
                         // fall
                     case "fill-opacity":
                         if (attrs.gradient) {
-                            gradient = R._g.doc.getElementById(node.getAttribute("fill").replace(/^url\(#|\)$/g, E));
+                            gradient = R._g.doc.querySelector(node.getAttribute("fill").replace(/^url\(#|\)$/g, E));
                             if (gradient) {
                                 stops = gradient.getElementsByTagName("stop");
                                 $(stops[stops.length - 1], {"stop-opacity": value});
@@ -8113,5 +8113,8 @@
     // Even with AMD, Raphael should be defined globally
     oldRaphael.was ? (g.win.Raphael = R) : (Raphael = R);
 
+    if(typeof exports == "object"){
+        module.exports = R;
+    }
     return R;
 }));
