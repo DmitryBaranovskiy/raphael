@@ -58,7 +58,7 @@ window.Raphael && window.Raphael.svg && function(R) {
             o = element.node,
             SVG = element.paper,
             s = o.style,
-            el = R._g.doc.getElementById(id);
+            el = R._g.doc.querySelector(id);
         if (!el) {
             gradient = Str(gradient).replace(R._radial_gradient, function (all, _fx, _fy) {
                 type = "radial";
@@ -205,7 +205,7 @@ window.Raphael && window.Raphael.svg && function(R) {
             if (type != "none") {
                 var pathId = "raphael-marker-" + type,
                     markerId = "raphael-marker-" + se + type + w + h;
-                if (!R._g.doc.getElementById(pathId)) {
+                if (!R._g.doc.querySelector(pathId)) {
                     p.defs.appendChild($($("path"), {
                         "stroke-linecap": "round",
                         d: markers[type],
@@ -215,7 +215,7 @@ window.Raphael && window.Raphael.svg && function(R) {
                 } else {
                     markerCounter[pathId]++;
                 }
-                var marker = R._g.doc.getElementById(markerId),
+                var marker = R._g.doc.querySelector(markerId),
                     use;
                 if (!marker) {
                     marker = $($("marker"), {
@@ -274,7 +274,7 @@ window.Raphael && window.Raphael.svg && function(R) {
                 delete o._.arrows[se + "String"];
             }
             for (attr in markerCounter) if (markerCounter[has](attr) && !markerCounter[attr]) {
-                var item = R._g.doc.getElementById(attr);
+                var item = R._g.doc.querySelector(attr);
                 item && item.parentNode.removeChild(item);
             }
         }
@@ -383,7 +383,7 @@ window.Raphael && window.Raphael.svg && function(R) {
                         if (!value) {
                             var path = node.getAttribute("clip-path");
                             if (path) {
-                                var clip = R._g.doc.getElementById(path.replace(/(^url\(#|\)$)/g, E));
+                                var clip = R._g.doc.querySelector(path.replace(/(^url\(#|\)$)/g, E));
                                 clip && clip.parentNode.removeChild(clip);
                                 $(node, {"clip-path": E});
                                 delete o.clip;
@@ -513,7 +513,7 @@ window.Raphael && window.Raphael.svg && function(R) {
                                 $(node, {"fill-opacity": attrs["fill-opacity"]});
                         } else if ((o.type == "circle" || o.type == "ellipse" || Str(value).charAt() != "r") && addGradientFill(o, value)) {
                             if ("opacity" in attrs || "fill-opacity" in attrs) {
-                                var gradient = R._g.doc.getElementById(node.getAttribute("fill").replace(/^url\(#|\)$/g, E));
+                                var gradient = R._g.doc.querySelector(node.getAttribute("fill").replace(/^url\(#|\)$/g, E));
                                 if (gradient) {
                                     var stops = gradient.getElementsByTagName("stop");
                                     $(stops[stops.length - 1], {"stop-opacity": ("opacity" in attrs ? attrs.opacity : 1) * ("fill-opacity" in attrs ? attrs["fill-opacity"] : 1)});
@@ -543,7 +543,7 @@ window.Raphael && window.Raphael.svg && function(R) {
                         // fall
                     case "fill-opacity":
                         if (attrs.gradient) {
-                            gradient = R._g.doc.getElementById(node.getAttribute("fill").replace(/^url\(#|\)$/g, E));
+                            gradient = R._g.doc.querySelector(node.getAttribute("fill").replace(/^url\(#|\)$/g, E));
                             if (gradient) {
                                 stops = gradient.getElementsByTagName("stop");
                                 $(stops[stops.length - 1], {"stop-opacity": value});

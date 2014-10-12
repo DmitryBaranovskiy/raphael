@@ -51,7 +51,7 @@
      | var paper = Raphael(10, 50, 320, 200);
      | // Canvas is created at the top left corner of the #notepad element
      | // (or its top right corner in dir="rtl" elements)
-     | var paper = Raphael(document.getElementById("notepad"), 320, 200);
+     | var paper = Raphael(document.querySelector("notepad"), 320, 200);
      | // Same as above
      | var paper = Raphael("notepad", 320, 200);
      | // Image dump
@@ -2351,7 +2351,7 @@
         };
     R._getContainer = function (x, y, w, h) {
         var container;
-        container = h == null && !R.is(x, "object") ? g.doc.getElementById(x) : x;
+        container = h == null && !R.is(x, "object") ? g.doc.querySelector(x) : x;
         if (container == null) {
             return;
         }
