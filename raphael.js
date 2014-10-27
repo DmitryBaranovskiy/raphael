@@ -5794,10 +5794,13 @@
                 el = $(el);
             }
             for (var key in attr) if (attr[has](key)) {
-                if (key.substring(0, 6) == "xlink:") {
-                    el.setAttributeNS(xlink, key.substring(6), Str(attr[key]));
-                } else {
-                    el.setAttribute(key, Str(attr[key]));
+                var path = Str(attr[key]);
+                if (path !== 'Z' && path !== 'M,0,0') {
+                    if (key.substring(0, 6) == "xlink:") {
+                        el.setAttributeNS(xlink, key.substring(6), path);
+                    } else {
+                        el.setAttribute(key, path);
+                    }
                 }
             }
         } else {
