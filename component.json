@@ -1,5 +1,8 @@
 {
   "name": "raphael",
   "version": "2.1.3",
-  "scripts": ["raphael.js"]
+  "scripts": ["raphael.js"],
+  "dependencies": {
+    "adobe-webplatform/eve": "master"
+  }
 }
