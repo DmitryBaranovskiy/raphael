@@ -15,77 +15,45 @@ module.exports = function(grunt) {
                 banner: "<%= banner %>"
             },
             dist: {
-                src: "<%= build.dist.dest %>",
+                src: "<%= concat.dist.dest %>",
                 dest: "../raphael-min.js"
             }
         },
-        build: {
-            options: {
-                banner: "<%= banner %>"
-            },
+        replace: {
             dist: {
-                dest: "../raphael.js",
+                options: {
+                    patterns: [{
+                        match: "VERSION",
+                        replacement: "<%= pkg.version %>"
+                    }]
+                },
+                files: [{
+                    expand: true,
+                    flatten: true,
+                    src: "<%= concat.dist.dest %>",
+                    dest: "../"
+                }]
+            }
+        },
+        concat: {
+            dist: {
+                dest: "../<%= pkg.name %>.js",
                 src: [
                     "../eve/eve.js",
                     "raphael.core.js",
                     "raphael.svg.js",
-                    "raphael.vml.js"
+                    "raphael.vml.js",
+                    "raphael.amd.js"
                 ]
             }
         }
     });
 
-
     // These plugins provide necessary tasks.
+    grunt.loadNpmTasks("grunt-contrib-concat");
     grunt.loadNpmTasks("grunt-contrib-uglify");
-
-    // Special concat/build task to handle Raphael's build requirements
-    grunt.registerMultiTask(
-        "build",
-        "Concatenate source, remove individual closures, embed version",
-        function() {
-            var data = this.data,
-                name = data.dest,
-                src = data.src,
-                options = this.options({
-                    banner: ""
-                }),
-                // Start with banner
-                compiled = options.banner,
-                svgorvmlRegex = /\.(svg|vml)\.js/,
-                closureRegex = /window\.Raphael.*\(R\)\s*\{/,
-                closureEndRegex = /\}\(window\.Raphael\);\s*$/,
-                exposeRegex = /(\r?\n\s*\/\/\s*EXPOSE(?:\r|\n|.)*\}\)\);)/;
-
-            // Concatenate src
-            src.forEach(function(path) {
-                var source = grunt.file.read(path);
-                var match = svgorvmlRegex.exec(path);
-
-                // If either SVG or VML,
-                // remove the closure and add an early return if not required
-                if (match) {
-                    source = "\n\n" +
-                        source.replace(closureRegex,
-                            "(function(){\n" +
-                            "    if (!R." + match[1] + ") {\n" +
-                            "        return;\n" +
-                            "    }"
-                        )
-                        .replace( closureEndRegex, "})();" );
-
-                    // Add source before EXPOSE line
-                    compiled = compiled.replace(exposeRegex, source + "$1");
-                } else {
-                    compiled += source;
-                }
-            });
-
-            grunt.file.write( name, compiled );
-
-            grunt.log.ok("Built file " + name);
-        });
+    grunt.loadNpmTasks("grunt-replace");
 
     // Default task.
-    grunt.registerTask("default", ["build", "uglify"]);
+    grunt.registerTask("default", ["concat", "replace", "uglify"]);
 };

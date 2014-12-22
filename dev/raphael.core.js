@@ -1,24 +1,22 @@
-// ┌─────────────────────────────────────────────────────────────────────┐ \\
-// │ "Raphaël 2.1.2" - JavaScript Vector Library                         │ \\
-// ├─────────────────────────────────────────────────────────────────────┤ \\
-// │ Copyright (c) 2008-2011 Dmitry Baranovskiy (http://raphaeljs.com)   │ \\
-// │ Copyright (c) 2008-2011 Sencha Labs (http://sencha.com)             │ \\
-// │ Licensed under the MIT (http://raphaeljs.com/license.html) license. │ \\
-// └─────────────────────────────────────────────────────────────────────┘ \\
+// ┌────────────────────────────────────────────────────────────────────┐ \\
+// │ Raphaël @@VERSION - JavaScript Vector Library                          │ \\
+// ├────────────────────────────────────────────────────────────────────┤ \\
+// │ Core Module                                                         │ \\
+// ├────────────────────────────────────────────────────────────────────┤ \\
+// │ Licensed under the MIT (http://raphaeljs.com/license.html) license.│ \\
+// └────────────────────────────────────────────────────────────────────┘ \\
 
 (function (glob, factory) {
-    // AMD support
     if (typeof define === "function" && define.amd) {
-        // Define as an anonymous module
-        define(["eve"], function( eve ) {
-            return factory(glob, eve);
+        define("raphael.core", ["eve"], function(eve) {
+            return factory(eve);
         });
+    } else if (typeof exports === "object") {
+        module.exports = factory(require("eve"));
     } else {
-        // Browser globals (glob is window)
-        // Raphael adds itself to window
-        factory(glob, glob.eve || (typeof require == "function" && require('eve')) );
+        glob.Raphael = factory(glob.eve);
     }
-}(this, function (window, eve) {
+}(window || this, function (eve) {
     /*\
      * Raphael
      [ method ]
@@ -86,7 +84,7 @@
             }
         }
     }
-    R.version = "2.1.2";
+    R.version = "@@VERSION";
     R.eve = eve;
     var loaded,
         separator = /[, ]+/,
@@ -126,7 +124,7 @@
              | var c = paper.circle(10, 10, 10).attr({hue: .45});
              | // or even like this:
              | c.animate({hue: 1}, 1e3);
-             | 
+             |
              | // You could also create custom attribute
              | // with multiple parameters:
              | paper.customAttributes.hsb = function (h, s, b) {
@@ -3076,7 +3074,7 @@
      [ method ]
      **
      * Adds or retrieves given value asociated with given key.
-     ** 
+     **
      * See also @Element.removeData
      > Parameters
      - key (string) key to store data
@@ -3184,8 +3182,8 @@
      - mcontext (object) #optional context for moving handler
      - scontext (object) #optional context for drag start handler
      - econtext (object) #optional context for drag end handler
-     * Additionaly following `drag` events will be triggered: `drag.start.<id>` on start, 
-     * `drag.end.<id>` on end and `drag.move.<id>` on every move. When element will be dragged over another element 
+     * Additionaly following `drag` events will be triggered: `drag.start.<id>` on start,
+     * `drag.end.<id>` on end and `drag.move.<id>` on every move. When element will be dragged over another element
      * `drag.over.<id>` will be fired as well.
      *
      * Start event and start handler will be called in specified context or in context of the element with following parameters:
@@ -3487,7 +3485,7 @@
      * Paper.setViewBox
      [ method ]
      **
-     * Sets the view box of the paper. Practically it gives you ability to zoom and pan whole paper surface by 
+     * Sets the view box of the paper. Practically it gives you ability to zoom and pan whole paper surface by
      * specifying new boundaries.
      **
      > Parameters
@@ -3960,7 +3958,7 @@
     elproto.getPath = function () {
         var path,
             getPath = R._getPath[this.type];
-        
+
         if (this.type == "text" || this.type == "set") {
             return;
         }
@@ -4246,8 +4244,8 @@
             }
         }
         return element;
-        // 
-        // 
+        //
+        //
         // var a = params ? R.animation(params, ms, easing, callback) : anim,
         //     status = element.status(anim);
         // return this.animate(a).status(a, status * anim.ms / a.ms);
@@ -5371,13 +5369,5 @@
         loaded = true;
     });
 
-    // EXPOSE
-    // SVG and VML are appended just before the EXPOSE line
-    // Even with AMD, Raphael should be defined globally
-    oldRaphael.was ? (g.win.Raphael = R) : (Raphael = R);
-
-    if(typeof exports == "object"){
-        module.exports = R;
-    }
     return R;
 }));
