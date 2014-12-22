@@ -18,7 +18,7 @@
     } else {
         factory(glob.Raphael);
     }
-}(window || this, function(R) {
+}(this, function(R) {
     if (R && !R.vml) {
         return;
     }

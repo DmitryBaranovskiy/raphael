@@ -26,7 +26,7 @@
     } else {
         glob.eve = factory();
     }
-}(window || this, function() {
+}(this, function() {
     var version = "0.5.1",
         has = "hasOwnProperty",
         separator = /[\.\/]/,
@@ -453,7 +453,7 @@
     } else {
         glob.Raphael = factory(glob.eve);
     }
-}(window || this, function (eve) {
+}(this, function (eve) {
     /*\
      * Raphael
      [ method ]
@@ -5829,7 +5829,7 @@
     } else {
         factory(glob.Raphael);
     }
-}(window || this, function(R) {
+}(this, function(R) {
     if (R && !R.svg) {
         return;
     }
@@ -7218,7 +7218,7 @@
     } else {
         factory(glob.Raphael);
     }
-}(window || this, function(R) {
+}(this, function(R) {
     if (R && !R.vml) {
         return;
     }
@@ -8213,6 +8213,6 @@
     } else {
         glob.Raphael = factory(glob.Raphael);
     }
-}(window || this, function (Raphael) {
+}(this, function (Raphael) {
     return Raphael.ninja();
 }));

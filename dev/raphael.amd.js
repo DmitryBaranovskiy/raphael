@@ -22,6 +22,6 @@
     } else {
         glob.Raphael = factory(glob.Raphael);
     }
-}(window || this, function (Raphael) {
+}(this, function (Raphael) {
     return Raphael.ninja();
 }));

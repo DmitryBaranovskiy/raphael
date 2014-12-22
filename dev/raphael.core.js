@@ -16,7 +16,7 @@
     } else {
         glob.Raphael = factory(glob.eve);
     }
-}(window || this, function (eve) {
+}(this, function (eve) {
     /*\
      * Raphael
      [ method ]
