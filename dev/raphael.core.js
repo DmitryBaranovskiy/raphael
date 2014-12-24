@@ -1215,6 +1215,7 @@
      o }
     \*/
     R.findDotsAtSegment = function (p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y, t) {
+        t = t || 0;
         var t1 = 1 - t,
             t13 = pow(t1, 3),
             t12 = pow(t1, 2),
