@@ -771,7 +771,7 @@
      * Raphael.is
      [ method ]
      **
-     * Handfull replacement for `typeof` operator.
+     * Handful of replacements for `typeof` operator.
      > Parameters
      - o (…) any object or primitive
      - type (string) name of the type, i.e. “string”, “function”, “number”, etc.
