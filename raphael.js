@@ -6651,6 +6651,10 @@
         } else {
             this.node.parentNode.removeChild(this.node);
         }
+        
+        // Remove custom data for element
+        delete eldata[this.id];
+        
         for (var i in this) {
             this[i] = typeof this[i] == "function" ? R._removedFactory(i) : null;
         }
