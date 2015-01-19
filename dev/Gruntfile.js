@@ -10,6 +10,13 @@ module.exports = function(grunt) {
         pkg: pkg,
         banner: grunt.file.read("copy.js").replace(/@VERSION/, pkg.version),
         // Task configuration.
+        jshint: {
+            beforeconcat: ['raphael.core.js', 'raphael.svg.js', 'raphael.vml.js'],
+            afterconcat: ['dist/raphael.js'],
+            "options": {
+                jshintrc: '.jshintrc'
+            }
+        },
         uglify: {
             options: {
                 banner: "<%= banner %>"
@@ -38,8 +45,9 @@ module.exports = function(grunt) {
 
     // These plugins provide necessary tasks.
     grunt.loadNpmTasks("grunt-contrib-uglify");
+    grunt.loadNpmTasks('grunt-contrib-jshint');
 
-    // Special concat/build task to handle Raphael's build requirements
+  // Special concat/build task to handle Raphael's build requirements
     grunt.registerMultiTask(
         "build",
         "Concatenate source, remove individual closures, embed version",
@@ -87,5 +95,5 @@ module.exports = function(grunt) {
         });
 
     // Default task.
-    grunt.registerTask("default", ["build", "uglify"]);
+    grunt.registerTask("default", ["build", /*"jshint",*/ "uglify"]); //Removed jshint because of too many errors, improving little by little...
 };

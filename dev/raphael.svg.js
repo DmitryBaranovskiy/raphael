@@ -127,7 +127,7 @@ window.Raphael && window.Raphael.svg && function(R) {
             }
         }
         $(o, {
-            fill: "url(#" + id + ")",
+            fill: "url(" + document.location + "#" + id + ")",
             opacity: 1,
             "fill-opacity": 1
         });
@@ -204,7 +204,7 @@ window.Raphael && window.Raphael.svg && function(R) {
             }
             if (type != "none") {
                 var pathId = "raphael-marker-" + type,
-                    markerId = "raphael-marker-" + se + type + w + h + o.id;
+                    markerId = "raphael-marker-" + se + type + w + h + "-obj" + o.id;
                 if (!R._g.doc.getElementById(pathId)) {
                     p.defs.appendChild($($("path"), {
                         "stroke-linecap": "round",
@@ -461,9 +461,6 @@ window.Raphael && window.Raphael.svg && function(R) {
                         if (o._.sx != 1 || o._.sy != 1) {
                             value /= mmax(abs(o._.sx), abs(o._.sy)) || 1;
                         }
-                        if (o.paper._vbSize) {
-                            value *= o.paper._vbSize;
-                        }
                         node.setAttribute(att, value);
                         if (attrs["stroke-dasharray"]) {
                             addDashes(o, attrs["stroke-dasharray"], params);
@@ -604,6 +601,13 @@ window.Raphael && window.Raphael.svg && function(R) {
             dif = a.y - (bb.y + bb.height / 2);
         dif && R.is(dif, "finite") && $(tspans[0], {dy: dif});
     },
+    getRealNode = function (node) {
+        if (node.parentNode && node.parentNode.tagName.toLowerCase() === "a") {
+            return node.parentNode;
+        } else {
+            return node;
+        }
+    }
     Element = function (node, svg) {
         var X = 0,
             Y = 0;
@@ -881,7 +885,8 @@ window.Raphael && window.Raphael.svg && function(R) {
      * Removes element from the paper.
     \*/
     elproto.remove = function () {
-        if (this.removed || !this.node.parentNode) {
+        var node = getRealNode(this.node);
+        if (this.removed || !node.parentNode) {
             return;
         }
         var paper = this.paper;
@@ -891,11 +896,8 @@ window.Raphael && window.Raphael.svg && function(R) {
             paper.defs.removeChild(this.gradient);
         }
         R._tear(this, paper);
-        if (this.node.parentNode.tagName.toLowerCase() == "a") {
-            this.node.parentNode.parentNode.removeChild(this.node.parentNode);
-        } else {
-            this.node.parentNode.removeChild(this.node);
-        }
+
+        node.parentNode.removeChild(node);
 
         // Remove custom data for element
         this.removeData();
@@ -910,13 +912,35 @@ window.Raphael && window.Raphael.svg && function(R) {
             this.show();
             var hide = true;
         }
+        var canvasHidden = false,
+            containerStyle;
+        if (this.paper.canvas.parentElement) {
+          containerStyle = this.paper.canvas.parentElement.style;
+        } //IE10+ can't find parentElement
+        else if (this.paper.canvas.parentNode) {
+          containerStyle = this.paper.canvas.parentNode.style;
+        }
+
+        if(containerStyle && containerStyle.display == "none") {
+          canvasHidden = true;
+          containerStyle.display = "";
+        }
         var bbox = {};
         try {
             bbox = this.node.getBBox();
         } catch(e) {
-            // Firefox 3.0.x plays badly here
+            // Firefox 3.0.x, 25.0.1 (probably more versions affected) play badly here - possible fix
+            bbox = {
+                x: this.node.clientLeft,
+                y: this.node.clientTop,
+                width: this.node.clientWidth,
+                height: this.node.clientHeight
+            }
         } finally {
             bbox = bbox || {};
+            if(canvasHidden){
+              containerStyle.display = "none";
+            }
         }
         hide && this.hide();
         return bbox;
@@ -1073,11 +1097,8 @@ window.Raphael && window.Raphael.svg && function(R) {
         if (this.removed) {
             return this;
         }
-        if (this.node.parentNode.tagName.toLowerCase() == "a") {
-            this.node.parentNode.parentNode.appendChild(this.node.parentNode);
-        } else {
-            this.node.parentNode.appendChild(this.node);
-        }
+        var node = getRealNode(this.node);
+        node.parentNode.appendChild(node);
         var svg = this.paper;
         svg.top != this && R._tofront(this, svg);
         return this;
@@ -1093,12 +1114,9 @@ window.Raphael && window.Raphael.svg && function(R) {
         if (this.removed) {
             return this;
         }
-        var parent = this.node.parentNode;
-        if (parent.tagName.toLowerCase() == "a") {
-            parent.parentNode.insertBefore(this.node.parentNode, this.node.parentNode.parentNode.firstChild);
-        } else if (parent.firstChild != this.node) {
-            parent.insertBefore(this.node, this.node.parentNode.firstChild);
-        }
+        var node = getRealNode(this.node);
+        var parentNode = node.parentNode;
+        parentNode.insertBefore(node, parentNode.firstChild);
         R._toback(this, this.paper);
         var svg = this.paper;
         return this;
@@ -1111,14 +1129,16 @@ window.Raphael && window.Raphael.svg && function(R) {
      = (object) @Element
     \*/
     elproto.insertAfter = function (element) {
-        if (this.removed) {
+        if (this.removed || !element) {
             return this;
         }
-        var node = element.node || element[element.length - 1].node;
-        if (node.nextSibling) {
-            node.parentNode.insertBefore(this.node, node.nextSibling);
+
+        var node = getRealNode(this.node);
+        var afterNode = getRealNode(element.node || element[element.length - 1].node);
+        if (afterNode.nextSibling) {
+            afterNode.parentNode.insertBefore(node, afterNode.nextSibling);
         } else {
-            node.parentNode.appendChild(this.node);
+            afterNode.parentNode.appendChild(node);
         }
         R._insertafter(this, element, this.paper);
         return this;
@@ -1131,11 +1151,13 @@ window.Raphael && window.Raphael.svg && function(R) {
      = (object) @Element
     \*/
     elproto.insertBefore = function (element) {
-        if (this.removed) {
+        if (this.removed || !element) {
             return this;
         }
-        var node = element.node || element[0].node;
-        node.parentNode.insertBefore(this.node, node);
+
+        var node = getRealNode(this.node);
+        var beforeNode = getRealNode(element.node || element[0].node);
+        beforeNode.parentNode.insertBefore(node, beforeNode);
         R._insertbefore(this, element, this.paper);
         return this;
     };
@@ -1275,7 +1297,8 @@ window.Raphael && window.Raphael.svg && function(R) {
     };
     R._engine.setViewBox = function (x, y, w, h, fit) {
         eve("raphael.setViewBox", this, this._viewBox, [x, y, w, h, fit]);
-        var size = mmax(w / this.width, h / this.height),
+        var paperSize = this.getSize(),
+            size = mmax(w / paperSize.width, h / paperSize.height),
             top = this.top,
             aspectRatio = fit ? "xMidYMid meet" : "xMinYMin",
             vb,

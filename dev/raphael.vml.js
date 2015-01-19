@@ -27,7 +27,7 @@ window.Raphael && window.Raphael.vml && function(R) {
         bites = /([clmz]),?([^clmz]*)/gi,
         blurregexp = / progid:\S+Blur\([^\)]+\)/g,
         val = /-?[^,\s-]+/g,
-        cssDot = "position:absolute;left:0;top:0;width:1px;height:1px",
+        cssDot = "position:absolute;left:0;top:0;width:1px;height:1px;behavior:url(#default#VML)",
         zoom = 21600,
         pathTypes = {path: 1, rect: 1, image: 1},
         ovalTypes = {circle: 1, ellipse: 1},
@@ -171,6 +171,7 @@ window.Raphael && window.Raphael.vml && function(R) {
         "blur" in params && o.blur(params.blur);
         if (params.path && o.type == "path" || newpath) {
             node.path = path2vml(~Str(a.path).toLowerCase().indexOf("r") ? R._pathToAbsolute(a.path) : a.path);
+            o._.dirty = 1;
             if (o.type == "image") {
                 o._.fillpos = [a.x, a.y];
                 o._.fillsize = [a.width, a.height];
@@ -496,7 +497,10 @@ window.Raphael && window.Raphael.vml && function(R) {
             skew.matrix = Str(matrix);
             skew.offset = matrix.offset();
         }
-        oldt && (this._.transform = oldt);
+        if (oldt !== null) { // empty string value is true as well
+            this._.transform = oldt;
+            R._extractTransform(this, oldt);
+        }
         return this;
     };
     elproto.rotate = function (deg, cx, cy) {
@@ -571,6 +575,26 @@ window.Raphael && window.Raphael.vml && function(R) {
     elproto.show = function () {
         !this.removed && (this.node.style.display = E);
         return this;
+    };
+    // Needed to fix the vml setViewBox issues
+    elproto.auxGetBBox = R.el.getBBox;
+    elproto.getBBox = function(){
+      var b = this.auxGetBBox();
+      if (this.paper && this.paper._viewBoxShift)
+      {
+        var c = {};
+        var z = 1/this.paper._viewBoxShift.scale;
+        c.x = b.x - this.paper._viewBoxShift.dx;
+        c.x *= z;
+        c.y = b.y - this.paper._viewBoxShift.dy;
+        c.y *= z;
+        c.width  = b.width  * z;
+        c.height = b.height * z;
+        c.x2 = c.x + c.width;
+        c.y2 = c.y + c.height;
+        return c;
+      }
+      return b;
     };
     elproto._getBBox = function () {
         if (this.removed) {
@@ -861,9 +885,9 @@ window.Raphael && window.Raphael.vml && function(R) {
     };
     R._engine.setViewBox = function (x, y, w, h, fit) {
         R.eve("raphael.setViewBox", this, this._viewBox, [x, y, w, h, fit]);
-        var width = this.width,
-            height = this.height,
-            size = 1 / mmax(w / width, h / height),
+        var paperSize = this.getSize(),
+            width = paperSize.width,
+            height = paperSize.height,
             H, W;
         if (fit) {
             H = height / h;
@@ -889,7 +913,13 @@ window.Raphael && window.Raphael.vml && function(R) {
     var createNode;
     R._engine.initWin = function (win) {
             var doc = win.document;
-            doc.createStyleSheet().addRule(".rvml", "behavior:url(#default#VML)");
+            if (doc.styleSheets.length < 31) {
+                doc.createStyleSheet().addRule(".rvml", "behavior:url(#default#VML)");
+            } else {
+                // no more room, add to the existing one
+                // http://msdn.microsoft.com/en-us/library/ms531194%28VS.85%29.aspx
+                doc.styleSheets[0].addRule(".rvml", "behavior:url(#default#VML)");
+            }
             try {
                 !doc.namespaces.rvml && doc.namespaces.add("rvml", "urn:schemas-microsoft-com:vml");
                 createNode = function (tagName) {
