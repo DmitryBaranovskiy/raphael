@@ -395,7 +395,7 @@
     } else {
         // Browser globals (glob is window)
         // Raphael adds itself to window
-        factory(glob, glob.eve);
+        factory(glob, glob.eve || (typeof require == "function" && require('eve')) );
     }
 }(this, function (window, eve) {
     /*\
@@ -6926,7 +6926,7 @@
         var el = $("rect");
         svg.canvas && svg.canvas.appendChild(el);
         var res = new Element(el, svg);
-        res.attrs = {x: x, y: y, width: w, height: h, r: r || 0, rx: r || 0, ry: r || 0, fill: "none", stroke: "#000"};
+        res.attrs = {x: x, y: y, width: w, height: h, rx: r || 0, ry: r || 0, fill: "none", stroke: "#000"};
         res.type = "rect";
         $(el, res.attrs);
         return res;
@@ -8113,5 +8113,8 @@
     // Even with AMD, Raphael should be defined globally
     oldRaphael.was ? (g.win.Raphael = R) : (Raphael = R);
 
+    if(typeof exports == "object"){
+        module.exports = R;
+    }
     return R;
 }));
