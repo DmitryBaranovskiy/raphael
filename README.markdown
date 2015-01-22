@@ -61,6 +61,7 @@ Remember to add all the info that can be useful such as
 * [raphael.boilerplate](https://github.com/tomasAlabes/raphael-boilerplate)
 * [backbone.raphael](https://github.com/tomasAlabes/backbone.raphael)
 * [mapael](https://github.com/neveldo/jQuery-Mapael)
+* [snap](https://github.com/adobe-webplatform/Snap.svg)
 
 
 ## Books
