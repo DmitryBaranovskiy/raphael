@@ -5942,7 +5942,7 @@
             }
         }
         $(o, {
-            fill: "url(" + document.location + "#" + id + ")",
+            fill: "url(#" + id + ")",
             opacity: 1,
             "fill-opacity": 1
         });
