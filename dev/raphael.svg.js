@@ -34,7 +34,7 @@ window.Raphael && window.Raphael.svg && function(R) {
         return  "Your browser supports SVG.\nYou are running Rapha\xebl " + this.version;
     };
     var $ = function (el, attr) {
-        if (attr) {
+        if (el && attr) {
             if (typeof el == "string") {
                 el = $(el);
             }

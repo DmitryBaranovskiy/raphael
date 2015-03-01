@@ -5849,7 +5849,7 @@
         return  "Your browser supports SVG.\nYou are running Rapha\xebl " + this.version;
     };
     var $ = function (el, attr) {
-        if (attr) {
+        if (el && attr) {
             if (typeof el == "string") {
                 el = $(el);
             }
