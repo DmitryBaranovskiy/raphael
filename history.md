@@ -1,7 +1,12 @@
+2.1.4 • 2015-03-09
+------------------
+
+  * Wrong position in ie7 when rotate image #612
+  * Gradients become black in some cases
+
 2.1.3 • 2015-02-03
 ------------------
 
-  * Gradients become black in some cases
   * Fix wrong variable used in VML setViewBox().
   * Missing comma in file
   * set-viewbox-variable fix by @TheCloudlessSky

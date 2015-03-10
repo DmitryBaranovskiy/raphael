@@ -1,0 +1,32 @@
+{
+  "name": "raphael",
+  "version": "2.1.4",
+  "description": "JavaScript Vector Library",
+  "main": "raphael.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/DmitryBaranovskiy/raphael.git"
+  },
+  "author": {
+    "name": "Dmitry Baranovskiy"
+  },
+  "license": "MIT",
+  "readmeFilename": "README.markdown",
+  "gitHead": "55151daed59ca2612001e493c37f2fa8407d6be6",
+  "dependencies": {
+    "eve": "git://github.com/adobe-webplatform/eve.git#eef80ed"
+  },
+  "devDependencies": {
+    "uglify-js": "~2.2.3"
+  },
+  "readme": "# Raphaël: Cross-browser vector graphics the easy way. \n\nVisit the library website for more information: [http://raphaeljs.com](http://raphaeljs.com/)\n\n## Quickstart guide\n\n* `git clone https://github.com/DmitryBaranovskiy/raphael.git`\n* `git submodule init && git submodule update && npm install`\n(thank you [Wes Tood](https://github.com/wesleytodd))\n\n### Dependencies\n* [uglifyjs](https://github.com/mishoo/UglifyJS)\n* [eve](https://github.com/adobe-webplatform/eve)\n\n## Development\n\nAt the moment we have 4 milestones:\n\n### v2.1.1\nMilestone for bug fixes contributed by the community.\n### v2.2.0\nMilestone for enhancements from contributors pull requests.\n### v2.2.1\nMilestone with bug fixes added from issues created by community.\nThis fixes were not provided in the issues.\n### v2.3.0\nMilestone with enhancements suggested in issues but not provided by community at those issues.\n\nWe are organizing the current issues between this milestones, setting the grounds for people to contribute and start pushing code soon.\n\n## Want to contribute?\n\nAll changes in code must go to `raphael.core`, `raphael.svg` or `raphael.vml`. `raphael.js` is a generated file.\n\nAfter adding your changes, execute `./make`, the minified version will be created, commit and you are ready to make a pull request!\n\n## Found an issue?\n\nFirst search for similar issues to make sure you don't repeat an existing one.\n\nThen please create a fiddle ([boilerplate](http://jsfiddle.net/SSJJT/)) recreating the bug so we can find out what the problem is more easily (or be a hero and find it yourself and send a pull request!). You can also use the [raphael playground](http://raphaeljs.com/playground.html) to reproduce your issues.\n\nRemember to add all the info that can be useful such as\n\n* error details\n* steps to reproduce\n* browser and its version\n* any suggestion of what do you think the problem could be\n\n## Collaborators\n\n* [tomasAlabes](https://github.com/tomasAlabes)\n\n## Copyright and license\n\nCopyright © 2008-2012 Dmitry Baranovskiy (http://raphaeljs.com) \n\nCopyright © 2008-2012 Sencha Labs (http://sencha.com)  \n\nLicensed under the **MIT** (http://raphaeljs.com/license.html) license.",
+  "bugs": {
+    "url": "https://github.com/DmitryBaranovskiy/raphael/issues"
+  },
+  "homepage": "https://github.com/DmitryBaranovskiy/raphael",
+  "_id": "raphael@2.1.4",
+  "_from": "raphael@"
+}
