@@ -1,4 +1,12 @@
-2.1.2 • 2013-08-26
+2.1.3 • 2015-02-03
+------------------
+
+  * Gradients become black in some cases
+  * Fix wrong variable used in VML setViewBox().
+  * Missing comma in file
+  * set-viewbox-variable fix by @TheCloudlessSky
+
+2.1.2 • 2015-08-26
 ------------------
 
   * isPointInside fix from @drbombay14
