@@ -591,6 +591,7 @@
             "text-anchor": "middle",
             title: "Raphael",
             transform: "",
+            "clip-path": "",
             width: 0,
             x: 0,
             y: 0
@@ -6109,16 +6110,19 @@
         "--..": [8, 3, 1, 3, 1, 3]
     },
     addDashes = function (o, value, params) {
-        value = dasharray[Str(value).toLowerCase()];
-        if (value) {
+        var textvalue = dasharray[Str(value).toLowerCase()];
+        if (textvalue) {
             var width = o.attrs["stroke-width"] || "1",
                 butt = {round: width, square: width, butt: 0}[o.attrs["stroke-linecap"] || params["stroke-linecap"]] || 0,
                 dashes = [],
-                i = value.length;
+                i = textvalue.length;
             while (i--) {
-                dashes[i] = value[i] * width + ((i % 2) ? 1 : -1) * butt;
+                dashes[i] = textvalue[i] * width + ((i % 2) ? 1 : -1) * butt;
             }
             $(o.node, {"stroke-dasharray": dashes.join(",")});
+        }
+        else {
+            $(o.node, {"stroke-dasharray": value});
         }
     },
     setFillAndStroke = function (o, params) {
@@ -6177,6 +6181,27 @@
                     case "arrow-end":
                         addArrow(o, value, 1);
                         break;
+                    case "clip-path":
+                        if(value) {
+                            o.clip && o.clip.parentNode.parentNode.removeChild(o.clip.parentNode);
+                            var el = $("clipPath"),
+                                path = $("path");
+                            el.id = R.createUUID();
+                            $(path, {d: value});
+                            el.appendChild(path);
+                            o.paper.defs.appendChild(el);
+                            $(node, {"clip-path": "url(#" + el.id + ")"});
+                            o.clip = path;
+                        }
+                        else {
+                            var path = node.getAttribute("clip-path");
+                            if (path) {
+                                var clip = R._g.doc.getElementById(path.replace(/(^url\(#|\)$)/g, E));
+                                clip && clip.parentNode.removeChild(clip);
+                                $(node, {"clip-path": E});
+                                delete o.clip;
+                            }
+                        }
                     case "clip-rect":
                         var rect = Str(value).split(separator);
                         if (rect.length == 4) {
