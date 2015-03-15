@@ -5266,6 +5266,17 @@
         return this.items.pop();
     };
     /*\
+     * Set.shift
+     [ method ]
+     **
+     * Removes first element and returns it.
+     = (object) element
+    \*/
+    setproto.shift = function () {
+        this.length && delete this[this.length--];
+        return this.items.shift();
+    };
+    /*\
      * Set.forEach
      [ method ]
      **
