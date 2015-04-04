@@ -8110,6 +8110,7 @@
         var paperSize = this.getSize(),
             width = paperSize.width,
             height = paperSize.height,
+            size = 1 / mmax(w / width, h / height),
             H, W;
         if (fit) {
             H = height / h;
@@ -8125,7 +8126,7 @@
         this._viewBoxShift = {
             dx: -x,
             dy: -y,
-            scale: paperSize
+            scale: size
         };
         this.forEach(function (el) {
             el.transform("...");
