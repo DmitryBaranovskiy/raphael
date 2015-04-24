@@ -4,12 +4,13 @@ Visit the library website for more information: [http://raphaeljs.com](http://ra
 
 ## Quickstart guide
 
+You need to have NPM installed to build the library.
+
 * `git clone https://github.com/DmitryBaranovskiy/raphael.git`
-* `git submodule init && git submodule update && cd dev && npm install`
+* `npm install && ./node_modules/grunt-cli/bin/grunt` or just `npm install && grunt` if you have grunt already installed
 
 ## Dependencies
 * [eve](https://github.com/adobe-webplatform/eve)
-* [grunt](https://github.com/gruntjs/grunt)
 
 ## Loading
 Check [Raphael-boilerplate](https://github.com/tomasAlabes/raphael-boilerplate) to see examples of loading.

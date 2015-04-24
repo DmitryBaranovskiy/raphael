@@ -2,19 +2,19 @@
 
 module.exports = function(grunt) {
 
-    var pkg = grunt.file.readJSON("../package.json");
+    var pkg = grunt.file.readJSON("package.json");
 
     // Project configuration.
     grunt.initConfig({
         // Metadata.
         pkg: pkg,
-        banner: grunt.file.read("copy.js").replace(/@VERSION/, pkg.version),
+        banner: grunt.file.read("dev/copy.js").replace(/@VERSION/, pkg.version),
         // Task configuration.
         jshint: {
-            beforeconcat: ['raphael.core.js', 'raphael.svg.js', 'raphael.vml.js'],
+            beforeconcat: ['dev/raphael.core.js', 'dev/raphael.svg.js', 'dev/raphael.vml.js'],
             afterconcat: ['dist/raphael.js'],
             "options": {
-                jshintrc: '.jshintrc'
+                jshintrc: 'dev/.jshintrc'
             }
         },
         uglify: {
@@ -23,7 +23,7 @@ module.exports = function(grunt) {
             },
             dist: {
                 src: "<%= build.dist.dest %>",
-                dest: "../raphael-min.js"
+                dest: "raphael-min.js"
             }
         },
         build: {
@@ -31,12 +31,12 @@ module.exports = function(grunt) {
                 banner: "<%= banner %>"
             },
             dist: {
-                dest: "../raphael.js",
+                dest: "raphael.js",
                 src: [
-                    "../eve/eve.js",
-                    "raphael.core.js",
-                    "raphael.svg.js",
-                    "raphael.vml.js"
+                    "node_modules/eve/eve.js",
+                    "dev/raphael.core.js",
+                    "dev/raphael.svg.js",
+                    "dev/raphael.vml.js"
                 ]
             }
         }
