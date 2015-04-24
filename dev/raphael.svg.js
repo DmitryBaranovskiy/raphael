@@ -490,7 +490,6 @@ window.Raphael && window.Raphael.svg && function(R) {
                                         h = this.offsetHeight;
                                     $(el, {width: w, height: h});
                                     $(ig, {width: w, height: h});
-                                    o.paper.safari();
                                 });
                             })(el);
                             o.paper.defs.appendChild(el);
@@ -865,7 +864,7 @@ window.Raphael && window.Raphael.svg && function(R) {
      = (object) @Element
     \*/
     elproto.hide = function () {
-        !this.removed && this.paper.safari(this.node.style.display = "none");
+        if(!this.removed) this.node.style.display = "none";
         return this;
     };
     /*\
@@ -876,7 +875,7 @@ window.Raphael && window.Raphael.svg && function(R) {
      = (object) @Element
     \*/
     elproto.show = function () {
-        !this.removed && this.paper.safari(this.node.style.display = "");
+        if(!this.removed) this.node.style.display = "";
         return this;
     };
     /*\

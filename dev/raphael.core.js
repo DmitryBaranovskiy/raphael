@@ -2702,26 +2702,6 @@
         };
     })(Matrix.prototype);
 
-    // WebKit rendering bug workaround method
-    var version = navigator.userAgent.match(/Version\/(.*?)\s/) || navigator.userAgent.match(/Chrome\/(\d+)/);
-    if ((navigator.vendor == "Apple Computer, Inc.") && (version && version[1] < 4 || navigator.platform.slice(0, 2) == "iP") ||
-        (navigator.vendor == "Google Inc." && version && version[1] < 8)) {
-        /*\
-         * Paper.safari
-         [ method ]
-         **
-         * There is an inconvenient rendering bug in Safari (WebKit):
-         * sometimes the rendering should be forced.
-         * This method should help with dealing with this bug.
-        \*/
-        paperproto.safari = function () {
-            var rect = this.rect(-99, -99, this.width + 99, this.height + 99).attr({stroke: "none"});
-            setTimeout(function () {rect.remove();});
-        };
-    } else {
-        paperproto.safari = fun;
-    }
-
     var preventDefault = function () {
         this.returnValue = false;
     },
@@ -4248,7 +4228,6 @@
                     }
                 }
             }
-            R.svg && that && that.paper && that.paper.safari();
             animationElements.length && requestAnimFrame(animation);
         },
         upto255 = function (color) {
