@@ -1,5 +1,5 @@
 // ┌─────────────────────────────────────────────────────────────────────┐ \\
-// │ Raphaël - JavaScript Vector Library                                 │ \\
+// │ Raphaël @@VERSION - JavaScript Vector Library                                 │ \\
 // ├─────────────────────────────────────────────────────────────────────┤ \\
 // │ SVG Module                                                          │ \\
 // ├─────────────────────────────────────────────────────────────────────┤ \\
@@ -8,7 +8,21 @@
 // │ Licensed under the MIT (http://raphaeljs.com/license.html) license. │ \\
 // └─────────────────────────────────────────────────────────────────────┘ \\
 
-window.Raphael && window.Raphael.svg && function(R) {
+(function (glob, factory) {
+    if (typeof define === "function" && define.amd) {
+        define("raphael.svg", ["raphael.core"], function(raphael) {
+            factory(raphael);
+        });
+    } else if (typeof exports === "object") {
+        factory(require("raphael.core"));
+    } else {
+        factory(glob.Raphael);
+    }
+}(this, function(R) {
+    if (R && !R.svg) {
+        return;
+    }
+
     var has = "hasOwnProperty",
         Str = String,
         toFloat = parseFloat,
@@ -643,7 +657,7 @@ window.Raphael && window.Raphael.svg && function(R) {
          * Element.id
          [ property (number) ]
          **
-         * Unique id of the element. Especially useful when you want to listen to events of the element,
+         * Unique id of the element. Especially usesful when you want to listen to events of the element,
          * because all events are fired in format `<module>.<action>.<id>`. Also useful for @Paper.getById method.
         \*/
         this.id = R._oid++;
@@ -1400,4 +1414,4 @@ window.Raphael && window.Raphael.svg && function(R) {
             };
         })(method);
     }
-}(window.Raphael);
+}));
