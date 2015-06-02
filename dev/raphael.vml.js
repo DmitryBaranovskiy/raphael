@@ -1,5 +1,5 @@
 // ┌─────────────────────────────────────────────────────────────────────┐ \\
-// │ Raphaël @@VERSION - JavaScript Vector Library                                 │ \\
+// │ Raphaël @@VERSION - JavaScript Vector Library                       │ \\
 // ├─────────────────────────────────────────────────────────────────────┤ \\
 // │ VML Module                                                          │ \\
 // ├─────────────────────────────────────────────────────────────────────┤ \\
@@ -11,7 +11,7 @@
 (function (glob, factory) {
     if (typeof define === "function" && define.amd) {
         define("raphael.vml", ["raphael.core"], function(raphael) {
-            factory(raphael);
+            return factory(raphael);
         });
     } else if (typeof exports === "object") {
         factory(require("raphael"));

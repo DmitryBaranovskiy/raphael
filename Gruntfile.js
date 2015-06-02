@@ -16,7 +16,7 @@ module.exports = function(grunt) {
             },
             dist: {
                 src: "<%= concat.dist.dest %>",
-                dest: "dev/raphael-min.js"
+                dest: "raphael-min.js"
             }
         },
         replace: {
@@ -39,7 +39,7 @@ module.exports = function(grunt) {
             dist: {
                 dest: "<%= pkg.name %>.js",
                 src: [
-                    "../node_modules/eve/eve.js",
+                    "node_modules/eve/eve.js",
                     "dev/raphael.core.js",
                     "dev/raphael.svg.js",
                     "dev/raphael.vml.js",

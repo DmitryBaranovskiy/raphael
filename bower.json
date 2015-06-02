@@ -5,6 +5,9 @@
   "dependencies": {
     "eve": "git://github.com/adobe-webplatform/eve.git#eef80ed"
   },
+  "devDependencies": {
+    "requirejs": "~2.1.17"
+  },
   "ignore": [
     "eve",
     "**/.*",

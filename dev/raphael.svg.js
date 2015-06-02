@@ -1,5 +1,5 @@
 // ┌─────────────────────────────────────────────────────────────────────┐ \\
-// │ Raphaël @@VERSION - JavaScript Vector Library                                 │ \\
+// │ Raphaël @@VERSION - JavaScript Vector Library                       │ \\
 // ├─────────────────────────────────────────────────────────────────────┤ \\
 // │ SVG Module                                                          │ \\
 // ├─────────────────────────────────────────────────────────────────────┤ \\
@@ -11,7 +11,7 @@
 (function (glob, factory) {
     if (typeof define === "function" && define.amd) {
         define("raphael.svg", ["raphael.core"], function(raphael) {
-            factory(raphael);
+            return factory(raphael);
         });
     } else if (typeof exports === "object") {
         factory(require("raphael.core"));
@@ -657,7 +657,7 @@
          * Element.id
          [ property (number) ]
          **
-         * Unique id of the element. Especially usesful when you want to listen to events of the element,
+         * Unique id of the element. Especially useful when you want to listen to events of the element,
          * because all events are fired in format `<module>.<action>.<id>`. Also useful for @Paper.getById method.
         \*/
         this.id = R._oid++;

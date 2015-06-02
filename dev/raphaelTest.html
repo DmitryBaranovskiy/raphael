@@ -6,8 +6,7 @@
 
     <!-- Global use -->
 
-    <!-- Remember to run to pull the eve submodule -->
-    <!-- To work with concatenated version -->
+    <!-- To work with full version -->
     <!--<script type="text/javascript" src="../raphael.js"></script>-->
 
     <!-- To work with minified version -->
@@ -15,24 +14,24 @@
 
     <!-- To work with dev versions -->
     <!-- Comment this 4 script tags if you are testing with AMD -->
-    <script type="text/javascript" src="../eve/eve.js"></script>
-    <script type="text/javascript" src="raphael.core.js"></script>
-    <script type="text/javascript" src="raphael.svg.js"></script>
-    <script type="text/javascript" src="raphael.vml.js"></script>
-    <script type="text/javascript" src="raphael.amd.js"></script>
+    <!--<script type="text/javascript" src="../node_modules/eve/eve.js"></script>-->
+    <!--<script type="text/javascript" src="raphael.core.js"></script>-->
+    <!--<script type="text/javascript" src="raphael.svg.js"></script>-->
+    <!--<script type="text/javascript" src="raphael.vml.js"></script>-->
+    <!--<script type="text/javascript" src="raphael.amd.js"></script>-->
 
     <!-- Comment this script tag if you are testing with AMD -->
-    <script type="text/javascript">
+    <!--<script type="text/javascript">
         // Initialize container when document is loaded
         window.onload = function () {
             paper = Raphael(0, 0, 640, 720, "container");
-            //paper.circle(100, 100, 100); //example
+            paper.circle(100, 100, 100); //example
         };
         //Work here, in a separate script file or via command line
-    </script>
+    </script>-->
 
     <!-- AMD use -->
-    <!--<script data-main="amdDev" src="require.js"></script>-->
+    <script data-main="amdDev" src="require.js"></script>
     <!-- Use amdDev.js to work with AMD and Raphael -->
 
 </head>

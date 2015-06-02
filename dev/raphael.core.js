@@ -1,7 +1,7 @@
 // ┌────────────────────────────────────────────────────────────────────┐ \\
-// │ Raphaël @@VERSION - JavaScript Vector Library                          │ \\
+// │ Raphaël @@VERSION - JavaScript Vector Library                      │ \\
 // ├────────────────────────────────────────────────────────────────────┤ \\
-// │ Core Module                                                         │ \\
+// │ Core Module                                                        │ \\
 // ├────────────────────────────────────────────────────────────────────┤ \\
 // │ Licensed under the MIT (http://raphaeljs.com/license.html) license.│ \\
 // └────────────────────────────────────────────────────────────────────┘ \\
@@ -5354,7 +5354,7 @@
      [ method ]
      **
      * If you want to leave no trace of Raphaël (Well, Raphaël creates only one global variable `Raphael`, but anyway.) You can use `ninja` method.
-     * Beware, that in this case plugins could stop working, because they are depending on global variable existance.
+     * Beware, that in this case plugins could stop working, because they are depending on global variable existence.
      **
      = (object) Raphael object
      > Usage
