@@ -1,5 +1,5 @@
 // ┌─────────────────────────────────────────────────────────────────────┐ \\
-// │ "Raphaël 2.1.2" - JavaScript Vector Library                         │ \\
+// │ "Raphaël 2.1.5" - JavaScript Vector Library                         │ \\
 // ├─────────────────────────────────────────────────────────────────────┤ \\
 // │ Copyright (c) 2008-2011 Dmitry Baranovskiy (http://raphaeljs.com)   │ \\
 // │ Copyright (c) 2008-2011 Sencha Labs (http://sencha.com)             │ \\
@@ -86,7 +86,7 @@
             }
         }
     }
-    R.version = "2.1.2";
+    R.version = "2.1.5";
     R.eve = eve;
     var loaded,
         separator = /[, ]+/,
