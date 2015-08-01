@@ -1,7 +1,8 @@
 2.1.5 • WIP
 ------------------
 
-  * fixed rounding issue in RGB formatter
+  * Set stop-opacity in gradient defs
+  * Fixed rounding issue in RGB formatter
 
 2.1.4 • 2015-03-09
 ------------------
