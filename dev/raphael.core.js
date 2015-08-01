@@ -1002,7 +1002,8 @@
      = (string) hex representation of the colour.
     \*/
     R.rgb = cacher(function (r, g, b) {
-        return "#" + (16777216 | b | (g << 8) | (r << 16)).toString(16).slice(1);
+        function round(x) { return (x + 0.5) | 0; }
+        return "#" + (16777216 | round(b) | (round(g) << 8) | (round(r) << 16)).toString(16).slice(1);
     });
     /*\
      * Raphael.getColor
