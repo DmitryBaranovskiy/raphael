@@ -946,8 +946,10 @@
             i.style.display = "none";
             g.doc.body.appendChild(i);
             toHex = cacher(function (color) {
+                var computedStyle;
                 i.style.color = color;
-                return g.doc.defaultView.getComputedStyle(i, E).getPropertyValue("color");
+                computedStyle = g.doc.defaultView.getComputedStyle(i, E);
+                return computedStyle ? computedStyle.getPropertyValue("color") : color;
             });
         }
         return toHex(color);
@@ -6367,7 +6369,9 @@
         }
         var a = el.attrs,
             node = el.node,
-            fontSize = node.firstChild ? toInt(R._g.doc.defaultView.getComputedStyle(node.firstChild, E).getPropertyValue("font-size"), 10) : 10;
+            computedStyle = node.firstChild ? R._g.doc.defaultView.getComputedStyle(node.firstChild, E) : undefined,
+            fontSize = computedStyle ? toInt(computedStyle.getPropertyValue("font-size"), 10) : 10;
+        
 
         if (params[has]("text")) {
             a.text = params.text;
