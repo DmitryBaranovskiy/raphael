@@ -2,7 +2,8 @@
 
 require.config({
     paths: {
-        raphael: '../raphael'
+        raphael: '../raphael'/*,
+        eve: '../bower_components/eve/eve'*/
     }
 });
 

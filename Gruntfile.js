@@ -39,7 +39,7 @@ module.exports = function(grunt) {
             dist: {
                 dest: "<%= pkg.name %>.js",
                 src: [
-                    "node_modules/eve/eve.js",
+                    "dev/eve.js",
                     "dev/raphael.core.js",
                     "dev/raphael.svg.js",
                     "dev/raphael.vml.js",
