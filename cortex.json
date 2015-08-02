@@ -1,8 +1,8 @@
 {
   "name": "raphael",
-  "version": "2.1.2",
+  "version": "2.1.4",
   "description": "JavaScript Vector Library",
-  "main": "./dev",
+  "main": "raphael",
   "repository": "git://github.com/DmitryBaranovskiy/raphael.git",
   "keywords": [
     "vector",

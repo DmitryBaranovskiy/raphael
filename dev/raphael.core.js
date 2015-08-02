@@ -1,24 +1,22 @@
-// ┌─────────────────────────────────────────────────────────────────────┐ \\
-// │ "Raphaël 2.1.2" - JavaScript Vector Library                         │ \\
-// ├─────────────────────────────────────────────────────────────────────┤ \\
-// │ Copyright (c) 2008-2011 Dmitry Baranovskiy (http://raphaeljs.com)   │ \\
-// │ Copyright (c) 2008-2011 Sencha Labs (http://sencha.com)             │ \\
-// │ Licensed under the MIT (http://raphaeljs.com/license.html) license. │ \\
-// └─────────────────────────────────────────────────────────────────────┘ \\
+// ┌────────────────────────────────────────────────────────────────────┐ \\
+// │ Raphaël @@VERSION - JavaScript Vector Library                      │ \\
+// ├────────────────────────────────────────────────────────────────────┤ \\
+// │ Core Module                                                        │ \\
+// ├────────────────────────────────────────────────────────────────────┤ \\
+// │ Licensed under the MIT (http://raphaeljs.com/license.html) license.│ \\
+// └────────────────────────────────────────────────────────────────────┘ \\
 
 (function (glob, factory) {
-    // AMD support
     if (typeof define === "function" && define.amd) {
-        // Define as an anonymous module
-        define(["eve"], function( eve ) {
-            return factory(glob, eve);
+        define("raphael.core", ["eve"], function(eve) {
+            return factory(eve);
         });
+    } else if (typeof exports === "object") {
+        module.exports = factory(require("eve"));
     } else {
-        // Browser globals (glob is window)
-        // Raphael adds itself to window
-        factory(glob, glob.eve || (typeof require == "function" && require('eve')) );
+        glob.Raphael = factory(glob.eve);
     }
-}(this, function (window, eve) {
+}(this, function (eve) {
     /*\
      * Raphael
      [ method ]
@@ -86,7 +84,7 @@
             }
         }
     }
-    R.version = "2.1.2";
+    R.version = "@@VERSION";
     R.eve = eve;
     var loaded,
         separator = /[, ]+/,
@@ -5358,7 +5356,7 @@
      [ method ]
      **
      * If you want to leave no trace of Raphaël (Well, Raphaël creates only one global variable `Raphael`, but anyway.) You can use `ninja` method.
-     * Beware, that in this case plugins could stop working, because they are depending on global variable existance.
+     * Beware, that in this case plugins could stop working, because they are depending on global variable existence.
      **
      = (object) Raphael object
      > Usage
@@ -5412,13 +5410,5 @@
         isLoaded();
     })(document, "DOMContentLoaded");
 
-    // EXPOSE
-    // SVG and VML are appended just before the EXPOSE line
-    // Even with AMD, Raphael should be defined globally
-    oldRaphael.was ? (g.win.Raphael = R) : (Raphael = R);
-
-    if(typeof exports == "object"){
-        module.exports = R;
-    }
     return R;
 }));

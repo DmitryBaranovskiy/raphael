@@ -1,11 +1,3 @@
-// ┌────────────────────────────────────────────────────────────────────┐ \\
-// │ Raphaël 2.1.4 - JavaScript Vector Library                          │ \\
-// ├────────────────────────────────────────────────────────────────────┤ \\
-// │ Copyright © 2008-2012 Dmitry Baranovskiy (http://raphaeljs.com)    │ \\
-// │ Copyright © 2008-2012 Sencha Labs (http://sencha.com)              │ \\
-// ├────────────────────────────────────────────────────────────────────┤ \\
-// │ Licensed under the MIT (http://raphaeljs.com/license.html) license.│ \\
-// └────────────────────────────────────────────────────────────────────┘ \\
 // Copyright (c) 2013 Adobe Systems Incorporated. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,8 +16,17 @@
 // ├────────────────────────────────────────────────────────────┤ \\
 // │ Author Dmitry Baranovskiy (http://dmitry.baranovskiy.com/) │ \\
 // └────────────────────────────────────────────────────────────┘ \\
-
-(function (glob) {
+(function (glob, factory) {
+    if (typeof define === "function" && define.amd) {
+        define("eve", function() {
+            return factory();
+        });
+    } else if (typeof exports === "object") {
+        module.exports = factory();
+    } else {
+        glob.eve = factory();
+    }
+}(this, function(){
     var version = "0.4.2",
         has = "hasOwnProperty",
         separator = /[\.\/]/,
@@ -50,9 +51,9 @@
      - varargs (...) the rest of arguments will be sent to event handlers
 
      = (object) array of returned values from the listeners
-    \*/
+     \*/
         eve = function (name, scope) {
-			name = String(name);
+            name = String(name);
             var e = events,
                 oldstop = stop,
                 args = Array.prototype.slice.call(arguments, 2),
@@ -112,8 +113,8 @@
             current_event = ce;
             return out.length ? out : null;
         };
-		// Undocumented. Debug only.
-		eve._events = events;
+    // Undocumented. Debug only.
+    eve._events = events;
     /*\
      * eve.listeners
      [ method ]
@@ -125,7 +126,7 @@
      - name (string) name of the event, dot (`.`) or slash (`/`) separated
 
      = (array) array of event handlers
-    \*/
+     \*/
     eve.listeners = function (name) {
         var names = name.split(separator),
             e = events,
@@ -157,7 +158,7 @@
         }
         return out;
     };
-    
+
     /*\
      * eve.on
      [ method ]
@@ -172,21 +173,21 @@
      - name (string) name of the event, dot (`.`) or slash (`/`) separated, with optional wildcards
      - f (function) event handler function
      **
-     = (function) returned function accepts a single numeric parameter that represents z-index of the handler. It is an optional feature and only used when you need to ensure that some subset of handlers will be invoked in a given order, despite of the order of assignment. 
+     = (function) returned function accepts a single numeric parameter that represents z-index of the handler. It is an optional feature and only used when you need to ensure that some subset of handlers will be invoked in a given order, despite of the order of assignment.
      > Example:
      | eve.on("mouse", eatIt)(2);
      | eve.on("mouse", scream);
      | eve.on("mouse", catchIt)(1);
      * This will ensure that `catchIt()` function will be called before `eatIt()`.
-	 *
+     *
      * If you want to put your handler before non-indexed handlers, specify a negative value.
      * Note: I assume most of the time you don’t need to worry about z-index, but it’s nice to have this feature “just in case”.
-    \*/
+     \*/
     eve.on = function (name, f) {
-		name = String(name);
-		if (typeof f != "function") {
-			return function () {};
-		}
+        name = String(name);
+        if (typeof f != "function") {
+            return function () {};
+        }
         var names = name.split(separator),
             e = events;
         for (var i = 0, ii = names.length; i < ii; i++) {
@@ -209,29 +210,29 @@
      [ method ]
      **
      * Returns function that will fire given event with optional arguments.
-	 * Arguments that will be passed to the result function will be also
-	 * concated to the list of final arguments.
- 	 | el.onclick = eve.f("click", 1, 2);
- 	 | eve.on("click", function (a, b, c) {
- 	 |     console.log(a, b, c); // 1, 2, [event object]
- 	 | });
+     * Arguments that will be passed to the result function will be also
+     * concated to the list of final arguments.
+     | el.onclick = eve.f("click", 1, 2);
+     | eve.on("click", function (a, b, c) {
+     |     console.log(a, b, c); // 1, 2, [event object]
+     | });
      > Arguments
-	 - event (string) event name
-	 - varargs (…) and any other arguments
-	 = (function) possible event handler function
-    \*/
-	eve.f = function (event) {
-		var attrs = [].slice.call(arguments, 1);
-		return function () {
-			eve.apply(null, [event, null].concat(attrs).concat([].slice.call(arguments, 0)));
-		};
-	};
+     - event (string) event name
+     - varargs (…) and any other arguments
+     = (function) possible event handler function
+     \*/
+    eve.f = function (event) {
+        var attrs = [].slice.call(arguments, 1);
+        return function () {
+            eve.apply(null, [event, null].concat(attrs).concat([].slice.call(arguments, 0)));
+        };
+    };
     /*\
      * eve.stop
      [ method ]
      **
      * Is used inside an event handler to stop the event, preventing any subsequent listeners from firing.
-    \*/
+     \*/
     eve.stop = function () {
         stop = 1;
     };
@@ -248,7 +249,7 @@
      = (string) name of the event, if `subname` is not specified
      * or
      = (boolean) `true`, if current event’s name contains `subname`
-    \*/
+     \*/
     eve.nt = function (subname) {
         if (subname) {
             return new RegExp("(?:\\.|\\/|^)" + subname + "(?:\\.|\\/|$)").test(current_event);
@@ -263,7 +264,7 @@
      **
      **
      = (array) names of the event
-    \*/
+     \*/
     eve.nts = function () {
         return current_event.split(separator);
     };
@@ -272,24 +273,24 @@
      [ method ]
      **
      * Removes given function from the list of event listeners assigned to given name.
-	 * If no arguments specified all the events will be cleared.
+     * If no arguments specified all the events will be cleared.
      **
      > Arguments
      **
      - name (string) name of the event, dot (`.`) or slash (`/`) separated, with optional wildcards
      - f (function) event handler function
-    \*/
+     \*/
     /*\
      * eve.unbind
      [ method ]
      **
      * See @eve.off
-    \*/
+     \*/
     eve.off = eve.unbind = function (name, f) {
-		if (!name) {
-		    eve._events = events = {n: {}};
-			return;
-		}
+        if (!name) {
+            eve._events = events = {n: {}};
+            return;
+        }
         var names = name.split(separator),
             e,
             key,
@@ -357,7 +358,7 @@
      - f (function) event handler function
      **
      = (function) same return function as @eve.on
-    \*/
+     \*/
     eve.once = function (name, f) {
         var f2 = function () {
             eve.unbind(name, f2);
@@ -370,34 +371,34 @@
      [ property (string) ]
      **
      * Current version of the library.
-    \*/
+     \*/
     eve.version = version;
     eve.toString = function () {
         return "You are running Eve " + version;
     };
-    (typeof module != "undefined" && module.exports) ? (module.exports = eve) : (typeof define != "undefined" ? (define("eve", [], function() { return eve; })) : (glob.eve = eve));
-})(this);
-// ┌─────────────────────────────────────────────────────────────────────┐ \\
-// │ "Raphaël 2.1.2" - JavaScript Vector Library                         │ \\
-// ├─────────────────────────────────────────────────────────────────────┤ \\
-// │ Copyright (c) 2008-2011 Dmitry Baranovskiy (http://raphaeljs.com)   │ \\
-// │ Copyright (c) 2008-2011 Sencha Labs (http://sencha.com)             │ \\
-// │ Licensed under the MIT (http://raphaeljs.com/license.html) license. │ \\
-// └─────────────────────────────────────────────────────────────────────┘ \\
+
+    return eve;
+}));
+
+// ┌────────────────────────────────────────────────────────────────────┐ \\
+// │ Raphaël 2.1.4 - JavaScript Vector Library                      │ \\
+// ├────────────────────────────────────────────────────────────────────┤ \\
+// │ Core Module                                                        │ \\
+// ├────────────────────────────────────────────────────────────────────┤ \\
+// │ Licensed under the MIT (http://raphaeljs.com/license.html) license.│ \\
+// └────────────────────────────────────────────────────────────────────┘ \\
 
 (function (glob, factory) {
-    // AMD support
     if (typeof define === "function" && define.amd) {
-        // Define as an anonymous module
-        define(["eve"], function( eve ) {
-            return factory(glob, eve);
+        define("raphael.core", ["eve"], function(eve) {
+            return factory(eve);
         });
+    } else if (typeof exports === "object") {
+        module.exports = factory(require("eve"));
     } else {
-        // Browser globals (glob is window)
-        // Raphael adds itself to window
-        factory(glob, glob.eve || (typeof require == "function" && require('eve')) );
+        glob.Raphael = factory(glob.eve);
     }
-}(this, function (window, eve) {
+}(this, function (eve) {
     /*\
      * Raphael
      [ method ]
@@ -465,7 +466,7 @@
             }
         }
     }
-    R.version = "2.1.2";
+    R.version = "2.1.4";
     R.eve = eve;
     var loaded,
         separator = /[, ]+/,
@@ -5737,7 +5738,7 @@
      [ method ]
      **
      * If you want to leave no trace of Raphaël (Well, Raphaël creates only one global variable `Raphael`, but anyway.) You can use `ninja` method.
-     * Beware, that in this case plugins could stop working, because they are depending on global variable existance.
+     * Beware, that in this case plugins could stop working, because they are depending on global variable existence.
      **
      = (object) Raphael object
      > Usage
@@ -5791,8 +5792,11 @@
         isLoaded();
     })(document, "DOMContentLoaded");
 
+    return R;
+}));
+
 // ┌─────────────────────────────────────────────────────────────────────┐ \\
-// │ Raphaël - JavaScript Vector Library                                 │ \\
+// │ Raphaël 2.1.4 - JavaScript Vector Library                       │ \\
 // ├─────────────────────────────────────────────────────────────────────┤ \\
 // │ SVG Module                                                          │ \\
 // ├─────────────────────────────────────────────────────────────────────┤ \\
@@ -5801,10 +5805,21 @@
 // │ Licensed under the MIT (http://raphaeljs.com/license.html) license. │ \\
 // └─────────────────────────────────────────────────────────────────────┘ \\
 
-(function(){
-    if (!R.svg) {
+(function (glob, factory) {
+    if (typeof define === "function" && define.amd) {
+        define("raphael.svg", ["raphael.core"], function(raphael) {
+            return factory(raphael);
+        });
+    } else if (typeof exports === "object") {
+        factory(require("raphael.core"));
+    } else {
+        factory(glob.Raphael);
+    }
+}(this, function(R) {
+    if (R && !R.svg) {
         return;
     }
+
     var has = "hasOwnProperty",
         Str = String,
         toFloat = parseFloat,
@@ -7197,10 +7212,10 @@
             };
         })(method);
     }
-})();
+}));
 
 // ┌─────────────────────────────────────────────────────────────────────┐ \\
-// │ Raphaël - JavaScript Vector Library                                 │ \\
+// │ Raphaël 2.1.4 - JavaScript Vector Library                       │ \\
 // ├─────────────────────────────────────────────────────────────────────┤ \\
 // │ VML Module                                                          │ \\
 // ├─────────────────────────────────────────────────────────────────────┤ \\
@@ -7209,10 +7224,21 @@
 // │ Licensed under the MIT (http://raphaeljs.com/license.html) license. │ \\
 // └─────────────────────────────────────────────────────────────────────┘ \\
 
-(function(){
-    if (!R.vml) {
+(function (glob, factory) {
+    if (typeof define === "function" && define.amd) {
+        define("raphael.vml", ["raphael.core"], function(raphael) {
+            return factory(raphael);
+        });
+    } else if (typeof exports === "object") {
+        factory(require("raphael"));
+    } else {
+        factory(glob.Raphael);
+    }
+}(this, function(R) {
+    if (R && !R.vml) {
         return;
     }
+
     var has = "hasOwnProperty",
         Str = String,
         toFloat = parseFloat,
@@ -7428,7 +7454,7 @@
         if ("arrow-end" in params) {
             addArrow(res, params["arrow-end"], 1);
         }
-        if (params.opacity != null || 
+        if (params.opacity != null ||
             params["stroke-width"] != null ||
             params.fill != null ||
             params.src != null ||
@@ -7507,7 +7533,7 @@
             params["stroke-width"] && (stroke.weight = width);
             width && width < 1 && (opacity *= width) && (stroke.weight = 1);
             stroke.opacity = opacity;
-        
+
             params["stroke-linejoin"] && (stroke.joinstyle = params["stroke-linejoin"] || "miter");
             stroke.miterlimit = params["stroke-miterlimit"] || 8;
             params["stroke-linecap"] && (stroke.endcap = params["stroke-linecap"] == "butt" ? "flat" : params["stroke-linecap"] == "square" ? "square" : "round");
@@ -7554,7 +7580,7 @@
                 res._.dirty = 1;
                 break;
             }
-        
+
             // text-anchor emulation
             switch (a["text-anchor"]) {
                 case "start":
@@ -7767,7 +7793,7 @@
         }
         cx = cx == null ? bbox.x + bbox.width / 2 : cx;
         cy = cy == null ? bbox.y + bbox.height / 2 : cy;
-    
+
         this.transform(this._.transform.concat([["s", sx, sy, cx, cy]]));
         this._.dirtyT = 1;
         return this;
@@ -8207,15 +8233,32 @@
             };
         })(method);
     }
-})();
+}));
 
-    // EXPOSE
-    // SVG and VML are appended just before the EXPOSE line
-    // Even with AMD, Raphael should be defined globally
-    oldRaphael.was ? (g.win.Raphael = R) : (Raphael = R);
+// ┌────────────────────────────────────────────────────────────────────┐ \\
+// │ Raphaël 2.1.4 - JavaScript Vector Library                      │ \\
+// ├────────────────────────────────────────────────────────────────────┤ \\
+// │ Copyright © 2008-2012 Dmitry Baranovskiy (http://raphaeljs.com)    │ \\
+// │ Copyright © 2008-2012 Sencha Labs (http://sencha.com)              │ \\
+// ├────────────────────────────────────────────────────────────────────┤ \\
+// │ Licensed under the MIT (http://raphaeljs.com/license.html) license.│ \\
+// └────────────────────────────────────────────────────────────────────┘ \\
 
-    if(typeof exports == "object"){
-        module.exports = R;
+(function (glob, factory) {
+    if (typeof define === "function" && define.amd) {
+        define("raphael", ["raphael.core", "raphael.svg", "raphael.vml"], function(Raphael) {
+            return factory(Raphael);
+        });
+    } else if (typeof exports === "object") {
+        var raphael = require("raphael.core");
+
+        require("raphael.svg");
+        require("raphael.vml");
+
+        module.exports = factory(raphael);
+    } else {
+        //glob.Raphael = factory(glob.Raphael);
     }
-    return R;
+}(this, function (Raphael) {
+    return Raphael.ninja();
 }));
