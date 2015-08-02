@@ -1,6 +1,7 @@
 2.2.0 • WIP
 ------------------
 
+  * Using origin and pathname with gradient urls, urls with # weren't being resolved correctly
   * Defined nodeps version, and changed how raphael is loaded
   * Set stop-opacity in gradient defs
   * Fixed rounding issue in RGB formatter
