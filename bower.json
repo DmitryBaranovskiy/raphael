@@ -8,7 +8,6 @@
     "requirejs": "~2.1.17"
   },
   "ignore": [
-    "eve",
     "**/.*",
     "*.html",
     "*.json",
@@ -16,9 +15,6 @@
     "*.md",
     "copy.js",
     "Gruntfile.js",
-    "raphael.core.js",
-    "raphael.svg.js",
-    "raphael.vml.js",
     "reference.js"
   ]
 }

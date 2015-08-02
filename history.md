@@ -1,6 +1,7 @@
-2.1.5 • WIP
+2.2.0 • WIP
 ------------------
 
+  * Defined nodeps version, and changed how raphael is loaded
   * Set stop-opacity in gradient defs
   * Fixed rounding issue in RGB formatter
 

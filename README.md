@@ -12,7 +12,10 @@ You need to have NPM installed to build the library.
 ## Dependencies
 * [eve](https://github.com/adobe-webplatform/eve)
 
-## Loading
+You have the `raphael/raphael-min.js` files that has `eve` bundled inside, and `raphael-nodeps/raphael-nodeps-min.js` 
+where `eve` must be loaded by you first (you can try with the one in the `dev/` folder).  
+
+## Where to start
 Check [Raphael-boilerplate](https://github.com/tomasAlabes/raphael-boilerplate) to see examples of loading.
 
 Raphael can be loaded in a script tag or with AMD:
