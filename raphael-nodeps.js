@@ -3803,7 +3803,7 @@
         var s = {
             width: (glow.width || 10) + (+this.attr("stroke-width") || 1),
             fill: glow.fill || false,
-            opacity: glow.opacity || .5,
+            opacity: glow.opacity == null ? .5 : glow.opacity,
             offsetx: glow.offsetx || 0,
             offsety: glow.offsety || 0,
             color: glow.color || "#000"
