@@ -5557,7 +5557,7 @@
             }
         }
         $(o, {
-            fill: "url('" + document.location + "#" + id + "')",
+            fill: "url('" + document.location.origin + document.location.pathname + "#" + id + "')",
             opacity: 1,
             "fill-opacity": 1
         });
