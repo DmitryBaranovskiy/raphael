@@ -7727,7 +7727,7 @@
             skew.matrix = Str(matrix);
             skew.offset = matrix.offset();
         }
-        if (oldt !== null) { // empty string value is true as well
+        if (oldt != null) { // only {null} and {undefined} is false
             this._.transform = oldt;
             R._extractTransform(this, oldt);
         }
