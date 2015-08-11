@@ -9,18 +9,18 @@
 
 (function (glob, factory) {
     if (typeof define === "function" && define.amd) {
-        define("raphael", ["raphael.core", "raphael.svg", "raphael.vml"], function(Raphael) {
+        define("raphael", ["dev/raphael.core.js", "raphael.svg", "raphael.vml"], function(Raphael) {
             return factory(Raphael);
         });
     } else if (typeof exports === "object") {
-        var raphael = require("raphael.core");
+        var raphael = require("./dev/raphael.core");
 
-        require("raphael.svg");
-        require("raphael.vml");
+        require("./dev/raphael.svg");
+        require("./dev/raphael.vml");
 
         module.exports = factory(raphael);
     } else {
-        //glob.Raphael = factory(glob.Raphael);
+        glob.Raphael = factory(glob.Raphael);
     }
 }(this, function (Raphael) {
     return Raphael.ninja();

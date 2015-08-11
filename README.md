@@ -13,7 +13,8 @@ You need to have NPM installed to build the library.
 * [eve](https://github.com/adobe-webplatform/eve)
 
 You have the `raphael/raphael-min.js` files that has `eve` bundled inside, and `raphael-nodeps/raphael-nodeps-min.js` 
-where `eve` must be loaded by you first (you can try with the one in the `dev/` folder).  
+where `eve` must be loaded by you first (you can try with the one in the `dev/` folder).
+For AMD loading like Browserify, you can use raphael.amd.js.
 
 ## Where to start
 Check [Raphael-boilerplate](https://github.com/tomasAlabes/raphael-boilerplate) to see examples of loading.
