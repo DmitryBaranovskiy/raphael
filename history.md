@@ -1,6 +1,7 @@
 2.2.0 • WIP
 ------------------
 
+  * raphael.amd.js as main in package.json.
   * raphael.amd.js version to work with Browserify.
   * Can't set glow with opacity 0
   * Using origin and pathname with gradient urls, urls with # weren't being resolved correctly
