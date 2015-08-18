@@ -2,7 +2,7 @@
   "name": "raphael",
   "version": "2.1.4",
   "description": "JavaScript Vector Library",
-  "main": "raphael.js",
+  "main": "raphael.amd.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
