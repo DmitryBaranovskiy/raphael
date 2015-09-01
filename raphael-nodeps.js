@@ -6284,6 +6284,9 @@
             this.attr({"stroke-width": sw});
         }
 
+        //Reduce transform string
+        _.transform = this.matrix.toTransformString();
+
         return this;
     };
     /*\

@@ -1,6 +1,7 @@
 2.2.0 • WIP
 ------------------
 
+  * Reduce transform string to avoid long parsing times after several transformations
   * raphael.amd.js as main in package.json.
   * raphael.amd.js version to work with Browserify.
   * Can't set glow with opacity 0
