@@ -142,7 +142,7 @@
             }
         }
         $(o, {
-            fill: "url('" + document.location.origin + document.location.pathname + "#" + id + "')",
+            fill: fillurl(id),
             opacity: 1,
             "fill-opacity": 1
         });
@@ -150,6 +150,16 @@
         s.opacity = 1;
         s.fillOpacity = 1;
         return 1;
+    },
+    isIE9 = function(){
+        return document.documentMode && (document.documentMode === 9);
+    },
+    fillurl = function(id) {
+        if(isIE9()){
+            return "url('#" + id + "')";
+        }
+        var location = document.location;
+        return "url('" + location.origin + location.pathname + "#" + id + "')";
     },
     updatePosition = function (o) {
         var bbox = o.getBBox(1);
