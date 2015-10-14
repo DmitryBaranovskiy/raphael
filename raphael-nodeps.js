@@ -5566,11 +5566,12 @@
         s.fillOpacity = 1;
         return 1;
     },
-    isIE9 = function(){
-        return document.documentMode && (document.documentMode === 9);
+    isIE9or10 = function(){
+        var mode = document.documentMode;
+        return mode && (mode === 9 || mode === 10);
     },
     fillurl = function(id) {
-        if(isIE9()){
+        if(isIE9or10()){
             return "url('#" + id + "')";
         }
         var location = document.location;
