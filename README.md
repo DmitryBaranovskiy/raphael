@@ -12,7 +12,7 @@ You need to have NPM installed to build the library.
 ## Dependencies
 * [eve](https://github.com/adobe-webplatform/eve)
 
-You have the `raphael/raphael-min.js` files that has `eve` bundled inside, and `raphael-nodeps/raphael-nodeps-min.js` 
+You have the `raphael/raphael-min.js` files that has `eve` bundled inside, and `raphael-nodeps/raphael-nodeps-min.js`
 where `eve` must be loaded by you first (you can try with the one in the `dev/` folder).
 For AMD loading like Browserify, you can use raphael.amd.js.
 
@@ -32,8 +32,9 @@ define([ "path/to/raphael" ], function( Raphael ) {
 Versions will be released as we gather and test new PRs. Each version should have a correspondent branch.
 As there are not automated tests, we will use the feedback from the users for the fixes.
 
+
 You can use the `raphaelTest.html` to try things, you need to start a server in the root dir to start testing things there.
-Something like running `python -m SimpleHTTPServer` in the `raphael` directory and hitting `http://localhost:8000/dev/raphaelTest.html` with the browser.
+Something like running `python -m SimpleHTTPServer` in the `raphael` directory and hitting `http://localhost:8000/dev/raphaelTest.html` with the browser. You should run `npm install -g bower && bower install -D ` before this can work.
 
 
 ## Collaborators
