@@ -1536,7 +1536,17 @@
         }
         data.toString = R._path2string;
         return data;
-    });
+    }, this, function(elem) {
+        if (!elem) return elem;
+        var newData = [];
+        for (var i = 0; i < elem.length; i++) {
+            var newLevel = [];
+            for (var j = 0; j < elem[i].length; j++) {
+                newLevel.push(elem[i][j]);
+            }
+            newData.push(newLevel);
+        }
+      return newData; } );
     // PATHS
     var paths = function (ps) {
         var p = paths.ps = paths.ps || {};
