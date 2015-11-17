@@ -7605,7 +7605,7 @@
         p.path = [];
         p.Path = E;
         setFillAndStroke(p, attr);
-        vml.canvas.appendChild(el);
+        vml.canvas && vml.canvas.appendChild(el);
         var skew = createNode("skew");
         skew.on = true;
         el.appendChild(skew);
