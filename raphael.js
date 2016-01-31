@@ -7157,7 +7157,7 @@
      * Paper.renderfix
      [ method ]
      **
-     * Fixes the issue of Firefox and IE9 regarding subpixel rendering. If paper is dependant
+     * Fixes the issue of Firefox and IE9 regarding subpixel rendering. If paper is dependent
      * on other elements after reflow it could shift half pixel which cause for lines to lost their crispness.
      * This method fixes the issue.
      **
