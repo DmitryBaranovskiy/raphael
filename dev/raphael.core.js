@@ -822,7 +822,11 @@ define(["eve"], function(eve) {
                 args = arg.join("\u2400");
 
             if (cache[has](args)) {
-                repush(count, args);
+                
+                if (count[count.length - 1] !== args) {
+                    repush(count, args);
+                }
+                
                 return postprocessor ? postprocessor(cache[args]) : cache[args];
             }
 
