@@ -536,7 +536,7 @@ define(["eve"], function(eve) {
                 bod = createPopup().document.body;
             }
             var range = bod.createTextRange();
-            toHex = cacher(function (color) {
+            toHex = cacher('toHex', function (color) {
                 try {
                     bod.style.color = Str(color).replace(trim, E);
                     var value = range.queryCommandValue("ForeColor");
@@ -551,7 +551,7 @@ define(["eve"], function(eve) {
             i.title = "Rapha\xebl Colour Picker";
             i.style.display = "none";
             g.doc.body.appendChild(i);
-            toHex = cacher(function (color) {
+            toHex = cacher('toHex', function (color) {
                 i.style.color = color;
                 return g.doc.defaultView.getComputedStyle(i, E).getPropertyValue("color");
             });
@@ -812,6 +812,9 @@ define(["eve"], function(eve) {
             return array.push(array.splice(i, 1)[0]);
         }
     }
+
+    var CACHE = R.CACHE = {};
+    
     function cacher(name, f, scope, postprocessor) {
         function newf() {
             var arg = Array.prototype.slice.call(arguments, 0),
@@ -827,6 +830,9 @@ define(["eve"], function(eve) {
             var cached = cache[args] = f[apply](scope, arg);
             return postprocessor ? postprocessor(cached) : cached;
         }
+
+        CACHE[name] = newf;
+        
         return newf;
     }
 
@@ -876,7 +882,7 @@ define(["eve"], function(eve) {
      o     error (boolean) true if string can’t be parsed
      o }
     \*/
-    R.getRGB = cacher(function (colour) {
+    R.getRGB = cacher('getRGB', function (colour) {
         if (!colour || !!((colour = Str(colour)).indexOf("-") + 1)) {
             return {r: -1, g: -1, b: -1, hex: "none", error: 1, toString: clrToString};
         }
@@ -958,7 +964,7 @@ define(["eve"], function(eve) {
      - b (number) value or brightness
      = (string) hex representation of the colour.
     \*/
-    R.hsb = cacher(function (h, s, b) {
+    R.hsb = cacher('hsb', function (h, s, b) {
         return R.hsb2rgb(h, s, b).hex;
     });
     /*\
@@ -972,7 +978,7 @@ define(["eve"], function(eve) {
      - l (number) luminosity
      = (string) hex representation of the colour.
     \*/
-    R.hsl = cacher(function (h, s, l) {
+    R.hsl = cacher('hsl', function (h, s, l) {
         return R.hsl2rgb(h, s, l).hex;
     });
     /*\
@@ -986,7 +992,7 @@ define(["eve"], function(eve) {
      - b (number) blue
      = (string) hex representation of the colour.
     \*/
-    R.rgb = cacher(function (r, g, b) {
+    R.rgb = cacher('rgb', function (r, g, b) {
         function round(x) { return (x + 0.5) | 0; }
         return "#" + (16777216 | round(b) | (round(g) << 8) | (round(r) << 16)).toString(16).slice(1);
     });
@@ -1120,7 +1126,7 @@ define(["eve"], function(eve) {
      - TString (string|array) transform string or array of transformations (in the last case it will be returned straight away)
      = (array) array of transformations.
     \*/
-    R.parseTransformString = cacher(function (TString) {
+    R.parseTransformString = cacher('parseTransformString', function (TString) {
         if (!TString) {
             return null;
         }
@@ -1827,7 +1833,7 @@ define(["eve"], function(eve) {
                 rad = PI / 180 * (+angle || 0),
                 res = [],
                 xy,
-                rotate = cacher(function (x, y, rad) {
+                rotate = cacher('a2c.rotate', function (x, y, rad) {
                     var X = x * math.cos(rad) - y * math.sin(rad),
                         Y = x * math.sin(rad) + y * math.cos(rad);
                     return {x: X, y: Y};
@@ -1916,7 +1922,7 @@ define(["eve"], function(eve) {
                 y: pow(t1, 3) * p1y + pow(t1, 2) * 3 * t * c1y + t1 * 3 * t * t * c2y + pow(t, 3) * p2y
             };
         },
-        curveDim = cacher(function (p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y) {
+        curveDim = cacher('curveDim', function (p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y) {
             var a = (c2x - 2 * c1x + p1x) - (p2x - 2 * c2x + c1x),
                 b = 2 * (c1x - p1x) - 2 * (c2x - c1x),
                 c = p1x - c1x,
@@ -1959,7 +1965,7 @@ define(["eve"], function(eve) {
                 max: {x: mmax[apply](0, x), y: mmax[apply](0, y)}
             };
         }),
-        path2curve = R._path2curve = cacher(function (path, path2) {
+        path2curve = R._path2curve = cacher('path2curve', function (path, path2) {
             var pth = !path2 && paths(path);
             if (!path2 && pth.curve) {
                 return pathClone(pth.curve);
@@ -2100,7 +2106,7 @@ define(["eve"], function(eve) {
             }
             return p2 ? [p, p2] : p;
         }, null, pathClone),
-        parseDots = R._parseDots = cacher(function (gradient) {
+        parseDots = R._parseDots = cacher('parseDots', function (gradient) {
             var dots = [];
             for (var i = 0, ii = gradient.length; i < ii; i++) {
                 var dot = {},
