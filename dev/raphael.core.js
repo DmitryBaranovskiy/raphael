@@ -822,14 +822,13 @@ define(["eve"], function(eve) {
                 args = arg.join("\u2400");
 
             if (cache[has](args)) {
-                
                 if (count[count.length - 1] !== args) {
                     repush(count, args);
                 }
-                
+
                 return postprocessor ? postprocessor(cache[args]) : cache[args];
             }
-
+            
             count.length >= 1e3 && delete cache[count.shift()];
             count.push(args);
             var cached = cache[args] = f[apply](scope, arg);
@@ -839,11 +838,24 @@ define(["eve"], function(eve) {
         var cache = newf.cache = {},
             count = newf.count = [];
 
+        newf.clear = function () {
+            cache = newf.cache = {};
+            count = newf.count = [];
+        };
+
         CACHE[name] = newf;
 
         return newf;
     }
 
+    R.clearCaches = function () {
+        for (var key in CACHE) {
+            if (!CACHE.hasOwnProperty(key)) continue;
+
+            CACHE[key].clear();
+        }
+    };
+    
     var preload = R._preload = function (src, f) {
         var img = g.doc.createElement("img");
         img.style.cssText = "position:absolute;left:-9999em;top:-9999em";
