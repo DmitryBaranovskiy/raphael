@@ -1,6 +1,6 @@
 {
   "name": "raphael",
-  "version": "2.1.4",
+  "version": "2.1.4a",
   "description": "JavaScript Vector Library",
   "main": "raphael.amd.js",
   "scripts": {
@@ -32,6 +32,6 @@
     "url": "https://github.com/DmitryBaranovskiy/raphael/issues"
   },
   "homepage": "https://github.com/DmitryBaranovskiy/raphael",
-  "_id": "raphael@2.1.4",
+  "_id": "raphael@2.1.4a",
   "_from": "raphael@"
 }
