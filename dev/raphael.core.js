@@ -816,23 +816,27 @@ define(["eve"], function(eve) {
     var CACHE = R.CACHE = {};
     
     function cacher(name, f, scope, postprocessor) {
+        
         function newf() {
             var arg = Array.prototype.slice.call(arguments, 0),
-                args = arg.join("\u2400"),
-                cache = newf.cache = newf.cache || {},
-                count = newf.count = newf.count || [];
+                args = arg.join("\u2400");
+
             if (cache[has](args)) {
                 repush(count, args);
                 return postprocessor ? postprocessor(cache[args]) : cache[args];
             }
+
             count.length >= 1e3 && delete cache[count.shift()];
             count.push(args);
             var cached = cache[args] = f[apply](scope, arg);
             return postprocessor ? postprocessor(cached) : cached;
         }
 
+        var cache = newf.cache = {},
+            count = newf.count = [];
+
         CACHE[name] = newf;
-        
+
         return newf;
     }
 
