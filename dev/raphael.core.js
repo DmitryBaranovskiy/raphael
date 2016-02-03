@@ -812,7 +812,7 @@ define(["eve"], function(eve) {
             return array.push(array.splice(i, 1)[0]);
         }
     }
-    function cacher(f, scope, postprocessor) {
+    function cacher(name, f, scope, postprocessor) {
         function newf() {
             var arg = Array.prototype.slice.call(arguments, 0),
                 args = arg.join("\u2400"),
@@ -824,8 +824,8 @@ define(["eve"], function(eve) {
             }
             count.length >= 1e3 && delete cache[count.shift()];
             count.push(args);
-            cache[args] = f[apply](scope, arg);
-            return postprocessor ? postprocessor(cache[args]) : cache[args];
+            var cached = cache[args] = f[apply](scope, arg);
+            return postprocessor ? postprocessor(cached) : cached;
         }
         return newf;
     }
