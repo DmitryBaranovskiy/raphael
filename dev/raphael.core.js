@@ -1,5 +1,7 @@
 define(["eve"], function(eve) {
 
+    var isIE7 = navigator.appVersion.indexOf("MSIE 7.") != -1;
+    
     /*\
      * Raphael
      [ method ]
@@ -452,8 +454,10 @@ define(["eve"], function(eve) {
      - rad (number) angle in radians
      = (number) angle in degrees.
     \*/
-    R.deg = function (rad) {
+    R.deg = isIE7 ? function (rad) {
         return Math.round ((rad * 180 / PI% 360)* 1000) / 1000;
+    } : function (rad) {
+        return rad * 180 / PI % 360;
     };
     /*\
      * Raphael.snapTo
