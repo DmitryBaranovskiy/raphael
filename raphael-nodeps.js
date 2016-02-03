@@ -1,5 +1,5 @@
 // ┌────────────────────────────────────────────────────────────────────┐ \\
-// │ Raphaël 2.1.4 - JavaScript Vector Library                      │ \\
+// │ Raphaël 2.1.4a - JavaScript Vector Library                      │ \\
 // ├────────────────────────────────────────────────────────────────────┤ \\
 // │ Core Module                                                        │ \\
 // ├────────────────────────────────────────────────────────────────────┤ \\
@@ -84,7 +84,7 @@
             }
         }
     }
-    R.version = "2.1.4";
+    R.version = "2.1.4a";
     R.eve = eve;
     var loaded,
         separator = /[, ]+/,
@@ -5366,7 +5366,7 @@
      | })(Raphael.ninja());
     \*/
     R.ninja = function () {
-        oldRaphael.was ? (g.win.Raphael = oldRaphael.is) : delete Raphael;
+        //oldRaphael.was ? (g.win.Raphael = oldRaphael.is) : delete Raphael;
         return R;
     };
     /*\
@@ -5414,7 +5414,7 @@
 }));
 
 // ┌─────────────────────────────────────────────────────────────────────┐ \\
-// │ Raphaël 2.1.4 - JavaScript Vector Library                       │ \\
+// │ Raphaël 2.1.4a - JavaScript Vector Library                       │ \\
 // ├─────────────────────────────────────────────────────────────────────┤ \\
 // │ SVG Module                                                          │ \\
 // ├─────────────────────────────────────────────────────────────────────┤ \\
@@ -5891,6 +5891,9 @@
                     case "stroke-width":
                         if (o._.sx != 1 || o._.sy != 1) {
                             value /= mmax(abs(o._.sx), abs(o._.sy)) || 1;
+                        }
+                        if (o.paper._vbSize) {
+                            value *= o.paper._vbSize;
                         }
                         node.setAttribute(att, value);
                         if (attrs["stroke-dasharray"]) {
@@ -6836,7 +6839,7 @@
 }));
 
 // ┌─────────────────────────────────────────────────────────────────────┐ \\
-// │ Raphaël 2.1.4 - JavaScript Vector Library                       │ \\
+// │ Raphaël 2.1.4a - JavaScript Vector Library                       │ \\
 // ├─────────────────────────────────────────────────────────────────────┤ \\
 // │ VML Module                                                          │ \\
 // ├─────────────────────────────────────────────────────────────────────┤ \\
@@ -7736,9 +7739,9 @@
     };
     R._engine.setViewBox = function (x, y, w, h, fit) {
         R.eve("raphael.setViewBox", this, this._viewBox, [x, y, w, h, fit]);
-        var paperSize = this.getSize(),
-            width = paperSize.width,
-            height = paperSize.height,
+        var width = this.width,
+            height = this.height,
+            size = 1 / mmax(w / width, h / height),
             H, W;
         if (fit) {
             H = height / h;
@@ -7754,10 +7757,10 @@
         this._viewBoxShift = {
             dx: -x,
             dy: -y,
-            scale: paperSize
+            scale: size
         };
         this.forEach(function (el) {
-            el.transform("...");
+            el.transform("");
         });
         return this;
     };
