@@ -1,6 +1,7 @@
 2.2.0 • WIP
 ------------------
 
+  * Strict error on method R.ninja
   * IE 9/10 gradient id fix
   * Reduce transform string to avoid long parsing times after several transformations
   * raphael.amd.js as main in package.json.
