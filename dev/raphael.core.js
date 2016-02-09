@@ -2246,6 +2246,9 @@
                 sy = 1,
                 _ = el._,
                 m = new Matrix;
+            if (_.transform + '' != tdata + '') {
+                _.dirtyT = 1;
+            }
             _.transform = tdata || [];
             if (tdata) {
                 for (var i = 0, ii = tdata.length; i < ii; i++) {
@@ -2304,7 +2307,6 @@
                     } else if (command == "m" && tlen == 7) {
                         m.add(t[1], t[2], t[3], t[4], t[5], t[6]);
                     }
-                    _.dirtyT = 1;
                     el.matrix = m;
                 }
             }
