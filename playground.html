@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Raphaël · Playground</title>
+        <link rel="stylesheet" href="demo.css" type="text/css" media="screen">
+        <link rel="stylesheet" href="demo-print.css" type="text/css" media="print">
+        <script src="raphael.js"></script>
+        <style media="screen">
+            body {
+                margin: 0;
+                padding: 0;
+                text-align: center;
+            }
+            h1 {
+                font-weight: 400;
+                height: 5%;
+            }
+            #canvas {
+                height: 480px;
+                margin: 0 auto;
+                text-align: left;
+                width: 640px;
+            }
+            #code {
+                font-family: Consolas, Monaco, "Lucida Console", monospace;
+                height: 4em;
+                margin: 10px;
+                padding: 0;
+                width: 90%;
+            }
+            #run {
+                font-size: 2em;
+            }
+        </style>
+        <script>
+            window.onload = function () {
+                var paper = Raphael("canvas", 640, 480),
+                    btn = document.getElementById("run"),
+                    cd = document.getElementById("code");
+
+                (btn.onclick = function () {
+                    paper.clear();
+                    paper.rect(0, 0, 640, 480, 10).attr({fill: "#fff", stroke: "none"});
+                    try {
+                        (new Function("paper", "window", "document", cd.value)).call(paper, paper);
+                    } catch (e) {
+                        alert(e.message || e);
+                    }
+                })();
+            };
+        </script>
+    </head>
+    <body>
+        <h1>Raphaël Playground</h1>
+        <div id="canvas"></div>
+        <div><textarea id="code">paper.circle(320, 240, 60).animate({fill: "#223fa3", stroke: "#000", "stroke-width": 80, "stroke-opacity": 0.5}, 2000);</textarea></div>
+        <div><button id="run" type="button">Run</button></div>
+        <p id="copy">Demo of <a href="http://raphaeljs.com/">Raphaël</a>—JavaScript Vector Library</p>
+    </body>
+</html>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Raphaël · Fonts</title>
+        <link rel="stylesheet" href="demo.css" media="screen">
+        <link rel="stylesheet" href="demo-print.css" media="print">
+        <script src="raphael.js"></script>
+        <script src="font.js"></script>
+        <script>
+            window.onload = function () {
+                var r = Raphael("holder", 640, 480),
+                    fonts = [0, r.getFont("1"), r.getFont("2"), r.getFont("3"), r.getFont("whoa")],
+                    custom = r.print(70, 150, "Custom fonts", fonts[4], 60).attr({fill: "#fff"}),
+                    aseasyas = r.print(50, 240, "As easy as", fonts[4], 60).attr({fill: "#fff"}),
+                    nums = [
+                        r.print(450, 240, "1", fonts[1], 60).attr({fill: "#fff"}),
+                        r.print(500, 240, "2", fonts[2], 60).attr({fill: "#fff"}),
+                        r.print(550, 240, "3", fonts[3], 60).attr({fill: "#fff"})
+                    ],
+                    times = 3;
+
+                for (var i = 0, ii = aseasyas.length; i < ii; i++) {
+                    aseasyas[i].animate({fill: Raphael.getColor()}, 2000);
+                }
+                nums[0].animate({fill: Raphael.getColor()}, 2000);
+                nums[1].animate({fill: Raphael.getColor()}, 2000);
+                nums[2].animate({fill: Raphael.getColor()}, 2000, function () {
+                    aseasyas.animate({transform: "...r360"}, 1000);
+                    var scale = [nums[0][0].transform(), nums[1][0].transform(), nums[2][0].transform()];
+                    nums[0].animate({transform: "...s3,3"}, 500, function () {
+                        nums[0].animate({transform: scale[0]}, 1000);
+                        nums[1].animate({transform: "...s3,3"}, 500, function () {
+                            nums[1].animate({transform: scale[1]}, 1000);
+                            nums[2].animate({transform: "...s3,3"}, 500, function () {
+                                nums[2].animate({transform: scale[2]}, 1000);
+                                custom.animate({opacity: .4}, 500);
+                            });
+                        });
+                    });
+                });
+                
+            };
+        </script>
+    </head>
+    <body>
+        <div id="holder"></div>
+        <p id="copy">Demo of <a href="http://raphaeljs.com/">Raphaël</a>—JavaScript Vector Library</p>
+    </body>
+</html>

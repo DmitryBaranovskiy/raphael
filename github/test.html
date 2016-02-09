@@ -1,0 +1,95 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <title>test</title>
+        <script type="text/javascript" charset="utf-8">
+            function hsv2rgb(hue, saturation, value) {
+                var red,
+                    green,
+                    blue;
+                if (value == 0.0) {
+                    red = 0;
+                    green = 0;
+                    blue = 0;
+                } else {
+                    var i = Math.floor(hue * 6),
+                        f = (hue * 6) - i,
+                        p = value * (1 - saturation),
+                        q = value * (1 - (saturation * f)),
+                        t = value * (1 - (saturation * (1 - f)));
+                    switch (i) {
+                        case 1: red = q; green = value; blue = p; break;
+                        case 2: red = p; green = value; blue = t; break;
+                        case 3: red = p; green = q; blue = value; break;
+                        case 4: red = t; green = p; blue = value; break;
+                        case 5: red = value; green = p; blue = q; break;
+                        case 6:
+                        case 0: red = value; green = t; blue = p; break;
+                    }
+                }
+                return {r: red, g: green, b: blue};
+            }
+
+            function rgb2hsv(red, green, blue) {
+                var max = Math.max(red, green, blue),
+                    min = Math.min(red, green, blue),
+                    hue,
+                    saturation,
+                    value = max;
+                if (min == max) {
+                    hue = 0;
+                    saturation = 0;
+                } else {
+                    var delta = (max - min);
+                    saturation = delta / max;
+                    if (red == max) {
+                        hue = (green - blue) / delta;
+                    } else if (green == max) {
+                        hue = 2 + ((blue - red) / delta);
+                    } else {
+                        hue = 4 + ((red - green) / delta);
+                    }
+                    hue /= 6;
+                    if (hue < 0) {
+                        hue += 1;
+                    }
+                    if (hue > 1) {
+                        hue -= 1;
+                    }
+                }
+                return {h: hue, s: saturation, v: value};
+            }
+            var start = {h: 0, s: 1, v: 200};
+            function getColor() {
+                var rgb = hsv2rgb(start.h, start.s, start.v);
+                start.h += .1;
+                if (start.h > 1) {
+                    start.h = 0;
+                    start.s -= .2;
+                    if (start.s <= 0) {
+                        start = {h: 0, s: 1, v: 200};
+                    }
+                }
+                console.log(start);
+                var r = Math.round(rgb.r).toString(16);
+                if (r.length == 1) {
+                    r = "0" + r;
+                }
+                var g = Math.round(rgb.g).toString(16);
+                if (g.length == 1) {
+                    g = "0" + g;
+                }
+                var b = Math.round(rgb.b).toString(16);
+                if (b.length == 1) {
+                    b = "0" + b;
+                }
+                document.body.style.backgroundColor = "#" + r + g + b;
+                return "#" + r + g + b;
+            }
+        </script>
+    </head>
+    <body>
+        
+    </body>
+</html>

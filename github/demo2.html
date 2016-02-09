@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <title>Demo</title>
+        <script src="../raphael.js" type="text/javascript" charset="utf-8"></script>
+        <script src="json-meta.js" type="text/javascript" charset="utf-8"></script>
+        <script src="json.js" type="text/javascript" charset="utf-8"></script>
+        <script type="text/javascript">
+            var commits = chunk1.commits.concat(chunk2.commits),
+                comms = {},
+                mmax = Math.max,
+                mtime = 0,
+                mspace = 0,
+                parents = {};
+            for (var i = 0, ii = commits.length; i < ii; i++) {
+                for (var j = 0, jj = commits[i].parents.length; j < jj; j++) {
+                    parents[commits[i].parents[j][0]] = true;
+                }
+                mtime = Math.max(mtime, commits[i].time);
+                mspace = Math.max(mspace, commits[i].space);
+            }
+            for (i = 0; i < ii; i++) {
+                if (commits[i].id in parents) {
+                    commits[i].isParent = true;
+                }
+                comms[commits[i].id] = commits[i];
+            }
+            var colors = ["#000"];
+            for (var k = 0; k < mspace; k++) {
+                colors.push(Raphael.getColor());
+            }
+            window.onload = function () {
+                var ch = mspace * 20 + 20, cw = mtime * 20 + 20,
+                    r = Raphael("holder", cw, ch),
+                    top = r.set();
+                for (i = 0; i < ii; i++) {
+                    var x = 10 + 20 * commits[i].time,
+                        y = 10 + 20 * commits[i].space;
+                    r.circle(x, y, 3).attr({fill: colors[commits[i].space], stroke: "none"});
+                    for (var j = 0, jj = commits[i].parents.length; j < jj; j++) {
+                        var c = comms[commits[i].parents[j][0]];
+                        if (c.space == commits[i].space) {
+                            r.path("M" + (x - 5) + "," + (y + .0001) + "L" + (15 + 20 * c.time) + "," + (10.0001 + 20 * c.space)).attr({stroke: colors[c.space], "stroke-width": 2});
+                            
+                        } else if (c.space < commits[i].space) {
+                            r.path(["M", x - 5, y + .0001, "l-5-2,0,4,5,-2L", 10.0001 + 20 * c.time, y + .0001, 10.0001 + 20 * c.time, (15.0001 + 20 * c.space)]).attr({stroke: colors[commits[i].space], "stroke-width": 2});
+                        } else {
+                            r.path(["M", x + .0001, y + 5, "l-2,5,4,0-2-5L", x + .0001, 10.0001 + 20 * c.space, 15.0001 + 20 * c.time, 10.0001 + 20 * c.space]).attr({stroke: colors[c.space < commits[i].space ? commits[i].space : c.space], "stroke-width": 2});
+                        }
+                    }
+                    (function (c, x, y) {
+                        top.push(r.circle(x, y, 10).attr({fill: "#000", opacity: 0, cursor: "pointer"}).hover(function () {
+                            if (this.popup) {
+                                this.popup.show();
+                            } else {
+                                var s = r.set(r.text(100, 100, c.author), r.text(100, 120, c.message)).attr({fill: "#fff"});
+                                this.popup = r.popupit(x, y, s, 0);
+                                top.push(this.popup.insertBefore(this));
+                            }
+                        }, function () {
+                            this.popup && this.popup.hide();
+                        }));
+                    }(commits[i], x, y))
+                }
+                top.toFront();
+                var holder = document.getElementById("holder"),
+                    hw = holder.offsetWidth,
+                    hh = holder.offsetHeight,
+                    v = r.rect(hw - 8, 0, 4, Math.pow(hh, 2) / ch, 2).attr({fill: "#000", opacity: 0}),
+                    h = r.rect(0, hh - 8, Math.pow(hw, 2) / cw, 4, 2).attr({fill: "#000", opacity: 0}),
+                    bars = r.set(v, h),
+                    drag,
+                    setBars = function () {
+                        var sl = holder.scrollLeft, st = holder.scrollTop;
+                        if (st > ch - hh) {
+                            st = holder.scrollTop = ch - hh;
+                        }
+                        v.attr({x: hw - 8 + sl, y: st + st * hh / ch});
+                        h.attr({x: sl + sl * hw / cw, y: hh - 8 + st});
+                    },
+                    dragger = function (e) {
+                        if (drag) {
+                            holder.scrollLeft = drag.sl - (e.clientX - drag.x);
+                            holder.scrollTop = drag.st - (e.clientY - drag.y);
+                            setBars();
+                        }
+                    };
+                holder.onmousedown = function (e) {
+                    drag = {x: e.clientX, y: e.clientY, st: holder.scrollTop, sl: holder.scrollLeft};
+                    document.onmousemove = dragger;
+                    bars.animate({opacity: .5}, 300);
+                };
+                document.onmouseup = function () {
+                    drag = false;
+                    document.onmousemove = null;
+                    bars.animate({opacity: 0}, 300);
+                };
+                holder.scrollLeft = cw;
+                setBars();
+            };
+            Raphael.fn.popupit = function (x, y, set, dir, size) {
+                dir = dir == null ? 2 : dir;
+                size = size || 5;
+                x = Math.round(x);
+                y = Math.round(y);
+                var bb = set.getBBox(),
+                    w = Math.round(bb.width / 2),
+                    h = Math.round(bb.height / 2),
+                    dx = [0, w + size * 2, 0, -w - size * 2],
+                    dy = [-h * 2 - size * 3, -h - size, 0, -h - size],
+                    p = ["M", x - dx[dir], y - dy[dir], "l", -size, (dir == 2) * -size, -mmax(w - size, 0), 0, "a", size, size, 0, 0, 1, -size, -size,
+                        "l", 0, -mmax(h - size, 0), (dir == 3) * -size, -size, (dir == 3) * size, -size, 0, -mmax(h - size, 0), "a", size, size, 0, 0, 1, size, -size,
+                        "l", mmax(w - size, 0), 0, size, !dir * -size, size, !dir * size, mmax(w - size, 0), 0, "a", size, size, 0, 0, 1, size, size,
+                        "l", 0, mmax(h - size, 0), (dir == 1) * size, size, (dir == 1) * -size, size, 0, mmax(h - size, 0), "a", size, size, 0, 0, 1, -size, size,
+                        "l", -mmax(w - size, 0), 0, "z"].join(","),
+                    xy = [{x: x, y: y + size * 2 + h}, {x: x - size * 2 - w, y: y}, {x: x, y: y - size * 2 - h}, {x: x + size * 2 + w, y: y}][dir];
+                set.translate(xy.x - w - bb.x, xy.y - h - bb.y);
+                return this.set(this.path(p).attr({fill: "#000", stroke: "none"}).insertBefore(set.node ? set : set[0]), set);
+            };
+            Raphael.fn.popup = function (x, y, text, dir, size) {
+                dir = dir == null ? 2 : dir > 3 ? 3 : dir;
+                size = size || 5;
+                text = text || "$9.99";
+                var res = this.set(),
+                    d = 3;
+                res.push(this.path().attr({fill: "#000", stroke: "#000"}));
+                res.push(this.text(x, y, text).attr(this.g.txtattr).attr({fill: "#fff", "font-family": "Helvetica, Arial"}));
+                res.update = function (X, Y, withAnimation) {
+                    X = X || x;
+                    Y = Y || y;
+                    var bb = this[1].getBBox(),
+                        w = bb.width / 2,
+                        h = bb.height / 2,
+                        dx = [0, w + size * 2, 0, -w - size * 2],
+                        dy = [-h * 2 - size * 3, -h - size, 0, -h - size],
+                        p = ["M", X - dx[dir], Y - dy[dir], "l", -size, (dir == 2) * -size, -mmax(w - size, 0), 0, "a", size, size, 0, 0, 1, -size, -size,
+                            "l", 0, -mmax(h - size, 0), (dir == 3) * -size, -size, (dir == 3) * size, -size, 0, -mmax(h - size, 0), "a", size, size, 0, 0, 1, size, -size,
+                            "l", mmax(w - size, 0), 0, size, !dir * -size, size, !dir * size, mmax(w - size, 0), 0, "a", size, size, 0, 0, 1, size, size,
+                            "l", 0, mmax(h - size, 0), (dir == 1) * size, size, (dir == 1) * -size, size, 0, mmax(h - size, 0), "a", size, size, 0, 0, 1, -size, size,
+                            "l", -mmax(w - size, 0), 0, "z"].join(","),
+                        xy = [{x: X, y: Y + size * 2 + h}, {x: X - size * 2 - w, y: Y}, {x: X, y: Y - size * 2 - h}, {x: X + size * 2 + w, y: Y}][dir];
+                    xy.path = p;
+                    if (withAnimation) {
+                        this.animate(xy, 500, ">");
+                    } else {
+                        this.attr(xy);
+                    }
+                    return this;
+                };
+                return res.update(x, y);
+            };
+        </script>
+        <style type="text/css" media="screen">
+            body {
+                background: #ccc;
+            }
+            #holder {
+                background: #fff;
+                border: solid 1px #999;
+                cursor: move;
+                height: 480px;
+                left: 50%;
+                margin: -240px 0 0 -320px;
+                overflow: hidden;
+                position: absolute;
+                top: 50%;
+                width: 640px;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="holder"></div>
+    </body>
+</html>

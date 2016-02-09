@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Raphaël · Tiger</title>
+        <link rel="stylesheet" href="demo.css" type="text/css" media="screen">
+        <link rel="stylesheet" href="demo-print.css" type="text/css" media="print">
+        <script src="raphael.js"></script>
+        <script src="tiger.js"></script>
+        <script>
+            window.onload = function () {
+                var r = Raphael(tiger).translate(200, 200);
+            };
+        </script>
+    </head>
+    <body>
+        <div id="holder"></div>
+        <p id="copy">Demo of <a href="http://raphaeljs.com/">Raphaël</a>—JavaScript Vector Library</p>
+    </body>
+</html>

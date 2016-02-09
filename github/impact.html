@@ -1,0 +1,72 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <title>Impact Chart</title>
+        <script src="../raphael.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../jquery.js" type="text/javascript" charset="utf-8"></script>
+        <script src="impact.js" type="text/javascript" charset="utf-8"></script>
+        <script src="impact-code.js" type="text/javascript" charset="utf-8"></script>
+        <link rel="stylesheet" href="../demo.css" type="text/css" media="screen">
+        <link rel="stylesheet" href="../demo-print.css" type="text/css" media="print">
+        <style type="text/css" media="screen">
+            #chart {
+                width: 100%;
+                _width: 500px;
+                overflow: auto;
+                clear: left;
+            }
+            .invisible {
+                visibility: hidden;
+            }
+            .hidden {
+                display: none;
+            }
+            #legend,
+            #legend2 {
+                -moz-border-radius: 2px;
+                -webkit-border-radius: 2px;
+                width: 1em;
+                height: 1em;
+                border: solid 1px #000;
+                margin-right: .3em;
+                line-height: 1;
+            }
+            #name, 
+            #name2 {
+                float: left;
+                clear: left;
+            }
+            #name div,
+            #name2 div {
+                float: left;
+            }
+            #placeholder {
+                clear: left;
+                color: #999;
+            }
+            em {
+                color: #666;
+                font-style: normal;
+            }
+            form {
+                margin: 0;
+                padding: 0;
+            }
+            fieldset {
+                margin: 0;
+                padding: 0;
+                border: none;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="name2" class="hidden">
+            <div id="legend2">&nbsp;</div>
+            <div id="username2">legend</div>
+        </div>
+        <div id="placeholder">mouse over the graph for more details</div>
+        <div id="chart"></div>
+        <p id="copy">Demo of <a href="http://raphaeljs.com/">Raphaël</a>—JavaScript Vector Library</p>
+    </body>
+</html>

@@ -1,0 +1,47 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <title>Raphaël · Dancing Helvetica</title>
+        <link rel="stylesheet" href="demo.css" type="text/css" media="screen">
+        <link rel="stylesheet" href="demo-print.css" type="text/css" media="print">
+        <script src="raphael.js" type="text/javascript" charset="utf-8"></script>
+        <script src="helvetica.js" type="text/javascript" charset="utf-8"></script>
+        <style type="text/css" media="screen">
+            #keycatcher {
+                position: absolute;
+                top: -9999em;
+                left: -9999em;
+            }
+            p {
+                text-align: center;
+            }
+        </style>
+        <script type="text/javascript" charset="utf-8">
+        // <!-- abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-=_+[]{}\|;':",./<>?`~!@#$%^&*() -->
+            window.onload = function () {
+                var r = Raphael("holder", 800, 600), pos = [0, 0];
+                var letter = r.path("M0,0L0,0z").attr({fill: "#fff", stroke: "#fff", "fill-opacity": .3, "stroke-width": 1, "stroke-linecap": "round", translation: "100 100"});
+                var kc = document.getElementById("keycatcher");
+                kc.onkeyup = function (e) {
+                    var key = this.value.substring(this.value.length - 1);
+                    this.value = "";
+                    if (key && key in helvetica) {
+                        letter.animate({path: helvetica[key]}, 200);
+                    }
+                    return false;
+                };
+                kc.onblur = function () {
+                    kc.focus();
+                };
+                kc.focus();
+            };
+        </script>
+    </head>
+    <body>
+        <p>Type something.</p>
+        <input type="text" value="" id="keycatcher">
+        <div id="holder"></div>
+        <p id="copy">Demo of <a href="http://raphaeljs.com/">Raphaël</a>—JavaScript Vector Library</p>
+    </body>
+</html>

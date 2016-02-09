@@ -1,0 +1,111 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <title>Languages</title>
+        <script src="../raphael.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../raphael.path.methods.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../jquery.js" type="text/javascript" charset="utf-8"></script>
+        <script src="languages.js" type="text/javascript" charset="utf-8"></script>
+        <link rel="stylesheet" href="../demo.css" type="text/css" media="screen">
+        <link rel="stylesheet" href="../demo-print.css" type="text/css" media="print">
+        <style type="text/css" media="screen">
+            #chart {
+                float: left;
+                margin: 10px;
+            }
+            #language_table span {
+                float: left;
+                font-size: 0;
+                width: 16px;
+                height: 16px;
+                margin-right: 4px;
+            }
+            #holder {
+                width: 600px;
+                height: 320px;
+                position: absolute;
+                left: 50%;
+                top: 50%;
+                margin: -160px 0 0 -300px;
+                background: #fff;
+                -moz-border-radius: 1em;
+                -webkit-border-radius: 1em;
+                -webkit-box-shadow: 0 5px 10px #333;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="holder">
+            <div id="chart"></div>
+            <table id="language_table">
+                <tr>
+                    <th>Language Name</th>
+                    <th>Percentage</th>
+                </tr>
+                <tr class="">
+                    <td>
+                        <span style="background: #FF0000">&nbsp;</span> <a href="http://github.com/languages/Ruby">Ruby</a>
+                    </td>
+                    <td>40%</td>
+                </tr>
+                <tr class="dark">
+                    <td>
+                        <span style="background: #F57F1F">&nbsp;</span> <a href="http://github.com/languages/JavaScript">JavaScript</a>
+                    </td>
+                    <td>26%</td>
+                </tr>
+                <tr class="">
+                    <td>
+                        <span style="background: #FFFF00">&nbsp;</span> <a href="http://github.com/languages/Shell">Shell</a>
+                    </td>
+                    <td>5%</td>
+                </tr>
+                <tr class="dark">
+                    <td>
+                        <span style="background: #00FF00">&nbsp;</span> <a href="http://github.com/languages/Python">Python</a>
+                    </td>
+                    <td>5%</td>
+                </tr>
+                <tr class="">
+                    <td>
+                        <span style="background: #0000FF">&nbsp;</span> <a href="http://github.com/languages/PHP">PHP</a>
+                    </td>
+                    <td>4%</td>
+                </tr>
+                <tr class="dark">
+                    <td>
+                        <span style="background: #008000">&nbsp;</span> <a href="http://github.com/languages/C">C</a>
+                    </td>
+                    <td>4%</td>
+                </tr>
+                <tr class="">
+                    <td>
+                        <span style="background: #00FFFF">&nbsp;</span> <a href="http://github.com/languages/Perl">Perl</a>
+                    </td>
+                    <td>3%</td>
+                </tr>
+                <tr class="dark">
+                    <td>
+                        <span style="background: #800080">&nbsp;</span> <a href="http://github.com/languages/C++">C++</a>
+                    </td>
+                    <td>2%</td>
+                </tr>
+                <tr class="">
+                    <td>
+                        <span style="background: #C0C0C0">&nbsp;</span> <a href="http://github.com/languages/Java">Java</a>
+                    </td>
+                    <td>2%</td>
+                </tr>
+                <tr class="dark">
+                    <td>
+                        <span style="background: #FF00FF">&nbsp;</span> <a href="http://github.com/languages/Objective-C">Objective-C</a>
+                    </td>
+                    <td>2%</td>
+                </tr>
+            </table>
+            <p id="copy">Demo of <a href="http://raphaeljs.com/">Raphaël</a>—JavaScript Vector Library</p>
+        </div>
+    </body>
+</html>

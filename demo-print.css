@@ -1,0 +1,20 @@
+body {
+    background: #fff;
+    color: #000;
+    font: 100.1% "Lucida Grande", Lucida, Verdana, sans-serif;
+}
+#holder {
+    height: 480px;
+    left: 50%;
+    margin: 0 0 0 -320px;
+    position: absolute;
+    top: 0;
+    width: 640px;
+}
+#copy {
+    bottom: 0;
+    font-size: .7em;
+    position: absolute;
+    right: 1em;
+    text-align: right;
+}
