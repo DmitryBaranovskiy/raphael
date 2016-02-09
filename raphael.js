@@ -8261,8 +8261,9 @@
 (function (glob, factory) {
     if (typeof define === "function" && define.amd) {
         define("raphael", ["raphael.core", "raphael.svg", "raphael.vml"], function(Raphael) {
-            return (glob.Raphael = factory(Raphael));
+            return factory(Raphael);
         });
+        glob.Raphael = require("raphael");
     } else if (typeof exports === "object") {
         var raphael = require("raphael.core");
 
