@@ -10,7 +10,7 @@ require.config({
 
 require(['raphael'], function(Raphael) {
     var paper = Raphael(0, 0, 640, 720, "container");
-    paper.circle(100, 100, 100); //example
+    paper.circle(100, 100, 100).attr({'fill':'270-#FAE56B:0-#E56B6B:100'}); //example
 
     // Work here
 });
