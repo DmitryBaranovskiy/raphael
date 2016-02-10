@@ -2628,6 +2628,9 @@
                 sy = 1,
                 _ = el._,
                 m = new Matrix;
+            if (_.transform + '' != tdata + '') {
+                _.dirtyT = 1;
+            }
             _.transform = tdata || [];
             if (tdata) {
                 for (var i = 0, ii = tdata.length; i < ii; i++) {
@@ -2686,7 +2689,6 @@
                     } else if (command == "m" && tlen == 7) {
                         m.add(t[1], t[2], t[3], t[4], t[5], t[6]);
                     }
-                    _.dirtyT = 1;
                     el.matrix = m;
                 }
             }
@@ -6402,13 +6404,19 @@
             }
             var texts = Str(params.text).split("\n"),
                 tspans = [],
-                tspan;
+                tspan,
+                row = 1;
             for (var i = 0, ii = texts.length; i < ii; i++) {
+                if (texts[i].trim() == "") {
+                    ++row;
+                    continue;
+                }
                 tspan = $("tspan");
-                i && $(tspan, {dy: fontSize * leading, x: a.x});
+                i && $(tspan, {dy: fontSize * leading * row, x: a.x});
                 tspan.appendChild(R._g.doc.createTextNode(texts[i]));
                 node.appendChild(tspan);
                 tspans[i] = tspan;
+                row = 1;
             }
         } else {
             tspans = node.getElementsByTagName("tspan");

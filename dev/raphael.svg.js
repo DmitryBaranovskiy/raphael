@@ -605,13 +605,19 @@
             }
             var texts = Str(params.text).split("\n"),
                 tspans = [],
-                tspan;
+                tspan,
+                row = 1;
             for (var i = 0, ii = texts.length; i < ii; i++) {
+                if (texts[i].trim() == "") {
+                    ++row;
+                    continue;
+                }
                 tspan = $("tspan");
-                i && $(tspan, {dy: fontSize * leading, x: a.x});
+                i && $(tspan, {dy: fontSize * leading * row, x: a.x});
                 tspan.appendChild(R._g.doc.createTextNode(texts[i]));
                 node.appendChild(tspan);
                 tspans[i] = tspan;
+                row = 1;
             }
         } else {
             tspans = node.getElementsByTagName("tspan");
