@@ -160,7 +160,13 @@
           return "url('#" + id + "')";
       }
       var location = document.location;
-      return "url('" + location.origin + location.pathname + location.search + "#" + id + "')";
+      var locationString = (
+          location.protocol + '//' +
+          location.host +
+          location.pathname +
+          location.search
+      );
+      return "url('" + locationString + "#" + id + "')";
     },
     updatePosition = function (o) {
         var bbox = o.getBBox(1);
