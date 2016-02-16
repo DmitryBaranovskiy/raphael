@@ -5366,7 +5366,15 @@
      | })(Raphael.ninja());
     \*/
     R.ninja = function () {
-        oldRaphael.was ? (g.win.Raphael = oldRaphael.is) : delete window.Raphael;
+        if (oldRaphael.was) {
+            g.win.Raphael = oldRaphael.is;
+        } else {
+            // IE8 raises an error when deleting window property
+            window.Raphael = undefined;
+            try {
+                delete window.Raphael;
+            } catch(e) {}
+        }
         return R;
     };
     /*\

@@ -5748,7 +5748,15 @@
      | })(Raphael.ninja());
     \*/
     R.ninja = function () {
-        oldRaphael.was ? (g.win.Raphael = oldRaphael.is) : delete window.Raphael;
+        if (oldRaphael.was) {
+            g.win.Raphael = oldRaphael.is;
+        } else {
+            // IE8 raises an error when deleting window property
+            window.Raphael = undefined;
+            try {
+                delete window.Raphael;
+            } catch(e) {}
+        }
         return R;
     };
     /*\
@@ -5957,7 +5965,13 @@
           return "url('#" + id + "')";
       }
       var location = document.location;
-      return "url('" + location.origin + location.pathname + location.search + "#" + id + "')";
+      var locationString = (
+          location.protocol + '//' +
+          location.host +
+          location.pathname +
+          location.search
+      );
+      return "url('" + locationString + "#" + id + "')";
     },
     updatePosition = function (o) {
         var bbox = o.getBBox(1);
@@ -8250,7 +8264,7 @@
 }));
 
 // ┌────────────────────────────────────────────────────────────────────┐ \\
-// │ Raphaël @VERSION - JavaScript Vector Library                       │ \\
+// │ Raphaël 2.1.4 - JavaScript Vector Library                      │ \\
 // ├────────────────────────────────────────────────────────────────────┤ \\
 // │ Copyright © 2008-2012 Dmitry Baranovskiy (http://raphaeljs.com)    │ \\
 // │ Copyright © 2008-2012 Sencha Labs (http://sencha.com)              │ \\
