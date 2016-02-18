@@ -1,6 +1,7 @@
 2.2.0 • WIP
 ------------------
 
+  * Added tests! (thanks @TheCloudlessSky)
   * Strict error on method R.ninja
   * Cross-browser gradient fixes
   * Reduce transform string to avoid long parsing times after several transformations
