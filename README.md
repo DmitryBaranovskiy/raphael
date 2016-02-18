@@ -1,6 +1,6 @@
 # Raphaël: Cross-browser vector graphics the easy way.
 
-Visit the library website for more information: ~~[http://raphaeljs.com](http://raphaeljs.com/)~~ [new raphael website](http://dmitrybaranovskiy.github.io/raphael/)
+Visit the library website for more information: ~~[http://raphaeljs.com](http://raphaeljs.com/)~~ [http://dmitrybaranovskiy.github.io/raphael/](http://dmitrybaranovskiy.github.io/raphael/)
 
 ## Quickstart guide
 

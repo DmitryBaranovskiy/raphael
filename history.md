@@ -2,7 +2,7 @@
 ------------------
 
   * Strict error on method R.ninja
-  * IE 9/10 gradient id fix
+  * Cross-browser gradient fixes
   * Reduce transform string to avoid long parsing times after several transformations
   * raphael.amd.js as main in package.json.
   * raphael.amd.js version to work with Browserify.
