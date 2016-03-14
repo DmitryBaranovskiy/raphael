@@ -2389,8 +2389,8 @@
             if (y == null) {
                 return {
                     container: container,
-                    width: container.style.pixelWidth || container.offsetWidth,
-                    height: container.style.pixelHeight || container.offsetHeight
+                    width: container.style.pixelWidth || container.getBoundingClientRect().width,
+                    height: container.style.pixelHeight || container.getBoundingClientRect().height
                 };
             } else {
                 return {
@@ -3488,10 +3488,11 @@
      = (object)
      \*/
     paperproto.getSize = function () {
-        var container = this.canvas.parentNode;
+        var container = this.canvas.parentNode,
+            boundingClientRect = container.getBoundingClientRect();
         return {
-            width: container.offsetWidth,
-            height: container.offsetHeight
+            width: boundingClientRect.width,
+            height: boundingClientRect.height
                 };
         };
     /*\

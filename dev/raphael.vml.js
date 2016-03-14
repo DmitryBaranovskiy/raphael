@@ -273,7 +273,8 @@
                     o._.fillpos = [bbox.x, bbox.y];
 
                     R._preload(isURL[1], function () {
-                        o._.fillsize = [this.offsetWidth, this.offsetHeight];
+                      var boundingClientRect = this.getBoundingClientRect();
+                        o._.fillsize = [boundingClientRect.width, boundingClientRect.height];
                     });
                 } else {
                     fill.color = R.getRGB(params.fill).hex;
