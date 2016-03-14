@@ -2389,8 +2389,8 @@
             if (y == null) {
                 return {
                     container: container,
-                    width: container.style.pixelWidth || container.offsetWidth,
-                    height: container.style.pixelHeight || container.offsetHeight
+                    width: container.style.pixelWidth || container.getBoundingClientRect().width,
+                    height: container.style.pixelHeight || container.getBoundingClientRect().height
                 };
             } else {
                 return {
@@ -3488,10 +3488,11 @@
      = (object)
      \*/
     paperproto.getSize = function () {
-        var container = this.canvas.parentNode;
+        var container = this.canvas.parentNode,
+            boundingClientRect = container.getBoundingClientRect();
         return {
-            width: container.offsetWidth,
-            height: container.offsetHeight
+            width: boundingClientRect.width,
+            height: boundingClientRect.height
                 };
         };
     /*\
@@ -5941,8 +5942,9 @@
 
                             (function (el) {
                                 R._preload(isURL[1], function () {
-                                    var w = this.offsetWidth,
-                                        h = this.offsetHeight;
+                                  var boundingClientRect = this.getBoundingClientRect();
+                                    var w = boundingClientRect.width,
+                                        h = boundingClientRect.height;
                                     $(el, {width: w, height: h});
                                     $(ig, {width: w, height: h});
                                 });
@@ -7135,7 +7137,8 @@
                     o._.fillpos = [bbox.x, bbox.y];
 
                     R._preload(isURL[1], function () {
-                        o._.fillsize = [this.offsetWidth, this.offsetHeight];
+                      var boundingClientRect = this.getBoundingClientRect();
+                        o._.fillsize = [boundingClientRect.width, boundingClientRect.height];
                     });
                 } else {
                     fill.color = R.getRGB(params.fill).hex;

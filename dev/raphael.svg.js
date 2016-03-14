@@ -518,8 +518,9 @@
 
                             (function (el) {
                                 R._preload(isURL[1], function () {
-                                    var w = this.offsetWidth,
-                                        h = this.offsetHeight;
+                                  var boundingClientRect = this.getBoundingClientRect();
+                                    var w = boundingClientRect.width,
+                                        h = boundingClientRect.height;
                                     $(el, {width: w, height: h});
                                     $(ig, {width: w, height: h});
                                 });

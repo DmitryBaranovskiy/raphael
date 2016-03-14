@@ -1,6 +1,7 @@
 2.2.0 • WIP
 ------------------
 
+  * Replacing offsetWidth and offsetHeight due to chrome deprecation
   * Added tests! (thanks @TheCloudlessSky)
   * Strict error on method R.ninja
   * Cross-browser gradient fixes
