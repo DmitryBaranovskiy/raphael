@@ -6,17 +6,8 @@
 // │ Licensed under the MIT (http://raphaeljs.com/license.html) license.│ \\
 // └────────────────────────────────────────────────────────────────────┘ \\
 
-(function (glob, factory) {
-    if (typeof define === "function" && define.amd) {
-        define("raphael.core", ["eve"], function(eve) {
-            return factory(eve);
-        });
-    } else if (typeof exports === "object") {
-        module.exports = factory(require("eve"));
-    } else {
-        glob.Raphael = factory(glob.eve);
-    }
-}(this, function (eve) {
+define(["eve"], function(eve) {
+
     /*\
      * Raphael
      [ method ]
@@ -5419,4 +5410,4 @@
     })(document, "DOMContentLoaded");
 
     return R;
-}));
+});
