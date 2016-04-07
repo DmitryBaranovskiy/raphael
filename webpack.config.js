@@ -44,6 +44,18 @@ module.exports = {
 
 	plugins: plugins,
 
+	loaders: [
+  		{
+  			test: /\.js$/, 
+  			loader: "eslint-loader", 
+  			include: "./dev/"
+  		}
+	],
+  	
+	eslint: {
+    	configFile: './.eslintrc'
+  	},
+
 	resolve: {
 		modulesDirectories: ["bower_components"]
 	}
