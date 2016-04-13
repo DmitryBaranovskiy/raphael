@@ -8,17 +8,7 @@
 // │ Licensed under the MIT (http://raphaeljs.com/license.html) license. │ \\
 // └─────────────────────────────────────────────────────────────────────┘ \\
 
-(function (glob, factory) {
-    if (typeof define === "function" && define.amd) {
-        define("raphael.vml", ["raphael.core"], function(raphael) {
-            return factory(raphael);
-        });
-    } else if (typeof exports === "object") {
-        factory(require("./raphael.core"));
-    } else {
-        factory(glob.Raphael);
-    }
-}(this, function(R) {
+define(["./raphael.core"], function(R) {
     if (R && !R.vml) {
         return;
     }
@@ -1017,4 +1007,4 @@
             };
         })(method);
     }
-}));
+});

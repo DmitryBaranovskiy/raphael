@@ -1,6 +1,6 @@
 {
   "name": "raphael",
-  "main": "raphael.js",
+  "main": "raphael.min.js",
   "description": "JavaScript Vector Library",
   "dependencies": {
     "eve": "https://github.com/adobe-webplatform/eve.git#eef80ed"

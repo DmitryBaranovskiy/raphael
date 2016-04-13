@@ -1,6 +1,7 @@
-2.2.0 • WIP
+2.2.0
 ------------------
 
+  * Webpack build
   * Added tests! (thanks @TheCloudlessSky)
   * Strict error on method R.ninja
   * Cross-browser gradient fixes

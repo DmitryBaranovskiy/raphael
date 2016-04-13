@@ -1,9 +1,11 @@
 ## Want to contribute?
 
 All changes in code must go to `raphael.core`, `raphael.svg` or `raphael.vml`.
-`raphael.js` and `raphael-min.js` are generated files, generated after running `grunt` in the `dev` directory.
+The rest are generated files, generated after running `npm run build`.
 
-After changing the core/vml/svg files, execute `grunt` in the dev folder to generate the minified version, make a commit and you are ready to make a pull request!
+To run tests you need to open `dev/test/index.html` in your browser, there's no automated way right now.
+
+After changing the core/vml/svg files, execute `npm run build` to generate all versions, make a commit and you are ready to make a pull request!
 Remember that if you want to add a functionality it must be present in the vml and svg versions, **no svg-only features will be accepted.**
 
 ## Found an issue?
