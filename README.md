@@ -7,14 +7,24 @@ Visit the library website for more information: ~~[http://raphaeljs.com](http://
 You need to have NPM installed to build the library.
 
 * `git clone https://github.com/DmitryBaranovskiy/raphael.git`
-* `npm install && bower install && ./node_modules/grunt-cli/bin/grunt` or just `npm install && bower install && grunt` if you have grunt already installed
+* `npm run start`
+* `npm run build`
+
+To run tests you need to open `dev/test/index.html` in your browser, there's no automated way right now.
 
 ## Dependencies
 * [eve](https://github.com/adobe-webplatform/eve)
 
-You have the `raphael/raphael-min.js` files that has `eve` bundled inside, and `raphael-nodeps/raphael-nodeps-min.js`
-where `eve` must be loaded by you first (you can try with the one in the `dev/` folder).
-For AMD loading like Browserify, you can use raphael.amd.js.
+
+## Distributable 
+
+All files are UMD compliant.
+
+You can use:
+* `raphael.min.js` (includes `eve` and it's minified)
+* `raphael.js` (includes `eve` and it's not minified)
+* `raphael.no-deps.js` (doesn't include `eve` it's not minified)
+* `raphael.no-deps.min.js`  (doesn't include `eve` it's minified)
 
 ## Where to start
 Check [Raphael-boilerplate](https://github.com/tomasAlabes/raphael-boilerplate) to see examples of loading.
@@ -29,12 +39,12 @@ define([ "path/to/raphael" ], function( Raphael ) {
 
 ## Development
 
-Versions will be released as we gather and test new PRs. Each version should have a correspondent branch.
-As there are not automated tests, we will use the feedback from the users for the fixes.
+Versions will be released as we gather and test new PRs. 
+As there are a lot of browsers being supported it might take a while to accept a PR, we will use the feedback from other users too.
 
 
 You can use the `raphaelTest.html` to try things, you need to start a server in the root dir to start testing things there.
-Something like running `python -m SimpleHTTPServer` in the `raphael` directory and hitting `http://localhost:8000/dev/raphaelTest.html` with the browser. You should run `npm install -g bower && bower install -D ` before this can work.
+Something like running `python -m SimpleHTTPServer` in the `raphael` directory and hitting `http://localhost:8000/dev/raphaelTest.html` with the browser. You should run `npm run start` before this can work.
 
 
 ## Collaborators
