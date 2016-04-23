@@ -398,7 +398,13 @@ define(["eve"], function(eve) {
         if (typeof obj == "function" || Object(obj) !== obj) {
             return obj;
         }
-        var res = new obj.constructor;
+        var res;
+        if (!obj.join) {
+          res = function(){};
+        }
+        else {
+          res = new obj.constructor;
+        }
         for (var key in obj) if (obj[has](key)) {
             res[key] = clone(obj[key]);
         }
