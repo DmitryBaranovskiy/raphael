@@ -63,16 +63,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;// ┌────────────────────────────────────────────────────────────────────┐ \\
-	// │ Raphaël @@VERSION - JavaScript Vector Library                      │ \\
-	// ├────────────────────────────────────────────────────────────────────┤ \\
-	// │ Copyright © 2008-2012 Dmitry Baranovskiy (http://raphaeljs.com)    │ \\
-	// │ Copyright © 2008-2012 Sencha Labs (http://sencha.com)              │ \\
-	// ├────────────────────────────────────────────────────────────────────┤ \\
-	// │ Licensed under the MIT (http://raphaeljs.com/license.html) license.│ \\
-	// └────────────────────────────────────────────────────────────────────┘ \\
-
-	!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(1), __webpack_require__(3), __webpack_require__(4)], __WEBPACK_AMD_DEFINE_RESULT__ = function(R) {
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(1), __webpack_require__(3), __webpack_require__(4)], __WEBPACK_AMD_DEFINE_RESULT__ = function(R) {
 
 	    return R;
 
@@ -82,15 +73,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 1 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;// ┌────────────────────────────────────────────────────────────────────┐ \\
-	// │ Raphaël @@VERSION - JavaScript Vector Library                      │ \\
-	// ├────────────────────────────────────────────────────────────────────┤ \\
-	// │ Core Module                                                        │ \\
-	// ├────────────────────────────────────────────────────────────────────┤ \\
-	// │ Licensed under the MIT (http://raphaeljs.com/license.html) license.│ \\
-	// └────────────────────────────────────────────────────────────────────┘ \\
-
-	!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(2)], __WEBPACK_AMD_DEFINE_RESULT__ = function(eve) {
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(2)], __WEBPACK_AMD_DEFINE_RESULT__ = function(eve) {
 
 	    /*\
 	     * Raphael
@@ -159,7 +142,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	        }
 	    }
-	    R.version = "@@VERSION";
+	    R.version = "2.2.0";
 	    R.eve = eve;
 	    var loaded,
 	        separator = /[, ]+/,
@@ -5507,17 +5490,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 3 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;// ┌─────────────────────────────────────────────────────────────────────┐ \\
-	// │ Raphaël @@VERSION - JavaScript Vector Library                       │ \\
-	// ├─────────────────────────────────────────────────────────────────────┤ \\
-	// │ SVG Module                                                          │ \\
-	// ├─────────────────────────────────────────────────────────────────────┤ \\
-	// │ Copyright (c) 2008-2011 Dmitry Baranovskiy (http://raphaeljs.com)   │ \\
-	// │ Copyright (c) 2008-2011 Sencha Labs (http://sencha.com)             │ \\
-	// │ Licensed under the MIT (http://raphaeljs.com/license.html) license. │ \\
-	// └─────────────────────────────────────────────────────────────────────┘ \\
-
-	!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(1)], __WEBPACK_AMD_DEFINE_RESULT__ = function(R) {
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(1)], __WEBPACK_AMD_DEFINE_RESULT__ = function(R) {
 	    if (R && !R.svg) {
 	        return;
 	    }
@@ -6941,17 +6914,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;// ┌─────────────────────────────────────────────────────────────────────┐ \\
-	// │ Raphaël @@VERSION - JavaScript Vector Library                       │ \\
-	// ├─────────────────────────────────────────────────────────────────────┤ \\
-	// │ VML Module                                                          │ \\
-	// ├─────────────────────────────────────────────────────────────────────┤ \\
-	// │ Copyright (c) 2008-2011 Dmitry Baranovskiy (http://raphaeljs.com)   │ \\
-	// │ Copyright (c) 2008-2011 Sencha Labs (http://sencha.com)             │ \\
-	// │ Licensed under the MIT (http://raphaeljs.com/license.html) license. │ \\
-	// └─────────────────────────────────────────────────────────────────────┘ \\
-
-	!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(1)], __WEBPACK_AMD_DEFINE_RESULT__ = function(R) {
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(1)], __WEBPACK_AMD_DEFINE_RESULT__ = function(R) {
 	    if (R && !R.vml) {
 	        return;
 	    }

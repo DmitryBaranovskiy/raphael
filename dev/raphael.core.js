@@ -1,11 +1,3 @@
-// ┌────────────────────────────────────────────────────────────────────┐ \\
-// │ Raphaël @@VERSION - JavaScript Vector Library                      │ \\
-// ├────────────────────────────────────────────────────────────────────┤ \\
-// │ Core Module                                                        │ \\
-// ├────────────────────────────────────────────────────────────────────┤ \\
-// │ Licensed under the MIT (http://raphaeljs.com/license.html) license.│ \\
-// └────────────────────────────────────────────────────────────────────┘ \\
-
 define(["eve"], function(eve) {
 
     /*\
@@ -75,7 +67,7 @@ define(["eve"], function(eve) {
             }
         }
     }
-    R.version = "@@VERSION";
+    R.version = "2.2.0";
     R.eve = eve;
     var loaded,
         separator = /[, ]+/,

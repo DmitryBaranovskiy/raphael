@@ -1,13 +1,3 @@
-// ┌─────────────────────────────────────────────────────────────────────┐ \\
-// │ Raphaël @@VERSION - JavaScript Vector Library                       │ \\
-// ├─────────────────────────────────────────────────────────────────────┤ \\
-// │ VML Module                                                          │ \\
-// ├─────────────────────────────────────────────────────────────────────┤ \\
-// │ Copyright (c) 2008-2011 Dmitry Baranovskiy (http://raphaeljs.com)   │ \\
-// │ Copyright (c) 2008-2011 Sencha Labs (http://sencha.com)             │ \\
-// │ Licensed under the MIT (http://raphaeljs.com/license.html) license. │ \\
-// └─────────────────────────────────────────────────────────────────────┘ \\
-
 define(["./raphael.core"], function(R) {
     if (R && !R.vml) {
         return;
