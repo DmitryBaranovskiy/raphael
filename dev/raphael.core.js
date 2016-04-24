@@ -2821,7 +2821,7 @@ define(["eve"], function(eve) {
      * Raphael.el
      [ property (object) ]
      **
-     * You can add your own method to elements. This is usefull when you want to hack default functionality or
+     * You can add your own method to elements. This is useful when you want to hack default functionality or
      * want to wrap some common transformation or attributes in one method. In difference to canvas methods,
      * you can redefine element method at any time. Expending element methods wouldn’t affect set.
      > Usage
@@ -3068,7 +3068,7 @@ define(["eve"], function(eve) {
      * Element.data
      [ method ]
      **
-     * Adds or retrieves given value asociated with given key.
+     * Adds or retrieves given value associated with given key.
      **
      * See also @Element.removeData
      > Parameters
@@ -3177,7 +3177,7 @@ define(["eve"], function(eve) {
      - mcontext (object) #optional context for moving handler
      - scontext (object) #optional context for drag start handler
      - econtext (object) #optional context for drag end handler
-     * Additionaly following `drag` events will be triggered: `drag.start.<id>` on start,
+     * Additionally following `drag` events will be triggered: `drag.start.<id>` on start,
      * `drag.end.<id>` on end and `drag.move.<id>` on every move. When element will be dragged over another element
      * `drag.over.<id>` will be fired as well.
      *
