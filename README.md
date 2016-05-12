@@ -68,8 +68,8 @@ Something like running `python -m SimpleHTTPServer` in the `raphael` directory a
 
 ## Copyright and license
 
-Copyright © 2008-2013 Dmitry Baranovskiy (http://raphaeljs.com)
+Copyright © 2008-2013 Dmitry Baranovskiy (http://dmitrybaranovskiy.github.io/raphael/)
 
 Copyright © 2008-2013 Sencha Labs (http://sencha.com)
 
-Licensed under the **MIT** (http://raphaeljs.com/license.html) license.
+Licensed under the **MIT** (http://dmitrybaranovskiy.github.io/raphael/license.html) license.
