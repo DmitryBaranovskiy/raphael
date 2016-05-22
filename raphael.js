@@ -270,7 +270,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            transform: "",
 	            width: 0,
 	            x: 0,
-	            y: 0
+	            y: 0,
+	            class: ""
 	        },
 	        availableAnimAttrs = R._availableAnimAttrs = {
 	            blur: nu,
