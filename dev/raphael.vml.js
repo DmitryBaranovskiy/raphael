@@ -219,7 +219,6 @@ define(["./raphael.core"], function(R) {
             addArrow(res, params["arrow-end"], 1);
         }
         if (params.opacity != null ||
-            params["stroke-width"] != null ||
             params.fill != null ||
             params.src != null ||
             params.stroke != null ||
