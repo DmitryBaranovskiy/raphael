@@ -11,7 +11,7 @@
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory(require("eve"));
 	else if(typeof define === 'function' && define.amd)
-		define("Raphael", ["eve"], factory);
+		define(["eve"], factory);
 	else if(typeof exports === 'object')
 		exports["Raphael"] = factory(require("eve"));
 	else
@@ -7136,7 +7136,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	            addArrow(res, params["arrow-end"], 1);
 	        }
 	        if (params.opacity != null ||
-	            params["stroke-width"] != null ||
 	            params.fill != null ||
 	            params.src != null ||
 	            params.stroke != null ||

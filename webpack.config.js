@@ -6,7 +6,7 @@ const fs = require("fs");
 const args = process.argv;
 
 let plugins = [
-	new webpack.BannerPlugin(fs.readFileSync('./dev/banner.txt', 'utf8'),{ raw: true, entryOnly: true })
+	new webpack.BannerPlugin(fs.readFileSync('./dev/banner.txt', 'utf8'), { raw: true, entryOnly: true })
 ];
 let externals = [];
 let filename = "raphael";
@@ -36,8 +36,7 @@ module.exports = {
 	output: {
 		filename: filename + ".js",
 		libraryTarget: "umd",
-		library: "Raphael",
-		umdNamedDefine: true
+		library: "Raphael"
 	},
 
 	externals: externals,
