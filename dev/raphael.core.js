@@ -369,7 +369,6 @@ define(["eve"], function(eve) {
     \*/
     R.fn = paperproto = Paper.prototype = R.prototype;
     R._id = 0;
-    R._oid = 0;
     /*\
      * Raphael.is
      [ method ]

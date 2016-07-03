@@ -1,3 +1,7 @@
+2.2.2 (WIP)
+------------------
+  * Improved elements ids, so multiple raphael instances are more reliable
+
 2.2.1
 ------------------
   * Removed name of amd module
