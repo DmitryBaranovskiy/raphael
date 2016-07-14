@@ -13,7 +13,7 @@
     }
   ],
   "dependencies": {
-    "eve": "git://github.com/adobe-webplatform/eve.git#eef80ed"
+    "eve": "https://github.com/adobe-webplatform/eve.git#eef80ed"
   },
   "devDependencies": {
     "bower": "1.4.1",
