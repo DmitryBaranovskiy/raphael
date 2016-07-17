@@ -20,7 +20,7 @@
         // Initialize container when document is loaded
         window.onload = function () {
             require(['../raphael'], function(Raphael) {
-                var paper = Raphael(0, 0, 640, 720, "container");
+                var paper = Raphael("container", 640, 720);
                 paper.circle(100, 100, 100).attr({'fill':'270-#FAE56B:0-#E56B6B:100'}); //example
             });
         };
