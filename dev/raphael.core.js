@@ -1140,7 +1140,11 @@ define(["eve"], function(eve) {
     });
     // PATHS
     var paths = function (ps) {
+        // p is the cache
         var p = paths.ps = paths.ps || {};
+        // q is the subset of cache items which have been used this tick
+        // (and so should not be expired from the cache)
+        var q = paths.q = paths.q || {};
         if (p[ps]) {
             p[ps].sleep = 100;
         } else {
@@ -1148,12 +1152,23 @@ define(["eve"], function(eve) {
                 sleep: 100
             };
         }
-        setTimeout(function () {
-            for (var key in p) if (p[has](key) && key != ps) {
-                p[key].sleep--;
-                !p[key].sleep && delete p[key];
-            }
-        });
+        // if we've already queued a timeout, just mark this path as being
+        // used this tick, and increase the amount the lifetime of non-used
+        // items will be reduced by
+        if (paths.t) {
+            q[ps] = 1;
+            paths.t += 1;
+        } else {
+            setTimeout(function () {
+                for (var key in p) if (p[has](key) && !q[has](key)) {
+                    p[key].sleep -= paths.t;
+                    (p[key].sleep <= 0) && delete p[key];
+                }
+                paths.t = 0;
+                paths.q = {};
+            });
+            paths.t = 1;
+        }
         return p[ps];
     };
     /*\
