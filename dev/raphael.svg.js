@@ -1362,6 +1362,9 @@ define(["./raphael.core"], function(R) {
         var cnvs = this.canvas,
             s = cnvs.style,
             pos;
+        if(!(cnvs.getScreenCTM || cnvs.createSVGMatrix)){
+            return;
+        }
         try {
             pos = cnvs.getScreenCTM() || cnvs.createSVGMatrix();
         } catch (e) {
