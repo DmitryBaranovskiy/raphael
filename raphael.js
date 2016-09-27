@@ -8192,7 +8192,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            scale: paperSize
 	        };
 	        this.forEach(function (el) {
-	            el.transform("...");
+	            //el.transform("...");
+	            el.transform("...t"+x+","+y);
 	        });
 	        return this;
 	    };
