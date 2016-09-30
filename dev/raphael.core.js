@@ -1,4 +1,4 @@
-define(["eve/eve"], function(eve) {
+define(["eve"], function(eve) {
 
     /*\
      * Raphael
