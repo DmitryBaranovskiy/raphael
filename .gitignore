@@ -3,3 +3,4 @@ bower_components/
 
 .idea
 *.iml
+npm-debug.log

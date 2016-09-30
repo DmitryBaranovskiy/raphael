@@ -3,10 +3,10 @@
   "main": "raphael.min.js",
   "description": "JavaScript Vector Library",
   "dependencies": {
-    "eve": "https://github.com/adobe-webplatform/eve.git#eef80ed"
+    "eve": "adobe-webplatform/eve"
   },
   "devDependencies": {
-    "requirejs": "~2.1.17"
+    "requirejs": "2.3.2"
   },
   "moduleType": [
     "amd",
