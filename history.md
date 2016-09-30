@@ -1,3 +1,7 @@
+2.2.4
+------------------
+  * Fixed no-deps version with eve.
+
 2.2.3
 ------------------
   * Changed eve dependencies avoiding short sha and github url
