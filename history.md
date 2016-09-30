@@ -1,4 +1,8 @@
-2.2.2 (WIP)
+2.2.3
+------------------
+  * Changed eve dependencies avoiding short sha and github url
+
+2.2.2
 ------------------
   * Improved elements ids, so multiple raphael instances are more reliable
 
