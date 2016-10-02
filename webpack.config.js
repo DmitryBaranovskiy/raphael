@@ -58,7 +58,7 @@ module.exports = {
 	resolve: {
 		modulesDirectories: ["bower_components"],
 		alias: {
-			"eve": "eve/eve"
+			"eve": "eve-raphael/eve"
 		}
 	}
 };

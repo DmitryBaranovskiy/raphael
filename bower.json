@@ -3,7 +3,7 @@
   "main": "raphael.min.js",
   "description": "JavaScript Vector Library",
   "dependencies": {
-    "eve": "adobe-webplatform/eve"
+    "eve-raphael": "0.5.0"
   },
   "devDependencies": {
     "requirejs": "2.3.2"
