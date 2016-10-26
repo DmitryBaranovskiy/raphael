@@ -4,6 +4,7 @@ const webpack = require("webpack");
 const fs = require("fs");
 
 const args = process.argv;
+var sourceEntry = './dev/raphael.amd.js';
 
 let plugins = [
 	new webpack.BannerPlugin(fs.readFileSync('./dev/banner.txt', 'utf8'), { raw: true, entryOnly: true })
@@ -16,6 +17,12 @@ if(args.indexOf('--no-deps') !== -1){
 	console.log('Building version without deps');
 	externals.push("eve");
 	filename += ".no-deps"
+}
+
+if(args.indexOf('--no-vml') !== -1){
+	console.log('Building version without vml');
+    sourceEntry = './dev/raphael.amd.novml.js';
+	filename += ".no-vml"
 }
 
 if(args.indexOf('--min') !== -1){
@@ -32,7 +39,7 @@ if(args.indexOf('--min') !== -1){
 }
 
 module.exports = {
-	entry: './dev/raphael.amd.js',
+	entry: sourceEntry,
 	output: {
 		filename: filename + ".js",
 		libraryTarget: "umd",
