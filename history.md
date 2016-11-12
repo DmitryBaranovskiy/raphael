@@ -1,3 +1,14 @@
+2.2.7
+------------------
+  * Updating package.json dependencies
+  * Using custom eve instead of old eve in npm
+  * Fixed class as a reserved word in old browsers
+
+2.2.5 - 2.2.6
+------------------
+Duplicated tag by mistake.
+  * Using custom repo for eve in bower to avoid using a short sha in it.
+
 2.2.4
 ------------------
   * Fixed no-deps version with eve.
