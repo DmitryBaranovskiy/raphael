@@ -196,7 +196,7 @@ define(["eve"], function(eve) {
             width: 0,
             x: 0,
             y: 0,
-            class: ""
+            "class": ""
         },
         availableAnimAttrs = R._availableAnimAttrs = {
             blur: nu,

@@ -13,17 +13,17 @@
     }
   ],
   "dependencies": {
-    "eve": "0.5.0"
+    "eve-raphael": "0.5.0"
   },
   "devDependencies": {
-    "bower": "1.7.9",
-    "eslint": "3.6.1",
-    "eslint-config-standard": "6.2.0",
-    "eslint-loader": "1.5.0",
-    "eslint-plugin-promise": "2.0.1",
+    "bower": "1.8.0",
+    "eslint": "3.10.0",
+    "eslint-config-standard": "6.2.1",
+    "eslint-loader": "1.6.1",
+    "eslint-plugin-promise": "3.3.2",
     "eslint-plugin-standard": "2.0.1",
     "qunitjs": "2.0.1",
-    "webpack": "1.13.2"
+    "webpack": "1.13.3"
   },
   "scripts": {
     "start": "npm install && bower install",
