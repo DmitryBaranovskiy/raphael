@@ -141,7 +141,7 @@ Duplicated tag by mistake.
     * [Element.glow](http://raphaeljs.com/reference.html#Element.glow)
     * [Element.onDragOver](http://raphaeljs.com/reference.html#Element.onDragOver)
     * [Element.removeData](http://raphaeljs.com/reference.html#Element.removeData)
-    * [Raphael.fullfill](http://raphaeljs.com/reference.html#Raphael.fullfill)
+    * [Raphael.fulfill](http://raphaeljs.com/reference.html#Raphael.fulfill)
     * [Raphael.matrix](http://raphaeljs.com/reference.html#Raphael.matrix)
     * [Raphael.parseTransformString](http://raphaeljs.com/reference.html#Raphael.parseTransformString)
     * [Set.clear](http://raphaeljs.com/reference.html#Set.clear)

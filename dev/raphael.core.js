@@ -5289,7 +5289,7 @@ define(["eve"], function(eve) {
         return token || E;
     };
     /*\
-     * Raphael.fullfill
+     * Raphael.fulfill
      [ method ]
      **
      * A little bit more advanced format function than @Raphael.format. Replaces construction of type “`{<name>}`” to the corresponding argument.
@@ -5301,7 +5301,7 @@ define(["eve"], function(eve) {
      = (string) formated string
      > Usage
      | // this will draw a rectangular shape equivalent to "M10,20h40v50h-40z"
-     | paper.path(Raphael.fullfill("M{x},{y}h{dim.width}v{dim.height}h{dim['negative width']}z", {
+     | paper.path(Raphael.fulfill("M{x},{y}h{dim.width}v{dim.height}h{dim['negative width']}z", {
      |     x: 10,
      |     y: 20,
      |     dim: {
@@ -5311,7 +5311,7 @@ define(["eve"], function(eve) {
      |     }
      | }));
     \*/
-    R.fullfill = (function () {
+    R.fulfill = (function () {
         var tokenRegex = /\{([^\}]+)\}/g,
             objNotationRegex = /(?:(?:^|\.)(.+?)(?=\[|\.|$|\()|\[('|")(.+?)\2\])(\(\))?/g, // matches .xxxxx or ["xxxxx"] to run over object properties
             replacer = function (all, key, obj) {
