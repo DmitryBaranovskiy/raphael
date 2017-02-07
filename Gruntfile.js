@@ -8,7 +8,7 @@ module.exports = function(grunt) {
     grunt.initConfig({
         // Metadata.
         pkg: pkg,
-        banner: grunt.file.read("dev/copy.js").replace(/@VERSION/, pkg.version),
+        banner: grunt.file.read("dev/banner.txt").replace(/@VERSION/, pkg.version),
         // Task configuration.
         uglify: {
             options: {
@@ -21,6 +21,14 @@ module.exports = function(grunt) {
             nodeps: {
                 src: "<%= concat.nodeps.dest %>",
                 dest: "<%= pkg.name %>-nodeps-min.js"
+            },
+            novml: {
+                src: "<%= concat.novml.dest %>",
+                dest: "<%= pkg.name %>-novml-min.js"
+            },
+            nodeps_novml: {
+                src: "<%= concat.nodeps_novml.dest %>",
+                dest: "<%= pkg.name %>-nodeps-novml-min.js"
             }
         },
         replace: {
@@ -34,7 +42,12 @@ module.exports = function(grunt) {
                 files: [{
                     expand: true,
                     flatten: true,
-                    src: ["<%= concat.dist.dest %>", "<%= concat.nodeps.dest %>"],
+                    src: [
+                        "<%= concat.dist.dest %>",
+                        "<%= concat.nodeps.dest %>",
+                        "<%= concat.novml.dest %>",
+                        "<%= concat.nodeps_novml.dest %>"
+                    ],
                     dest: "./"
                 }]
             }
@@ -57,6 +70,23 @@ module.exports = function(grunt) {
                     "dev/raphael.svg.js",
                     "dev/raphael.vml.js",
                     "dev/raphael.amd.js"
+                ]
+            },
+            novml: {
+                dest: "<%= pkg.name %>-novml.js",
+                src: [
+                    "dev/eve.js",
+                    "dev/raphael.core.js",
+                    "dev/raphael.svg.js",
+                    "dev/raphael.amd.novml.js"
+                ]
+            },
+            nodeps_novml: {
+                dest: "<%= pkg.name %>-nodeps-novml.js",
+                src: [
+                    "dev/raphael.core.js",
+                    "dev/raphael.svg.js",
+                    "dev/raphael.amd.novml.js"
                 ]
             }
         }

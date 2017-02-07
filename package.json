@@ -27,7 +27,7 @@
   },
   "scripts": {
     "start": "npm install && bower install",
-    "build": "webpack && webpack --min && webpack --no-deps && webpack --no-deps --min",
+    "build": "webpack && webpack --min && webpack --no-deps && webpack --no-deps --min && webpack --no-vml && webpack --no-vml --min && webpack --no-vml --no-deps && webpack --no-vml --no-deps --min",
     "test": "echo \"Open dev/test/index.html with your browser\" && exit 1"
   },
   "repository": {
