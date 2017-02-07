@@ -582,7 +582,8 @@ define(["./raphael.core"], function(R) {
         }
         var a = el.attrs,
             node = el.node,
-            fontSize = node.firstChild ? toInt(R._g.doc.defaultView.getComputedStyle(node.firstChild, E).getPropertyValue("font-size"), 10) : 10;
+            computedFontSize = node.firstChild && toInt(R._g.doc.defaultView.getComputedStyle(node.firstChild, E).getPropertyValue("font-size"), 10),
+            fontSize = isNaN(computedFontSize) ? 10 : computedFontSize;
 
         if (params[has]("text")) {
             a.text = params.text;
