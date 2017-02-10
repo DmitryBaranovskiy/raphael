@@ -1,0 +1,47 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+    <head>
+        <title>Raphael Tooltips</title>
+        <script src="../raphael.js" type="text/javascript"></script>
+        <script src="../plugins/raphael.brightness.js" type="text/javascript"></script>
+        <style type="text/css">
+            body {
+                background-color: #222;
+            }
+        </style>
+        <script type="text/javascript">
+            window.onload = function () {
+                var r = Raphael("holder", 1200, 800);
+
+                r.circle(200, 200, 150).attr({ fill: '#ff0000' }).lighter(6);
+                r.circle(550, 200, 150).attr({ fill: '#ff0000' }).lighter(6).resetBrightness();
+                r.circle(900, 200, 150).attr({ fill: '#ff0000' }).darker(6);
+
+                var s = r.set();
+
+                s.push(
+                    r.circle(200, 500, 75).attr({fill: '#ff0000' }),
+                    r.circle(200, 700, 75).attr({fill: '#00ff00' })
+                ).lighter(6);
+
+                var t = r.set();
+
+                t.push(
+                    r.circle(550, 500, 75).attr({fill: '#ff0000' }),
+                    r.circle(550, 700, 75).attr({fill: '#00ff00' })
+                ).lighter(6).resetBrightness();
+
+                var u = r.set();
+
+                u.push(
+                    r.circle(900, 500, 75).attr({fill: '#ff0000'}),
+                    r.circle(900, 700, 75).attr({fill: '#00ff00'})
+                ).darker(6);
+            };
+        </script>
+    </head>
+    <body class="raphael">
+        <div id="holder"></div>
+    </body>
+</html>
