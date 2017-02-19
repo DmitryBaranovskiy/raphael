@@ -3120,7 +3120,7 @@ define(["eve"], function(eve) {
     \*/
     elproto.removeData = function (key) {
         if (key == null) {
-            eldata[this.id] = {};
+            delete eldata[this.id];
         } else {
             eldata[this.id] && delete eldata[this.id][key];
         }
