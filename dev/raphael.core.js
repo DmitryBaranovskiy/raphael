@@ -122,7 +122,7 @@ define(["eve"], function(eve) {
         appendChild = "appendChild",
         apply = "apply",
         concat = "concat",
-        supportsTouch = ('ontouchstart' in g.win) || g.win.DocumentTouch && g.doc instanceof DocumentTouch, //taken from Modernizr touch test
+        supportsTouch = R.supportsTouch = (typeof g.doc.createTouch === "function" || typeof g.win.TouchEvent === "function" || typeof g.win.Touch === "function"),
         E = "",
         S = " ",
         Str = String,
