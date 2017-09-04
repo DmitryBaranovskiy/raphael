@@ -490,7 +490,7 @@ define(["./raphael.core"], function(R) {
             skew.matrix = Str(matrix);
             skew.offset = matrix.offset();
         }
-        if (oldt !== null) { // empty string value is true as well
+        if (oldt != null) { // empty string value is true as well; oldt maybe undefined, use `!= null` instead
             this._.transform = oldt;
             R._extractTransform(this, oldt);
         }
