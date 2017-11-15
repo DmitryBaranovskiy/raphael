@@ -22,7 +22,7 @@
     "eslint-loader": "1.6.1",
     "eslint-plugin-promise": "3.3.2",
     "eslint-plugin-standard": "2.0.1",
-    "qunitjs": "2.0.1",
+    "qunitjs": "^1",
     "webpack": "1.13.3"
   },
   "scripts": {
