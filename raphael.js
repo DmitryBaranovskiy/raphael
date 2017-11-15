@@ -7190,14 +7190,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    R._engine.create = function () {
 	        var con = R._getContainer.apply(0, arguments),
-	            container = con && con.container,
-	            x = con.x,
-	            y = con.y,
-	            width = con.width,
-	            height = con.height;
+	            container = con && con.container;
 	        if (!container) {
 	            throw new Error("SVG container not found.");
 	        }
+	        var x = con.x,
+	            y = con.y,
+	            width = con.width,
+	            height = con.height;
 	        var cnvs = $("svg"),
 	            css = "overflow:hidden;",
 	            isFloating;
