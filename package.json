@@ -19,15 +19,15 @@
     "bower": "1.8.0",
     "eslint": "3.10.0",
     "eslint-config-standard": "6.2.1",
-    "eslint-loader": "1.6.1",
+    "eslint-loader": "^1.9.0",
     "eslint-plugin-promise": "3.3.2",
     "eslint-plugin-standard": "2.0.1",
     "qunitjs": "2.0.1",
-    "webpack": "1.13.3"
+    "webpack": "^3.10.0"
   },
   "scripts": {
     "start": "npm install && bower install",
-    "build": "webpack && webpack --min && webpack --no-deps && webpack --no-deps --min",
+    "build": "webpack && webpack --min && webpack --env.noDeps && webpack --env.noDeps --env.min",
     "test": "echo \"Open dev/test/index.html with your browser\" && exit 1"
   },
   "repository": {
