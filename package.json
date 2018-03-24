@@ -16,18 +16,16 @@
     "eve-raphael": "0.5.0"
   },
   "devDependencies": {
-    "bower": "1.8.0",
-    "eslint": "3.10.0",
-    "eslint-config-standard": "6.2.1",
-    "eslint-loader": "1.6.1",
-    "eslint-plugin-promise": "3.3.2",
-    "eslint-plugin-standard": "2.0.1",
-    "qunitjs": "2.0.1",
-    "webpack": "1.13.3"
+    "qunitjs": "2.4.1",
+    "webpack": "4.2.0",
+    "webpack-cli": "2.0.12"
   },
   "scripts": {
-    "start": "npm install && bower install",
-    "build": "webpack && webpack --min && webpack --no-deps && webpack --no-deps --min",
+    "build-dev": "webpack -d",
+    "build-no-deps": "webpack --env.noDeps -d --output-filename raphael.no-deps.js",
+    "build-no-deps-min": "webpack --env.noDeps -p --output-filename raphael.no-deps.min.js",
+    "build-prod": "webpack -p --output-filename raphael.min.js",
+    "build-all": "yarn build-dev && yarn build-no-deps && yarn build-no-deps-min && yarn build-prod",
     "test": "echo \"Open dev/test/index.html with your browser\" && exit 1"
   },
   "repository": {
