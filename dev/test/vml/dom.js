@@ -1,4 +1,4 @@
-(function() {
+(() =>{
 
 QUnit.module('DOM');
 
