@@ -1,1 +1,1 @@
-define(["./raphael.core", "./raphael.svg", "./raphael.vml"], R=>R);
+define(["./raphael.core", "./raphael.svg", "./raphael.vml"], R => R);
