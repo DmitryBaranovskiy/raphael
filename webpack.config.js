@@ -3,7 +3,7 @@
 const webpack = require("webpack");
 const fs = require("fs");
 
-module.exports = function (env) {
+module.exports = env => {
   
   let externals = [];
   
