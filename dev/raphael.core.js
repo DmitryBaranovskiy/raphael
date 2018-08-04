@@ -3222,7 +3222,7 @@ define(["eve"], function(eve) {
             onstart && eve.on("raphael.drag.start." + this.id, onstart);
             onmove && eve.on("raphael.drag.move." + this.id, onmove);
             onend && eve.on("raphael.drag.end." + this.id, onend);
-            eve("raphael.drag.start." + this.id, start_scope || move_scope || this, e.clientX + scrollX, e.clientY + scrollY, e);
+            eve("raphael.drag.start." + this.id, start_scope || move_scope || this, this._drag.x, this._drag.y, e);
         }
         this._drag = {};
         draggable.push({el: this, start: start});
