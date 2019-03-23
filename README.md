@@ -58,6 +58,7 @@ Something like running `python -m SimpleHTTPServer` in the `raphael` directory a
 * [backbone.raphael](https://github.com/tomasAlabes/backbone.raphael)
 * [mapael](https://github.com/neveldo/jQuery-Mapael)
 * [snap](https://github.com/adobe-webplatform/Snap.svg)
+* [react-raphael](https://github.com/liuhong1happy/react-raphael)
 
 
 ## Books
