@@ -122,7 +122,8 @@ define(["eve"], function(eve) {
         appendChild = "appendChild",
         apply = "apply",
         concat = "concat",
-        supportsTouch = ('ontouchstart' in g.win) || g.win.DocumentTouch && g.doc instanceof DocumentTouch, //taken from Modernizr touch test
+        //taken from Modernizr touch test: https://github.com/Modernizr/Modernizr/blob/master/feature-detects/touchevents.js#L40
+        supportsTouch = ('ontouchstart' in window) || window.TouchEvent || window.DocumentTouch && document instanceof DocumentTouch,
         E = "",
         S = " ",
         Str = String,
