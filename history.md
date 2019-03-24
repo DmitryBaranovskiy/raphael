@@ -1,3 +1,15 @@
+2.2.8
+------------------
+  * Downgraded qunit to v1 to make tests work again
+  * Updated webpack to build dist
+  * Updated supportsTouch query from modernizr #1084
+  * Fix drag offsets passed to "drag.start" from touch drags in elproto.drag #1101
+  * Fix memory leak in `Element.removeData()` #1077
+  * Adding react-raphael to related projects #1072
+  * Added icons back to raphael's website
+  * Updated version in banner and raphael's website
+  * Updated site refs to `https`
+
 2.2.7
 ------------------
   * Updating package.json dependencies
