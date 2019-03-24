@@ -16,7 +16,7 @@
     "eve-raphael": "0.5.0"
   },
   "devDependencies": {
-    "qunitjs": "2.4.1",
+    "qunitjs": "^1.0.0",
     "webpack": "4.2.0",
     "webpack-cli": "2.0.12"
   },
