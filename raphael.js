@@ -6923,18 +6923,24 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
         try {
             pos = cnvs.getScreenCTM() || cnvs.createSVGMatrix();
         } catch (e) {
-            pos = cnvs.createSVGMatrix();
-        }
-        var left = -pos.e % 1,
-            top = -pos.f % 1;
-        if (left || top) {
-            if (left) {
-                this._left = (this._left + left) % 1;
-                s.left = this._left + "px";
+            try {
+                pos = cnvs.createSVGMatrix();
+            } catch (e) {
+
             }
-            if (top) {
-                this._top = (this._top + top) % 1;
-                s.top = this._top + "px";
+        }
+        if (pos) {
+            var left = -pos.e % 1,
+                top = -pos.f % 1;
+            if (left || top) {
+                if (left) {
+                    this._left = (this._left + left) % 1;
+                    s.left = this._left + "px";
+                }
+                if (top) {
+                    this._top = (this._top + top) % 1;
+                    s.top = this._top + "px";
+                }
             }
         }
     };
