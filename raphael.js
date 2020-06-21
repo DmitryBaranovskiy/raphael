@@ -7323,7 +7323,11 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
             a["font-style"] && (s.fontStyle = a["font-style"]);
             fontSize = toFloat(a["font-size"] || fontSize && fontSize[0]) || 10;
             s.fontSize = fontSize * m + "px";
-            res.textpath.string && (span.innerHTML = Str(res.textpath.string).replace(/</g, "&#60;").replace(/&/g, "&#38;").replace(/\n/g, "<br>"));
+            /*Resolve IE7 issue with innerHTML*/
+            var newdiv = document.createElement("div");
+            res.textpath.string && (newdiv.innerHTML = Str(res.textpath.string).replace(/</g, "&#60;").replace(/&/g, "&#38;").replace(/\n/g, "<br>"));
+            span.appendChild(newdiv);
+            /*end of resolution*/
             var brect = span.getBoundingClientRect();
             res.W = a.w = (brect.right - brect.left) / m;
             res.H = a.h = (brect.bottom - brect.top) / m;
