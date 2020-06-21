@@ -5162,11 +5162,11 @@ define(["eve"], function(eve) {
         var thefont;
         if (font) {
             for (var i = 0, ii = font.length; i < ii; i++) {
-                thefont = font[i];
-                if (thefont.face["font-weight"] == weight && (thefont.face["font-style"] == style || !thefont.face["font-style"]) && thefont.face["font-stretch"] == stretch) {
-                    break;
+                if (font[i].face["font-weight"] == weight && (font[i].face["font-style"] == style || !font[i].face["font-style"] && style=="normal") && font[i].face["font-stretch"] == stretch) {
+                    thefont = font[i];
                 }
             }
+            if (!thefont) thefont = font[0];
         }
         return thefont;
     };
