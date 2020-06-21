@@ -4718,7 +4718,7 @@ define(["eve"], function(eve) {
             len,
             e;
         if (value != null) {
-            runAnimation(anim, this, -1, mmin(value, 1));
+            runAnimation(anim, this, 100, mmin(value, 1));
             return this;
         } else {
             len = animationElements.length;
