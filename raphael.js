@@ -7875,6 +7875,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
         var paperSize = this.getSize(),
             width = paperSize.width,
             height = paperSize.height,
+            size = 1 / mmax(w / width, h / height),
             H, W;
         if (fit) {
             H = height / h;
@@ -7890,7 +7891,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
         this._viewBoxShift = {
             dx: -x,
             dy: -y,
-            scale: paperSize
+            scale: size
         };
         this.forEach(function (el) {
             el.transform("...");
