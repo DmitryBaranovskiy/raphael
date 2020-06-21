@@ -870,6 +870,8 @@ define(["./raphael.core"], function(R) {
         height == +height && (height += "px");
         cs.width = width;
         cs.height = height;
+        if((width + '').match(/%$/)) width = this.canvas.offsetWidth + 'px';
+        if((height + '').match(/%$/)) height = this.canvas.offsetHeight + 'px';
         cs.clip = "rect(0 " + width + " " + height + " 0)";
         if (this._viewBox) {
             R._engine.setViewBox.apply(this, this._viewBox);
