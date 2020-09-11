@@ -6473,7 +6473,10 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
         eve.unbind("raphael.*.*." + this.id);
         if (this.gradient) {
             paper.defs.removeChild(this.gradient);
-        }
+		}
+		if (this.clip) {
+			paper.defs.removeChild(this.clip.parentElement);
+		}
         R._tear(this, paper);
 
         node.parentNode.removeChild(node);
