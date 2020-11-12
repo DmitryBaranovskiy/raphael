@@ -916,6 +916,9 @@ define(["./raphael.core"], function(R) {
         if (this.gradient) {
             paper.defs.removeChild(this.gradient);
         }
+        if (this.clip) {
+            paper.defs.removeChild(this.clip.parentNode);
+        }
         R._tear(this, paper);
 
         node.parentNode.removeChild(node);
