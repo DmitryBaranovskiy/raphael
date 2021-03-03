@@ -1685,7 +1685,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
     R.isPointInsidePath = function (path, x, y) {
         var bbox = R.pathBBox(path);
         return R.isPointInsideBBox(bbox, x, y) &&
-               interPathHelper(path, [["M", x, y], ["H", bbox.x2 + 10]], 1) % 2 == 1;
+               interPathHelper(path, [["M", x, y], ["l", bbox.width + 10, Math.random()]], 1) % 2 == 1;
     };
     R._removedFactory = function (methodname) {
         return function () {
