@@ -3343,7 +3343,7 @@ define(["eve"], function(eve) {
      * Creates a path element by given path data string.
      > Parameters
      - pathString (string) #optional path string in SVG format.
-     * Path string consists of one-letter commands, followed by comma seprarated arguments in numercal form. Example:
+     * Path string consists of one-letter commands, followed by comma separated arguments in numercal form. Example:
      | "M10,20L30,40"
      * Here we can see two commands: “M”, with arguments `(10, 20)` and “L” with arguments `(30, 40)`. Upper case letter mean command is absolute, lower case—relative.
      *
