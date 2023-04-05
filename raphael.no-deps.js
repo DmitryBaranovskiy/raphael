@@ -3473,7 +3473,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
      * Creates a path element by given path data string.
      > Parameters
      - pathString (string) #optional path string in SVG format.
-     * Path string consists of one-letter commands, followed by comma seprarated arguments in numercal form. Example:
+     * Path string consists of one-letter commands, followed by comma separated arguments in numercal form. Example:
      | "M10,20L30,40"
      * Here we can see two commands: “M”, with arguments `(10, 20)` and “L” with arguments `(30, 40)`. Upper case letter mean command is absolute, lower case—relative.
      *
@@ -6391,7 +6391,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
      * Each letter is a command. There are four commands: `t` is for translate, `r` is for rotate, `s` is for
      * scale and `m` is for matrix.
      *
-     * There are also alternative “absolute” translation, rotation and scale: `T`, `R` and `S`. They will not take previous transformation into account. For example, `...T100,0` will always move element 100 px horisontally, while `...t100,0` could move it vertically if there is `r90` before. Just compare results of `r90t100,0` and `r90T100,0`.
+     * There are also alternative “absolute” translation, rotation and scale: `T`, `R` and `S`. They will not take previous transformation into account. For example, `...T100,0` will always move element 100 px horizontally, while `...t100,0` could move it vertically if there is `r90` before. Just compare results of `r90t100,0` and `r90T100,0`.
      *
      * So, the example line above could be read like “translate by 100, 100; rotate 30° around 100, 100; scale twice around 100, 100;
      * rotate 45° around centre; scale 1.5 times relative to centre”. As you can see rotate and scale commands have origin
