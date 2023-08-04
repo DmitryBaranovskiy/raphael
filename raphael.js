@@ -19,7 +19,7 @@
 })(window, function() {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
-/******/ 	var installedModules = {};
+/******/ 	let installedModules = {};
 /******/
 /******/ 	// The require function
 /******/ 	function __webpack_require__(moduleId) {
@@ -29,7 +29,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 			return installedModules[moduleId].exports;
 /******/ 		}
 /******/ 		// Create a new module (and put it into the cache)
-/******/ 		var module = installedModules[moduleId] = {
+/******/ 		let module = installedModules[moduleId] = {
 /******/ 			i: moduleId,
 /******/ 			l: false,
 /******/ 			exports: {}
@@ -76,16 +76,16 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 		if(mode & 1) value = __webpack_require__(value);
 /******/ 		if(mode & 8) return value;
 /******/ 		if((mode & 4) && typeof value === 'object' && value && value.__esModule) return value;
-/******/ 		var ns = Object.create(null);
+/******/ 		let ns = Object.create(null);
 /******/ 		__webpack_require__.r(ns);
 /******/ 		Object.defineProperty(ns, 'default', { enumerable: true, value: value });
-/******/ 		if(mode & 2 && typeof value != 'string') for(var key in value) __webpack_require__.d(ns, key, function(key) { return value[key]; }.bind(null, key));
+/******/ 		if(mode & 2 && typeof value != 'string') for(let key in value) __webpack_require__.d(ns, key, function(key) { return value[key]; }.bind(null, key));
 /******/ 		return ns;
 /******/ 	};
 /******/
 /******/ 	// getDefaultExport function for compatibility with non-harmony modules
 /******/ 	__webpack_require__.n = function(module) {
-/******/ 		var getter = module && module.__esModule ?
+/******/ 		let getter = module && module.__esModule ?
 /******/ 			function getDefault() { return module['default']; } :
 /******/ 			function getModuleExports() { return module; };
 /******/ 		__webpack_require__.d(getter, 'a', getter);
@@ -112,7 +112,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(/*! ./raphael.core */ "./dev/raphael.core.js"), __webpack_require__(/*! ./raphael.svg */ "./dev/raphael.svg.js"), __webpack_require__(/*! ./raphael.vml */ "./dev/raphael.vml.js")], __WEBPACK_AMD_DEFINE_RESULT__ = (function(R) {
+let __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(/*! ./raphael.core */ "./dev/raphael.core.js"), __webpack_require__(/*! ./raphael.svg */ "./dev/raphael.svg.js"), __webpack_require__(/*! ./raphael.vml */ "./dev/raphael.vml.js")], __WEBPACK_AMD_DEFINE_RESULT__ = (function(R) {
 
     return R;
 
@@ -128,7 +128,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(/*! eve */ "./node_modules/eve-raphael/eve.js")], __WEBPACK_AMD_DEFINE_RESULT__ = (function(eve) {
+let __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(/*! eve */ "./node_modules/eve-raphael/eve.js")], __WEBPACK_AMD_DEFINE_RESULT__ = (function(eve) {
 
     /*\
      * Raphael
@@ -186,9 +186,9 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
         } else if (R.is(first, array)) {
             return R._engine.create[apply](R, first.splice(0, 3 + R.is(first[0], nu))).add(first);
         } else {
-            var args = Array.prototype.slice.call(arguments, 0);
+            let args = Array.prototype.slice.call(arguments, 0);
             if (R.is(args[args.length - 1], "function")) {
-                var f = args.pop();
+                let f = args.pop();
                 return loaded ? f.call(R._engine.create[apply](R, args)) : eve.on("raphael.DOMload", function () {
                     f.call(R._engine.create[apply](R, args));
                 });
@@ -199,7 +199,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
     }
     R.version = "2.3.0";
     R.eve = eve;
-    var loaded,
+    let loaded,
         separator = /[, ]+/,
         elements = {circle: 1, rect: 1, path: 1, ellipse: 1, text: 1, image: 1},
         formatrg = /\{(\d+)\}/g,
@@ -387,27 +387,27 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
                 return el.attr("path");
             },
             circle: function (el) {
-                var a = el.attrs;
+                let a = el.attrs;
                 return ellipsePath(a.cx, a.cy, a.r);
             },
             ellipse: function (el) {
-                var a = el.attrs;
+                let a = el.attrs;
                 return ellipsePath(a.cx, a.cy, a.rx, a.ry);
             },
             rect: function (el) {
-                var a = el.attrs;
+                let a = el.attrs;
                 return rectPath(a.x, a.y, a.width, a.height, a.r);
             },
             image: function (el) {
-                var a = el.attrs;
+                let a = el.attrs;
                 return rectPath(a.x, a.y, a.width, a.height);
             },
             text: function (el) {
-                var bbox = el._getBBox();
+                let bbox = el._getBBox();
                 return rectPath(bbox.x, bbox.y, bbox.width, bbox.height);
             },
             set : function(el) {
-                var bbox = el._getBBox();
+                let bbox = el._getBBox();
                 return rectPath(bbox.x, bbox.y, bbox.width, bbox.height);
             }
         },
@@ -425,7 +425,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
             if (!matrix) {
                 return path;
             }
-            var x, y, i, j, ii, jj, pathi;
+            let x, y, i, j, ii, jj, pathi;
             path = path2curve(path);
             for (i = 0, ii = path.length; i < ii; i++) {
                 pathi = path[i];
@@ -448,7 +448,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
     \*/
     R.type = (g.win.SVGAngle || g.doc.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#BasicStructure", "1.1") ? "SVG" : "VML");
     if (R.type == "VML") {
-        var d = g.doc.createElement("div"),
+        let d = g.doc.createElement("div"),
             b;
         d.innerHTML = '<v:shape adj="1"/>';
         b = d.firstChild;
@@ -529,8 +529,8 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
         if (typeof obj == "function" || Object(obj) !== obj) {
             return obj;
         }
-        var res = new obj.constructor;
-        for (var key in obj) if (obj[has](key)) {
+        let res = new obj.constructor;
+        for (let key in obj) if (obj[has](key)) {
             res[key] = clone(obj[key]);
         }
         return res;
@@ -552,7 +552,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
     \*/
     R.angle = function (x1, y1, x2, y2, x3, y3) {
         if (x3 == null) {
-            var x = x1 - x2,
+            let x = x1 - x2,
                 y = y1 - y2;
             if (!x && !y) {
                 return 0;
@@ -600,13 +600,13 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
     R.snapTo = function (values, value, tolerance) {
         tolerance = R.is(tolerance, "finite") ? tolerance : 10;
         if (R.is(values, array)) {
-            var i = values.length;
+            let i = values.length;
             while (i--) if (abs(values[i] - value) <= tolerance) {
                 return values[i];
             }
         } else {
             values = +values;
-            var rem = value % values;
+            let rem = value % values;
             if (rem < tolerance) {
                 return value - rem;
             }
@@ -623,12 +623,12 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
      **
      * Returns RFC4122, version 4 ID
     \*/
-    var createUUID = R.createUUID = (function (uuidRegEx, uuidReplacer) {
+    let createUUID = R.createUUID = (function (uuidRegEx, uuidReplacer) {
         return function () {
             return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(uuidRegEx, uuidReplacer).toUpperCase();
         };
     })(/[xy]/g, function (c) {
-        var r = math.random() * 16 | 0,
+        let r = math.random() * 16 | 0,
             v = c == "x" ? r : (r & 3 | 8);
         return v.toString(16);
     });
@@ -649,24 +649,24 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
             R._engine.initWin(g.win);
         }
     };
-    var toHex = function (color) {
+    let toHex = function (color) {
         if (R.vml) {
             // http://dean.edwards.name/weblog/2009/10/convert-any-colour-value-to-hex-in-msie/
-            var trim = /^\s+|\s+$/g;
-            var bod;
+            let trim = /^\s+|\s+$/g;
+            let bod;
             try {
-                var docum = new ActiveXObject("htmlfile");
+                let docum = new ActiveXObject("htmlfile");
                 docum.write("<body>");
                 docum.close();
                 bod = docum.body;
             } catch(e) {
                 bod = createPopup().document.body;
             }
-            var range = bod.createTextRange();
+            let range = bod.createTextRange();
             toHex = cacher(function (color) {
                 try {
                     bod.style.color = Str(color).replace(trim, E);
-                    var value = range.queryCommandValue("ForeColor");
+                    let value = range.queryCommandValue("ForeColor");
                     value = ((value & 255) << 16) | (value & 65280) | ((value & 16711680) >>> 16);
                     return "#" + ("000000" + value.toString(16)).slice(-6);
                 } catch(e) {
@@ -674,7 +674,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
                 }
             });
         } else {
-            var i = g.doc.createElement("i");
+            let i = g.doc.createElement("i");
             i.title = "Rapha\xebl Colour Picker";
             i.style.display = "none";
             g.doc.body.appendChild(i);
@@ -701,7 +701,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
             r = r.r;
         }
         if (g == null && R.is(r, string)) {
-            var clr = R.getRGB(r);
+            let clr = R.getRGB(r);
             r = clr.r;
             g = clr.g;
             b = clr.b;
@@ -718,7 +718,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
         r *= 255;
         g *= 255;
         b *= 255;
-        var rgb = {
+        let rgb = {
             r: r,
             g: g,
             b: b,
@@ -750,7 +750,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
      o }
     \*/
     R.color = function (clr) {
-        var rgb;
+        let rgb;
         if (R.is(clr, "object") && "h" in clr && "s" in clr && "b" in clr) {
             rgb = R.hsb2rgb(clr);
             clr.r = rgb.r;
@@ -807,7 +807,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
             h = h.h;
         }
         h *= 360;
-        var R, G, B, X, C;
+        let R, G, B, X, C;
         h = (h % 360) / 60;
         C = v * s;
         X = C * (1 - abs(h % 2 - 1));
@@ -848,7 +848,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
             l /= 100;
         }
         h *= 360;
-        var R, G, B, X, C;
+        let R, G, B, X, C;
         h = (h % 360) / 60;
         C = 2 * s * (l < .5 ? l : 1 - l);
         X = C * (1 - abs(h % 2 - 1));
