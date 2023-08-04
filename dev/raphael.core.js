@@ -56,7 +56,7 @@ define(["eve"], function(eve) {
         } else if (R.is(first, array)) {
             return R._engine.create[apply](R, first.splice(0, 3 + R.is(first[0], nu))).add(first);
         } else {
-            var args = Array.prototype.slice.call(arguments, 0);
+            let args = Array.prototype.slice.call(arguments, 0);
             if (R.is(args[args.length - 1], "function")) {
                 var f = args.pop();
                 return loaded ? f.call(R._engine.create[apply](R, args)) : eve.on("raphael.DOMload", function () {
@@ -69,7 +69,7 @@ define(["eve"], function(eve) {
     }
     R.version = "2.3.0";
     R.eve = eve;
-    var loaded,
+    let loaded,
         separator = /[, ]+/,
         elements = {circle: 1, rect: 1, path: 1, ellipse: 1, text: 1, image: 1},
         formatrg = /\{(\d+)\}/g,
@@ -257,27 +257,27 @@ define(["eve"], function(eve) {
                 return el.attr("path");
             },
             circle: function (el) {
-                var a = el.attrs;
+                let a = el.attrs;
                 return ellipsePath(a.cx, a.cy, a.r);
             },
             ellipse: function (el) {
-                var a = el.attrs;
+                let a = el.attrs;
                 return ellipsePath(a.cx, a.cy, a.rx, a.ry);
             },
             rect: function (el) {
-                var a = el.attrs;
+                let a = el.attrs;
                 return rectPath(a.x, a.y, a.width, a.height, a.r);
             },
             image: function (el) {
-                var a = el.attrs;
+                let a = el.attrs;
                 return rectPath(a.x, a.y, a.width, a.height);
             },
             text: function (el) {
-                var bbox = el._getBBox();
+                let bbox = el._getBBox();
                 return rectPath(bbox.x, bbox.y, bbox.width, bbox.height);
             },
             set : function(el) {
-                var bbox = el._getBBox();
+                let bbox = el._getBBox();
                 return rectPath(bbox.x, bbox.y, bbox.width, bbox.height);
             }
         },
@@ -295,7 +295,7 @@ define(["eve"], function(eve) {
             if (!matrix) {
                 return path;
             }
-            var x, y, i, j, ii, jj, pathi;
+            let x, y, i, j, ii, jj, pathi;
             path = path2curve(path);
             for (i = 0, ii = path.length; i < ii; i++) {
                 pathi = path[i];
@@ -318,7 +318,7 @@ define(["eve"], function(eve) {
     \*/
     R.type = (g.win.SVGAngle || g.doc.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#BasicStructure", "1.1") ? "SVG" : "VML");
     if (R.type == "VML") {
-        var d = g.doc.createElement("div"),
+        let d = g.doc.createElement("div"),
             b;
         d.innerHTML = '<v:shape adj="1"/>';
         b = d.firstChild;
@@ -399,8 +399,8 @@ define(["eve"], function(eve) {
         if (typeof obj == "function" || Object(obj) !== obj) {
             return obj;
         }
-        var res = new obj.constructor;
-        for (var key in obj) if (obj[has](key)) {
+        let res = new obj.constructor;
+        for (let key in obj) if (obj[has](key)) {
             res[key] = clone(obj[key]);
         }
         return res;
@@ -422,7 +422,7 @@ define(["eve"], function(eve) {
     \*/
     R.angle = function (x1, y1, x2, y2, x3, y3) {
         if (x3 == null) {
-            var x = x1 - x2,
+            let x = x1 - x2,
                 y = y1 - y2;
             if (!x && !y) {
                 return 0;
@@ -470,13 +470,13 @@ define(["eve"], function(eve) {
     R.snapTo = function (values, value, tolerance) {
         tolerance = R.is(tolerance, "finite") ? tolerance : 10;
         if (R.is(values, array)) {
-            var i = values.length;
+            let i = values.length;
             while (i--) if (abs(values[i] - value) <= tolerance) {
                 return values[i];
             }
         } else {
             values = +values;
-            var rem = value % values;
+            let rem = value % values;
             if (rem < tolerance) {
                 return value - rem;
             }
@@ -493,12 +493,12 @@ define(["eve"], function(eve) {
      **
      * Returns RFC4122, version 4 ID
     \*/
-    var createUUID = R.createUUID = (function (uuidRegEx, uuidReplacer) {
+    let createUUID = R.createUUID = (function (uuidRegEx, uuidReplacer) {
         return function () {
             return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(uuidRegEx, uuidReplacer).toUpperCase();
         };
     })(/[xy]/g, function (c) {
-        var r = math.random() * 16 | 0,
+        let r = math.random() * 16 | 0,
             v = c == "x" ? r : (r & 3 | 8);
         return v.toString(16);
     });
@@ -519,20 +519,20 @@ define(["eve"], function(eve) {
             R._engine.initWin(g.win);
         }
     };
-    var toHex = function (color) {
+    let toHex = function (color) {
         if (R.vml) {
             // http://dean.edwards.name/weblog/2009/10/convert-any-colour-value-to-hex-in-msie/
-            var trim = /^\s+|\s+$/g;
-            var bod;
+            let trim = /^\s+|\s+$/g;
+            let bod;
             try {
-                var docum = new ActiveXObject("htmlfile");
+                let docum = new ActiveXObject("htmlfile");
                 docum.write("<body>");
                 docum.close();
                 bod = docum.body;
             } catch(e) {
                 bod = createPopup().document.body;
             }
-            var range = bod.createTextRange();
+            let range = bod.createTextRange();
             toHex = cacher(function (color) {
                 try {
                     bod.style.color = Str(color).replace(trim, E);
@@ -544,7 +544,7 @@ define(["eve"], function(eve) {
                 }
             });
         } else {
-            var i = g.doc.createElement("i");
+            let i = g.doc.createElement("i");
             i.title = "Rapha\xebl Colour Picker";
             i.style.display = "none";
             g.doc.body.appendChild(i);
@@ -571,7 +571,7 @@ define(["eve"], function(eve) {
             r = r.r;
         }
         if (g == null && R.is(r, string)) {
-            var clr = R.getRGB(r);
+            let clr = R.getRGB(r);
             r = clr.r;
             g = clr.g;
             b = clr.b;
@@ -588,7 +588,7 @@ define(["eve"], function(eve) {
         r *= 255;
         g *= 255;
         b *= 255;
-        var rgb = {
+        let rgb = {
             r: r,
             g: g,
             b: b,
@@ -620,7 +620,7 @@ define(["eve"], function(eve) {
      o }
     \*/
     R.color = function (clr) {
-        var rgb;
+        let rgb;
         if (R.is(clr, "object") && "h" in clr && "s" in clr && "b" in clr) {
             rgb = R.hsb2rgb(clr);
             clr.r = rgb.r;
@@ -677,7 +677,7 @@ define(["eve"], function(eve) {
             h = h.h;
         }
         h *= 360;
-        var R, G, B, X, C;
+        let R, G, B, X, C;
         h = (h % 360) / 60;
         C = v * s;
         X = C * (1 - abs(h % 2 - 1));
@@ -718,7 +718,7 @@ define(["eve"], function(eve) {
             l /= 100;
         }
         h *= 360;
-        var R, G, B, X, C;
+        let R, G, B, X, C;
         h = (h % 360) / 60;
         C = 2 * s * (l < .5 ? l : 1 - l);
         X = C * (1 - abs(h % 2 - 1));
@@ -752,7 +752,7 @@ define(["eve"], function(eve) {
         g = b[1];
         b = b[2];
 
-        var H, S, V, C;
+        let H, S, V, C;
         V = mmax(r, g, b);
         C = V - mmin(r, g, b);
         H = (C == 0 ? null :
@@ -786,7 +786,7 @@ define(["eve"], function(eve) {
         g = b[1];
         b = b[2];
 
-        var H, S, L, M, m, C;
+        let H, S, L, M, m, C;
         M = mmax(r, g, b);
         m = mmin(r, g, b);
         C = M - m;
@@ -805,13 +805,13 @@ define(["eve"], function(eve) {
         return this.join(",").replace(p2s, "$1");
     };
     function repush(array, item) {
-        for (var i = 0, ii = array.length; i < ii; i++) if (array[i] === item) {
+        for (let i = 0, ii = array.length; i < ii; i++) if (array[i] === item) {
             return array.push(array.splice(i, 1)[0]);
         }
     }
     function cacher(f, scope, postprocessor) {
         function newf() {
-            var arg = Array.prototype.slice.call(arguments, 0),
+            let arg = Array.prototype.slice.call(arguments, 0),
                 args = arg.join("\u2400"),
                 cache = newf.cache = newf.cache || {},
                 count = newf.count = newf.count || [];
@@ -827,8 +827,8 @@ define(["eve"], function(eve) {
         return newf;
     }
 
-    var preload = R._preload = function (src, f) {
-        var img = g.doc.createElement("img");
+    let preload = R._preload = function (src, f) {
+        let img = g.doc.createElement("img");
         img.style.cssText = "position:absolute;left:-9999em;top:-9999em";
         img.onload = function () {
             f.call(this);
@@ -881,7 +881,7 @@ define(["eve"], function(eve) {
             return {r: -1, g: -1, b: -1, hex: "none", toString: clrToString};
         }
         !(hsrg[has](colour.toLowerCase().substring(0, 2)) || colour.charAt() == "#") && (colour = toHex(colour));
-        var res,
+        let res,
             red,
             green,
             blue,
@@ -997,7 +997,7 @@ define(["eve"], function(eve) {
      = (string) hex representation of the colour.
     \*/
     R.getColor = function (value) {
-        var start = this.getColor.start = this.getColor.start || {h: 0, s: 1, b: value || .75},
+        let start = this.getColor.start = this.getColor.start || {h: 0, s: 1, b: value || .75},
             rgb = this.hsb2rgb(start.h, start.s, start.b);
         start.h += .075;
         if (start.h > 1) {
@@ -1019,9 +1019,9 @@ define(["eve"], function(eve) {
 
     // http://schepers.cc/getting-to-the-point
     function catmullRom2bezier(crp, z) {
-        var d = [];
-        for (var i = 0, iLen = crp.length; iLen - 2 * !z > i; i += 2) {
-            var p = [
+        let d = [];
+        for (let i = 0, iLen = crp.length; iLen - 2 * !z > i; i += 2) {
+            let p = [
                         {x: +crp[i - 2], y: +crp[i - 1]},
                         {x: +crp[i],     y: +crp[i + 1]},
                         {x: +crp[i + 2], y: +crp[i + 3]},
@@ -1070,19 +1070,19 @@ define(["eve"], function(eve) {
         if (!pathString) {
             return null;
         }
-        var pth = paths(pathString);
+        let pth = paths(pathString);
         if (pth.arr) {
             return pathClone(pth.arr);
         }
 
-        var paramCounts = {a: 7, c: 6, h: 1, l: 2, m: 2, r: 4, q: 4, s: 4, t: 2, v: 1, z: 0},
+        let paramCounts = {a: 7, c: 6, h: 1, l: 2, m: 2, r: 4, q: 4, s: 4, t: 2, v: 1, z: 0},
             data = [];
         if (R.is(pathString, array) && R.is(pathString[0], array)) { // rough assumption
             data = pathClone(pathString);
         }
         if (!data.length) {
             Str(pathString).replace(pathCommand, function (a, b, c) {
-                var params = [],
+                let params = [],
                     name = b.toLowerCase();
                 c.replace(pathValues, function (a, b) {
                     b && params.push(+b);
@@ -1121,14 +1121,14 @@ define(["eve"], function(eve) {
         if (!TString) {
             return null;
         }
-        var paramCounts = {r: 3, s: 4, t: 2, m: 6},
+        let paramCounts = {r: 3, s: 4, t: 2, m: 6},
             data = [];
         if (R.is(TString, array) && R.is(TString[0], array)) { // rough assumption
             data = pathClone(TString);
         }
         if (!data.length) {
             Str(TString).replace(tCommand, function (a, b, c) {
-                var params = [],
+                let params = [],
                     name = lowerCase.call(b);
                 c.replace(pathValues, function (a, b) {
                     b && params.push(+b);
@@ -1140,17 +1140,17 @@ define(["eve"], function(eve) {
         return data;
     }, this, function(elem) {
         if (!elem) return elem;
-        var newData = [];
-        for (var i = 0; i < elem.length; i++) {
-            var newLevel = [];
-            for (var j = 0; j < elem[i].length; j++) {
+        let newData = [];
+        for (let i = 0; i < elem.length; i++) {
+            let newLevel = [];
+            for (let j = 0; j < elem[i].length; j++) {
                 newLevel.push(elem[i][j]);
             }
             newData.push(newLevel);
         }
       return newData; } );
     // PATHS
-    var paths = function (ps) {
+    let paths = function (ps) {
         var p = paths.ps = paths.ps || {};
         if (p[ps]) {
             p[ps].sleep = 100;
@@ -1160,7 +1160,7 @@ define(["eve"], function(eve) {
             };
         }
         setTimeout(function () {
-            for (var key in p) if (p[has](key) && key != ps) {
+            for (let key in p) if (p[has](key) && key != ps) {
                 p[key].sleep--;
                 !p[key].sleep && delete p[key];
             }
@@ -1208,7 +1208,7 @@ define(["eve"], function(eve) {
      o }
     \*/
     R.findDotsAtSegment = function (p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y, t) {
-        var t1 = 1 - t,
+        let t1 = 1 - t,
             t13 = pow(t1, 3),
             t12 = pow(t1, 2),
             t2 = t * t,
