@@ -3,7 +3,7 @@ define(["./raphael.core"], function(R) {
         return;
     }
 
-    var has = "hasOwnProperty",
+    let has = "hasOwnProperty",
         Str = String,
         toFloat = parseFloat,
         math = Math,
@@ -26,13 +26,13 @@ define(["./raphael.core"], function(R) {
         pathTypes = {path: 1, rect: 1, image: 1},
         ovalTypes = {circle: 1, ellipse: 1},
         path2vml = function (path) {
-            var total =  /[ahqstv]/ig,
+            let total =  /[ahqstv]/ig,
                 command = R._pathToAbsolute;
             Str(path).match(total) && (command = R._path2curve);
             total = /[clmz]/g;
             if (command == R._pathToAbsolute && !Str(path).match(total)) {
-                var res = Str(path).replace(bites, function (all, command, args) {
-                    var vals = [],
+                let res = Str(path).replace(bites, function (all, command, args) {
+                    let vals = [],
                         isMove = command.toLowerCase() == "m",
                         res = map[command];
                     args.replace(val, function (value) {
@@ -46,13 +46,13 @@ define(["./raphael.core"], function(R) {
                 });
                 return res;
             }
-            var pa = command(path), p, r;
+            let pa = command(path), p, r;
             res = [];
             for (var i = 0, ii = pa.length; i < ii; i++) {
                 p = pa[i];
                 r = pa[i][0].toLowerCase();
                 r == "z" && (r = "x");
-                for (var j = 1, jj = p.length; j < jj; j++) {
+                for (let j = 1, jj = p.length; j < jj; j++) {
                     r += round(p[j] * zoom) + (j != jj - 1 ? "," : E);
                 }
                 res.push(r);
@@ -60,7 +60,7 @@ define(["./raphael.core"], function(R) {
             return res.join(S);
         },
         compensation = function (deg, dx, dy) {
-            var m = R.matrix();
+            let m = R.matrix();
             m.rotate(-deg, .5, .5);
             return {
                 dx: m.x(dx, dy),
@@ -68,7 +68,7 @@ define(["./raphael.core"], function(R) {
             };
         },
         setCoords = function (p, sx, sy, dx, dy, deg) {
-            var _ = p._,
+            let _ = p._,
                 m = p.matrix,
                 fillpos = _.fillpos,
                 o = p.node,
@@ -85,7 +85,7 @@ define(["./raphael.core"], function(R) {
             o.coordsize = abs(kx) + S + abs(ky);
             s.rotation = deg * (sx * sy < 0 ? -1 : 1);
             if (deg) {
-                var c = compensation(deg, dx, dy);
+                let c = compensation(deg, dx, dy);
                 dx = c.dx;
                 dy = c.dy;
             }
@@ -94,7 +94,7 @@ define(["./raphael.core"], function(R) {
             s.flip = flip;
             o.coordorigin = (dx * -kx) + S + (dy * -ky);
             if (fillpos || _.fillsize) {
-                var fill = o.getElementsByTagName(fillString);
+                let fill = o.getElementsByTagName(fillString);
                 fill = fill && fill[0];
                 o.removeChild(fill);
                 if (fillpos) {
@@ -111,8 +111,8 @@ define(["./raphael.core"], function(R) {
     R.toString = function () {
         return  "Your browser doesn\u2019t support SVG. Falling down to VML.\nYou are running Rapha\xebl " + this.version;
     };
-    var addArrow = function (o, value, isEnd) {
-        var values = Str(value).toLowerCase().split("-"),
+    let addArrow = function (o, value, isEnd) {
+        let values = Str(value).toLowerCase().split("-"),
             se = isEnd ? "end" : "start",
             i = values.length,
             type = "classic",
@@ -134,7 +134,7 @@ define(["./raphael.core"], function(R) {
                 case "short": w = values[i]; break;
             }
         }
-        var stroke = o.node.getElementsByTagName("stroke")[0];
+        let stroke = o.node.getElementsByTagName("stroke")[0];
         stroke[se + "arrow"] = type;
         stroke[se + "arrowlength"] = w;
         stroke[se + "arrowwidth"] = h;
@@ -142,7 +142,7 @@ define(["./raphael.core"], function(R) {
     setFillAndStroke = function (o, params) {
         // o.paper.canvas.style.display = "none";
         o.attrs = o.attrs || {};
-        var node = o.node,
+        let node = o.node,
             a = o.attrs,
             s = node.style,
             xy,
@@ -151,7 +151,7 @@ define(["./raphael.core"], function(R) {
             res = o;
 
 
-        for (var par in params) if (params[has](par)) {
+        for (let par in params) if (params[has](par)) {
             a[par] = params[par];
         }
         if (newpath) {
@@ -174,7 +174,7 @@ define(["./raphael.core"], function(R) {
         }
         "transform" in params && o.transform(params.transform);
         if (isOval) {
-            var cx = +a.cx,
+            let cx = +a.cx,
                 cy = +a.cy,
                 rx = +a.rx || +a.r || 0,
                 ry = +a.ry || +a.r || 0;
@@ -182,11 +182,11 @@ define(["./raphael.core"], function(R) {
             o._.dirty = 1;
         }
         if ("clip-rect" in params) {
-            var rect = Str(params["clip-rect"]).split(separator);
+            let rect = Str(params["clip-rect"]).split(separator);
             if (rect.length == 4) {
                 rect[2] = +rect[2] + (+rect[0]);
                 rect[3] = +rect[3] + (+rect[1]);
-                var div = node.clipRect || R._g.doc.createElement("div"),
+                let div = node.clipRect || R._g.doc.createElement("div"),
                     dstyle = div.style;
                 dstyle.clip = R.format("rect({1}px {2}px {3}px {0}px)", rect);
                 if (!node.clipRect) {
@@ -205,7 +205,7 @@ define(["./raphael.core"], function(R) {
             }
         }
         if (o.textpath) {
-            var textpathStyle = o.textpath.style;
+            let textpathStyle = o.textpath.style;
             params.font && (textpathStyle.font = params.font);
             params["font-family"] && (textpathStyle.fontFamily = '"' + params["font-family"].split(",")[0].replace(/^['"]+|['"]+$/g, E) + '"');
             params["font-size"] && (textpathStyle.fontSize = params["font-size"]);
@@ -229,7 +229,7 @@ define(["./raphael.core"], function(R) {
             params["stroke-miterlimit"] != null ||
             params["stroke-linejoin"] != null ||
             params["stroke-linecap"] != null) {
-            var fill = node.getElementsByTagName(fillString),
+            let fill = node.getElementsByTagName(fillString),
                 newfill = false;
             fill = fill && fill[0];
             !fill && (newfill = fill = createNode(fillString));
@@ -241,13 +241,13 @@ define(["./raphael.core"], function(R) {
                 fill.on = false;
             }
             if (fill.on && params.fill) {
-                var isURL = Str(params.fill).match(R._ISURL);
+                let isURL = Str(params.fill).match(R._ISURL);
                 if (isURL) {
                     fill.parentNode == node && node.removeChild(fill);
                     fill.rotate = true;
                     fill.src = isURL[1];
                     fill.type = "tile";
-                    var bbox = o.getBBox(1);
+                    let bbox = o.getBBox(1);
                     fill.position = bbox.x + S + bbox.y;
                     o._.fillpos = [bbox.x, bbox.y];
 
