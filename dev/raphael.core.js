@@ -883,7 +883,7 @@ define(["eve"], function(eve) {
             case "inherit":
             case "initial":
             case "unset":
-            case "revert:":
+            case "revert":
             case "revert-layer":
                 return {r: -1, g: -1, b: -1, hex: "none", toString: clrToString};
         !(hsrg[has](colour.toLowerCase().substring(0, 2)) || colour.charAt() == "#") && (colour = toHex(colour));
