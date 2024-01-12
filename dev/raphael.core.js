@@ -877,9 +877,15 @@ define(["eve"], function(eve) {
         if (!colour || !!((colour = Str(colour)).indexOf("-") + 1)) {
             return {r: -1, g: -1, b: -1, hex: "none", error: 1, toString: clrToString};
         }
-        if (colour == "none") {
-            return {r: -1, g: -1, b: -1, hex: "none", toString: clrToString};
-        }
+        switch (colour) {
+            case "none":
+            case "transparent":
+            case "inherit":
+            case "initial":
+            case "unset":
+            case "revert:":
+            case "revert-layer":
+                return {r: -1, g: -1, b: -1, hex: "none", toString: clrToString};
         !(hsrg[has](colour.toLowerCase().substring(0, 2)) || colour.charAt() == "#") && (colour = toHex(colour));
         var res,
             red,
